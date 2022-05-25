@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (c) 2021-2022 T-Systems International GmbH
+
+    See the AUTHORS file(s) distributed with this work for additional
+    information regarding authorship.
+
+    This program and the accompanying materials are made available under the
+    terms of the Apache License, Version 2.0 which is available at
+    https://www.apache.org/licenses/LICENSE-2.0.
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations
+    under the License.
+
+    SPDX-License-Identifier: Apache-2.0
+-->
+
+<!-- Maven POM file to the SLDT packages -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+    <!-- SLDT modules are based on Spring Boot as the Dependency Injection/Plumbing framework -->
+	<parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.5.13</version> <!-- need to be repeated in properties section for technical purposes -->
+        <relativePath/> <!-- lookup parent from repository and not the filesystem -->
+    </parent>
+
+	<groupId>org.eclipse.tractusx</groupId>
+	<artifactId>digital-twin-registry</artifactId>
+	<version>1.3.0-SNAPSHOT</version>
+	<name>Tractus-X Semantic Layer Digital Twin Registry</name>
+	<description>Root Module of the Tractus-X Semantic Layer Digital Twin Registry</description>
+	<packaging>pom</packaging>
+
+	<organization>
+		<name>${organization}</name>
+		<url>${url}</url>
+	</organization>
+
+	<licenses>
+		<license>
+			<name>${licence_name}</name>
+			<url>${licence_url}</url>
+			<distribution>${licence_distribution}</distribution>
+			<comments>${licence_comments}</comments>
+		</license>
+	</licenses>
+
+	<properties>
+		<!-- project properties -->
+		<organization>Tractus-X project</organization>
+		<url>https://projects.eclipse.org/projects/automotive.tractusx</url>
+		<email>tractusx-dev@eclipse.org</email>
+		<licence_name>Apache License, Version 2.0</licence_name>
+		<licence_url>https://www.apache.org/licenses/LICENSE-2.0.txt</licence_url>
+		<licence_distribution>repo</licence_distribution>
+		<licence_comments>An Eclipse Project</licence_comments>
+		<!-- build properties -->
+		<java.version>11</java.version>
+		<maven.minimum.version>3.3.9</maven.minimum.version>
+
+		<!-- version properties -->
+		<!-- framework and base stuff -->
+		<spring.boot.version>2.5.13</spring.boot.version>
+		<spring.cloud.version>2020.0.3</spring.cloud.version>
+		<spring.version>5.3.12</spring.version>
+		<spring.feign.version>3.0.5</spring.feign.version>
+		<springdoc.version>1.6.6</springdoc.version>
+		<springfox.version>2.9.2</springfox.version>
+		<collection-utlis.version>4.4</collection-utlis.version>
+		<lombok.version>1.18.22</lombok.version>
+		<javax-annotation-api.version>1.3.2</javax-annotation-api.version>
+		<swagger-annotations.version>1.5.20</swagger-annotations.version>
+		<swagger-core-version>2.0.0</swagger-core-version>
+		<guava.version>31.0.1-jre</guava.version>
+		<vavr.version>0.10.3</vavr.version>
+		<commons-io.version>2.11.0</commons-io.version>
+		<google.findbugs.version>3.0.2</google.findbugs.version>
+
+		<!-- logging -->
+		<slf4j.version>1.7.32</slf4j.version>
+		<logback.version>1.2.11</logback.version>
+
+		<!-- communication -->
+		<httpcomponents.version>4.5.13</httpcomponents.version>
+		<feign-version>11.7</feign-version>
+		<feign-form-version>2.1.0</feign-form-version>
+		<ids-framework.version>4.0.3</ids-framework.version>
+		<edc.version>0.0.1-SNAPSHOT</edc.version>
+		<javax.servlet>4.0.1</javax.servlet>
+
+		<!-- json, xml, formats, ... -->
+		<jackson.version>2.13.1</jackson.version>
+		<json.version>20211205</json.version>
+		<!-- authentication -->
+		<oltu-version>1.0.2</oltu-version>
+
+		<!-- semantics -->
+		<bamm.version>1.0.0</bamm.version>
+		<bamm.sdk.version>1.0.2</bamm.sdk.version>
+		<jena.version>4.2.0</jena.version>
+		<shacl.version>1.3.1</shacl.version>
+
+		<!-- persistence -->
+		<mapstruct.version>1.4.2.Final</mapstruct.version>
+		<mapstruct.lombok.version>0.2.0</mapstruct.lombok.version>
+		<postgresql.version>42.2.25</postgresql.version>
+		<h2.version>2.1.210</h2.version>
+		<liquibase.version>4.9.1</liquibase.version>
+
+		<!-- test libs -->
+		<assertj.version>3.18.1</assertj.version>
+		<junit.version>5.6.3</junit.version>
+
+		<!-- build -->
+		<maven.compiler.version>3.8.1</maven.compiler.version>
+	</properties>
+
+	<modules>
+		<module>backend</module>
+      <!-- more modules are expected to come -->
+    </modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- Predefined potential dependencies and versions -->
+			<!-- Java Stuff -->
+			<dependency>
+				<groupId>javax.annotation</groupId>
+				<artifactId>javax.annotation-api</artifactId>
+				<version>${javax-annotation-api.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>${lombok.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>${guava.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.vavr</groupId>
+				<artifactId>vavr</artifactId>
+				<version>${vavr.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>${commons-io.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>javax.servlet-api</artifactId>
+				<version>${javax.servlet}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.code.findbugs</groupId>
+				<artifactId>jsr305</artifactId>
+				<version>${google.findbugs.version}</version>
+			</dependency>
+			<!-- Framework -->
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring.cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-web</artifactId>
+				<version>${spring.boot.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-starter-logging</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-starter-tomcat</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-test</artifactId>
+				<version>${spring.boot.version}</version>
+				<scope>test</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-starter-logging</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
+			<!-- logging -->
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-simple</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+				<version>${logback.version}</version>
+			</dependency>
+
+			<!-- spring -->
+			<dependency>
+			  <groupId>org.springframework.cloud</groupId>
+			  <artifactId>spring-cloud-starter-openfeign</artifactId>
+			  <version>${spring.feign.version}</version>
+		    </dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-test</artifactId>
+				<version>${spring.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-data-jpa</artifactId>
+				<version>${spring.boot.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-starter-logging</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-webmvc</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+
+			<!-- Open API Stuff -->
+			<dependency>
+				<groupId>org.springdoc</groupId>
+				<artifactId>springdoc-openapi-ui</artifactId>
+				<version>${springdoc.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger2</artifactId>
+				<version>${springfox.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger-ui</artifactId>
+				<version>${springfox.version}</version>
+				<scope>runtime</scope>
+			</dependency>
+
+			<!-- Communication -->
+			<dependency>
+				<groupId>io.swagger.core.v3</groupId>
+				<artifactId>swagger-annotations</artifactId>
+				<version>${swagger-core-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.swagger</groupId>
+				<artifactId>swagger-annotations</artifactId>
+				<version>${swagger-annotations.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openapitools</groupId>
+				<artifactId>jackson-databind-nullable</artifactId>
+				<version>0.1.0</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.openfeign</groupId>
+				<artifactId>feign-core</artifactId>
+				<version>${feign-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.openfeign</groupId>
+				<artifactId>feign-jackson</artifactId>
+				<version>${feign-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.openfeign</groupId>
+				<artifactId>feign-slf4j</artifactId>
+				<version>${feign-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.openfeign.form</groupId>
+				<artifactId>feign-form</artifactId>
+				<version>${feign-form-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>${httpcomponents.version}</version>
+			</dependency>
+
+			<!-- Formats -->
+			<dependency>
+				<groupId>com.fasterxml.jackson.datatype</groupId>
+				<artifactId>jackson-datatype-jsr310</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
+
+			<!-- Authentication -->
+			<dependency>
+				<groupId>org.apache.oltu.oauth2</groupId>
+				<artifactId>org.apache.oltu.oauth2.client</artifactId>
+				<version>${oltu-version}</version>
+			</dependency>
+
+			<!-- Persistence Mapping -->
+			<dependency>
+				<groupId>org.mapstruct</groupId>
+				<artifactId>mapstruct</artifactId>
+				<version>${mapstruct.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.liquibase</groupId>
+				<artifactId>liquibase-core</artifactId>
+				<version>${liquibase.version}</version>
+			</dependency>
+
+			<!-- Persistence -->
+			<dependency>
+				<groupId>org.postgresql</groupId>
+				<artifactId>postgresql</artifactId>
+				<version>${postgresql.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.h2database</groupId>
+				<artifactId>h2</artifactId>
+				<version>${h2.version}</version>
+			</dependency>
+
+			<!-- Semantics Libraries -->
+			<dependency>
+				<groupId>io.openmanufacturing</groupId>
+				<artifactId>sds-aspect-meta-model</artifactId>
+				<version>${bamm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.openmanufacturing</groupId>
+				<artifactId>sds-aspect-model-starter</artifactId>
+				<version>${bamm.sdk.version}</version>
+			</dependency>			
+			<dependency>
+				<groupId>org.apache.jena</groupId>
+				<artifactId>jena-core</artifactId>
+				<version>${jena.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.jena</groupId>
+				<artifactId>jena-arq</artifactId>
+				<version>${jena.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.jena</groupId>
+				<artifactId>jena-fuseki-main</artifactId>
+				<version>${jena.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.jena</groupId>
+				<artifactId>jena-querybuilder</artifactId>
+				<version>${jena.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.topbraid</groupId>
+				<artifactId>shacl</artifactId>
+				<version>${shacl.version}</version>
+			</dependency>
+
+			<!-- Test -->
+			<dependency>
+				<groupId>org.assertj</groupId>
+				<artifactId>assertj-core</artifactId>
+				<version>${assertj.version}</version>
+				<scope>test</scope>
+			</dependency>			
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter</artifactId>
+				<version>${junit.version}</version>
+				<scope>test</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>${maven.compiler.version}</version>
+					<configuration>
+						<source>${java.version}</source>
+						<target>${java.version}</target>
+						<!--<release>${java.version}</release>-->
+						<annotationProcessorPaths>
+							<path>
+								<groupId>org.projectlombok</groupId>
+								<artifactId>lombok</artifactId>
+								<version>${lombok.version}</version>
+							</path>
+							<path>
+								<groupId>org.mapstruct</groupId>
+								<artifactId>mapstruct-processor</artifactId>
+								<version>${mapstruct.version}</version>
+							</path>
+							<path>
+								<groupId>org.projectlombok</groupId>
+								<artifactId>lombok-mapstruct-binding</artifactId>
+								<version>${mapstruct.lombok.version}</version>
+							</path>
+						</annotationProcessorPaths>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>io.github.git-commit-id</groupId>
+					<artifactId>git-commit-id-maven-plugin</artifactId>
+					<version>5.0.0</version>
+					<executions>
+						<execution>
+							<id>get-the-git-infos</id>
+							<goals>
+								<goal>revision</goal>
+							</goals>
+							<phase>initialize</phase>
+						</execution>
+					</executions>
+					<configuration>
+						<generateGitPropertiesFile>true</generateGitPropertiesFile>
+						<generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+						<includeOnlyProperties>
+							<includeOnlyProperty>^git.build.(time|version)$</includeOnlyProperty>
+							<includeOnlyProperty>^git.commit.id.(abbrev|full)$</includeOnlyProperty>
+						</includeOnlyProperties>
+						<commitIdGenerationMode>full</commitIdGenerationMode>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-maven-plugin</artifactId>
+					<version>${spring.boot.version}</version>
+					<configuration>
+						<requiresUnpack>
+							<dependency>
+								<groupId>org.asciidoctor</groupId>
+								<artifactId>asciidoctorj</artifactId>
+							</dependency>
+						</requiresUnpack>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>3.0.0-M5</version>
+					<configuration>
+						<systemPropertyVariables>
+							<propertyName>licence_type</propertyName>
+							<propertyName>licence_url</propertyName>
+							<propertyName>licence_distribution</propertyName>
+							<buildDirectory>${project.build.directory}</buildDirectory>
+						</systemPropertyVariables>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>2.8.2</version>
+					<configuration>
+						<skip>true</skip>
+					</configuration>
+				</plugin>
+				<plugin>
+				<groupId>org.openapitools</groupId>
+				<artifactId>openapi-generator-maven-plugin</artifactId>
+				<version>5.4.0</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<repositories>
+		<repository>
+			<id>Maven Central</id>
+			<name>maven-central</name>
+			<url>https://repo1.maven.org/maven2/</url>
+		</repository>
+		<repository>
+			<id>ids-fraunhofer</id>
+			<name>ids fraunhofer repository</name>
+			<url>https://maven.iais.fraunhofer.de/artifactory/eis-ids-public/</url>
+		</repository>
+	</repositories>
+</project>

@@ -1,0 +1,366 @@
+###############################################################
+# Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
+# Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache License, Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0.
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+###############################################################
+
+databaseChangeLog:
+  - changeSet:
+      id: 27012022-01
+      author: fmisir
+      changes:
+        - createTable:
+            tableName: SHELL
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: ID_EXTERNAL
+                  type: nvarchar(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ID_SHORT
+                  type: nvarchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: CREATED_DATE
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: LAST_MODIFIED_DATE
+                  type: timestamp
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            columnNames: ID_EXTERNAL
+            constraintName: SHELL_AK_01
+            tableName: SHELL
+            validate: true
+  - changeSet:
+      id: 27012022-02
+      author: fmisir
+      changes:
+        - createTable:
+            tableName: SHELL_IDENTIFIER
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: KEY
+                  type: nvarchar(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: VALUE
+                  type: nvarchar(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SHELL_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+             columnNames:  KEY, FK_SHELL_ID
+             constraintName:  SHELL_IDENTIFIER_AK_01
+             tableName:  SHELL_IDENTIFIER
+             validate:  true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_IDENTIFIER
+            baseColumnNames: FK_SHELL_ID
+            constraintName: SHELL_IDENTIFIER_FK_SHELL
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL
+            validate: true
+  - changeSet:
+      id: 27012022-03
+      author: fmisir
+      changes:
+        - createTable:
+            tableName: SHELL_DESCRIPTION
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: LANGUAGE
+                  type: nvarchar(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: TEXT
+                  type: nvarchar(500)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SHELL_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            columnNames:  LANGUAGE, FK_SHELL_ID
+            constraintName:  SHELL_DESCRIPTION_AK_01
+            tableName:  SHELL_DESCRIPTION
+            validate:  true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_DESCRIPTION
+            baseColumnNames: FK_SHELL_ID
+            constraintName: SHELL_DESCRIPTION_FK_SHELL
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL
+            validate: true
+  - changeSet:
+      id: 27012022-04
+      author: fmisir
+      changes:
+        - createTable:
+            tableName: SUBMODEL
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: ID_EXTERNAL
+                  type: nvarchar(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ID_SHORT
+                  type: nvarchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: SEMANTIC_ID
+                  type: nvarchar(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SHELL_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            columnNames: ID_EXTERNAL, FK_SHELL_ID
+            constraintName: SUBMODEL_SHELL_AK_01
+            tableName: SUBMODEL
+            validate: true
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL
+            baseColumnNames: FK_SHELL_ID
+            constraintName: SUBMODEL_FK_SHELL_ID
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL
+            validate: true
+  - changeSet:
+      id: 27012022-05
+      author: fmisir
+      changes:
+        - createTable:
+            tableName: SUBMODEL_DESCRIPTION
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: LANGUAGE
+                  type: nvarchar(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: TEXT
+                  type: nvarchar(500)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SUBMODEL_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            columnNames: LANGUAGE, FK_SUBMODEL_ID
+            constraintName: SM_DESCRIPTION_AK_01
+            tableName: SUBMODEL_DESCRIPTION
+            validate: true
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_DESCRIPTION
+            baseColumnNames: FK_SUBMODEL_ID
+            constraintName: SM_DESCRIPTION_FK_SM
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL
+            validate: true
+  - changeSet:
+      id: 27012022-06
+      author: fmisir
+      changes:
+        - createTable:
+            tableName: SUBMODEL_ENDPOINT
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: INTERFACE_NAME
+                  type: nvarchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ENDPOINT_ADDRESS
+                  type: nvarchar(300)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ENDPOINT_PROTOCOL
+                  type: nvarchar(50)
+              - column:
+                  name: ENDPOINT_PROTOCOL_VERSION
+                  type: nvarchar(10)
+              - column:
+                  name: SUB_PROTOCOL
+                  type: nvarchar(50)
+              - column:
+                  name: SUB_PROTOCOL_BODY
+                  type: nvarchar(50)
+              - column:
+                  name: SUB_PROTOCOL_BODY_ENCODING
+                  type: nvarchar(50)
+              - column:
+                  name: FK_SUBMODEL_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_ENDPOINT
+            baseColumnNames: FK_SUBMODEL_ID
+            constraintName: SM_ENDPOINT_FK_SM
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL
+            validate: true
+  - changeSet:
+      id: 21022022-01
+      author: cjung7
+      comment: 'Adapt to H2 latest version (which does not allow "KEY" and "VALUE" as column names) and introduce multiple global asset ids'
+      changes:
+        -  modifyDataType:
+             tableName: SUBMODEL_ENDPOINT
+             columnName:  ENDPOINT_ADDRESS
+             newDataType:  VARCHAR(512)
+        - renameColumn:
+            tableName: SHELL_IDENTIFIER
+            newColumnName: NAMESPACE
+            oldColumnName: KEY
+        - renameColumn:
+            tableName: SHELL_IDENTIFIER
+            newColumnName: IDENTIFIER
+            oldColumnName: VALUE
+        - addColumn:
+            tableName: SHELL_IDENTIFIER
+            columns:
+              - column:
+                  name: IS_UNIQUE
+                  type: BOOLEAN
+                  defaultValue: false
+  - changeSet:
+      id: 22022022-01
+      author: fmisir
+      changes:
+        - createIndex:
+            tableName: SHELL_IDENTIFIER
+            indexName:  SHELL_IDENTIFIER_IX01
+            columns:
+              - column:
+                  name: NAMESPACE
+              - column:
+                  name: IDENTIFIER
+  - changeSet:
+      id: 02032022-01
+      author: fmisir
+      changes:
+        - dropUniqueConstraint:
+            tableName: SHELL_IDENTIFIER
+            constraintName: SHELL_IDENTIFIER_AK_01
+            uniqueColumns: KEY, FK_SHELL_ID
+  - changeSet:
+      id: 10032022-01
+      author: cjung7
+      changes:
+        -  modifyDataType:
+             tableName: SUBMODEL_ENDPOINT
+             columnName:  INTERFACE_NAME
+             newDataType:  NVARCHAR(512)
+        -  modifyDataType:
+             tableName: SUBMODEL_ENDPOINT
+             columnName:  ENDPOINT_PROTOCOL_VERSION
+             newDataType:  nvarchar(24)
+  - changeSet:
+      id: 12042022-01
+      author: fmisir
+      changes:
+        - dropUniqueConstraint:
+            tableName: SUBMODEL
+            uniqueColumns: ID_EXTERNAL, FK_SHELL_ID
+            constraintName: SUBMODEL_SHELL_AK_01
+        - addUniqueConstraint:
+            columnNames: ID_EXTERNAL
+            constraintName: SUBMODEL_AK_01
+            tableName: SUBMODEL
+            validate: true
+  - changeSet:
+      id: 20042022-01
+      author: fmisir
+      changes:
+        - dropColumn:
+            tableName: SHELL_IDENTIFIER
+            columnName: IS_UNIQUE
