@@ -1,0 +1,1294 @@
+###############################################################
+# Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
+# Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache License, Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0.
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+###############################################################
+
+# Plattform_i40-Registry-and-Discovery-Final-Draft-resolved.yaml
+# https://app.swaggerhub.com/apis/Plattform_i40/Registry-and-Discovery/Final-Draft#/info
+---
+openapi: 3.0.3
+info:
+  title: DotAAS Part 2 | HTTP/REST | Registry and Discovery
+  description: The registry and discovery interface as part of Details of the Asset Administration Shell Part 2
+  termsOfService: https://github.com/admin-shell-io/aas-specs
+  contact:
+    name: Michael Hoffmeister, Torben Miny, Andreas Orzelski, Manuel Sauer, Constantin Ziesche
+  version: Final-Draft
+
+servers:
+- url: ./
+
+security:
+  - CatenaXOpenId:
+      - profile
+
+paths:
+  /registry/shell-descriptors:
+    get:
+      tags:
+      - Registry and Discovery Interface
+      summary: Returns all Asset Administration Shell Descriptors
+      operationId: GetAllAssetAdministrationShellDescriptors
+      parameters:
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            description: The page to return
+            default: 0
+        - in: query
+          name: pageSize
+          required: false
+          schema:
+            type: integer
+            enum:
+              - 10
+              - 50
+              - 100
+            default: 10
+            description: Size of the pages that the results should be partitioned in
+      responses:
+        "200":
+          description: Requested Asset Administration Shell Descriptors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetAdministrationShellDescriptorCollection'
+              examples:
+                complete:
+                  $ref: '#/components/examples/complete-asset-administration-shell-collection'
+      x-semanticIds:
+      - https://admin-shell.io/aas/API/GetAllAssetAdministrationShellDescriptors/1/0/RC02
+    post:
+      tags:
+      - Registry and Discovery Interface
+      summary: Creates a new Asset Administration Shell Descriptor, i.e. registers an AAS
+      operationId: PostAssetAdministrationShellDescriptor
+      requestBody:
+        description: Asset Administration Shell Descriptor object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssetAdministrationShellDescriptor'
+            examples:
+              complete:
+                $ref: '#/components/examples/complete-asset-administration-shell-descriptor'
+              minimal:
+                $ref: '#/components/examples/minimal-asset-administration-shell-descriptor'
+        required: true
+      responses:
+        "201":
+          description: Asset Administration Shell Descriptor created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetAdministrationShellDescriptor'
+              examples:
+                complete:
+                  $ref: '#/components/examples/complete-asset-administration-shell-descriptor'
+                minimal:
+                  $ref: '#/components/examples/minimal-asset-administration-shell-descriptor'
+      x-semanticIds:
+      - https://admin-shell.io/aas/API/PostAssetAdministrationShellDescriptor/1/0/RC02
+  /registry/shell-descriptors/batch:
+    post:
+      tags:
+        - Registry and Discovery Interface
+      summary: Creates multiple Asset Administration Shell Descriptors.
+      operationId: PostBatchAssetAdministrationShellDescriptor
+      requestBody:
+        description: Asset Administration Shell Descriptor object
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/AssetAdministrationShellDescriptor'
+            examples:
+              complete:
+                $ref: '#/components/examples/asset-administration-shell-descriptor-batch'
+        required: true
+      responses:
+        "201":
+          description: Asset Administration Shells in batch created successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BatchResult'
+              examples:
+                complete:
+                  $ref: '#/components/examples/asset-administration-shell-descriptor-batch-result'
+      x-semanticIds:
+        - https://admin-shell.io/aas/API/PostAssetAdministrationShellDescriptor/1/0/RC02
+  /registry/shell-descriptors/fetch:
+    post:
+      tags:
+        - Registry and Discovery Interface
+      summary: Returns shell descriptors for the given identifications.
+      operationId: PostFetchAssetAdministrationShellDescriptor
+      requestBody:
+        description: Asset Administration Shell Descriptor object
+        content:
+          application/json:
+            schema:
+              type: array
+              minLength: 1
+              items:
+                $ref: '#/components/schemas/Identifier'
+            examples:
+              complete:
+                $ref: '#/components/examples/asset-administration-shell-descriptor-fetch-request'
+        required: true
+      responses:
+        "201":
+          description: Asset Administration Shell Descriptors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetAdministrationShellDescriptorCollectionBase'
+              examples:
+                complete:
+                  $ref: '#/components/examples/asset-administration-shell-descriptor-fetch-result'
+      x-semanticIds:
+        - https://admin-shell.io/aas/API/PostAssetAdministrationShellDescriptor/1/0/RC02
+  /registry/shell-descriptors/{aasIdentifier}:
+    get:
+      tags:
+      - Registry and Discovery Interface
+      summary: Returns a specific Asset Administration Shell Descriptor
+      operationId: GetAssetAdministrationShellDescriptorById
+      parameters:
+      - name: aasIdentifier
+        in: path
+        description: The Asset Administration Shell’s unique id (BASE64-URL-encoded)
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Requested Asset Administration Shell Descriptor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetAdministrationShellDescriptor'
+              examples:
+                complete:
+                  $ref: '#/components/examples/complete-submodel-descriptor'
+      x-semanticIds:
+      - https://admin-shell.io/aas/API/GetAssetAdministrationShellDescriptorById/1/0/RC02
+    put:
+      tags:
+      - Registry and Discovery Interface
+      summary: Updates an existing Asset Administration Shell Descriptor
+      operationId: PutAssetAdministrationShellDescriptorById
+      parameters:
+      - name: aasIdentifier
+        in: path
+        description: The Asset Administration Shell’s unique id (BASE64-URL-encoded)
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Asset Administration Shell Descriptor object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssetAdministrationShellDescriptor'
+            examples:
+              complete:
+                $ref: '#/components/examples/complete-submodel-descriptor'
+              minimal:
+                $ref: '#/components/examples/minimal-submodel-descriptor'
+        required: true
+      responses:
+        "204":
+          description: Asset Administration Shell Descriptor updated successfully
+      x-semanticIds:
+      - https://admin-shell.io/aas/API/PutAssetAdministrationShellDescriptorById/1/0/RC02
+    delete:
+      tags:
+      - Registry and Discovery Interface
+      summary: Deletes an Asset Administration Shell Descriptor, i.e. de-registers an AAS
+      operationId: DeleteAssetAdministrationShellDescriptorById
+      parameters:
+      - name: aasIdentifier
+        in: path
+        description: The Asset Administration Shell’s unique id (BASE64-URL-encoded)
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Asset Administration Shell Descriptor deleted successfully
+      x-semanticIds:
+      - https://admin-shell.io/aas/API/DeleteAssetAdministrationShellDescriptorById/1/0/RC02
+  /registry/shell-descriptors/{aasIdentifier}/submodel-descriptors:
+    get:
+      tags:
+      - Registry and Discovery Interface
+      summary: Returns all Submodel Descriptors
+      operationId: GetAllSubmodelDescriptors
+      parameters:
+      - name: aasIdentifier
+        in: path
+        description: The Asset Administration Shell’s unique id (BASE64-URL-encoded)
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Requested Submodel Descriptors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubmodelDescriptor'
+              examples:
+                collection:
+                  $ref: '#/components/examples/submodel-descriptor-collection'
+      x-semanticIds:
+      - https://admin-shell.io/aas/API/GetAllSubmodelDescriptors/1/0/RC02
+    post:
+      tags:
+      - Registry and Discovery Interface
+      summary: Creates a new Submodel Descriptor, i.e. registers a submodel
+      operationId: PostSubmodelDescriptor
+      parameters:
+      - name: aasIdentifier
+        in: path
+        description: The Asset Administration Shell’s unique id (BASE64-URL-encoded)
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Submodel Descriptor object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmodelDescriptor'
+            examples:
+              complete:
+                $ref: '#/components/examples/complete-submodel-descriptor'
+              minimal:
+                $ref: '#/components/examples/minimal-submodel-descriptor'
+        required: true
+      responses:
+        "201":
+          description: Submodel Descriptor created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmodelDescriptor'
+              examples:
+                complete:
+                  $ref: '#/components/examples/complete-asset-administration-shell-descriptor'
+                minimal:
+                  $ref: '#/components/examples/minimal-asset-administration-shell-descriptor'
+      x-semanticIds:
+      - https://admin-shell.io/aas/API/PostSubmodelDescriptor/1/0/RC02
+  /registry/shell-descriptors/{aasIdentifier}/submodel-descriptors/{submodelIdentifier}:
+    get:
+      tags:
+      - Registry and Discovery Interface
+      summary: Returns a specific Submodel Descriptor
+      operationId: GetSubmodelDescriptorById
+      parameters:
+      - name: aasIdentifier
+        in: path
+        description: The Asset Administration Shell’s unique id (BASE64-URL-encoded)
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: submodelIdentifier
+        in: path
+        description: The Submodel’s unique id (BASE64-URL-encoded)
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Requested Submodel Descriptor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmodelDescriptor'
+              examples:
+                complete:
+                  $ref: '#/components/examples/complete-submodel-descriptor'
+                minimal:
+                  $ref: '#/components/examples/minimal-submodel-descriptor'
+      x-semanticIds:
+      - https://admin-shell.io/aas/API/GetSubmodelDescriptorById/1/0/RC02
+    put:
+      tags:
+      - Registry and Discovery Interface
+      summary: Updates an existing Submodel Descriptor
+      operationId: PutSubmodelDescriptorById
+      parameters:
+      - name: aasIdentifier
+        in: path
+        description: The Asset Administration Shell’s unique id (BASE64-URL-encoded)
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: submodelIdentifier
+        in: path
+        description: The Submodel’s unique id (BASE64-URL-encoded)
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Submodel Descriptor object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmodelDescriptor'
+            examples:
+              complete:
+                $ref: '#/components/examples/complete-submodel-descriptor'
+              minimal:
+                $ref: '#/components/examples/minimal-submodel-descriptor'
+        required: true
+      responses:
+        "204":
+          description: Submodel Descriptor updated successfully
+      x-semanticIds:
+      - https://admin-shell.io/aas/API/PutSubmodelDescriptorById/1/0/RC02
+    delete:
+      tags:
+      - Registry and Discovery Interface
+      summary: Deletes a Submodel Descriptor, i.e. de-registers a submodel
+      operationId: DeleteSubmodelDescriptorById
+      parameters:
+      - name: aasIdentifier
+        in: path
+        description: The Asset Administration Shell’s unique id (BASE64-URL-encoded)
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: submodelIdentifier
+        in: path
+        description: The Submodel’s unique id (BASE64-URL-encoded)
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Submodel Descriptor deleted successfully
+      x-semanticIds:
+      - https://admin-shell.io/aas/API/DeleteSubmodelDescriptorById/1/0/RC02
+  /lookup/shells:
+    get:
+      tags:
+      - Registry and Discovery Interface
+      summary: Returns a list of Asset Administration Shell ids based on Asset identifier key-value-pairs. Only the Shell ids are returned when all provided key-value pairs match.
+      operationId: GetAllAssetAdministrationShellIdsByAssetLink
+      parameters:
+      - name: assetIds
+        in: query
+        description: The key-value-pair of an Asset identifier
+        required: false
+       # The form style defined in the AAS API does not match with the provided example.
+       # the "content" is the correct way to accept json encoded query parameters
+       # style: form
+       # explode: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/IdentifierKeyValuePair'
+        examples:
+          complete:
+            $ref: '#/components/examples/lookup-shells-by-aas-identifier-query'
+      responses:
+        "200":
+          description: Requested Asset Administration Shell ids
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Identifier'
+              examples:
+                complete:
+                  $ref: '#/components/examples/lookup-shells-by-aas-identifier-response'
+      x-semanticIds:
+      - https://admin-shell.io/aas/API/GetAllAssetAdministrationShellIdsByAssetLink/1/0/RC02
+  /lookup/shells/{aasIdentifier}:
+    get:
+      tags:
+      - Registry and Discovery Interface
+      summary: Returns a list of Asset identifier key-value-pairs based on an Asset Administration Shell id to edit discoverable content
+      operationId: GetAllAssetLinksById
+      parameters:
+      - name: aasIdentifier
+        in: path
+        description: The Asset Administration Shell’s unique id (BASE64-URL-encoded)
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Requested Asset identifier key-value-pairs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IdentifierKeyValuePair'
+              examples:
+                complete:
+                  $ref: '#/components/examples/lookup-specific-asset-ids'
+      x-semanticIds:
+      - https://admin-shell.io/aas/API/GetAllAssetLinksById/1/0/RC02
+    post:
+      tags:
+      - Registry and Discovery Interface
+      summary: Creates all Asset identifier key-value-pair linked to an Asset Administration Shell to edit discoverable content
+      operationId: PostAllAssetLinksById
+      parameters:
+      - name: aasIdentifier
+        in: path
+        description: The Asset Administration Shell’s unique id (BASE64-URL-encoded)
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Asset identifier key-value-pairs
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/IdentifierKeyValuePair'
+            examples:
+              complete:
+                $ref: '#/components/examples/lookup-specific-asset-ids'
+        required: true
+      responses:
+        "201":
+          description: Asset identifier key-value-pairs created successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IdentifierKeyValuePair'
+              examples:
+                complete:
+                  $ref: '#/components/examples/lookup-specific-asset-ids'
+      x-semanticIds:
+      - https://admin-shell.io/aas/API/PostAllAssetLinksById/1/0/RC02
+    delete:
+      tags:
+      - Registry and Discovery Interface
+      summary: Deletes all Asset identifier key-value-pair linked to an Asset Administration Shell to edit discoverable content
+      operationId: DeleteAllAssetLinksById
+      parameters:
+      - name: aasIdentifier
+        in: path
+        description: The Asset Administration Shell’s unique id (BASE64-URL-encoded)
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Asset identifier key-value-pairs deleted successfully
+      x-semanticIds:
+      - https://admin-shell.io/aas/API/DeleteAllAssetLinksById/1/0/RC02
+  /lookup/shells/query:
+    post:
+      tags:
+        - Registry and Discovery Interface
+      summary: Returns a list of Asset Administration Shell ids based on Asset identifier key-value-pairs.
+      operationId: PostQueryAllAssetAdministrationShellIds
+      requestBody:
+        description: Asset Administration Shell Descriptor object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShellLookup'
+        required: true
+      responses:
+        "200":
+          description: Requested Asset Administration Shell ids
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Identifier'
+              examples:
+                complete:
+                  $ref: '#/components/examples/lookup-shells-by-aas-identifier-response'
+components:
+  schemas:
+    # The official spec does not support pagination right now. This is an addition.
+    AssetAdministrationShellDescriptorCollectionBase:
+      title: AssetAdministrationShellDescriptorCollectionBase
+      required:
+        - items
+      type: object
+      properties:
+        items:
+          title: Items
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetAdministrationShellDescriptor'
+    AssetAdministrationShellDescriptorCollection:
+      title: AssetAdministrationShellDescriptorCollection
+      allOf:
+        - $ref: '#/components/schemas/AssetAdministrationShellDescriptorCollectionBase'
+      required:
+        - totalItems
+        - currentPage
+        - totalPages
+        - itemCount
+      type: object
+      properties:
+        totalItems:
+          title: Totalitems
+          type: integer
+        currentPage:
+          title: Currentpage
+          type: integer
+        totalPages:
+          title: Totalpages
+          type: integer
+        itemCount:
+          title: Itemcount
+          type: integer
+    AssetAdministrationShellDescriptor:
+      required:
+      - identification
+      - idShort
+      type: object
+      properties:
+        administration:
+          $ref: '#/components/schemas/AdministrativeInformation'
+        description:
+          type: array
+          items:
+            $ref: '#/components/schemas/LangString'
+        globalAssetId:
+          $ref: '#/components/schemas/Reference'
+        idShort:
+          type: string
+          minLength: 1
+          maxLength: 100
+        identification:
+          $ref: '#/components/schemas/Identifier'
+        specificAssetIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifierKeyValuePair'
+        submodelDescriptors:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubmodelDescriptor'
+      allOf:
+      - $ref: '#/components/schemas/Descriptor'
+    Descriptor:
+      type: object
+      properties:
+        endpoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/Endpoint'
+      example: '{  "endpoints": [{ "protocolInformation": { "endpointAddress": "https://localhost:1234", "endpointProtocolVersion: "1.1"  }, "interface": "AAS-1.0"  }, { "protocolInformation": {  "endpointAddress": "opc.tcp://localhost:4840" },    "interface": "AAS-1.0" }, {  "protocolInformation": { "endpointAddress": "https://localhost:5678",  "endpointProtocolVersion: "1.1", "subprotocol": "OPC UA Basic SOAP", "subprotocolBody": "ns=2;s=MyAAS", "subprotocolBodyEncoding": "plain"  }, "interface": "AAS-1.0"  }] }'
+    Endpoint:
+      required:
+      - interface
+      - protocolInformation
+      type: object
+      properties:
+        interface:
+          type: string
+        protocolInformation:
+          $ref: '#/components/schemas/ProtocolInformation'
+    ProtocolInformation:
+      required:
+      - endpointAddress
+      type: object
+      properties:
+        endpointAddress:
+          type: string
+          minLength: 1
+          maxLength: 512
+        endpointProtocol:
+          type: string
+          minLength: 1
+          maxLength: 50
+        endpointProtocolVersion:
+          type: string
+          minLength: 1
+          maxLength: 24
+        subprotocol:
+          type: string
+          minLength: 1
+          maxLength: 50
+        subprotocolBody:
+          type: string
+          minLength: 1
+          maxLength: 50
+        subprotocolBodyEncoding:
+          type: string
+          minLength: 1
+          maxLength: 50
+    AdministrativeInformation:
+      type: object
+      properties:
+        revision:
+          type: string
+        version:
+          type: string
+    LangString:
+      required:
+      - language
+      - text
+      type: object
+      properties:
+        language:
+          type: string
+          minLength: 1
+          maxLength: 10
+        text:
+          type: string
+          minLength: 1
+          maxLength: 500
+    Reference:
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/GlobalReference'
+      #- $ref: '#/components/schemas/ModelReference'
+    GlobalReference:
+      required:
+      - value
+      properties:
+        value:
+          type: array
+          minItems: 1
+          maxItems: 1
+          items:
+            $ref: '#/components/schemas/Identifier'
+  # The code generator gets in issues, because it's somehow recursive. Reference has a reference ModelReference ..
+  #    allOf:
+  #    - $ref: '#/components/schemas/Reference'
+    Identifier:
+      type: string
+      minLength: 1
+      maxLength: 200
+    ModelReference:
+      required:
+      - keys
+      properties:
+      # not supported for Catena-X
+      #  referredSemanticId:
+       #   $ref: '#/components/schemas/Reference'
+        keys:
+          type: array
+          items:
+            $ref: '#/components/schemas/Key'
+  # The code generator gets in issues, because it's somehow recursive. Reference has a reference ModelReference ..
+  #    allOf:
+  #    - $ref: '#/components/schemas/Reference'
+    Key:
+      required:
+      - type
+      - value
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/KeyElements'
+        value:
+          type: string
+    KeyElements:
+      type: string
+      enum:
+      - AssetAdministrationShell
+      - AccessPermissionRule
+      - ConceptDescription
+      - Submodel
+      - AnnotatedRelationshipElement
+      - BasicEvent
+      - Blob
+      - Capability
+      - DataElement
+      - File
+      - Entity
+      - Event
+      - MultiLanguageProperty
+      - Operation
+      - Property
+      - Range
+      - ReferenceElement
+      - RelationshipElement
+      - SubmodelElement
+      - SubmodelElementList
+      - SubmodelElementStruct
+      - View
+      - FragmentReference
+    IdentifierKeyValuePair:
+      allOf:
+      - $ref: '#/components/schemas/HasSemantics'
+      - required:
+        - key
+        - value
+        properties:
+          key:
+            type: string
+            minLength: 1
+            maxLength: 200
+          # not supported for Catena-X
+          # subjectId:
+            # $ref: '#/components/schemas/Reference'
+          value:
+            type: string
+            minLength: 1
+            maxLength: 200
+    HasSemantics:
+      type: object
+      properties:
+        semanticId:
+          $ref: '#/components/schemas/Reference'
+    SubmodelDescriptor:
+      required:
+      - endpoints
+      - identification
+      # in the AAS Spec the semanticId is not required for submodels
+      # this does not make sense as it's the only way for consumers to know what kind of data an endpoint returns
+      - semanticId
+      type: object
+      properties:
+        administration:
+          $ref: '#/components/schemas/AdministrativeInformation'
+        description:
+          type: array
+          items:
+            $ref: '#/components/schemas/LangString'
+        idShort:
+          type: string
+          minLength: 1
+          maxLength: 100
+        identification:
+          $ref: '#/components/schemas/Identifier'
+        semanticId:
+          $ref: '#/components/schemas/Reference'
+      allOf:
+      - $ref: '#/components/schemas/Descriptor'
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          $ref: '#/components/schemas/Error'
+    Error:
+      type: object
+      required:
+        - details
+      properties:
+        message:
+          type: string
+          example: size must be between {min} and {max}
+          description: The detailed error message for the exception which occurred.
+          minLength: 1
+        path:
+          type: string
+          description: The requested path.
+          minLength: 1
+        details:
+          type: object
+          additionalProperties:
+            type: object
+          description: An object with key/value pairs containing additional information about the error.
+    BatchResult:
+      type: object
+      required:
+        - message
+        - identification
+        - status
+      properties:
+        message:
+          type: string
+          description: The detailed error message for the exception which occurred.
+        identification:
+          type: string
+          description: The requested path.
+        status:
+          type: integer
+          description: The status code
+    ShellLookup:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: object
+          properties:
+            assetIds:
+              type: array
+              items:
+                $ref: '#/components/schemas/IdentifierKeyValuePair'
+  securitySchemes:
+    CatenaXOpenId:
+      type: openIdConnect
+      openIdConnectUrl: ../.well-known/openid-configuration
+
+  examples:
+    minimal-asset-administration-shell-descriptor:
+      value:
+        {
+          "idShort": "future concept x",
+          "identification": "882fc530-b69b-4707-95f6-5dbc5e9baaa8"
+        }
+    complete-asset-administration-shell-descriptor:
+      value:
+        {
+          "description": [
+            {
+              "language": "en",
+              "text": "The shell for a vehicle"
+            }
+          ],
+          "globalAssetId": {
+            "value": [
+                "urn:uuid:882fc530-b69b-4707-95f6-5dbc5e9baaa8"
+            ]
+          },
+          "idShort": "future concept x",
+          "identification": "882fc530-b69b-4707-95f6-5dbc5e9baaa8",
+          "specificAssetIds": [
+            {
+              "key": "PartInstanceID",
+              "value": "24975539203421"
+            }
+          ],
+          "submodelDescriptors": [
+            {
+              "description": [
+                {
+                  "language": "en",
+                  "text": "Provides traceability information"
+                }
+              ],
+              "idShort": "traceability-info",
+              "identification": "4a738a24-b7d8-4989-9cd6-387772f40565",
+              "semanticId": {
+                "value": [
+                    "urn:bamm:com.catenax:0.0.1#Traceability"
+                ]
+              },
+              "endpoints": [
+                {
+                  "interface": "SUBMODEL-1.0RC02",
+                  "protocolInformation": {
+                    "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                    "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
+                    "endpointProtocolVersion": "0.0.1"
+                  }
+                }
+              ]
+            },
+            {
+              "description": [
+                {
+                  "language": "en",
+                  "text": "Provides base vehicle information"
+                }
+              ],
+              "idShort": "vehicle part details",
+              "identification": "dae4d249-6d66-4818-b576-bf52f3b9ae90",
+              "semanticId": {
+                "value": [
+                    "urn:bamm:com.catenax.vehicle:0.1.1#PartDetails"
+                ]
+              },
+              "endpoints": [
+                {
+                  "interface": "SUBMODEL-1.0RC02",
+                  "protocolInformation": {
+                    "endpointAddress": "edc://provider.connector:9191/offer-details/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/dae4d249-6d66-4818-b576-bf52f3b9ae90/submodel",
+                    "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
+                    "endpointProtocolVersion": "0.0.1"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+    complete-asset-administration-shell-collection:
+      value:
+        {
+          "items": [
+            {
+              "description": [
+                {
+                  "language": "en",
+                  "text": "The shell for a vehicle"
+                }
+              ],
+              "globalAssetId": {
+                "value": [
+                    "urn:uuid:882fc530-b69b-4707-95f6-5dbc5e9baaa8"
+                ]
+              },
+              "idShort": "future concept x",
+              "identification": "882fc530-b69b-4707-95f6-5dbc5e9baaa8",
+              "specificAssetIds": [
+                {
+                  "key": "PartInstanceID",
+                  "value": "24975539203421"
+                }
+              ],
+              "submodelDescriptors": [
+                {
+                  "description": [
+                    {
+                      "language": "en",
+                      "text": "Provides traceability information"
+                    }
+                  ],
+                  "idShort": "traceability-info",
+                  "identification": "4a738a24-b7d8-4989-9cd6-387772f40565",
+                  "semanticId": {
+                    "value": [
+                        "urn:bamm:com.catenax:0.0.1#Traceability"
+                    ]
+                  },
+                  "endpoints": [
+                    {
+                      "interface": "SUBMODEL-1.0RC02",
+                      "protocolInformation": {
+                        "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                        "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
+                        "endpointProtocolVersion": "0.0.1"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "idShort": "future concept x",
+              "identification": "459842bf-3466-4eb6-8d95-ef0557e64883"
+            }
+          ],
+          "totalItems": 2,
+          "currentPage": 0,
+          "totalPages": 1,
+          "itemCount": 2
+        }
+    asset-administration-shell-descriptor-fetch-result:
+      value:
+        {
+          "items": [
+            {
+              "description": [
+                {
+                  "language": "en",
+                  "text": "The shell for a vehicle"
+                }
+              ],
+              "globalAssetId": {
+                "value": [
+                    "urn:uuid:882fc530-b69b-4707-95f6-5dbc5e9baaa8"
+                ]
+              },
+              "idShort": "future concept x",
+              "identification": "882fc530-b69b-4707-95f6-5dbc5e9baaa8",
+              "specificAssetIds": [
+                {
+                  "key": "PartInstanceID",
+                  "value": "24975539203421"
+                }
+              ],
+              "submodelDescriptors": [
+                {
+                  "description": [
+                    {
+                      "language": "en",
+                      "text": "Provides traceability information"
+                    }
+                  ],
+                  "idShort": "traceability-info",
+                  "identification": "4a738a24-b7d8-4989-9cd6-387772f40565",
+                  "semanticId": {
+                    "value": [
+                        "urn:bamm:com.catenax:0.0.1#Traceability"
+                    ]
+                  },
+                  "endpoints": [
+                    {
+                      "interface": "SUBMODEL-1.0RC02",
+                      "protocolInformation": {
+                        "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                        "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
+                        "endpointProtocolVersion": "0.0.1"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "idShort": "future concept x",
+              "identification": "459842bf-3466-4eb6-8d95-ef0557e64883"
+            }
+          ]
+        }
+    asset-administration-shell-descriptor-fetch-request:
+       value:
+         [
+          "882fc530-b69b-4707-95f6-5dbc5e9baaa8",
+          "459842bf-3466-4eb6-8d95-ef0557e64883"
+         ]
+    asset-administration-shell-descriptor-batch:
+       value:
+        [
+          {
+            "identification": "5bed6107-24b7-4f47-a5e9-25a6d1acc836",
+            "idShort": "exampleShellShortId",
+            "description": [
+              {
+                "language": "en",
+                "text": "this is an example description"
+              },
+              {
+                "language": "de",
+                "text": "das ist ein beispiel"
+              }
+            ],
+            "globalAssetId": {
+              "value": [
+                  "urn:uuid:882fc530-b69b-4707-95f6-5dbc5e9baaa8"
+              ]
+            },
+            "specificAssetIds": [
+              {
+                "key": "VAN",
+                "value": "WEBFC102u30912"
+              }
+            ],
+            "submodelDescriptors": [
+              {
+                "description": [
+                  {
+                    "language": "en",
+                    "text": "Provides traceability information"
+                  }
+                ],
+                "idShort": "traceability-info",
+                "identification": "4a738a24-b7d8-4989-9cd6-387772f40565",
+                "semanticId": {
+                  "value": [
+                      "urn:bamm:com.catenax:0.0.1#Traceability"
+                  ]
+                },
+                "endpoints": [
+                  {
+                    "interface": "SUBMODEL-1.0RC02",
+                    "protocolInformation": {
+                      "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                      "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
+                      "endpointProtocolVersion": "0.0.1"
+                    }
+                  }
+                ]
+              },
+              {
+                "description": [
+                  {
+                    "language": "en",
+                    "text": "Provides traceability information"
+                  }
+                ],
+                "idShort": "traceability-info",
+                "identification": "4a738a24-b7d8-4989-9cd6-387772f40565",
+                "semanticId": {
+                  "value": [
+                      "urn:bamm:com.catenax:0.0.1#Traceability"
+                  ]
+                },
+                "endpoints": [
+                  {
+                    "interface": "SUBMODEL-1.0RC02",
+                    "protocolInformation": {
+                      "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                      "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
+                      "endpointProtocolVersion": "0.0.1"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "identification": "5bed6107-24b7-4f47-a5e9-25a6d1acc836",
+            "idShort": "exampleShellShortId"
+          }
+        ]
+    asset-administration-shell-descriptor-batch-result:
+      value:
+        [
+          {
+            "message": "AssetAdministrationShell successfully created.",
+            "identification": "5bed6107-24b7-4f47-a5e9-25a6d1acc836",
+            "status": 200
+          },
+          {
+            "message": "An AssetAdministrationShell for the given identification does already exists.",
+            "identification": "5bed6107-24b7-4f47-a5e9-25a6d1acc836",
+            "status": 400
+          }
+        ]
+    minimal-submodel-descriptor:
+      value:
+        {
+          "idShort": "traceability-info",
+          "identification": "4a738a24-b7d8-4989-9cd6-387772f40565",
+          "semanticId": {
+            "value": [
+                "urn:bamm:com.catenax:0.0.1#Traceability"
+            ]
+          },
+          "endpoints": [
+            {
+              "interface": "SUBMODEL-1.0RC02",
+              "protocolInformation": {
+                "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
+                "endpointProtocolVersion": "0.0.1"
+              }
+            }
+          ]
+        }
+    complete-submodel-descriptor:
+      value:
+        {
+          "description": [
+            {
+              "language": "en",
+              "text": "Provides traceability information"
+            }
+          ],
+          "idShort": "traceability-info",
+          "identification": "4a738a24-b7d8-4989-9cd6-387772f40565",
+          "semanticId": {
+            "value": [
+                "urn:bamm:com.catenax:0.0.1#Traceability"
+            ]
+          },
+          "endpoints": [
+            {
+              "interface": "SUBMODEL-1.0RC02",
+              "protocolInformation": {
+                "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
+                "endpointProtocolVersion": "0.0.1"
+              }
+            }
+          ]
+        }
+    submodel-descriptor-collection:
+      value:
+        [
+        {
+          "description": [
+            {
+              "language": "en",
+              "text": "Provides traceability information"
+            }
+          ],
+          "idShort": "traceability-info",
+          "identification": "4a738a24-b7d8-4989-9cd6-387772f40565",
+          "semanticId": {
+            "value": [
+                "urn:bamm:com.catenax:0.0.1#Traceability"
+            ]
+          },
+          "endpoints": [
+            {
+              "interface": "SUBMODEL-1.0RC02",
+              "protocolInformation": {
+                "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
+                "endpointProtocolVersion": "0.0.1"
+              }
+            }
+          ]
+        }
+        ]
+    lookup-shells-by-aas-identifier-query:
+      value:
+        [
+            {
+              "key" :   "globalAssetId",
+              "value" :  "urn:uuid:882fc530-b69b-4707-95f6-5dbc5e9baaa8"
+            },
+            {
+              "key": "PartInstanceID",
+              "value": "24975539203421"
+            }
+        ]
+    lookup-shells-by-aas-identifier-response:
+      value:
+        [
+          "882fc530-b69b-4707-95f6-5dbc5e9baaa8"
+        ]
+    lookup-specific-asset-ids:
+      value:
+        [
+          {
+            "key": "PartInstanceID",
+            "value": "24975539203421"
+          }
+        ]
