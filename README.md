@@ -20,7 +20,7 @@
 
 
 # Digital Twin Registry
-The Digital Twin Registry is a logical and architectural component of Catena-X.
+The Digital Twin Registry is a logical and architectural component of Tractus-X.
 The source code under this folder contains reference implementations of the SLDT Registry.
 
 ## Build Packages
