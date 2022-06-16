@@ -1,0 +1,40 @@
+name: gitleaks
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  gitleaks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+
+      - name: Run Gitleaks
+        id: gitleaks
+        uses: DariuszPorowski/github-action-gitleaks@v2
+        with:
+          report_format: "sarif"
+          fail: true
+          # config: "/.gitleaks/GitleaksUdmCombo.toml"
+
+      - name: Get the output from the gitleaks step
+        run: |
+          echo "exitcode: ${{ steps.gitleaks.outputs.exitcode }}"
+          echo "result: ${{ steps.gitleaks.outputs.result }}"
+          echo "output: ${{ steps.gitleaks.outputs.output }}"
+          echo "command: ${{ steps.gitleaks.outputs.command }}"
+          echo "report: ${{ steps.gitleaks.outputs.report }}"
+        if: always()
+
+      - name: Upload Gitleaks output as artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: gitleaks.sarif
+          path: ${{ steps.gitleaks.outputs.report }}
+        if: always()
+
+      - name: Upload SARIF report
+        if: always()
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: ${{ steps.gitleaks.outputs.report }}
