@@ -68,7 +68,7 @@
 		<spring.boot.version>2.5.14</spring.boot.version>
 		<spring.cloud.version>2020.0.3</spring.cloud.version>
 		<spring.version>5.3.12</spring.version>
-		<spring.feign.version>3.0.5</spring.feign.version>
+		<spring.feign.version>3.1.3</spring.feign.version>
 		<springdoc.version>1.6.6</springdoc.version>
 		<springfox.version>2.9.2</springfox.version>
 		<collection-utlis.version>4.4</collection-utlis.version>
@@ -218,6 +218,11 @@
 			  <artifactId>spring-cloud-starter-openfeign</artifactId>
 			  <version>${spring.feign.version}</version>
 		    </dependency>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-openfeign-core</artifactId>
+				<version>${spring.feign.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-test</artifactId>
