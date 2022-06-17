@@ -29,7 +29,7 @@ USER spring:spring
 
 WORKDIR /service
 
-COPY ./target/registry*.jar app.jar
+COPY ./target/digital-twin-registry-backend*.jar app.jar
 
 ENV JAVA_TOOL_OPTIONS "-Xms512m -Xmx2048m"
 EXPOSE 4243

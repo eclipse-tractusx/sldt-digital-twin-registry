@@ -31,7 +31,7 @@
     </parent>
 
     <groupId>org.eclipse.tractusx.digital_twin_registry</groupId>
-    <artifactId>backend</artifactId>
+    <artifactId>digital-twin-registry-backend</artifactId>
     <name>Tractus-X Semantic Layer Digital Twin Registry Backend</name>
     <description>Module contains the Semantic Layer Digital Twin Registry Service  Backend</description>
     <packaging>jar</packaging>
