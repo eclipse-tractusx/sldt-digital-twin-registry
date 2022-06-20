@@ -108,7 +108,7 @@
 		<!-- persistence -->
 		<mapstruct.version>1.4.2.Final</mapstruct.version>
 		<mapstruct.lombok.version>0.2.0</mapstruct.lombok.version>
-		<postgresql.version>42.2.25</postgresql.version>
+		<postgresql.version>42.3.6</postgresql.version>
 		<h2.version>2.1.210</h2.version>
 		<liquibase.version>4.9.1</liquibase.version>
 
