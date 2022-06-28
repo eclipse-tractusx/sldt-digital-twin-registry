@@ -31,7 +31,7 @@
 
 	<groupId>org.eclipse.tractusx</groupId>
 	<artifactId>digital-twin-registry</artifactId>
-	<version>1.3.0-SNAPSHOT</version>
+	<version>DEV-SNAPSHOT</version>
 	<name>Tractus-X Semantic Layer Digital Twin Registry</name>
 	<description>Root Module of the Tractus-X Semantic Layer Digital Twin Registry</description>
 	<packaging>pom</packaging>
@@ -480,9 +480,6 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-deploy-plugin</artifactId>
 					<version>2.8.2</version>
-					<configuration>
-						<skip>true</skip>
-					</configuration>
 				</plugin>
 				<plugin>
 				<groupId>org.openapitools</groupId>
@@ -499,10 +496,13 @@
 			<name>maven-central</name>
 			<url>https://repo1.maven.org/maven2/</url>
 		</repository>
-		<repository>
-			<id>ids-fraunhofer</id>
-			<name>ids fraunhofer repository</name>
-			<url>https://maven.iais.fraunhofer.de/artifactory/eis-ids-public/</url>
-		</repository>
 	</repositories>
+
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/eclipse-tractusx/sldt-digital-twin-registry</url>
+		</repository>
+  	</distributionManagement>
 </project>
