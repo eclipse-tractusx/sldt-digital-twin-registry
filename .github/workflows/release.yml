@@ -31,8 +31,9 @@ jobs:
       - name: Merge changes from main
         run: |
           git merge origin/main
-      - name: Adjust version
+      - name: Run tests and adjust version
         run: |
+          mvn clean package
           mvn versions:set -DnewVersion=${{ inputs.version }}
           mvn versions:commit
       - name: Create tag, commit and push
