@@ -46,5 +46,11 @@ public class RegistryProperties {
          */
         @NotEmpty(message = "public client id must not be empty")
         private String publicClientId;
+
+        /**
+         * The tenant id claim name in the jwt token.
+         */
+        @NotEmpty(message = "tenantId claimName must not be empty")
+        private String tenantIdClaimName;
     }
 }

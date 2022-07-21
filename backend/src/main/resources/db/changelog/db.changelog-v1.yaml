@@ -364,3 +364,16 @@ databaseChangeLog:
         - dropColumn:
             tableName: SHELL_IDENTIFIER
             columnName: IS_UNIQUE
+  - changeSet:
+      id: 21072022-01
+      author: fmisir
+      changes:
+        - addColumn:
+            tableName: SHELL
+            columns:
+              - column:
+                  name: TENANT_ID
+                  type: nvarchar(40)
+                  defaultValue: NO_OP_TENANT
+                  constraints:
+                    nullable: false

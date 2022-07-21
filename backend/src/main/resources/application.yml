@@ -52,6 +52,7 @@ spring:
 registry:
   idm:
     public-client-id: catenax-portal
+    tenant-id-claim-name: bpn
 
 springdoc:
   cache:

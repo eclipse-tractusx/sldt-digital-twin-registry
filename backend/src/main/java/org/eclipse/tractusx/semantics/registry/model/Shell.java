@@ -38,6 +38,7 @@ public class Shell {
     UUID id;
     String idExternal;
     String idShort;
+    String tenantId;
 
     @MappedCollection(idColumn = "fk_shell_id")
     Set<ShellIdentifier> identifiers;

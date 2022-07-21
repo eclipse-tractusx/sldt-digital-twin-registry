@@ -17,9 +17,9 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ********************************************************************************/
+package org.eclipse.tractusx.semantics.registry.security;
 
-package org.eclipse.tractusx.semantics;
-
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,11 +28,17 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @Profile("local")
 @Configuration
 public class LocalOauthSecurityConfig extends WebSecurityConfigurerAdapter {
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests(auth -> auth
                         .anyRequest().permitAll())
                 .csrf().disable();
+    }
+
+    @Bean
+    public TenantAware tenantAware(){
+        return new NoOpTenantAware();
     }
 }
