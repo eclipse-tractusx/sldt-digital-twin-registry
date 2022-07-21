@@ -48,6 +48,12 @@ spring:
       file-size-threshold: 2KB
   jackson:
     default-property-inclusion: non_null
+  # override this in environment variables
+  #security:
+  #  oauth2:
+  #    resourceserver:
+  #      jwt:
+  #        issuer-uri: "http://localhost:9090/auth/realms/CX-Central"
 
 registry:
   idm:
