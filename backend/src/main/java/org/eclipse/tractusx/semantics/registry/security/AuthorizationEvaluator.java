@@ -109,7 +109,7 @@ public class AuthorizationEvaluator implements TenantAware {
     public void ensureOwnership(String tenantId) {
         String tenantIdFromToken = getTenantId();
         if(!tenantId.equals(tenantIdFromToken)){
-            log.info("Tenant in token {} does not match tenant {} from resource. Access will be denied", tenantIdFromToken, tenantId);
+            log.info("Tenant from token {} does not match tenant {} from the resource. Access will be denied", tenantIdFromToken, tenantId);
             throw new AccessDeniedException("You are authorized to modify this resource.");
         }
     }
