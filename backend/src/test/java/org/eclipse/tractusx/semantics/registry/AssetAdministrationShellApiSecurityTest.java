@@ -33,8 +33,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  *  This class contains test to verify Authentication and RBAC based Authorization for all API endpoints.
@@ -308,6 +307,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     )
                     .andDo(MockMvcResultHandlers.print())
                     .andExpect(status().isCreated());
+
         }
 
         @Test
@@ -552,5 +552,120 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     .andExpect(jsonPath("$.items", hasSize(0)));
         }
 
+    }
+
+    @Nested
+    @DisplayName("Multi Tenancy Test")
+    class MultiTenancyTest{
+        private String shellId;
+        private String submodelId;
+
+        @BeforeEach
+        public void before() throws Exception{
+            ObjectNode shell = createShell();
+            performShellCreateRequest(toJson(shell));
+
+            ObjectNode submodel = createSubmodel("submodelIdPrefix");
+            performSubmodelCreateRequest(toJson(submodel), getId(shell));
+
+            shellId = getId(shell);
+            submodelId = getId(submodel);
+        }
+
+        @Test
+        public void testMultiTenancyForShell() throws Exception {
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .put(SINGLE_SHELL_BASE_PATH, shellId )
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(toJson(createShell()))
+                                    .with(jwtTokenFactory.tenantTwo().updateTwin())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isForbidden());
+
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .delete(SINGLE_SHELL_BASE_PATH, shellId )
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.tenantTwo().deleteTwin())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isForbidden());
+
+            // read is allowed for any tenant
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .get(SINGLE_SHELL_BASE_PATH, shellId )
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.tenantTwo().readTwin())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        public void testMultiTenancyForSubmodel() throws Exception {
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .put(SINGLE_SUB_MODEL_BASE_PATH, shellId, submodelId )
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(toJson(createSubmodel(submodelId)))
+                                    .with(jwtTokenFactory.tenantTwo().addTwin())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isForbidden());
+
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .delete(SINGLE_SUB_MODEL_BASE_PATH, shellId, submodelId )
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.tenantTwo().deleteTwin())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isForbidden());
+
+            // read is allowed for any tenant
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .get(SINGLE_SUB_MODEL_BASE_PATH, shellId, submodelId )
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.tenantTwo().readTwin())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        public void testMultiTenancyForSpecificAssetIds() throws Exception {
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .put(SINGLE_LOOKUP_SHELL_BASE_PATH, shellId )
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(toJson(specificAssetId("abc", "abc")))
+                                    .with(jwtTokenFactory.tenantTwo().addTwin())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isForbidden());
+
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .delete(SINGLE_LOOKUP_SHELL_BASE_PATH, shellId )
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.tenantTwo().deleteTwin())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isForbidden());
+
+            // read is allowed for any tenant
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .get(SINGLE_LOOKUP_SHELL_BASE_PATH, shellId )
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.tenantTwo().readTwin())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isOk());
+        }
     }
 }

@@ -31,6 +31,7 @@ import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
 import org.eclipse.tractusx.semantics.registry.model.Submodel;
+import org.eclipse.tractusx.semantics.registry.security.TenantAware;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -51,17 +52,21 @@ public class ShellService {
     private final ShellRepository shellRepository;
     private final ShellIdentifierRepository shellIdentifierRepository;
     private final SubmodelRepository submodelRepository;
+    private final TenantAware tenantAware;
 
-    public ShellService(ShellRepository shellRepository, ShellIdentifierRepository shellIdentifierRepository,
-                        SubmodelRepository submodelRepository) {
+    public ShellService(ShellRepository shellRepository,
+                        ShellIdentifierRepository shellIdentifierRepository,
+                        SubmodelRepository submodelRepository,
+                        TenantAware tenantAware) {
         this.shellRepository = shellRepository;
         this.shellIdentifierRepository = shellIdentifierRepository;
         this.submodelRepository = submodelRepository;
+        this.tenantAware = tenantAware;
     }
 
     @Transactional
     public Shell save(Shell shell) {
-        return shellRepository.save(shell);
+        return shellRepository.save(shell.withTenantId(tenantAware.getTenantId()));
     }
 
     @Transactional(readOnly = true)
@@ -101,17 +106,20 @@ public class ShellService {
     }
 
     @Transactional
-    public Shell update(String externalShellId, Shell shell){
+    public void update(String externalShellId, Shell shell){
         ShellMinimal shellFromDb = findShellMinimalByExternalId(externalShellId);
-        return shellRepository.save(
+        tenantAware.ensureOwnership(shellFromDb.getTenantId());
+        shellRepository.save(
                 shell.withId(shellFromDb.getId()).withCreatedDate(shellFromDb.getCreatedDate())
+                        .withTenantId(tenantAware.getTenantId())
         );
     }
 
     @Transactional
     public void deleteShell(String externalShellId) {
-        ShellMinimal shellId = findShellMinimalByExternalId(externalShellId);
-        shellRepository.deleteById(shellId.getId());
+        ShellMinimal shellFromDb = findShellMinimalByExternalId(externalShellId);
+        tenantAware.ensureOwnership(shellFromDb.getTenantId());
+        shellRepository.deleteById(shellFromDb.getId());
     }
 
     @Transactional(readOnly = true)
@@ -122,40 +130,45 @@ public class ShellService {
 
     @Transactional
     public void deleteAllIdentifiers(String externalShellId){
-        ShellMinimal shellId = findShellMinimalByExternalId(externalShellId);
-        shellIdentifierRepository.deleteShellIdentifiersByShellId(shellId.getId(), ShellIdentifier.GLOBAL_ASSET_ID_KEY);
+        ShellMinimal shellFromDb = findShellMinimalByExternalId(externalShellId);
+        tenantAware.ensureOwnership(shellFromDb.getTenantId());
+        shellIdentifierRepository.deleteShellIdentifiersByShellId(shellFromDb.getId(), ShellIdentifier.GLOBAL_ASSET_ID_KEY);
     }
 
     @Transactional
     public Set<ShellIdentifier> save(String externalShellId, Set<ShellIdentifier> shellIdentifiers){
-        ShellMinimal shellId = findShellMinimalByExternalId(externalShellId);
-        shellIdentifierRepository.deleteShellIdentifiersByShellId(shellId.getId(), ShellIdentifier.GLOBAL_ASSET_ID_KEY);
+        ShellMinimal shellFromDb = findShellMinimalByExternalId(externalShellId);
+        tenantAware.ensureOwnership(shellFromDb.getTenantId());
+        shellIdentifierRepository.deleteShellIdentifiersByShellId(shellFromDb.getId(), ShellIdentifier.GLOBAL_ASSET_ID_KEY);
 
-        List<ShellIdentifier> identifiersToUpdate = shellIdentifiers.stream().map(identifier -> identifier.withShellId(shellId.getId()))
+        List<ShellIdentifier> identifiersToUpdate = shellIdentifiers.stream().map(identifier -> identifier.withShellId(shellFromDb.getId()))
                 .collect(Collectors.toList());
         return ImmutableSet.copyOf(shellIdentifierRepository.saveAll(identifiersToUpdate));
     }
 
     @Transactional
     public Submodel save(String externalShellId, Submodel submodel){
-        ShellMinimal shellId = findShellMinimalByExternalId(externalShellId);
-        return submodelRepository.save(submodel.withShellId(shellId.getId()));
+        ShellMinimal shellFromDb = findShellMinimalByExternalId(externalShellId);
+        tenantAware.ensureOwnership(shellFromDb.getTenantId());
+        return submodelRepository.save(submodel.withShellId(shellFromDb.getId()));
     }
 
     @Transactional
-    public Submodel update(String externalShellId, String externalSubmodelId, Submodel submodel){
-        ShellMinimal shellId = findShellMinimalByExternalId(externalShellId);
-        SubmodelMinimal subModelId = findSubmodelMinimalByExternalId(shellId.getId(), externalSubmodelId);
-        return submodelRepository.save(submodel
+    public void update(String externalShellId, String externalSubmodelId, Submodel submodel){
+        ShellMinimal shellFromDb = findShellMinimalByExternalId(externalShellId);
+        tenantAware.ensureOwnership(shellFromDb.getTenantId());
+        SubmodelMinimal subModelId = findSubmodelMinimalByExternalId(shellFromDb.getId(), externalSubmodelId);
+        submodelRepository.save(submodel
                 .withId(subModelId.getId())
-                .withShellId(shellId.getId())
+                .withShellId(shellFromDb.getId())
         );
     }
 
     @Transactional
     public void deleteSubmodel(String externalShellId, String externalSubModelId) {
-        ShellMinimal shellId = findShellMinimalByExternalId(externalShellId);
-        SubmodelMinimal submodelId = findSubmodelMinimalByExternalId(shellId.getId(), externalSubModelId);
+        ShellMinimal shellFromDb = findShellMinimalByExternalId(externalShellId);
+        tenantAware.ensureOwnership(shellFromDb.getTenantId());
+        SubmodelMinimal submodelId = findSubmodelMinimalByExternalId(shellFromDb.getId(), externalSubModelId);
         submodelRepository.deleteById(submodelId.getId());
     }
 
@@ -184,9 +197,10 @@ public class ShellService {
      * @return the result of each save operation
      */
     public List<BatchResultDto> saveBatch(List<Shell> shells) {
+        String tenantId = tenantAware.getTenantId();
         return shells.stream().map(shell -> {
             try {
-                shellRepository.save(shell);
+                shellRepository.save(shell.withTenantId(tenantId));
                 return new BatchResultDto("AssetAdministrationShell successfully created.",
                         shell.getIdExternal(), HttpStatus.OK.value());
             } catch (Exception e){

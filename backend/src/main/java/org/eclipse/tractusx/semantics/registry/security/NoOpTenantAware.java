@@ -17,42 +17,15 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ********************************************************************************/
-package org.eclipse.tractusx.semantics.registry.model;
+package org.eclipse.tractusx.semantics.registry.security;
 
+public class NoOpTenantAware implements TenantAware{
 
-import lombok.Value;
-import lombok.With;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.relational.core.mapping.MappedCollection;
+    @Override
+    public String getTenantId() {
+        return "NO_OP_TENANT";
+    }
 
-import java.time.Instant;
-import java.util.Set;
-import java.util.UUID;
-
-@Value
-@With
-public class Shell {
-    @Id
-    UUID id;
-    String idExternal;
-    String idShort;
-    String tenantId;
-
-    @MappedCollection(idColumn = "fk_shell_id")
-    Set<ShellIdentifier> identifiers;
-
-    @MappedCollection(idColumn = "fk_shell_id")
-    Set<ShellDescription> descriptions;
-
-    @MappedCollection(idColumn = "fk_shell_id")
-    Set<Submodel> submodels;
-
-    @CreatedDate
-    Instant createdDate;
-
-    @LastModifiedDate
-    Instant lastModifiedDate;
-
+    @Override
+    public void ensureOwnership(String tenantId) {}
 }
