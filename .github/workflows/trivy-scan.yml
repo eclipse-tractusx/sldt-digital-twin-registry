@@ -1,0 +1,42 @@
+name: Trivy Scan
+
+on:
+  schedule:
+    - cron: 0 2 * * 0
+  workflow_dispatch:
+
+jobs:
+  analyze-registry:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      - name: Build JAR
+        run: mvn clean package
+      - name: Build Image
+        run: docker build -t registry ./backend
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: registry
+          # ignore-unfixed: true
+          exit-code: "1"
+          hide-progress: false
+          format: "sarif"
+          output: "trivy-results-registry.sarif"
+          severity: "CRITICAL,HIGH"
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v1
+        if: always()
+        with:
+          sarif_file: "trivy-results-registry.sarif"
