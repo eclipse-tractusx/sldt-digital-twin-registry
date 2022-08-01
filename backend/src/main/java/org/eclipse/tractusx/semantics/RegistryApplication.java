@@ -31,6 +31,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
+import org.springframework.security.web.server.authorization.AuthorizationContext;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -63,7 +64,7 @@ public class RegistryApplication {
 	}
 
 	@Bean
-	SpringDocConfiguration springDocConfiguration(){
+	public SpringDocConfiguration springDocConfiguration(){
 		return new SpringDocConfiguration();
 	}
 
@@ -73,15 +74,10 @@ public class RegistryApplication {
 	}
 
 	@Bean
-    public HttpFirewall allowUrlEncodedSlashHttpFirewall() {
-        StrictHttpFirewall firewall = new StrictHttpFirewall();
+	public HttpFirewall allowUrlEncodedSlashHttpFirewall() {
+		StrictHttpFirewall firewall = new StrictHttpFirewall();
 		firewall.setAllowUrlEncodedSlash(true);
-        return firewall;
-    }
-
-	@Bean
-	public AuthorizationEvaluator authorizationEvaluator(RegistryProperties registryProperties){
-		return new AuthorizationEvaluator(registryProperties.getIdm().getPublicClientId());
+		return firewall;
 	}
 
 	/**

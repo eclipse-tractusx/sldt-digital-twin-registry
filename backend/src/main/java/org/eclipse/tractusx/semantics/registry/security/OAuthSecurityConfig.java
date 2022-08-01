@@ -17,22 +17,27 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ********************************************************************************/
+package org.eclipse.tractusx.semantics.registry.security;
 
-package org.eclipse.tractusx.semantics;
-
+import org.eclipse.tractusx.semantics.RegistryProperties;
+import org.eclipse.tractusx.semantics.registry.security.AuthorizationEvaluator;
+import org.eclipse.tractusx.semantics.registry.security.JwtTenantIdValidator;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-
-import java.util.Collection;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
 @Profile("!local")
 @Configuration
@@ -70,5 +75,22 @@ public class OAuthSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
           .oauth2ResourceServer()
           .jwt();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public JwtDecoder jwtDecoder(RegistryProperties registryProps,
+                                 OAuth2ResourceServerProperties oauth2Props) {
+        String issuerUri = oauth2Props.getJwt().getIssuerUri();
+        NimbusJwtDecoder jwtDecoder = JwtDecoders.fromIssuerLocation(issuerUri);
+        OAuth2TokenValidator<Jwt> defaultIssuer = JwtValidators.createDefaultWithIssuer(issuerUri);
+        OAuth2TokenValidator<Jwt> tenantIdValidator = new JwtTenantIdValidator(registryProps.getIdm().getTenantIdClaimName());
+        jwtDecoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(defaultIssuer, tenantIdValidator));
+        return jwtDecoder;
+    }
+
+    @Bean
+    public AuthorizationEvaluator authorizationEvaluator(RegistryProperties registryProperties){
+        return new AuthorizationEvaluator(registryProperties.getIdm().getPublicClientId(), registryProperties.getIdm().getTenantIdClaimName());
     }
 }

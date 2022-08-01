@@ -33,8 +33,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  *  This class contains test to verify Authentication and RBAC based Authorization for all API endpoints.
@@ -308,6 +307,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     )
                     .andDo(MockMvcResultHandlers.print())
                     .andExpect(status().isCreated());
+
         }
 
         @Test
@@ -553,4 +553,5 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
         }
 
     }
+
 }
