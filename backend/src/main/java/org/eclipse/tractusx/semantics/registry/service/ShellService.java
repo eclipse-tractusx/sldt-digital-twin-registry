@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.semantics.registry.service;
 
 import com.google.common.collect.ImmutableSet;
-import org.eclipse.tractusx.semantics.aas.registry.model.IdentifierKeyValuePair;
+import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.registry.dto.BatchResultDto;
 import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
@@ -35,12 +35,10 @@ import org.eclipse.tractusx.semantics.registry.repository.SubmodelRepository;
 import org.eclipse.tractusx.semantics.registry.security.TenantAware;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,15 +54,18 @@ public class ShellService {
     private final ShellIdentifierRepository shellIdentifierRepository;
     private final SubmodelRepository submodelRepository;
     private final TenantAware tenantAware;
+    private final String owningTenantId;
 
     public ShellService(ShellRepository shellRepository,
                         ShellIdentifierRepository shellIdentifierRepository,
                         SubmodelRepository submodelRepository,
-                        TenantAware tenantAware) {
+                        TenantAware tenantAware,
+                        RegistryProperties registryProperties) {
         this.shellRepository = shellRepository;
         this.shellIdentifierRepository = shellIdentifierRepository;
         this.submodelRepository = submodelRepository;
         this.tenantAware = tenantAware;
+        this.owningTenantId = registryProperties.getIdm().getOwningTenantId();
     }
 
     @Transactional
@@ -98,6 +99,10 @@ public class ShellService {
     }
 
     private Set<ShellIdentifier> filterSpecificAssetIdsByTenantId(Set<ShellIdentifier> shellIdentifiers, String tenantId) {
+        // the owning tenant should always see all identifiers
+        if(tenantId.equals(owningTenantId)){
+            return shellIdentifiers;
+        }
         return shellIdentifiers.stream()
                 .filter(shellIdentifier -> shellIdentifier.getExternalSubjectId() == null ||
                         shellIdentifier.getExternalSubjectId().equals(tenantId)).collect(Collectors.toSet());
@@ -107,13 +112,13 @@ public class ShellService {
     public List<String> findExternalShellIdsByIdentifiersByExactMatch(Set<ShellIdentifier> shellIdentifiers) {
         List<String[]> keyValueCombinations = shellIdentifiers.stream().map(shellIdentifier -> new String[]{shellIdentifier.getKey(), shellIdentifier.getValue()}).collect(Collectors.toList());
         return shellRepository.findExternalShellIdsByIdentifiersByExactMatch(keyValueCombinations,
-                keyValueCombinations.size(), tenantAware.getTenantId());
+                keyValueCombinations.size(), tenantAware.getTenantId(), owningTenantId);
     }
 
     @Transactional(readOnly = true)
     public List<String> findExternalShellIdsByIdentifiersByAnyMatch(Set<ShellIdentifier> shellIdentifiers) {
         List<String[]> keyValueCombinations = shellIdentifiers.stream().map(shellIdentifier -> new String[]{shellIdentifier.getKey(), shellIdentifier.getValue()}).collect(Collectors.toList());
-        return shellRepository.findExternalShellIdsByIdentifiersByAnyMatch(keyValueCombinations, tenantAware.getTenantId());
+        return shellRepository.findExternalShellIdsByIdentifiersByAnyMatch(keyValueCombinations, tenantAware.getTenantId(), owningTenantId);
     }
 
     @Transactional(readOnly = true)

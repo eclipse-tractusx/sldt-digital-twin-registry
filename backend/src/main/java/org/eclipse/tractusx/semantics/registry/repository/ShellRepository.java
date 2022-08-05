@@ -57,14 +57,15 @@ public interface ShellRepository extends PagingAndSortingRepository<Shell, UUID>
                     "join (values :keyValueCombinations ) as t (input_key,input_value) " +
                     "ON si.namespace = input_key " +
                         "AND si.identifier = input_value " +
-                        "AND (si.external_subject_id is null or si.external_subject_id = :tenantId) " +
+                        "AND (si.external_subject_id is null or :tenantId = :owningTenantId or si.external_subject_id = :tenantId) " +
                     "group by si.fk_shell_id " +
                     "having count(*) = :keyValueCombinationsSize " +
             ")"
     )
     List<String> findExternalShellIdsByIdentifiersByExactMatch(@Param("keyValueCombinations") List<String[]> keyValueCombinations,
                                                    @Param("keyValueCombinationsSize") int keyValueCombinationsSize,
-                                                   @Param("tenantId") String tenantId);
+                                                   @Param("tenantId") String tenantId,
+                                                   @Param("owningTenantId") String owningTenantId);
 
     /**
      * Returns external shell ids for the given keyValueCombinations.
@@ -82,10 +83,11 @@ public interface ShellRepository extends PagingAndSortingRepository<Shell, UUID>
                     "join (values :keyValueCombinations ) as t (input_key,input_value) " +
                     "ON si.namespace = input_key " +
                         "AND si.identifier = input_value " +
-                        "AND (si.external_subject_id is null or si.external_subject_id = :tenantId) " +
+                        "AND (si.external_subject_id is null or :tenantId = :owningTenantId or si.external_subject_id = :tenantId) " +
                     "group by si.fk_shell_id " +
                     ")"
     )
     List<String> findExternalShellIdsByIdentifiersByAnyMatch(@Param("keyValueCombinations") List<String[]> keyValueCombinations,
-                                                             @Param("tenantId") String tenantId);
+                                                             @Param("tenantId") String tenantId,
+                                                             @Param("owningTenantId") String owningTenantId);
 }
