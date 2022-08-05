@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.semantics.registry.service;
 
 import com.google.common.collect.ImmutableSet;
+import org.eclipse.tractusx.semantics.aas.registry.model.IdentifierKeyValuePair;
 import org.eclipse.tractusx.semantics.registry.dto.BatchResultDto;
 import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
@@ -34,10 +35,12 @@ import org.eclipse.tractusx.semantics.registry.repository.SubmodelRepository;
 import org.eclipse.tractusx.semantics.registry.security.TenantAware;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,43 +73,56 @@ public class ShellService {
     }
 
     @Transactional(readOnly = true)
-    public Shell findShellByExternalId(String externalShellId){
+    public Shell findShellByExternalId(String externalShellId) {
         return shellRepository.findByIdExternal(externalShellId)
+                .map(shell -> shell.withIdentifiers(filterSpecificAssetIdsByTenantId(shell.getIdentifiers(), tenantAware.getTenantId())))
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Shell for identifier %s not found", externalShellId)));
     }
 
     @Transactional(readOnly = true)
-    public ShellCollectionDto findAllShells(int page, int pageSize){
+    public ShellCollectionDto findAllShells(int page, int pageSize) {
         Pageable pageable = PageRequest.of(page, pageSize, Sort.Direction.ASC, "createdDate");
-        Page<Shell> shellsPage = shellRepository.findAll(pageable);
+        Page<Shell> shellsPage = filterSpecificAssetIdsByTenantId(shellRepository.findAll(pageable));
         return ShellCollectionDto.builder()
                 .currentPage(pageable.getPageNumber())
-                .totalItems((int)shellsPage.getTotalElements())
+                .totalItems((int) shellsPage.getTotalElements())
                 .totalPages(shellsPage.getTotalPages())
                 .itemCount(shellsPage.getNumberOfElements())
                 .items(shellsPage.getContent())
                 .build();
     }
 
-    @Transactional(readOnly = true)
-    public List<String> findExternalShellIdsByIdentifiersByExactMatch(Set<ShellIdentifier> shellIdentifiers){
-        List<String[]> keyValueCombinations = shellIdentifiers.stream().map(shellIdentifier -> new String[]{shellIdentifier.getKey(), shellIdentifier.getValue()}).collect(Collectors.toList());
-        return shellRepository.findExternalShellIdsByIdentifiersByExactMatch(keyValueCombinations, keyValueCombinations.size());
+    private Page<Shell> filterSpecificAssetIdsByTenantId(Page<Shell> shells){
+        String tenantId = tenantAware.getTenantId();
+        return shells.map(shell ->  shell.withIdentifiers(filterSpecificAssetIdsByTenantId(shell.getIdentifiers(), tenantId)));
+    }
+
+    private Set<ShellIdentifier> filterSpecificAssetIdsByTenantId(Set<ShellIdentifier> shellIdentifiers, String tenantId) {
+        return shellIdentifiers.stream()
+                .filter(shellIdentifier -> shellIdentifier.getExternalSubjectId() == null ||
+                        shellIdentifier.getExternalSubjectId().equals(tenantId)).collect(Collectors.toSet());
     }
 
     @Transactional(readOnly = true)
-    public List<String> findExternalShellIdsByIdentifiersByAnyMatch(Set<ShellIdentifier> shellIdentifiers){
+    public List<String> findExternalShellIdsByIdentifiersByExactMatch(Set<ShellIdentifier> shellIdentifiers) {
         List<String[]> keyValueCombinations = shellIdentifiers.stream().map(shellIdentifier -> new String[]{shellIdentifier.getKey(), shellIdentifier.getValue()}).collect(Collectors.toList());
-        return shellRepository.findExternalShellIdsByIdentifiersByAnyMatch(keyValueCombinations);
+        return shellRepository.findExternalShellIdsByIdentifiersByExactMatch(keyValueCombinations,
+                keyValueCombinations.size(), tenantAware.getTenantId());
     }
 
     @Transactional(readOnly = true)
-    public List<Shell> findShellsByExternalShellIds(Set<String> externalShellIds){
+    public List<String> findExternalShellIdsByIdentifiersByAnyMatch(Set<ShellIdentifier> shellIdentifiers) {
+        List<String[]> keyValueCombinations = shellIdentifiers.stream().map(shellIdentifier -> new String[]{shellIdentifier.getKey(), shellIdentifier.getValue()}).collect(Collectors.toList());
+        return shellRepository.findExternalShellIdsByIdentifiersByAnyMatch(keyValueCombinations, tenantAware.getTenantId());
+    }
+
+    @Transactional(readOnly = true)
+    public List<Shell> findShellsByExternalShellIds(Set<String> externalShellIds) {
         return shellRepository.findShellsByIdExternalIsIn(externalShellIds);
     }
 
     @Transactional
-    public void update(String externalShellId, Shell shell){
+    public void update(String externalShellId, Shell shell) {
         ShellMinimal shellFromDb = findShellMinimalByExternalId(externalShellId);
         shellRepository.save(
                 shell.withId(shellFromDb.getId()).withCreatedDate(shellFromDb.getCreatedDate())
@@ -120,19 +136,19 @@ public class ShellService {
     }
 
     @Transactional(readOnly = true)
-    public Set<ShellIdentifier> findShellIdentifiersByExternalShellId(String externalShellId){
+    public Set<ShellIdentifier> findShellIdentifiersByExternalShellId(String externalShellId) {
         ShellMinimal shellId = findShellMinimalByExternalId(externalShellId);
-        return shellIdentifierRepository.findByShellId(shellId.getId());
+        return filterSpecificAssetIdsByTenantId(shellIdentifierRepository.findByShellId(shellId.getId()), tenantAware.getTenantId());
     }
 
     @Transactional
-    public void deleteAllIdentifiers(String externalShellId){
+    public void deleteAllIdentifiers(String externalShellId) {
         ShellMinimal shellFromDb = findShellMinimalByExternalId(externalShellId);
         shellIdentifierRepository.deleteShellIdentifiersByShellId(shellFromDb.getId(), ShellIdentifier.GLOBAL_ASSET_ID_KEY);
     }
 
     @Transactional
-    public Set<ShellIdentifier> save(String externalShellId, Set<ShellIdentifier> shellIdentifiers){
+    public Set<ShellIdentifier> save(String externalShellId, Set<ShellIdentifier> shellIdentifiers) {
         ShellMinimal shellFromDb = findShellMinimalByExternalId(externalShellId);
         shellIdentifierRepository.deleteShellIdentifiersByShellId(shellFromDb.getId(), ShellIdentifier.GLOBAL_ASSET_ID_KEY);
 
@@ -142,13 +158,13 @@ public class ShellService {
     }
 
     @Transactional
-    public Submodel save(String externalShellId, Submodel submodel){
+    public Submodel save(String externalShellId, Submodel submodel) {
         ShellMinimal shellFromDb = findShellMinimalByExternalId(externalShellId);
         return submodelRepository.save(submodel.withShellId(shellFromDb.getId()));
     }
 
     @Transactional
-    public void update(String externalShellId, String externalSubmodelId, Submodel submodel){
+    public void update(String externalShellId, String externalSubmodelId, Submodel submodel) {
         ShellMinimal shellFromDb = findShellMinimalByExternalId(externalShellId);
         SubmodelMinimal subModelId = findSubmodelMinimalByExternalId(shellFromDb.getId(), externalSubmodelId);
         submodelRepository.save(submodel
@@ -165,26 +181,27 @@ public class ShellService {
     }
 
     @Transactional(readOnly = true)
-    public Submodel findSubmodelByExternalId(String externalShellId, String externalSubModelId){
+    public Submodel findSubmodelByExternalId(String externalShellId, String externalSubModelId) {
         ShellMinimal shellIdByExternalId = findShellMinimalByExternalId(externalShellId);
         return submodelRepository
                 .findByShellIdAndIdExternal(shellIdByExternalId.getId(), externalSubModelId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Submodel for identifier %s not found.", externalSubModelId)));
     }
 
-    private SubmodelMinimal findSubmodelMinimalByExternalId(UUID shellId, String externalSubModelId ){
+    private SubmodelMinimal findSubmodelMinimalByExternalId(UUID shellId, String externalSubModelId) {
         return submodelRepository
                 .findMinimalRepresentationByShellIdAndIdExternal(shellId, externalSubModelId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Submodel for identifier %s not found.", externalSubModelId)));
     }
 
-    private ShellMinimal findShellMinimalByExternalId(String externalShellId){
+    private ShellMinimal findShellMinimalByExternalId(String externalShellId) {
         return shellRepository.findMinimalRepresentationByIdExternal(externalShellId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Shell for identifier %s not found", externalShellId)));
     }
 
     /**
      * Saves the provided shells. The transaction is scoped per shell. If saving of one shell fails others may succeed.
+     *
      * @param shells the shells to save
      * @return the result of each save operation
      */
@@ -194,10 +211,10 @@ public class ShellService {
                 shellRepository.save(shell);
                 return new BatchResultDto("AssetAdministrationShell successfully created.",
                         shell.getIdExternal(), HttpStatus.OK.value());
-            } catch (Exception e){
-                if(e.getCause() instanceof DuplicateKeyException){
+            } catch (Exception e) {
+                if (e.getCause() instanceof DuplicateKeyException) {
                     DuplicateKeyException duplicateKeyException = (DuplicateKeyException) e.getCause();
-                    return new BatchResultDto( DatabaseExceptionTranslation.translate(duplicateKeyException),
+                    return new BatchResultDto(DatabaseExceptionTranslation.translate(duplicateKeyException),
                             shell.getIdExternal(),
                             HttpStatus.BAD_REQUEST.value());
                 }

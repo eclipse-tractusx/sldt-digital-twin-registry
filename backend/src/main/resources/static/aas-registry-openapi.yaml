@@ -788,12 +788,12 @@ components:
             minLength: 1
             maxLength: 200
           # not supported for Catena-X
-          # subjectId:
-            # $ref: '#/components/schemas/Reference'
           value:
             type: string
             minLength: 1
             maxLength: 200
+          externalSubjectId:
+            $ref: '#/components/schemas/Reference'
     HasSemantics:
       type: object
       properties:

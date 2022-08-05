@@ -553,5 +553,4 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
         }
 
     }
-
 }
