@@ -32,3 +32,10 @@ spring:
 registry:
   idm:
     owning-tenant-id: TENANT_ONE
+
+logging:
+  level:
+    org:
+      springframework:
+        jdbc:
+          core: TRACE

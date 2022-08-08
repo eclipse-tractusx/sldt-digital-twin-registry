@@ -554,9 +554,21 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
     }
 
     /**
-     * The specificAssetId#externalSubjectId indicates which tenant is allowed to see the particular specificAssetId.
-     * This test ensures that tenantTwo is not able to see a specificAssetId#externalSubjectId that is set to tenantOne
-     * and vice versa.
+     * The specificAssetId#externalSubjectId indicates which tenant is allowed to see the specificAssetId and
+     * find a Shell.
+     *
+     * Given:
+     *  - Company A creates an AAS with multiple with: 1. one specificAssetId without externalSubjectId,
+     *                                                 2. one with externalSubjectId = Company B
+     *                                                 3. one with externalSubjectId = Company C
+     *
+     *   - Rules: When Company A requests the AAS, all specificAssetIds 1,2 and are shown. Company A is the owner of the AAS.
+     *               The AAS Registry has an environment property "owningTenantId" that is compared with the tenantId from the token.
+     *            When Company B requests the AAS, only specificAssetIds 1 and 2 are shown.
+     *            When Company C requests the AAS, only specificAssetIds 1 and 3 are shown.
+     *
+     *            The same logic applies also to the lookup endpoints.
+     *
      */
     @Nested
     @DisplayName("Tenant based specificAssetId visibility test")
@@ -701,9 +713,9 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             ObjectNode firstShellPayload = createBaseIdPayload("sampleForQuery", "idShortSampleForQuery");
             firstShellPayload.set("specificAssetIds", emptyArrayNode()
                     .add(specificAssetId(keyPrefix + "findExternalShellIdQueryKey_2", "value_2"))
-                    .add(specificAssetId(keyPrefix + "findExternalShellIdQueryKey_2_1", "value_2_2",
+                    .add(specificAssetId(keyPrefix + "findExternalShellIdQueryKey_2_1", "value_2_1",
                             jwtTokenFactory.tenantTwo().getTenantId()))
-                    .add(specificAssetId(keyPrefix + "findExternalShellIdQueryKey_2_2", "value_2_1",
+                    .add(specificAssetId(keyPrefix + "findExternalShellIdQueryKey_2_2", "value_2_2",
                             jwtTokenFactory.tenantThree().getTenantId())));
             performShellCreateRequest(toJson(firstShellPayload));
 
@@ -732,7 +744,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                                     .get(LOOKUP_SHELL_BASE_PATH)
                                     .queryParam("assetIds", toJson(specificAssetIdsWithTenantTwoIncluded))
                                     .accept(MediaType.APPLICATION_JSON)
-                                    .with(jwtTokenFactory.allRoles())
+                                    .with(jwtTokenFactory.tenantTwo().allRoles())
                     )
                     .andDo(MockMvcResultHandlers.print())
                     .andExpect(status().isOk())
