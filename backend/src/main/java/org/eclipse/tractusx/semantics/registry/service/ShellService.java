@@ -123,7 +123,10 @@ public class ShellService {
 
     @Transactional(readOnly = true)
     public List<Shell> findShellsByExternalShellIds(Set<String> externalShellIds) {
-        return shellRepository.findShellsByIdExternalIsIn(externalShellIds);
+        String tenantId = tenantAware.getTenantId();
+        return shellRepository.findShellsByIdExternalIsIn(externalShellIds).stream()
+                .map(shell ->  shell.withIdentifiers(filterSpecificAssetIdsByTenantId(shell.getIdentifiers(), tenantId)))
+                .collect(Collectors.toList());
     }
 
     @Transactional

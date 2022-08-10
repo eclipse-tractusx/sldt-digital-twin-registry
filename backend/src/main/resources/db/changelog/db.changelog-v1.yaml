@@ -374,3 +374,16 @@ databaseChangeLog:
               - column:
                   name: EXTERNAL_SUBJECT_ID
                   type: nvarchar(30)
+        - dropIndex:
+            tableName: SHELL_IDENTIFIER
+            indexName: SHELL_IDENTIFIER_IX01
+        - createIndex:
+            tableName: SHELL_IDENTIFIER
+            indexName:  SHELL_IDENTIFIER_IX01
+            columns:
+              - column:
+                  name: NAMESPACE
+              - column:
+                  name: IDENTIFIER
+              - column:
+                  name: EXTERNAL_SUBJECT_ID

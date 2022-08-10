@@ -617,7 +617,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
         }
 
         @Test
-        public void testGetShellPayloadWithFilteredSpecificAssetIdsByTenantId() throws Exception {
+        public void testGetShellWithFilteredSpecificAssetIdsByTenantId() throws Exception {
             ObjectNode shellPayload = createBaseIdPayload("example", "example");
             String tenantTwoAssetIdValue = "tenantTwofgkj12308410239401";
             String tenantThreeAssetIdValue = "tenantThree23408410293o42731";
@@ -652,6 +652,48 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     .andExpect(jsonPath("$.identification", equalTo(shellId)))
                     .andExpect(jsonPath("$.specificAssetIds[*].value", hasItems(tenantTwoAssetIdValue, withoutTenantAssetIdValue)))
                     .andExpect(jsonPath("$.specificAssetIds[*].value", not(hasItem(tenantThreeAssetIdValue))));
+        }
+
+        @Test
+        public void testFetchShellsWithFilteredSpecificAssetIdsByTenantId() throws Exception {
+            ObjectNode shellPayload = createBaseIdPayload("example", "example");
+            String tenantTwoAssetIdValue = "tenantTwofgkj129293";
+            String tenantThreeAssetIdValue = "tenantThree543412394";
+            String withoutTenantAssetIdValue = "withoutTenant329347192jf18";
+            shellPayload.set("specificAssetIds", emptyArrayNode()
+                    .add(specificAssetId("CustomerPartId", tenantTwoAssetIdValue,  jwtTokenFactory.tenantTwo().getTenantId()))
+                    .add(specificAssetId("CustomerPartId", tenantThreeAssetIdValue, jwtTokenFactory.tenantThree().getTenantId()))
+                    .add(specificAssetId("MaterialNumber",withoutTenantAssetIdValue))
+            );
+            performShellCreateRequest(toJson(shellPayload));
+            String shellId = getId(shellPayload);
+
+            ArrayNode queryPayload = emptyArrayNode().add(shellId);
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .post(SHELL_BASE_PATH + "/fetch")
+                                    .content(toJson(queryPayload))
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.allRoles())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.items[*].identification", hasItem(shellId)))
+                    .andExpect(jsonPath("$.items[*].specificAssetIds[*].value", hasItems(tenantTwoAssetIdValue,tenantThreeAssetIdValue, withoutTenantAssetIdValue)));
+
+            // test with tenant two
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .post(SHELL_BASE_PATH + "/fetch")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(toJson(queryPayload))
+                                    .with(jwtTokenFactory.tenantTwo().allRoles())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.items[*].identification", hasItem(shellId)))
+                    .andExpect(jsonPath("$.items[*].specificAssetIds[*].value", hasItems(tenantTwoAssetIdValue, withoutTenantAssetIdValue)))
+                    .andExpect(jsonPath("$.items[*].specificAssetIds[*].value", not(hasItem(tenantThreeAssetIdValue))));
         }
 
         @Test
