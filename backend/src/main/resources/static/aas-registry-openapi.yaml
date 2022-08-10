@@ -788,12 +788,12 @@ components:
             minLength: 1
             maxLength: 200
           # not supported for Catena-X
-          # subjectId:
-            # $ref: '#/components/schemas/Reference'
           value:
             type: string
             minLength: 1
             maxLength: 200
+          externalSubjectId:
+            $ref: '#/components/schemas/Reference'
     HasSemantics:
       type: object
       properties:
@@ -910,6 +910,20 @@ components:
             {
               "key": "PartInstanceID",
               "value": "24975539203421"
+            },
+            {
+              "key": "CustomerPartId",
+              "value": "231982",
+              "externalSubjectId" : {
+                "value": ["TENANT_TWO"]
+              }
+            },
+            {
+              "key": "CustomerPartId",
+              "value": "123829238",
+              "externalSubjectId": {
+                "value": [ "TENANT_THREE" ]
+              }
             }
           ],
           "submodelDescriptors": [
@@ -931,7 +945,7 @@ components:
                 {
                   "interface": "SUBMODEL-1.0RC02",
                   "protocolInformation": {
-                    "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                    "endpointAddress": "https://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
                     "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
                     "endpointProtocolVersion": "0.0.1"
                   }
@@ -956,7 +970,7 @@ components:
                 {
                   "interface": "SUBMODEL-1.0RC02",
                   "protocolInformation": {
-                    "endpointAddress": "edc://provider.connector:9191/offer-details/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/dae4d249-6d66-4818-b576-bf52f3b9ae90/submodel",
+                    "endpointAddress": "https://provider.connector:9191/offer-details/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/dae4d249-6d66-4818-b576-bf52f3b9ae90/submodel",
                     "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
                     "endpointProtocolVersion": "0.0.1"
                   }
@@ -1008,7 +1022,7 @@ components:
                     {
                       "interface": "SUBMODEL-1.0RC02",
                       "protocolInformation": {
-                        "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                        "endpointAddress": "https://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
                         "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
                         "endpointProtocolVersion": "0.0.1"
                       }
@@ -1070,7 +1084,7 @@ components:
                     {
                       "interface": "SUBMODEL-1.0RC02",
                       "protocolInformation": {
-                        "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                        "endpointAddress": "https://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
                         "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
                         "endpointProtocolVersion": "0.0.1"
                       }
@@ -1137,7 +1151,7 @@ components:
                   {
                     "interface": "SUBMODEL-1.0RC02",
                     "protocolInformation": {
-                      "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                      "endpointAddress": "https://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
                       "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
                       "endpointProtocolVersion": "0.0.1"
                     }
@@ -1162,7 +1176,7 @@ components:
                   {
                     "interface": "SUBMODEL-1.0RC02",
                     "protocolInformation": {
-                      "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                      "endpointAddress": "https://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
                       "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
                       "endpointProtocolVersion": "0.0.1"
                     }
@@ -1204,7 +1218,7 @@ components:
             {
               "interface": "SUBMODEL-1.0RC02",
               "protocolInformation": {
-                "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                "endpointAddress": "https://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
                 "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
                 "endpointProtocolVersion": "0.0.1"
               }
@@ -1231,7 +1245,7 @@ components:
             {
               "interface": "SUBMODEL-1.0RC02",
               "protocolInformation": {
-                "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                "endpointAddress": "https://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
                 "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
                 "endpointProtocolVersion": "0.0.1"
               }
@@ -1259,7 +1273,7 @@ components:
             {
               "interface": "SUBMODEL-1.0RC02",
               "protocolInformation": {
-                "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                "endpointAddress": "https://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
                 "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
                 "endpointProtocolVersion": "0.0.1"
               }

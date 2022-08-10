@@ -173,9 +173,17 @@ public abstract class AbstractAssetAdministrationShellApi {
     }
 
     protected ObjectNode specificAssetId(String key, String value) {
+       return specificAssetId(key, value, null);
+    }
+
+    protected ObjectNode specificAssetId(String key, String value, String tenantId){
         ObjectNode specificAssetId = mapper.createObjectNode();
         specificAssetId.put("key", key);
         specificAssetId.put("value", value);
+        if(tenantId != null){
+            specificAssetId.set("externalSubjectId", mapper.createObjectNode()
+                    .set("value", emptyArrayNode().add(tenantId) ));
+        }
         return specificAssetId;
     }
 

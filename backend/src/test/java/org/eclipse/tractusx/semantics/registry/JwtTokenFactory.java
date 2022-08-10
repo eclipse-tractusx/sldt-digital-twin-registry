@@ -20,7 +20,8 @@
 package org.eclipse.tractusx.semantics.registry;
 
 import com.nimbusds.jose.shaded.json.JSONArray;
-import org.eclipse.tractusx.semantics.AuthorizationEvaluator;
+import lombok.Value;
+import org.eclipse.tractusx.semantics.registry.security.AuthorizationEvaluator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -29,80 +30,129 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 
 public class JwtTokenFactory {
 
-    private String publicClientId;
+    private static final String TENANT_ONE = "TENANT_ONE";
+    private static final String TENANT_TWO = "TENANT_TWO";
+    private static final String TENANT_THREE = "TENANT_THREE";
 
-    public JwtTokenFactory(String publicClientId){
-        this.publicClientId = publicClientId;
+    private final Tenant tenantOne;
+    private final Tenant tenantTwo;
+    private final Tenant tenantThree;
+
+    public JwtTokenFactory(String publicClientId, String tenantIdClaimName){
+        this.tenantOne = new Tenant(publicClientId, tenantIdClaimName, TENANT_ONE);
+        this.tenantTwo = new Tenant(publicClientId, tenantIdClaimName, TENANT_TWO);
+        this.tenantThree = new Tenant(publicClientId, tenantIdClaimName, TENANT_THREE);
     }
-
-    private RequestPostProcessor authenticationWithRoles(String ... roles){
-        Jwt jwt = Jwt.withTokenValue("token")
-                .header("alg", "none")
-                .claim("sub", "user")
-                .claim("resource_access", Map.of(publicClientId, Map.of("roles", toJsonArray(roles) )))
-                .build();
-        Collection<GrantedAuthority> authorities = Collections.emptyList();
-        return authentication(new JwtAuthenticationToken(jwt, authorities));
-    }
-
-    private static JSONArray toJsonArray(String ... elements){
-        JSONArray jsonArray = new JSONArray();
-        for (String element : elements){
-            jsonArray.appendElement(element);
-        }
-        return jsonArray;
-    }
-
-
-
     public RequestPostProcessor allRoles(){
-        return authenticationWithRoles(
-                AuthorizationEvaluator.Roles.ROLE_VIEW_DIGITAL_TWIN,
-                AuthorizationEvaluator.Roles.ROLE_ADD_DIGITAL_TWIN,
-                AuthorizationEvaluator.Roles.ROLE_UPDATE_DIGITAL_TWIN,
-                AuthorizationEvaluator.Roles.ROLE_DELETE_DIGITAL_TWIN
-        );
+        return tenantOne.allRoles();
     }
 
     public RequestPostProcessor readTwin(){
-        return authenticationWithRoles(AuthorizationEvaluator.Roles.ROLE_VIEW_DIGITAL_TWIN);
+        return tenantOne.readTwin();
     }
 
     public RequestPostProcessor addTwin(){
-        return authenticationWithRoles(AuthorizationEvaluator.Roles.ROLE_ADD_DIGITAL_TWIN);
+        return tenantOne.addTwin();
     }
 
     public RequestPostProcessor updateTwin(){
-        return authenticationWithRoles(AuthorizationEvaluator.Roles.ROLE_UPDATE_DIGITAL_TWIN);
+        return tenantOne.updateTwin();
     }
 
     public RequestPostProcessor deleteTwin(){
-        return authenticationWithRoles(AuthorizationEvaluator.Roles.ROLE_DELETE_DIGITAL_TWIN);
+        return tenantOne.deleteTwin();
     }
 
     public RequestPostProcessor withoutResourceAccess(){
-        Jwt jwt = Jwt.withTokenValue("token")
-                .header("alg", "none")
-                .claim("sub", "user")
-                .build();
-        Collection<GrantedAuthority> authorities = Collections.emptyList();
-        return authentication(new JwtAuthenticationToken(jwt, authorities));
+        return tenantOne.withoutResourceAccess();
     }
 
     public RequestPostProcessor withoutRoles(){
-        Jwt jwt = Jwt.withTokenValue("token")
-                .header("alg", "none")
-                .claim("sub", "user")
-                .claim("resource_access", Map.of(publicClientId, new HashMap<String, String>()))
-                .build();
-        Collection<GrantedAuthority> authorities = Collections.emptyList();
-        return authentication(new JwtAuthenticationToken(jwt, authorities));
+        return tenantOne.withoutRoles();
+    }
+
+    public Tenant tenantTwo() {
+        return tenantTwo;
+    }
+    public Tenant tenantThree() {
+        return tenantThree;
+    }
+
+    @Value
+    public static class Tenant{
+        String publicClientId;
+        String tenantIdClaimName;
+        String tenantId;
+
+        public RequestPostProcessor allRoles(){
+            return authenticationWithRoles(tenantId,
+                    List.of(AuthorizationEvaluator.Roles.ROLE_VIEW_DIGITAL_TWIN,
+                            AuthorizationEvaluator.Roles.ROLE_ADD_DIGITAL_TWIN,
+                            AuthorizationEvaluator.Roles.ROLE_UPDATE_DIGITAL_TWIN,
+                            AuthorizationEvaluator.Roles.ROLE_DELETE_DIGITAL_TWIN)
+            );
+        }
+
+        public RequestPostProcessor readTwin(){
+            return authenticationWithRoles(tenantId, List.of(AuthorizationEvaluator.Roles.ROLE_VIEW_DIGITAL_TWIN));
+        }
+
+        public RequestPostProcessor addTwin(){
+            return authenticationWithRoles(tenantId, List.of(AuthorizationEvaluator.Roles.ROLE_ADD_DIGITAL_TWIN));
+        }
+
+        public RequestPostProcessor updateTwin(){
+            return authenticationWithRoles(tenantId,List.of(AuthorizationEvaluator.Roles.ROLE_UPDATE_DIGITAL_TWIN));
+        }
+
+        public RequestPostProcessor deleteTwin(){
+            return authenticationWithRoles(tenantId, List.of(AuthorizationEvaluator.Roles.ROLE_DELETE_DIGITAL_TWIN));
+        }
+
+        public RequestPostProcessor withoutResourceAccess(){
+            Jwt jwt = Jwt.withTokenValue("token")
+                    .header("alg", "none")
+                    .claim("sub", "user")
+                    .build();
+            Collection<GrantedAuthority> authorities = Collections.emptyList();
+            return authentication(new JwtAuthenticationToken(jwt, authorities));
+        }
+
+        public RequestPostProcessor withoutRoles(){
+            Jwt jwt = Jwt.withTokenValue("token")
+                    .header("alg", "none")
+                    .claim("sub", "user")
+                    .claim("resource_access", Map.of(publicClientId, new HashMap<String, String>()))
+                    .build();
+            Collection<GrantedAuthority> authorities = Collections.emptyList();
+            return authentication(new JwtAuthenticationToken(jwt, authorities));
+        }
+
+        private RequestPostProcessor authenticationWithRoles(String tenantId, List<String> roles){
+            Jwt jwt = Jwt.withTokenValue("token")
+                    .header("alg", "none")
+                    .claim("sub", "user")
+                    .claim("resource_access", Map.of(publicClientId, Map.of("roles", toJsonArray(roles) )))
+                    .claim(tenantIdClaimName, tenantId)
+                    .build();
+            Collection<GrantedAuthority> authorities = Collections.emptyList();
+            return authentication(new JwtAuthenticationToken(jwt, authorities));
+        }
+
+        private static JSONArray toJsonArray(List<String> elements){
+            JSONArray jsonArray = new JSONArray();
+            for (String element : elements){
+                jsonArray.appendElement(element);
+            }
+            return jsonArray;
+        }
     }
 
 }

@@ -31,6 +31,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import java.util.UUID;
 
+import static org.assertj.core.api.AssertionsForClassTypes.notIn;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -282,7 +283,6 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                     .andExpect(content().json(toJson(specificAssetIds)));
         }
 
-
         /**
          * The API method for creation of specificAssetIds accepts an array of objects.
          * Invoking the API removes all existing specificAssetIds and adds the new ones.
@@ -355,6 +355,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                     .andExpect(status().isOk())
                     .andExpect(content().json(toJson(shellPayload.get("specificAssetIds"))));
         }
+
 
         @Test
         public void testGetSpecificIdsExpectNotFound() throws Exception {
