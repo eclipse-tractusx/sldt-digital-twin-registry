@@ -39,13 +39,16 @@ public class JwtTokenFactory {
 
     private static final String TENANT_ONE = "TENANT_ONE";
     private static final String TENANT_TWO = "TENANT_TWO";
+    private static final String TENANT_THREE = "TENANT_THREE";
 
     private final Tenant tenantOne;
     private final Tenant tenantTwo;
+    private final Tenant tenantThree;
 
     public JwtTokenFactory(String publicClientId, String tenantIdClaimName){
         this.tenantOne = new Tenant(publicClientId, tenantIdClaimName, TENANT_ONE);
         this.tenantTwo = new Tenant(publicClientId, tenantIdClaimName, TENANT_TWO);
+        this.tenantThree = new Tenant(publicClientId, tenantIdClaimName, TENANT_THREE);
     }
     public RequestPostProcessor allRoles(){
         return tenantOne.allRoles();
@@ -75,11 +78,11 @@ public class JwtTokenFactory {
         return tenantOne.withoutRoles();
     }
 
-    public Tenant tenantOne() {
-        return tenantOne;
-    }
     public Tenant tenantTwo() {
         return tenantTwo;
+    }
+    public Tenant tenantThree() {
+        return tenantThree;
     }
 
     @Value

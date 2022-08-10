@@ -39,7 +39,10 @@ public interface ShellRepository extends PagingAndSortingRepository<Shell, UUID>
 
     /**
      * Returns external shell ids for the given keyValueCombinations.
-     * Only external shell ids that match all keyValueCombinations are returned.
+     * External shell ids matching the conditions below are returned:
+     *   - specificAssetIds match exactly the keyValueCombinations
+     *   - if externalSubjectId (tenantId) is not null it must match the tenantId
+     *
      *
      * To be able to properly index the key and value conditions, the query does not use any functions.
      * Computed indexes cannot be created for mutable functions like CONCAT in Postgres.
@@ -52,13 +55,17 @@ public interface ShellRepository extends PagingAndSortingRepository<Shell, UUID>
             "select s.id_external from shell s where s.id in (" +
                     "select si.fk_shell_id from shell_identifier si " +
                     "join (values :keyValueCombinations ) as t (input_key,input_value) " +
-                    "ON si.namespace = input_key AND si.identifier = input_value " +
+                    "ON si.namespace = input_key " +
+                        "AND si.identifier = input_value " +
+                        "AND (si.external_subject_id is null or :tenantId = :owningTenantId or si.external_subject_id = :tenantId) " +
                     "group by si.fk_shell_id " +
                     "having count(*) = :keyValueCombinationsSize " +
             ")"
     )
     List<String> findExternalShellIdsByIdentifiersByExactMatch(@Param("keyValueCombinations") List<String[]> keyValueCombinations,
-                                                   @Param("keyValueCombinationsSize") int keyValueCombinationsSize);
+                                                   @Param("keyValueCombinationsSize") int keyValueCombinationsSize,
+                                                   @Param("tenantId") String tenantId,
+                                                   @Param("owningTenantId") String owningTenantId);
 
     /**
      * Returns external shell ids for the given keyValueCombinations.
@@ -74,9 +81,13 @@ public interface ShellRepository extends PagingAndSortingRepository<Shell, UUID>
             "select distinct s.id_external from shell s where s.id in (" +
                     "select si.fk_shell_id from shell_identifier si " +
                     "join (values :keyValueCombinations ) as t (input_key,input_value) " +
-                    "ON si.namespace = input_key AND si.identifier = input_value " +
+                    "ON si.namespace = input_key " +
+                        "AND si.identifier = input_value " +
+                        "AND (si.external_subject_id is null or :tenantId = :owningTenantId or si.external_subject_id = :tenantId) " +
                     "group by si.fk_shell_id " +
                     ")"
     )
-    List<String> findExternalShellIdsByIdentifiersByAnyMatch(@Param("keyValueCombinations") List<String[]> keyValueCombinations);
+    List<String> findExternalShellIdsByIdentifiersByAnyMatch(@Param("keyValueCombinations") List<String[]> keyValueCombinations,
+                                                             @Param("tenantId") String tenantId,
+                                                             @Param("owningTenantId") String owningTenantId);
 }

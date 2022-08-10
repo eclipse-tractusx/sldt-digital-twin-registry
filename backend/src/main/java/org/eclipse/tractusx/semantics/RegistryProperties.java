@@ -52,5 +52,12 @@ public class RegistryProperties {
          */
         @NotEmpty(message = "tenantId claimName must not be empty")
         private String tenantIdClaimName;
+
+        /**
+         * The owning tenant id to which this AAS Registry belongs to.
+         */
+        @NotEmpty(message = "owningTenantId must not be empty")
+        private String owningTenantId;
+
     }
 }
