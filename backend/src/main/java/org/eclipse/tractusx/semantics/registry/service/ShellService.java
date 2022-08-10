@@ -21,18 +21,17 @@ package org.eclipse.tractusx.semantics.registry.service;
 
 import com.google.common.collect.ImmutableSet;
 import org.eclipse.tractusx.semantics.RegistryProperties;
+import org.eclipse.tractusx.semantics.registry.dto.BatchResultDto;
+import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
+import org.eclipse.tractusx.semantics.registry.model.Shell;
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
+import org.eclipse.tractusx.semantics.registry.model.Submodel;
 import org.eclipse.tractusx.semantics.registry.model.projection.ShellMinimal;
 import org.eclipse.tractusx.semantics.registry.model.projection.SubmodelMinimal;
 import org.eclipse.tractusx.semantics.registry.model.support.DatabaseExceptionTranslation;
 import org.eclipse.tractusx.semantics.registry.repository.ShellIdentifierRepository;
 import org.eclipse.tractusx.semantics.registry.repository.ShellRepository;
 import org.eclipse.tractusx.semantics.registry.repository.SubmodelRepository;
-import org.eclipse.tractusx.semantics.registry.security.TenantAware;
-import org.eclipse.tractusx.semantics.registry.dto.BatchResultDto;
-import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
-import org.eclipse.tractusx.semantics.registry.model.Shell;
-import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
-import org.eclipse.tractusx.semantics.registry.model.Submodel;
 import org.eclipse.tractusx.semantics.registry.security.TenantAware;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
@@ -55,18 +54,15 @@ public class ShellService {
     private final ShellIdentifierRepository shellIdentifierRepository;
     private final SubmodelRepository submodelRepository;
     private final TenantAware tenantAware;
-    private final String owningTenantId;
 
     public ShellService(ShellRepository shellRepository,
                         ShellIdentifierRepository shellIdentifierRepository,
                         SubmodelRepository submodelRepository,
-                        TenantAware tenantAware,
-                        RegistryProperties registryProperties) {
+                        TenantAware tenantAware) {
         this.shellRepository = shellRepository;
         this.shellIdentifierRepository = shellIdentifierRepository;
         this.submodelRepository = submodelRepository;
         this.tenantAware = tenantAware;
-        this.owningTenantId = registryProperties.getIdm().getOwningTenantId();
     }
 
     @Transactional
@@ -77,7 +73,7 @@ public class ShellService {
     @Transactional(readOnly = true)
     public Shell findShellByExternalId(String externalShellId) {
         return shellRepository.findByIdExternal(externalShellId)
-                .map(shell -> shell.withIdentifiers(filterSpecificAssetIdsByTenantId(shell.getIdentifiers(), tenantAware.getTenantId())))
+                .map(shell -> shell.withIdentifiers(filterSpecificAssetIdsByTenantId(shell.getIdentifiers(), shell.getTenantId(), tenantAware.getTenantId())))
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Shell for identifier %s not found", externalShellId)));
     }
 
@@ -96,37 +92,47 @@ public class ShellService {
 
     private Page<Shell> filterSpecificAssetIdsByTenantId(Page<Shell> shells){
         String tenantId = tenantAware.getTenantId();
-        return shells.map(shell ->  shell.withIdentifiers(filterSpecificAssetIdsByTenantId(shell.getIdentifiers(), tenantId)));
+        return shells.map(shell ->  shell.withIdentifiers(filterSpecificAssetIdsByTenantId(shell.getIdentifiers(), shell.getTenantId(), tenantId)));
     }
 
-    private Set<ShellIdentifier> filterSpecificAssetIdsByTenantId(Set<ShellIdentifier> shellIdentifiers, String tenantId) {
+    /**
+     * Filters the provided shellIdentifiers by the requestingTenantId.
+     * If the owningTenantId is equal to the requestingTenantId no filtering applies. The owner is allowed to see all
+     * shellIdentifiers.
+     *
+     * @param shellIdentifiers to filter by tenant id
+     * @param owningTenantId the tenant who owns the shell
+     * @param requestingTenantId the tenant who requests the shell
+     * @return filtered shellIdentifier by requesting tenantId
+     */
+    private Set<ShellIdentifier> filterSpecificAssetIdsByTenantId(Set<ShellIdentifier> shellIdentifiers, String owningTenantId, String requestingTenantId) {
         // the owning tenant should always see all identifiers
-        if(tenantId.equals(owningTenantId)){
+        if(requestingTenantId.equals(owningTenantId)){
             return shellIdentifiers;
         }
         return shellIdentifiers.stream()
                 .filter(shellIdentifier -> shellIdentifier.getExternalSubjectId() == null ||
-                        shellIdentifier.getExternalSubjectId().equals(tenantId)).collect(Collectors.toSet());
+                        shellIdentifier.getExternalSubjectId().equals(requestingTenantId)).collect(Collectors.toSet());
     }
 
     @Transactional(readOnly = true)
     public List<String> findExternalShellIdsByIdentifiersByExactMatch(Set<ShellIdentifier> shellIdentifiers) {
         List<String[]> keyValueCombinations = shellIdentifiers.stream().map(shellIdentifier -> new String[]{shellIdentifier.getKey(), shellIdentifier.getValue()}).collect(Collectors.toList());
         return shellRepository.findExternalShellIdsByIdentifiersByExactMatch(keyValueCombinations,
-                keyValueCombinations.size(), tenantAware.getTenantId(), owningTenantId);
+                keyValueCombinations.size(), tenantAware.getTenantId());
     }
 
     @Transactional(readOnly = true)
     public List<String> findExternalShellIdsByIdentifiersByAnyMatch(Set<ShellIdentifier> shellIdentifiers) {
         List<String[]> keyValueCombinations = shellIdentifiers.stream().map(shellIdentifier -> new String[]{shellIdentifier.getKey(), shellIdentifier.getValue()}).collect(Collectors.toList());
-        return shellRepository.findExternalShellIdsByIdentifiersByAnyMatch(keyValueCombinations, tenantAware.getTenantId(), owningTenantId);
+        return shellRepository.findExternalShellIdsByIdentifiersByAnyMatch(keyValueCombinations, tenantAware.getTenantId());
     }
 
     @Transactional(readOnly = true)
     public List<Shell> findShellsByExternalShellIds(Set<String> externalShellIds) {
         String tenantId = tenantAware.getTenantId();
         return shellRepository.findShellsByIdExternalIsIn(externalShellIds).stream()
-                .map(shell ->  shell.withIdentifiers(filterSpecificAssetIdsByTenantId(shell.getIdentifiers(), tenantId)))
+                .map(shell ->  shell.withIdentifiers(filterSpecificAssetIdsByTenantId(shell.getIdentifiers(), shell.getTenantId(), tenantId)))
                 .collect(Collectors.toList());
     }
 
@@ -149,8 +155,9 @@ public class ShellService {
 
     @Transactional(readOnly = true)
     public Set<ShellIdentifier> findShellIdentifiersByExternalShellId(String externalShellId) {
-        ShellMinimal shellId = findShellMinimalByExternalId(externalShellId);
-        return filterSpecificAssetIdsByTenantId(shellIdentifierRepository.findByShellId(shellId.getId()), tenantAware.getTenantId());
+        ShellMinimal shellMinimal = findShellMinimalByExternalId(externalShellId);
+        return filterSpecificAssetIdsByTenantId(shellIdentifierRepository.findByShellId(shellMinimal.getId()), shellMinimal.getTenantId(),
+                tenantAware.getTenantId());
     }
 
     @Transactional

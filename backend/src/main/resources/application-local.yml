@@ -40,7 +40,3 @@ spring:
       enabled: true
       settings:
         web-allow-others: true
-
-registry:
-  idm:
-    owningTenantId: TENANT_ONE
