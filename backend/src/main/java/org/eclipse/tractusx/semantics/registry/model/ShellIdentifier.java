@@ -40,6 +40,8 @@ public class ShellIdentifier {
     String key;
     @Column("identifier")
     String value;
+    @Column("external_subject_id")
+    String externalSubjectId;
     @Column( "fk_shell_id")
     UUID shellId;
 }

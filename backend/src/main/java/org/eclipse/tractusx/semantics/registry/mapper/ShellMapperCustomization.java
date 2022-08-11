@@ -93,6 +93,6 @@ public class ShellMapperCustomization {
         if(Strings.isNullOrEmpty(globalAssetId)){
             return Optional.empty();
         }
-        return Optional.of(new ShellIdentifier(null, ShellIdentifier.GLOBAL_ASSET_ID_KEY, globalAssetId, null));
+        return Optional.of(new ShellIdentifier(null, ShellIdentifier.GLOBAL_ASSET_ID_KEY, globalAssetId, null, null));
     }
 }
