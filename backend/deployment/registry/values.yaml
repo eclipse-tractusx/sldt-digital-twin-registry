@@ -21,14 +21,14 @@
 enablePostgres: true
 
 registry:
-  image: registry:latest
+  image: registry:0.1.0-M1-multi-tenancy
   replicaCount: 1
   imagePullPolicy: IfNotPresent
   containerPort: 4242
-  host: minikube
+  host: host
   ## If 'authentication' is set to false, no OAuth authentication is enforced
   authentication: false
-  idpIssuerUri: https://catenaxdev042akssrv.germanywestcentral.cloudapp.azure.com/iamcentralidp/auth/realms/CX-Central
+  idpIssuerUri: https://idp-url
   service:
     port: 8080
     type: ClusterIP
@@ -68,5 +68,5 @@ postgresql:
       postgresql: 5432
   auth:
     username: catenax
-    password: TFLIykCd4rUvSjbs
+    password: password
     database: registry
