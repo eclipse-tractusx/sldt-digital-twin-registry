@@ -65,7 +65,8 @@
             2.4.2 is version packed with spring boot 2.7.3.
             There is an issue in 2.4.2 and 2.4.1 with array bind parameters e.g. join (values :keyValueCombinations ).
             We use this feature in the for ShellRepository.
-            Downgrading to 2.4.0 resolves the issue.
+            Downgrading to 2.4.0 resolves the issue. Related issue is here:
+            https://github.com/spring-projects/spring-data-relational/issues/1323
         -->
         <dependency>
             <artifactId>spring-data-jdbc</artifactId>
