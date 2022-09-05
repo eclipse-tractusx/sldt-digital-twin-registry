@@ -36,6 +36,9 @@ http:
     read: 10000
 
 spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
   application:
     name: semantics-services
   banner:

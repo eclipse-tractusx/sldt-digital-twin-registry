@@ -54,6 +54,23 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jdbc</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>spring-data-jdbc</artifactId>
+                    <groupId>org.springframework.data</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--
+            2.4.2 is version packed with spring boot 2.7.3.
+            There is an issue in 2.4.2 and 2.4.1 with array bind parameters e.g. join (values :keyValueCombinations ).
+            We use this feature in the for ShellRepository.
+            Downgrading to 2.4.0 resolves the issue.
+        -->
+        <dependency>
+            <artifactId>spring-data-jdbc</artifactId>
+            <groupId>org.springframework.data</groupId>
+            <version>2.4.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
