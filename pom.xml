@@ -65,7 +65,7 @@
 
 		<!-- version properties -->
 		<!-- framework and base stuff -->
-		<spring.boot.version>2.7.1</spring.boot.version>
+		<spring.boot.version>2.7.3</spring.boot.version>
 		<springdoc.version>1.6.6</springdoc.version>
 		<lombok.version>1.18.22</lombok.version>
 		<swagger-annotations.version>1.5.20</swagger-annotations.version>
