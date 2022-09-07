@@ -17,34 +17,25 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 ###############################################################
+version: "3.9"
 
-###########################################################
-# Configuration of the Semantic Layer
-##########################################################
-spring:
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri:
+services:
 
-  datasource:
-    driverClassName: org.h2.Driver
-    password: tractusx
-    username: tractusx
-    url: jdbc:h2:file:./persistence/registrydb;CASE_INSENSITIVE_IDENTIFIERS=TRUE
+  postgres:
+    image: postgres:13.6-alpine
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: example
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
 
-  # Properties develop against a postgres instance
-  # You can start a postgres instance using the docker-compose file located in the backend/postgres/ directory
-  # datasource:
-  #  url: jdbc:postgresql://localhost:5432/postgres
-  #  driverClassName: org.postgresql.Driver
-  #  username: postgres
-  #  password: example
+  adminer:
+    image: adminer:4.8.1-standalone
+    container_name: adminer
+    ports:
+      - "8080:8080"
 
-  h2:
-    console:
-      path: /admin/database
-      enabled: true
-      settings:
-        web-allow-others: true
+volumes:
+  postgres-data:

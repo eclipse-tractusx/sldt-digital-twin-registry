@@ -26,8 +26,16 @@ spring:
           issuer-uri:
 
   datasource:
-    driverClassName: org.h2.Driver
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;CASE_INSENSITIVE_IDENTIFIERS=TRUE
+   driverClassName: org.h2.Driver
+   url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;CASE_INSENSITIVE_IDENTIFIERS=TRUE
+
+  # Properties for running tests against a postgres instance
+  # You can start a postgres instance using the docker-compose file located in the backend/postgres/ directory
+  #datasource:
+    #url: jdbc:postgresql://localhost:5432/postgres
+    #driverClassName: org.postgresql.Driver
+    #username: postgres
+    #password: example
 
 logging:
   level:
