@@ -19,7 +19,7 @@
 ###############################################################
 
 # Docker buildfile to containerize the semantics layer
-FROM eclipse-temurin:11-jre
+FROM eclipse-temurin:11.0.16.1_1-jre-jammy
 
 RUN adduser --system --group spring \
     && mkdir -p /service \

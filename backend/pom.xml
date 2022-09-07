@@ -54,6 +54,24 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jdbc</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>spring-data-jdbc</artifactId>
+                    <groupId>org.springframework.data</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--
+            2.4.2 is version packed with spring boot 2.7.3.
+            There is an issue in 2.4.2 and 2.4.1 with array bind parameters e.g. join (values :keyValueCombinations ).
+            We use this feature in the for ShellRepository.
+            Downgrading to 2.4.0 resolves the issue. Related issue is here:
+            https://github.com/spring-projects/spring-data-relational/issues/1323
+        -->
+        <dependency>
+            <artifactId>spring-data-jdbc</artifactId>
+            <groupId>org.springframework.data</groupId>
+            <version>2.4.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -70,10 +88,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jetty</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -126,19 +140,10 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
-            <version>1.6</version>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.topbraid</groupId>
-            <artifactId>shacl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.vavr</groupId>
-            <artifactId>vavr</artifactId>
         </dependency>
         <dependency>
             <groupId>org.openapitools</groupId>
