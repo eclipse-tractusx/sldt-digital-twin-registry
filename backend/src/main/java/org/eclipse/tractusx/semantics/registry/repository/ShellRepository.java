@@ -32,7 +32,7 @@ import java.util.*;
 public interface ShellRepository extends PagingAndSortingRepository<Shell, UUID>{
     Optional<Shell> findByIdExternal(String idExternal);
 
-    @Query("select s.id, s.created_date s.tenant_id from shell s where s.id_external = :idExternal")
+    @Query("select s.id, s.created_date, s.tenant_id from shell s where s.id_external = :idExternal")
     Optional<ShellMinimal> findMinimalRepresentationByIdExternal(String idExternal);
 
     List<Shell> findShellsByIdExternalIsIn(Set<String> idExternals);
