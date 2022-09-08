@@ -209,6 +209,18 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring.boot.version}</version>
+                <configuration>
+                    <excludes>
+                        <!--
+                            H2 is only used for local development.
+                            Exclusion is required because of this CVE: https://nvd.nist.gov/vuln/detail/CVE-2018-10054
+                         -->
+                        <exclude>
+                            <groupId>com.h2database</groupId>
+                            <artifactId>h2</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
             </plugin>
 
             <plugin>
