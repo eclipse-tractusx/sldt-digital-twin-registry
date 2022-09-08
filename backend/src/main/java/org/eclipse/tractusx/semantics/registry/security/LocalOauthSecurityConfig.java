@@ -34,7 +34,8 @@ public class LocalOauthSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests(auth -> auth
                         .anyRequest().permitAll())
-                .csrf().disable();
+                .csrf().disable()
+                .headers().frameOptions().disable();
     }
 
     @Bean

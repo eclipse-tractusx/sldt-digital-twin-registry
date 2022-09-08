@@ -24,20 +24,6 @@ The Digital Twin Registry is a logical and architectural component of Tractus-X.
 The source code under this folder contains reference implementations of the SLDT Registry.
 
 ## Build Packages
-The project requires a private package from https://maven.pkg.github.com/eclipse-dataspaceconnector/DataSpaceConnector.
-Add the following configuration to your `.m2/settings.xml`:
-
-```xml
-<server>
-    <id>edc-github</id>
-    <username>oauth2</username>
-    <password>$ADD_GITHUB_ACCESS_TOKEN_HERE</password>
-</server>
-```
-
-You need to add your own GitHub Access Token. Navigate to https://github.com/settings/tokens and create a new token
-with the permission `read:packages`.
-
 Run `mvn install` to run unit tests, build and install the package.
 
 ## Run Package Locally
