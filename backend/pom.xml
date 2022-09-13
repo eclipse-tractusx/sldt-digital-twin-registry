@@ -106,6 +106,11 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Tempory fix for a finding in snakeyaml v1.30, remove once new Spring Boot release contains fix -->
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+        </dependency>
 
         <!-- persistence -->
         <dependency>
