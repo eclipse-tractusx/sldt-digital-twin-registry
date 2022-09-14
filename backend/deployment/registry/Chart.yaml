@@ -23,8 +23,8 @@ name: registry
 description: A Helm chart for Kubernetes
 
 type: application
-version: 0.1.0
-appVersion: 0.1.0-M1-multi-tenancy
+version: 0.2.0
+appVersion: 0.2.0-M1-multi-tenancy
 
 dependencies:
   - repository: https://charts.bitnami.com/bitnami
