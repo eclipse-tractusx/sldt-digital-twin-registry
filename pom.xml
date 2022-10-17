@@ -71,7 +71,7 @@
 		<swagger-annotations.version>1.5.20</swagger-annotations.version>
 		<swagger-core-version>2.0.0</swagger-core-version>
 		<guava.version>31.0.1-jre</guava.version>
-		<apache-commonse.version>1.6</apache-commonse.version>
+		<apache-commonse.version>1.10.0</apache-commonse.version>
 		<google.findbugs.version>3.0.2</google.findbugs.version>
 		<snakeyaml.version>1.31</snakeyaml.version>
 
