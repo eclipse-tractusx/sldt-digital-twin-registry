@@ -21,7 +21,7 @@
 enablePostgres: true
 
 registry:
-  image: registry:0.1.0-M1-multi-tenancy
+  image: registry:0.2.0-M2-multi-tenancy
   replicaCount: 1
   imagePullPolicy: IfNotPresent
   containerPort: 4242
