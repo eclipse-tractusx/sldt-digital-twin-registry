@@ -28,30 +28,12 @@ jobs:
 
       - name: Run Gitleaks
         id: gitleaks
-        uses: DariuszPorowski/github-action-gitleaks@v2.0.4
-        with:
-          report_format: "sarif"
-          fail: true
-          # config: "/.gitleaks/GitleaksUdmCombo.toml"
-
-      - name: Get the output from the gitleaks step
         run: |
-          echo "exitcode: ${{ steps.gitleaks.outputs.exitcode }}"
-          echo "result: ${{ steps.gitleaks.outputs.result }}"
-          echo "output: ${{ steps.gitleaks.outputs.output }}"
-          echo "command: ${{ steps.gitleaks.outputs.command }}"
-          echo "report: ${{ steps.gitleaks.outputs.report }}"
-        if: always()
-
-      - name: Upload Gitleaks output as artifact
-        uses: actions/upload-artifact@v1
-        with:
-          name: gitleaks.sarif
-          path: ${{ steps.gitleaks.outputs.report }}
-        if: always()
+          docker pull zricethezav/gitleaks:latest
+          docker run -v $PWD:/path zricethezav/gitleaks:latest detect --source="/path" -f sarif -r /path/gitleaks-report-registry.sarif
 
       - name: Upload SARIF report
         if: always()
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: ${{ steps.gitleaks.outputs.report }}
+          sarif_file: gitleaks-report-registry.sarif
