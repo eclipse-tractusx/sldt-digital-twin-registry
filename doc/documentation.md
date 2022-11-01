@@ -2,7 +2,7 @@
 This page provides an overview of the Digital Twin Registry and all relevant information for developers to get started with integration against the Digital Twin Registry.
 
 ## Architectural Overview
-The Digital Twin Registry acts as an address book for Digital Twins. Data Providers register their Digital Twins in the Digital Twin Registry. Data consumers query the Digital Twin Registry to find Digital Twins and interact with them further. A Digital Twin contains endpoint references to Submodel endpoints. Calling a Submodel endpoint returns data complaint to a semantic model. A semantic model describes the data that a Submodel endpoint returns.
+The Digital Twin Registry acts as an address book for Digital Twins. Data Providers register their Digital Twins in the Digital Twin Registry. Data consumers query the Digital Twin Registry to find Digital Twins and interact with them further. A Digital Twin contains endpoint references to Submodel endpoints. Calling a Submodel endpoint returns data compliant to a semantic model. A semantic model describes the data that a Submodel endpoint returns.
 ![](img/image009.png)
 
 
@@ -23,38 +23,46 @@ For the purpose of simplification the diagram above does only show the required 
 
 ```
 {
-"description": [{
-"language": "en",
-"text": "The shell for a vehicle"
-}],
-"globalAssetId": {
-"value": [
-"c02729fe-915e-416c-9723-f2781627f3e2"
-]
-},
-"idShort": "future concept x",
-"identification": "882fc530-b69b-4707-95f6-5dbc5e9baaa8",
-"specificAssetIds": [{
-"key": "PartID",
-"value": "12309481209312"
-}],
-"submodelDescriptors": [{
-"identification": "urn:uuid:53125dc3-5e6f-4f4b-838d-447432b97918",
-"idShort": "serialPartTypization",
-"semanticId": {
-"value": [
-"urn:bamm:com.catenax.serial_part_typization:1.0.0"
-]
-},
-"endpoints": [{
-"interface": "EDC",
-"protocolInformation": {
-"endpointAddress": "edc://provider.connector:port/BPNL7588787849VQ/urn%3Auuid%3Ac227a880-b82b-40f7-846c-3942ddf26c29-urn%3Auuid%3A53125dc3-5e6f-4f4b-838d-447432b97918/submodel?content=value&extent=WithBLOBValue",
-"endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
-"endpointProtocolVersion": "0.0.1-SNAPSHOT"
-}
-}]
-}]
+  "description": [
+    {
+      "language": "en",
+      "text": "The shell for a vehicle"
+    }
+  ],
+  "globalAssetId": {
+    "value": [
+      "c02729fe-915e-416c-9723-f2781627f3e2"
+    ]
+  },
+  "idShort": "future concept x",
+  "identification": "882fc530-b69b-4707-95f6-5dbc5e9baaa8",
+  "specificAssetIds": [
+    {
+      "key": "PartID",
+      "value": "12309481209312"
+    }
+  ],
+  "submodelDescriptors": [
+    {
+      "identification": "urn:uuid:53125dc3-5e6f-4f4b-838d-447432b97918",
+      "idShort": "serialPartTypization",
+      "semanticId": {
+        "value": [
+          "urn:bamm:com.catenax.serial_part_typization:1.0.0"
+        ]
+      },
+      "endpoints": [
+        {
+          "interface": "EDC",
+          "protocolInformation": {
+            "endpointAddress": "edc://provider.connector:port/BPNL7588787849VQ/urn%3Auuid%3Ac227a880-b82b-40f7-846c-3942ddf26c29-urn%3Auuid%3A53125dc3-5e6f-4f4b-838d-447432b97918/submodel?content=value&extent=WithBLOBValue",
+            "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
+            "endpointProtocolVersion": "0.0.1-SNAPSHOT"
+          }
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -64,19 +72,19 @@ There are two actors who interact with the AAS Registry.
 |Actor |  	Description | Examples |
 |---|---|---|
 | Data provider  | The data provider registers AAS Descriptors and Submodel Descriptors so that consumers can query for AAS Descriptors and request data via the Submodel Descriptor Endpoints. Responsibilities: Providing EDC compatible Submodel Descriptor Endpoints, Registration of the AAS Descriptors  | Any manufacturer who provides data for their assets |
-| Data consumer  | 	The data consumer are accessing the AAS Registry to discover and consume data from the Submodel Descriptor Endpoints. Responsibilities: Query the AAS Registry for AAS Descriptors, Access the Submodel Descriptor Endpoints via EDC  |  |
+| Data consumer  | 	The data consumers are accessing the AAS Registry to discover and consume data from the Submodel Descriptor Endpoints. Responsibilities: Query the AAS Registry for AAS Descriptors, Access the Submodel Descriptor Endpoints via EDC  |  |
 
 The interactions of both actors are shown in the diagrams below.
 For the purpose of simplifying, the interactions via EDC is not shown.
 
 EDC is involved as following:
-1. Interactions with the AAS Registry must not done with EDC
-2. Interactions with Submodel Endpoints ( Data Provider ) have to be done with EDC
+1. Interactions with the AAS Registry must not be done with EDC
+2. Interactions with Submodel Endpoints (Data Provider) have to be done with EDC
 
 ## Data provider
 To be able to register a DigitalTwin the following prerequisites must be met.
 1. The identifiers for an asset are known (specificAssetIds, e.g. serial number, part id)
-2. An endpoint that provides the data for the asset is available. The data have to be complaint with an Aspect Model.
+2. An endpoint that provides the data for the asset is available. The data has to be complaint with an Aspect Model.
 
 ### Without EDC (simplified)
 ![](img/image002.png)
@@ -112,7 +120,7 @@ Therefore the AAS Registry cannot enforce uniqueness for natural keys (specificA
 | Field | Value | Description |
 |---|---|---|
 | AssetAdministrationShellDescriptor#identification  | Random UUIDv4  | - |
-| AssetAdministrationShellDescriptor#globalAssetId[0]  | Random UUIDv4  | The globalAssetId is a natural key that identifiers an asset uniquely. An example for instance is the MAC - Address. In the manufacturing industry not all assets do have a global unique natural key. It's was decided therefore to use a random UUID. |
+| AssetAdministrationShellDescriptor#globalAssetId[0]  | Random UUIDv4  | The globalAssetId is a natural key that identifies an asset uniquely. An example for instance is the MAC - Address. In the manufacturing industry not all assets do have a global unique natural key. It was decided therefore to use a random UUID. |
 | SubmodelDescriptor#identification  | Random UUIDv4  | - |
 
 
@@ -135,180 +143,100 @@ Operation Endpoint: http://myawesomeconnector.com/BPNL7588787849VQ/urn%3Auuid%3A
 | protocolInformation#endpointProtocol  |  The protocol of the endpoint. | HTTPS |
 |  protocolInformation#endpointProtocolVersion |  The version of the protocol. |  1.0|
 
-   	
-
 ## Authentication & Authorization
-   The AAS Registry is integrated with the IAM of Catena-X. Every API call have to provide a valid Bearer Token issued by Catena-X IAM.
-   Authorization (roles & permissions) are not in place for Release 1.
+   The AAS Registry needs to be integrated with an OAuth2 compliant authorization server. Every API call has to provide a valid Bearer Token issued by this authorization server.
    Authorization is supported by Role Based Access Control (RBAC). Following roles are available:
 
 | Role | 	Description | 
 |---|---|
 | view_digital_twin | Can read all digital twins.|
 |  add_digital_twin | Can add a digital twin.|
-|  update_digital_twin |Can update a digital twin.Users can only update digital twins they own.
-Ownership is ensured by the BPN of the user. |
-| delete_digital_twin |Can delete a digital twin. Users can only delete digital twins they own.
-Ownership is ensured by the BPN of the user.|
+|  update_digital_twin |Can update a digital twin.Users can only update digital twins they own. Ownership is ensured by the tenantId/BPN of the user. |
+| delete_digital_twin |Can delete a digital twin. Users can only delete digital twins they own. Ownership is ensured by the tenantId/BPN of the user.|
    
 The Swagger UI of the AAS Registry is integrated with IAM. You can check the Swagger UI API calls for examples.
 
-### Visibility of specificAssetIds based on BPN
-You can control the visibility of specificAssetIds based the BPN.
-- You can provide the BPN as attribute to a specificAssetId. Only users having the same BPN in the access token are able to see the specificAssetId.
-- he specificAssetIds of Digital Twins you created will always be shown to you.
+### Visibility of specificAssetIds based on tenantId/BPN
+You can control the visibility of specificAssetIds based on the tenantId/BPN.
+- You can provide the tenantId/BPN as attribute to a specificAssetId. Only users having the same tenantId/BPN in the access token are able to see the specificAssetId.
+- The specificAssetIds of Digital Twins you created will always be shown to you.
 
-- Detailed example:
+Detailed example:
 ```
 // Given specificAssetIds:
-
-[{
-"key": "CustomerPartId",
-"value": "293913",
-"externalSubjectId": {
-"value": ["BPN12"]
-}
-}, {
-"key": "CustomerPartId",
-"value": "429212",
-"externalSubjectId": {
-"value": ["BPN49"]
-}
-}, {
-"key": "CustomerPartId",
-"value": "523192",
-"externalSubjectId": {
-"value": ["BPN29"]
-}
-}, {
-"key": "MaterialNumber",
-"value": "39192"
-}]
-
-// A customer with (BPN12) will only get the specificAssetIds that contains his BPN. Taking the above example, the response for the customer //(BPN12) would be:
-[{
-"key": "CustomerPartId",
-"value": "293913",
-"externalSubjectId": {
-"value": ["BPN12"]
-}
-}, {
-"key": "MaterialNumber",
-"value": "39192"
-}]
-
+[
+  {
+    "key": "CustomerPartId",
+    "value": "293913",
+    "externalSubjectId": {
+      "value": [
+        "BPN12"
+      ]
+    }
+  },
+  {
+    "key": "CustomerPartId",
+    "value": "429212",
+    "externalSubjectId": {
+      "value": [
+        "BPN49"
+      ]
+    }
+  },
+  {
+    "key": "CustomerPartId",
+    "value": "523192",
+    "externalSubjectId": {
+      "value": [
+        "BPN29"
+      ]
+    }
+  },
+  {
+    "key": "MaterialNumber",
+    "value": "39192"
+  }
+]
+// A customer with (BPN12) will only get the specificAssetIds that contains his BPN/tenantId. Taking the above example, the response for the customer //(BPN12) would be:
+[
+  {
+    "key": "CustomerPartId",
+    "value": "293913",
+    "externalSubjectId": {
+      "value": [
+        "BPN12"
+      ]
+    }
+  },
+  {
+    "key": "MaterialNumber",
+    "value": "39192"
+  }
+]
 // Lookup API:  GET /shells/lookup and POST /shells/lookup/query with BPN12
-
 // REQUEST:
-[{
-"key": "CustomerPartId",
-"value": "429212" // note: the externalSubjectId of this assetId is BPN49
-}]
-
+[
+  {
+    "key": "CustomerPartId",
+    "value": "429212" // note: the externalSubjectId of this assetId is BPN49
+  }
+]
 // RESPONSE:
 // The response is empty, because the above assetId belongs to customer (BPN49) and not to the  customer (BPN12).
-
 []
 ```
 
 ### Authentication on behalf of a user
-The AAS Registry can accessed on behalf of a User. The Token have to be obtained via the Open-Id Connect flow. The AAS Registry will accept these tokens.
+The AAS Registry can be accessed on behalf of a user. The token has to be obtained via the OpenID Connect flow. The AAS Registry will validate these tokens.
 
-### Authentication via client credentials flow
-The AAS Registry can also be accessed via a token obtained for a technical user.
-If you do not have a technical user yet, please request one from Julia Jeroch . You have to provide at least the name of the Project / Application you are working on.
-The postman collection AAS Registry Authentication contains an example for the client credentials flow.
-
-| Variable | Value | 
-|---|---|
-| IDM_BASE_URL | https://centralidp.demo.catena-x.net/auth/realms/CX-Central/|
-| YOUR_CLIENT_ID | request at Tractus-X portal team |
-| YOUR_CLIENT_SECRET | request at Tractus-X portal team |
-
+#### Postman configuration
 ![](img/image005.png)
-
-### Authentication with the Swagger UI
-The Swagger UI is integrated with IAM.
-If you do not have a IAM user yet, it needs to be requested by the IAM operator.
-1.	Open the Swagger UI of the AAS Registry and click on the Authorize button on the right side
-![](img/image006.png)
-
-
-2. In the opened dialog, scroll to the flow
-      CatenaXOpenId (OAuth2, authorization_code with PKCE) and click the Authorize button
-![](img/image007.png)
-
-3. There are two scenarios:
-If you have already an active IAM session you will be logged in directly and should see the a Logout button in the Dialog:
-![](img/image008.png)
-
-4. If you do not have an active session, you will be redirected to the IAM. This is the same process as for the Portal UI. Choose "Microsoft" and enter your login information.
-      After submitting, you will be redirected back to the Swagger UI.
-5. Close the dialog, you can now start working with the AAS Registry API.
-
-## Running the AAS Registry in Kubernetes (via Helm Charts)
-   You can deploy the AAS Registry to your own Kubernetes cluster by using the helm charts in eclipse-tractus/sldt-digital-twin-registry.
-   Please use the values.yaml below and update the values according to your needs.
-
-| Variable | Value |  Notes |
-|---|---|---|
-| registry.image | 	e.g. ghcr.io/catenax-ng/registry:0.2.0-m1-multi-tenancy | 	If you need another docker image you can build it with the provided docker file |
-| registry.host | minikube | Update this value to the domain to run the AAS Registry on. Example: semantics.int.demo.catena-x.net |
-| registry.authentication | false | Disables authentication. |
-|  registry.idpIssuerUri| "" | The URL of the Oauth2 provider. Takes effect if authentication is set to true. |
-
-		
-
-		
-		
-
-##  Running the AAS Registry locally (via Docker)
-   The most convenient way use the AAS Registry locally is via the available Docker image in the Catena-X Azure Docker Registry.
-
-1.     Create a new file docker-compose.yml with the below code:
-Docker-Compose AAS Registry
-```
-version: "3.9"
-
-services:
-
-postgres:
-image: postgres:13.6-alpine
-container_name: postgres
-ports:
-- "5432:5432"
-environment:
-POSTGRES_PASSWORD: example
-volumes:
-- postgres-data:/var/lib/postgresql/data
-
-aas_registry:
-image: ghcr.io/catenax-ng/registry:0.2.0-m1-multi-tenancy
-container_name: aas_registry
-ports:
-- "4243:4243"
-environment:
-SPRING_PROFILES_ACTIVE: local # disables security
-SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5432/postgres
-SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
-SPRING_DATASOURCE_USERNAME: postgres
-SPRING_DATASOURCE_PASSWORD: example
-
-volumes:
-postgres-data:
-```
-
-2.	Run docker-compose up -d
-3.	Open the Swagger UI with this link: http://localhost:4243/swagger-ui/index.html
-      GitHub Repository	GitHub Semantic Services
-
-
 
 *Support contact*	tractusx-dev@eclipse.org
 
 
 ## Remarks
-The Digital Twin Registry implementation is not 100 % specification compliant. Please find the current deviations in the below table.
+The Digital Twin Registry implementation is not 100 % specification compliant. Please find the current deviations in the table below.
 
 | No | Deviation |  Reason |
 |---|---|---|
