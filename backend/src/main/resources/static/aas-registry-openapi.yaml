@@ -118,6 +118,7 @@ paths:
           application/json:
             schema:
               type: array
+              maxItems: 10000
               items:
                 $ref: '#/components/schemas/AssetAdministrationShellDescriptor'
             examples:
@@ -131,6 +132,7 @@ paths:
             application/json:
               schema:
                 type: array
+                maxItems: 10000
                 items:
                   $ref: '#/components/schemas/BatchResult'
               examples:
@@ -151,6 +153,7 @@ paths:
             schema:
               type: array
               minLength: 1
+              maxItems: 10000
               items:
                 $ref: '#/components/schemas/Identifier'
             examples:
@@ -268,6 +271,7 @@ paths:
             application/json:
               schema:
                 type: array
+                maxItems: 10000
                 items:
                   $ref: '#/components/schemas/SubmodelDescriptor'
               examples:
@@ -437,6 +441,7 @@ paths:
           application/json:
             schema:
               type: array
+              maxItems: 10000
               items:
                 $ref: '#/components/schemas/IdentifierKeyValuePair'
         examples:
@@ -449,6 +454,7 @@ paths:
             application/json:
               schema:
                 type: array
+                maxItems: 10000
                 items:
                   $ref: '#/components/schemas/Identifier'
               examples:
@@ -478,6 +484,7 @@ paths:
             application/json:
               schema:
                 type: array
+                maxItems: 10000
                 items:
                   $ref: '#/components/schemas/IdentifierKeyValuePair'
               examples:
@@ -505,6 +512,7 @@ paths:
           application/json:
             schema:
               type: array
+              maxItems: 10000
               items:
                 $ref: '#/components/schemas/IdentifierKeyValuePair'
             examples:
@@ -518,6 +526,7 @@ paths:
             application/json:
               schema:
                 type: array
+                maxItems: 10000
                 items:
                   $ref: '#/components/schemas/IdentifierKeyValuePair'
               examples:
@@ -564,6 +573,7 @@ paths:
             application/json:
               schema:
                 type: array
+                maxItems: 10000
                 items:
                   $ref: '#/components/schemas/Identifier'
               examples:
@@ -581,6 +591,7 @@ components:
         items:
           title: Items
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/AssetAdministrationShellDescriptor'
     AssetAdministrationShellDescriptorCollection:
@@ -616,6 +627,7 @@ components:
           $ref: '#/components/schemas/AdministrativeInformation'
         description:
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/LangString'
         globalAssetId:
@@ -628,10 +640,12 @@ components:
           $ref: '#/components/schemas/Identifier'
         specificAssetIds:
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/IdentifierKeyValuePair'
         submodelDescriptors:
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/SubmodelDescriptor'
       allOf:
@@ -641,6 +655,7 @@ components:
       properties:
         endpoints:
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/Endpoint'
       example: '{  "endpoints": [{ "protocolInformation": { "endpointAddress": "https://localhost:1234", "endpointProtocolVersion: "1.1"  }, "interface": "AAS-1.0"  }, { "protocolInformation": {  "endpointAddress": "opc.tcp://localhost:4840" },    "interface": "AAS-1.0" }, {  "protocolInformation": { "endpointAddress": "https://localhost:5678",  "endpointProtocolVersion: "1.1", "subprotocol": "OPC UA Basic SOAP", "subprotocolBody": "ns=2;s=MyAAS", "subprotocolBodyEncoding": "plain"  }, "interface": "AAS-1.0"  }] }'
@@ -735,6 +750,7 @@ components:
        #   $ref: '#/components/schemas/Reference'
         keys:
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/Key'
   # The code generator gets in issues, because it's somehow recursive. Reference has a reference ModelReference ..
@@ -812,6 +828,7 @@ components:
           $ref: '#/components/schemas/AdministrativeInformation'
         description:
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/LangString'
         idShort:
@@ -876,6 +893,7 @@ components:
           properties:
             assetIds:
               type: array
+              maxItems: 10000
               items:
                 $ref: '#/components/schemas/IdentifierKeyValuePair'
   securitySchemes:
