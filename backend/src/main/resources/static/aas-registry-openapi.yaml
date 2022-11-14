@@ -20,7 +20,6 @@
 
 # Plattform_i40-Registry-and-Discovery-Final-Draft-resolved.yaml
 # https://app.swaggerhub.com/apis/Plattform_i40/Registry-and-Discovery/Final-Draft#/info
----
 openapi: 3.0.3
 info:
   title: DotAAS Part 2 | HTTP/REST | Registry and Discovery
@@ -29,9 +28,6 @@ info:
   contact:
     name: Michael Hoffmeister, Torben Miny, Andreas Orzelski, Manuel Sauer, Constantin Ziesche
   version: Final-Draft
-
-servers:
-- url: ./
 
 security:
   - CatenaXOpenId:
@@ -444,9 +440,9 @@ paths:
               maxItems: 10000
               items:
                 $ref: '#/components/schemas/IdentifierKeyValuePair'
-        examples:
-          complete:
-            $ref: '#/components/examples/lookup-shells-by-aas-identifier-query'
+            examples:
+              complete:
+                $ref: '#/components/examples/lookup-shells-by-aas-identifier-query'
       responses:
         "200":
           description: Requested Asset Administration Shell ids
