@@ -25,7 +25,7 @@
 	<parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.3</version> <!-- need to be repeated in properties section for technical purposes -->
+        <version>2.7.5</version> <!-- need to be repeated in properties section for technical purposes -->
         <relativePath/> <!-- lookup parent from repository and not the filesystem -->
     </parent>
 
@@ -65,8 +65,9 @@
 
 		<!-- version properties -->
 		<!-- framework and base stuff -->
-		<spring.boot.version>2.7.3</spring.boot.version>
+		<spring.boot.version>2.7.5</spring.boot.version>
 		<springdoc.version>1.6.6</springdoc.version>
+		<spring.security.version>5.7.5</spring.security.version>
 		<lombok.version>1.18.22</lombok.version>
 		<swagger-annotations.version>1.5.20</swagger-annotations.version>
 		<swagger-core-version>2.0.0</swagger-core-version>
@@ -127,6 +128,7 @@
 				<artifactId>jsr305</artifactId>
 				<version>${google.findbugs.version}</version>
 			</dependency>
+			<!-- Framework -->
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter-web</artifactId>
@@ -154,7 +156,14 @@
 					</exclusion>
 				</exclusions>
 			</dependency>
-
+			<!-- must be set explicitly cause of CVE-2022-31692. The newest springboot version not includes the fix.
+			TODO: Check if the newest version of springboot includes the security-core version > 5.7.5
+			 and if it applies remove the following dependency -->
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-core</artifactId>
+				<version>${spring.security.version}</version>
+			</dependency>
 			<!-- logging -->
 			<dependency>
 				<groupId>org.slf4j</groupId>
