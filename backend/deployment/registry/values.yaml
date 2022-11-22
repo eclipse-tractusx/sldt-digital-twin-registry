@@ -24,11 +24,12 @@ registry:
   image: registry:0.2.0-M2-multi-tenancy
   replicaCount: 1
   imagePullPolicy: IfNotPresent
-  containerPort: 4242
-  host: host
+  containerPort: 4243
+  host: minikube
   ## If 'authentication' is set to false, no OAuth authentication is enforced
   authentication: false
   idpIssuerUri: https://idp-url
+  idpClientId: idpClientID
   service:
     port: 8080
     type: ClusterIP
