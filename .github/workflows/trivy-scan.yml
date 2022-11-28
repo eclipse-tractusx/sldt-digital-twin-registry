@@ -18,8 +18,16 @@
 name: Trivy Scan
 
 on:
+  push:
+    branches: [main, master]
+  pull_request:
+  # The branches below must be a subset of the branches above
+    branches: [main, master]
+    paths-ignore:
+      - "**/*.md"
+      - "**/*.txt"
   schedule:
-    - cron: 0 2 * * 0
+    - cron: "0 0 * * *"
   workflow_dispatch:
 
 jobs:
@@ -32,7 +40,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
@@ -53,7 +61,7 @@ jobs:
           severity: "CRITICAL,HIGH"
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v1
+        uses: github/codeql-action/upload-sarif@v2
         if: always()
         with:
           sarif_file: "trivy-results-registry.sarif"
