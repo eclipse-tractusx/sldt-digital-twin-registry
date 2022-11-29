@@ -18,8 +18,11 @@
 name: gitleaks
 on: [push, pull_request, workflow_dispatch]
 jobs:
-  gitleaks:
+  gitleaks-run:
     runs-on: ubuntu-latest
+    container:
+      image: zricethezav/gitleaks:latest
+      options: --user root
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -28,30 +31,30 @@ jobs:
 
       - name: Run Gitleaks
         id: gitleaks
-        uses: DariuszPorowski/github-action-gitleaks@v2.0.4
-        with:
-          report_format: "sarif"
-          fail: true
-          # config: "/.gitleaks/GitleaksUdmCombo.toml"
-
-      - name: Get the output from the gitleaks step
+        
         run: |
-          echo "exitcode: ${{ steps.gitleaks.outputs.exitcode }}"
-          echo "result: ${{ steps.gitleaks.outputs.result }}"
-          echo "output: ${{ steps.gitleaks.outputs.output }}"
-          echo "command: ${{ steps.gitleaks.outputs.command }}"
-          echo "report: ${{ steps.gitleaks.outputs.report }}"
-        if: always()
+          git config --global --add safe.directory $PWD
+          gitleaks detect -f sarif -r ./gitleaks-report-registry.sarif --exit-code 0
 
-      - name: Upload Gitleaks output as artifact
-        uses: actions/upload-artifact@v1
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
         with:
-          name: gitleaks.sarif
-          path: ${{ steps.gitleaks.outputs.report }}
-        if: always()
+          name: gitleaks-report
+          path: ./gitleaks-report-registry.sarif
+        
 
+  gitleaks-upload:
+    runs-on: ubuntu-latest
+    needs: gitleaks-run
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: gitleaks-report
       - name: Upload SARIF report
         if: always()
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: ${{ steps.gitleaks.outputs.report }}
+          sarif_file: ./gitleaks-report-registry.sarif
