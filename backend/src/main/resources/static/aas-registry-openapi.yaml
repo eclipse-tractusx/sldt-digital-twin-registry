@@ -19,11 +19,11 @@
 ###############################################################
 
 # Plattform_i40-Registry-and-Discovery-Final-Draft-resolved.yaml
-# https://app.swaggerhub.com/apis/Plattform_i40/Registry-and-Discovery/Final-Draft#/info
+# https://app.swaggerhub.com/apis/Plattform_i40/Registry-and-Discovery/V1.0RC03#/Registry%20and%20Discovery%20API
 openapi: 3.0.3
 info:
-  title: DotAAS Part 2 | HTTP/REST | Registry and Discovery
-  description: The registry and discovery interface as part of Details of the Asset Administration Shell Part 2
+  title: Catena-X Profile | HTTP/REST | Registry and Discovery
+  description: The Catena-X Profile of the registry and discovery API as part of Details of the Asset Administration Shell
   termsOfService: https://github.com/admin-shell-io/aas-specs
   contact:
     name: Michael Hoffmeister, Torben Miny, Andreas Orzelski, Manuel Sauer, Constantin Ziesche
