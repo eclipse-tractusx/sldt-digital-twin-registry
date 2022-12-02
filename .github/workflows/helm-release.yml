@@ -6,6 +6,8 @@ on:
       - 'charts/**'
     branches:
       - main
+  workflow_dispatch:
+    
 jobs:
   release:
     permissions:
