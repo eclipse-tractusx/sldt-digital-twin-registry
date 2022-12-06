@@ -17,31 +17,13 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ********************************************************************************/
-package org.eclipse.tractusx.semantics.registry.model;
+package org.eclipse.tractusx.semantics.registry.security;
 
+public class NoOpTenantAware implements TenantAware{
 
+    @Override
+    public String getTenantId() {
+        return "NO_OP_TENANT";
+    }
 
-import lombok.Value;
-import lombok.With;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-
-import java.util.UUID;
-
-@Value
-@With
-public class ShellIdentifier {
-
-    public static final String GLOBAL_ASSET_ID_KEY = "globalAssetId";
-
-    @Id
-    UUID id;
-    @Column("namespace")
-    String key;
-    @Column("identifier")
-    String value;
-    @Column("external_subject_id")
-    String externalSubjectId;
-    @Column( "fk_shell_id")
-    UUID shellId;
 }

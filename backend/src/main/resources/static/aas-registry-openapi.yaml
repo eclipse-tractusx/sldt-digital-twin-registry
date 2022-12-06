@@ -20,7 +20,6 @@
 
 # Plattform_i40-Registry-and-Discovery-Final-Draft-resolved.yaml
 # https://app.swaggerhub.com/apis/Plattform_i40/Registry-and-Discovery/Final-Draft#/info
----
 openapi: 3.0.3
 info:
   title: DotAAS Part 2 | HTTP/REST | Registry and Discovery
@@ -29,9 +28,6 @@ info:
   contact:
     name: Michael Hoffmeister, Torben Miny, Andreas Orzelski, Manuel Sauer, Constantin Ziesche
   version: Final-Draft
-
-servers:
-- url: ./
 
 security:
   - CatenaXOpenId:
@@ -118,6 +114,7 @@ paths:
           application/json:
             schema:
               type: array
+              maxItems: 10000
               items:
                 $ref: '#/components/schemas/AssetAdministrationShellDescriptor'
             examples:
@@ -131,6 +128,7 @@ paths:
             application/json:
               schema:
                 type: array
+                maxItems: 10000
                 items:
                   $ref: '#/components/schemas/BatchResult'
               examples:
@@ -151,6 +149,7 @@ paths:
             schema:
               type: array
               minLength: 1
+              maxItems: 10000
               items:
                 $ref: '#/components/schemas/Identifier'
             examples:
@@ -268,6 +267,7 @@ paths:
             application/json:
               schema:
                 type: array
+                maxItems: 10000
                 items:
                   $ref: '#/components/schemas/SubmodelDescriptor'
               examples:
@@ -437,11 +437,12 @@ paths:
           application/json:
             schema:
               type: array
+              maxItems: 10000
               items:
                 $ref: '#/components/schemas/IdentifierKeyValuePair'
-        examples:
-          complete:
-            $ref: '#/components/examples/lookup-shells-by-aas-identifier-query'
+            examples:
+              complete:
+                $ref: '#/components/examples/lookup-shells-by-aas-identifier-query'
       responses:
         "200":
           description: Requested Asset Administration Shell ids
@@ -449,6 +450,7 @@ paths:
             application/json:
               schema:
                 type: array
+                maxItems: 10000
                 items:
                   $ref: '#/components/schemas/Identifier'
               examples:
@@ -478,6 +480,7 @@ paths:
             application/json:
               schema:
                 type: array
+                maxItems: 10000
                 items:
                   $ref: '#/components/schemas/IdentifierKeyValuePair'
               examples:
@@ -505,6 +508,7 @@ paths:
           application/json:
             schema:
               type: array
+              maxItems: 10000
               items:
                 $ref: '#/components/schemas/IdentifierKeyValuePair'
             examples:
@@ -518,6 +522,7 @@ paths:
             application/json:
               schema:
                 type: array
+                maxItems: 10000
                 items:
                   $ref: '#/components/schemas/IdentifierKeyValuePair'
               examples:
@@ -564,6 +569,7 @@ paths:
             application/json:
               schema:
                 type: array
+                maxItems: 10000
                 items:
                   $ref: '#/components/schemas/Identifier'
               examples:
@@ -581,6 +587,7 @@ components:
         items:
           title: Items
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/AssetAdministrationShellDescriptor'
     AssetAdministrationShellDescriptorCollection:
@@ -616,6 +623,7 @@ components:
           $ref: '#/components/schemas/AdministrativeInformation'
         description:
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/LangString'
         globalAssetId:
@@ -628,10 +636,12 @@ components:
           $ref: '#/components/schemas/Identifier'
         specificAssetIds:
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/IdentifierKeyValuePair'
         submodelDescriptors:
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/SubmodelDescriptor'
       allOf:
@@ -641,6 +651,7 @@ components:
       properties:
         endpoints:
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/Endpoint'
       example: '{  "endpoints": [{ "protocolInformation": { "endpointAddress": "https://localhost:1234", "endpointProtocolVersion: "1.1"  }, "interface": "AAS-1.0"  }, { "protocolInformation": {  "endpointAddress": "opc.tcp://localhost:4840" },    "interface": "AAS-1.0" }, {  "protocolInformation": { "endpointAddress": "https://localhost:5678",  "endpointProtocolVersion: "1.1", "subprotocol": "OPC UA Basic SOAP", "subprotocolBody": "ns=2;s=MyAAS", "subprotocolBodyEncoding": "plain"  }, "interface": "AAS-1.0"  }] }'
@@ -735,6 +746,7 @@ components:
        #   $ref: '#/components/schemas/Reference'
         keys:
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/Key'
   # The code generator gets in issues, because it's somehow recursive. Reference has a reference ModelReference ..
@@ -788,12 +800,12 @@ components:
             minLength: 1
             maxLength: 200
           # not supported for Catena-X
-          # subjectId:
-            # $ref: '#/components/schemas/Reference'
           value:
             type: string
             minLength: 1
             maxLength: 200
+          externalSubjectId:
+            $ref: '#/components/schemas/Reference'
     HasSemantics:
       type: object
       properties:
@@ -812,6 +824,7 @@ components:
           $ref: '#/components/schemas/AdministrativeInformation'
         description:
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/LangString'
         idShort:
@@ -876,6 +889,7 @@ components:
           properties:
             assetIds:
               type: array
+              maxItems: 10000
               items:
                 $ref: '#/components/schemas/IdentifierKeyValuePair'
   securitySchemes:
@@ -910,6 +924,20 @@ components:
             {
               "key": "PartInstanceID",
               "value": "24975539203421"
+            },
+            {
+              "key": "CustomerPartId",
+              "value": "231982",
+              "externalSubjectId" : {
+                "value": ["TENANT_TWO"]
+              }
+            },
+            {
+              "key": "CustomerPartId",
+              "value": "123829238",
+              "externalSubjectId": {
+                "value": [ "TENANT_THREE" ]
+              }
             }
           ],
           "submodelDescriptors": [
@@ -931,7 +959,7 @@ components:
                 {
                   "interface": "SUBMODEL-1.0RC02",
                   "protocolInformation": {
-                    "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                    "endpointAddress": "https://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
                     "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
                     "endpointProtocolVersion": "0.0.1"
                   }
@@ -956,7 +984,7 @@ components:
                 {
                   "interface": "SUBMODEL-1.0RC02",
                   "protocolInformation": {
-                    "endpointAddress": "edc://provider.connector:9191/offer-details/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/dae4d249-6d66-4818-b576-bf52f3b9ae90/submodel",
+                    "endpointAddress": "https://provider.connector:9191/offer-details/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/dae4d249-6d66-4818-b576-bf52f3b9ae90/submodel",
                     "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
                     "endpointProtocolVersion": "0.0.1"
                   }
@@ -1008,7 +1036,7 @@ components:
                     {
                       "interface": "SUBMODEL-1.0RC02",
                       "protocolInformation": {
-                        "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                        "endpointAddress": "https://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
                         "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
                         "endpointProtocolVersion": "0.0.1"
                       }
@@ -1070,7 +1098,7 @@ components:
                     {
                       "interface": "SUBMODEL-1.0RC02",
                       "protocolInformation": {
-                        "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                        "endpointAddress": "https://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
                         "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
                         "endpointProtocolVersion": "0.0.1"
                       }
@@ -1137,7 +1165,7 @@ components:
                   {
                     "interface": "SUBMODEL-1.0RC02",
                     "protocolInformation": {
-                      "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                      "endpointAddress": "https://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
                       "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
                       "endpointProtocolVersion": "0.0.1"
                     }
@@ -1162,7 +1190,7 @@ components:
                   {
                     "interface": "SUBMODEL-1.0RC02",
                     "protocolInformation": {
-                      "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                      "endpointAddress": "https://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
                       "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
                       "endpointProtocolVersion": "0.0.1"
                     }
@@ -1204,7 +1232,7 @@ components:
             {
               "interface": "SUBMODEL-1.0RC02",
               "protocolInformation": {
-                "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                "endpointAddress": "https://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
                 "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
                 "endpointProtocolVersion": "0.0.1"
               }
@@ -1231,7 +1259,7 @@ components:
             {
               "interface": "SUBMODEL-1.0RC02",
               "protocolInformation": {
-                "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                "endpointAddress": "https://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
                 "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
                 "endpointProtocolVersion": "0.0.1"
               }
@@ -1259,7 +1287,7 @@ components:
             {
               "interface": "SUBMODEL-1.0RC02",
               "protocolInformation": {
-                "endpointAddress": "edc://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
+                "endpointAddress": "https://provider.connector:9191/offer-windchill/shells/882fc530-b69b-4707-95f6-5dbc5e9baaa8/aas/4a738a24-b7d8-4989-9cd6-387772f40565/submodel",
                 "endpointProtocol": "IDS/ECLIPSE DATASPACE CONNECTOR",
                 "endpointProtocolVersion": "0.0.1"
               }

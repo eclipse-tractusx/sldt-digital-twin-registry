@@ -53,7 +53,9 @@ public class AssetAdministrationShellApiDelegate implements RegistryApiDelegate,
     private final ShellMapper shellMapper;
     private final SubmodelMapper submodelMapper;
 
-    public AssetAdministrationShellApiDelegate(final ShellService shellService, final ShellMapper shellMapper, SubmodelMapper submodelMapper) {
+    public AssetAdministrationShellApiDelegate(final ShellService shellService,
+                                               final ShellMapper shellMapper,
+                                               final SubmodelMapper submodelMapper) {
         this.shellService = shellService;
         this.shellMapper = shellMapper;
         this.submodelMapper = submodelMapper;

@@ -32,9 +32,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  *  This class contains test to verify Authentication and RBAC based Authorization for all API endpoints.
@@ -308,6 +307,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     )
                     .andDo(MockMvcResultHandlers.print())
                     .andExpect(status().isCreated());
+
         }
 
         @Test
@@ -551,6 +551,323 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.items", hasSize(0)));
         }
+    }
+
+    /**
+     * The specificAssetId#externalSubjectId indicates which tenant is allowed to see the specificAssetId and
+     * find a Shell.
+     *
+     * Given:
+     *  - Company A creates an AAS with multiple with: 1. one specificAssetId without externalSubjectId,
+     *                                                 2. one with externalSubjectId = Company B
+     *                                                 3. one with externalSubjectId = Company C
+     *
+     *   - Rules: When Company A requests the AAS, all specificAssetIds 1,2 and are shown. Company A is the owner of the AAS.
+     *               The AAS Registry has an environment property "owningTenantId" that is compared with the tenantId from the token.
+     *            When Company B requests the AAS, only specificAssetIds 1 and 2 are shown.
+     *            When Company C requests the AAS, only specificAssetIds 1 and 3 are shown.
+     *
+     *            The same logic applies also to the lookup endpoints.
+     *
+     */
+    @Nested
+    @DisplayName("Tenant based specificAssetId visibility test")
+    class TenantBasedVisibilityTest {
+
+        @Test
+        public void testGetAllShellsWithFilteredSpecificAssetIdsByTenantId() throws Exception {
+            ObjectNode shellPayload = createBaseIdPayload("example", "example");
+
+            String tenantTwoAssetIdValue = "tenantTwo23848920932";
+            String tenantThreeAssetIdValue = "tenantThree2gdf19023123423";
+            String withoutTenantAssetIdValue = "withoutTenant2gdfk1273";
+            shellPayload.set("specificAssetIds", emptyArrayNode()
+                    .add(specificAssetId("CustomerPartId", tenantTwoAssetIdValue,  jwtTokenFactory.tenantTwo().getTenantId()))
+                    .add(specificAssetId("CustomerPartId", tenantThreeAssetIdValue, jwtTokenFactory.tenantThree().getTenantId()))
+                    .add(specificAssetId("MaterialNumber",withoutTenantAssetIdValue))
+            );
+            performShellCreateRequest(toJson(shellPayload));
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .get(SHELL_BASE_PATH)
+                                    .queryParam("pageSize", "100")
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.allRoles())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.items").exists())
+                    .andExpect(jsonPath("$.items[*].identification", hasItem(getId(shellPayload))))
+                    .andExpect(jsonPath("$.items[*].specificAssetIds[*].value", hasItems(tenantThreeAssetIdValue, tenantTwoAssetIdValue, withoutTenantAssetIdValue)));
+
+            // test with tenant two
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .get(SHELL_BASE_PATH)
+                                    .queryParam("pageSize", "100")
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.tenantTwo().allRoles())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.items").exists())
+                    .andExpect(jsonPath("$.items[*].identification", hasItem(getId(shellPayload))))
+                    .andExpect(jsonPath("$.items[*].specificAssetIds[*].value", hasItems(tenantTwoAssetIdValue, withoutTenantAssetIdValue)))
+                    .andExpect(jsonPath("$.items[*].specificAssetIds[*].value", not(hasItem(tenantThreeAssetIdValue))));
+        }
+
+        @Test
+        public void testGetShellWithFilteredSpecificAssetIdsByTenantId() throws Exception {
+            ObjectNode shellPayload = createBaseIdPayload("example", "example");
+            String tenantTwoAssetIdValue = "tenantTwofgkj12308410239401";
+            String tenantThreeAssetIdValue = "tenantThree23408410293o42731";
+            String withoutTenantAssetIdValue = "withoutTenant23947192jf18";
+            shellPayload.set("specificAssetIds", emptyArrayNode()
+                    .add(specificAssetId("CustomerPartId", tenantTwoAssetIdValue,  jwtTokenFactory.tenantTwo().getTenantId()))
+                    .add(specificAssetId("CustomerPartId", tenantThreeAssetIdValue, jwtTokenFactory.tenantThree().getTenantId()))
+                    .add(specificAssetId("MaterialNumber",withoutTenantAssetIdValue))
+            );
+            performShellCreateRequest(toJson(shellPayload));
+            String shellId = getId(shellPayload);
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .get(SINGLE_SHELL_BASE_PATH, shellId)
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.allRoles())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.identification", equalTo(shellId)))
+                    .andExpect(jsonPath("$.specificAssetIds[*].value", containsInAnyOrder(tenantTwoAssetIdValue,tenantThreeAssetIdValue, withoutTenantAssetIdValue)));
+
+            // test with tenant two
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .get(SINGLE_SHELL_BASE_PATH, shellId)
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.tenantTwo().allRoles())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.identification", equalTo(shellId)))
+                    .andExpect(jsonPath("$.specificAssetIds[*].value", hasItems(tenantTwoAssetIdValue, withoutTenantAssetIdValue)))
+                    .andExpect(jsonPath("$.specificAssetIds[*].value", not(hasItem(tenantThreeAssetIdValue))));
+        }
+
+        @Test
+        public void testFetchShellsWithFilteredSpecificAssetIdsByTenantId() throws Exception {
+            ObjectNode shellPayload = createBaseIdPayload("example", "example");
+            String tenantTwoAssetIdValue = "tenantTwofgkj129293";
+            String tenantThreeAssetIdValue = "tenantThree543412394";
+            String withoutTenantAssetIdValue = "withoutTenant329347192jf18";
+            shellPayload.set("specificAssetIds", emptyArrayNode()
+                    .add(specificAssetId("CustomerPartId", tenantTwoAssetIdValue,  jwtTokenFactory.tenantTwo().getTenantId()))
+                    .add(specificAssetId("CustomerPartId", tenantThreeAssetIdValue, jwtTokenFactory.tenantThree().getTenantId()))
+                    .add(specificAssetId("MaterialNumber",withoutTenantAssetIdValue))
+            );
+            performShellCreateRequest(toJson(shellPayload));
+            String shellId = getId(shellPayload);
+
+            ArrayNode queryPayload = emptyArrayNode().add(shellId);
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .post(SHELL_BASE_PATH + "/fetch")
+                                    .content(toJson(queryPayload))
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.allRoles())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.items[*].identification", hasItem(shellId)))
+                    .andExpect(jsonPath("$.items[*].specificAssetIds[*].value", hasItems(tenantTwoAssetIdValue,tenantThreeAssetIdValue, withoutTenantAssetIdValue)));
+
+            // test with tenant two
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .post(SHELL_BASE_PATH + "/fetch")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(toJson(queryPayload))
+                                    .with(jwtTokenFactory.tenantTwo().allRoles())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.items[*].identification", hasItem(shellId)))
+                    .andExpect(jsonPath("$.items[*].specificAssetIds[*].value", hasItems(tenantTwoAssetIdValue, withoutTenantAssetIdValue)))
+                    .andExpect(jsonPath("$.items[*].specificAssetIds[*].value", not(hasItem(tenantThreeAssetIdValue))));
+        }
+
+        @Test
+        public void testGetSpecificAssetIdsFilteredByTenantId() throws Exception {
+            ObjectNode shellPayload = createBaseIdPayload("example", "example");
+            performShellCreateRequest(toJson(shellPayload));
+
+
+            String tenantTwoAssetIdValue = "tenantTwofgkj12308410239401";
+            String tenantThreeAssetIdValue = "tenantThree23408410293o42731";
+            String withoutTenantAssetIdValue = "withoutTenant23947192jf18";
+            ArrayNode specificAssetIds = emptyArrayNode()
+                    .add(specificAssetId("CustomerPartId", tenantTwoAssetIdValue,  jwtTokenFactory.tenantTwo().getTenantId()))
+                    .add(specificAssetId("CustomerPartId", tenantThreeAssetIdValue, jwtTokenFactory.tenantThree().getTenantId()))
+                    .add(specificAssetId("MaterialNumber",withoutTenantAssetIdValue));
+
+            String shellId = getId(shellPayload);
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .post(SINGLE_LOOKUP_SHELL_BASE_PATH, shellId)
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(toJson(specificAssetIds))
+                                    .with(jwtTokenFactory.allRoles())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isCreated())
+                    .andExpect(content().json(toJson(specificAssetIds)));
+
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .get(SINGLE_LOOKUP_SHELL_BASE_PATH, shellId)
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.allRoles())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[*].value", containsInAnyOrder(tenantTwoAssetIdValue,
+                            tenantThreeAssetIdValue,
+                            withoutTenantAssetIdValue)));
+
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .get(SINGLE_LOOKUP_SHELL_BASE_PATH, shellId)
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.tenantTwo().allRoles())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[*].value", hasItems(tenantTwoAssetIdValue, withoutTenantAssetIdValue)))
+                    .andExpect(jsonPath("$[*].value", not(hasItem(tenantThreeAssetIdValue))));
+        }
+
+        @Test
+        public void testFindExternalShellIdsBySpecificAssetIdsWithTenantBasedVisibilityExpectSuccess() throws Exception {
+            // the keyPrefix ensures that this test can run against a persistent database multiple times
+            String keyPrefix = UUID.randomUUID().toString();
+            // first shell
+            ObjectNode firstShellPayload = createBaseIdPayload("sampleForQuery", "idShortSampleForQuery");
+            firstShellPayload.set("specificAssetIds", emptyArrayNode()
+                    .add(specificAssetId(keyPrefix + "findExternalShellIdQueryKey_2", "value_2"))
+                    .add(specificAssetId(keyPrefix + "findExternalShellIdQueryKey_2_1", "value_2_1",
+                            jwtTokenFactory.tenantTwo().getTenantId()))
+                    .add(specificAssetId(keyPrefix + "findExternalShellIdQueryKey_2_2", "value_2_2",
+                            jwtTokenFactory.tenantThree().getTenantId())));
+            performShellCreateRequest(toJson(firstShellPayload));
+
+            ArrayNode specificAssetIds = emptyArrayNode()
+                    .add(specificAssetId(keyPrefix + "findExternalShellIdQueryKey_2", "value_2"))
+                    .add(specificAssetId(keyPrefix + "findExternalShellIdQueryKey_2_1", "value_2_1"));
+
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .get(LOOKUP_SHELL_BASE_PATH)
+                                    .queryParam("assetIds", toJson(specificAssetIds))
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.allRoles())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", hasSize(1)))
+                    // ensure that only three results match
+                    .andExpect(jsonPath("$", contains(getId(firstShellPayload))));
+
+            // test with tenantTwo assetId included
+            ArrayNode specificAssetIdsWithTenantTwoIncluded = specificAssetIds
+                    .add(specificAssetId(keyPrefix + "findExternalShellIdQueryKey_2_2", "value_2_2"));
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .get(LOOKUP_SHELL_BASE_PATH)
+                                    .queryParam("assetIds", toJson(specificAssetIdsWithTenantTwoIncluded))
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.tenantTwo().allRoles())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", hasSize(0)));
+
+            // Test lookup with one assetId for tenant two and one without tenantId
+            ArrayNode specificAssetIdsTenantTwo = emptyArrayNode()
+                    .add(specificAssetId(keyPrefix + "findExternalShellIdQueryKey_2", "value_2"))
+                    .add(specificAssetId(keyPrefix + "findExternalShellIdQueryKey_2_1", "value_2_1"));
+
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .get(LOOKUP_SHELL_BASE_PATH)
+                                    .queryParam("assetIds", toJson(specificAssetIdsTenantTwo))
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.tenantTwo().allRoles())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", hasSize(1)))
+                    // ensure that only three results match
+                    .andExpect(jsonPath("$", contains(getId(firstShellPayload))));
+        }
+
+        @Test
+        public void testFindExternalShellIdsBySpecificAssetIdsWithAnyMatchExpectSuccess() throws Exception {
+            // the keyPrefix ensures that this test can run against a persistent database multiple times
+            String keyPrefix = UUID.randomUUID().toString();
+            ObjectNode commonAssetId = specificAssetId(keyPrefix + "commonAssetIdKey", "commonAssetIdValue");
+            // first shell
+            ObjectNode firstShellPayload = createBaseIdPayload("sampleForQuery", "idShortSampleForQuery");
+            firstShellPayload.set("specificAssetIds", emptyArrayNode()
+                    .add(specificAssetId(keyPrefix + "findExternalShellIdQueryKey_1", "value_1")));
+            performShellCreateRequest(toJson(firstShellPayload));
+
+            // second shell
+            ObjectNode secondShellPayload = createBaseIdPayload("sampleForQuery", "idShortSampleForQuery");
+            secondShellPayload.set("specificAssetIds", emptyArrayNode()
+                    .add(specificAssetId(keyPrefix + "findExternalShellIdQueryKey_2", "value_2", jwtTokenFactory.tenantTwo().getTenantId())));
+            performShellCreateRequest(toJson(secondShellPayload));
+
+            // third shell
+            ObjectNode thirdShellPayload = createBaseIdPayload("sampleForQuery", "idShortSampleForQuery");
+            thirdShellPayload.set("specificAssetIds", emptyArrayNode()
+                    .add(specificAssetId(keyPrefix + "findExternalShellIdQueryKey_3", "value_3", jwtTokenFactory.tenantThree().getTenantId())));
+            performShellCreateRequest(toJson(thirdShellPayload));
+
+            // query to retrieve any match
+            JsonNode anyMatchAueryByAssetIds = mapper.createObjectNode().set("query", mapper.createObjectNode()
+                    .set("assetIds",  emptyArrayNode()
+                            .add(specificAssetId(keyPrefix + "findExternalShellIdQueryKey_1", "value_1"))
+                            .add(specificAssetId(keyPrefix + "findExternalShellIdQueryKey_2", "value_2"))
+                            .add(specificAssetId(keyPrefix + "findExternalShellIdQueryKey_3", "value_3"))
+                            .add(commonAssetId))
+            );
+
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .post(LOOKUP_SHELL_BASE_PATH + "/query")
+                                    .content(toJson(anyMatchAueryByAssetIds))
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.allRoles())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", hasSize(3)))
+                    .andExpect(jsonPath("$", containsInAnyOrder(getId(firstShellPayload), getId(secondShellPayload), getId(thirdShellPayload))));
+
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .post(LOOKUP_SHELL_BASE_PATH + "/query")
+                                    .content(toJson(anyMatchAueryByAssetIds))
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.tenantTwo().allRoles())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", hasSize(2)))
+                    .andExpect(jsonPath("$", containsInAnyOrder(getId(firstShellPayload), getId(secondShellPayload))));
+        }
 
     }
+
 }

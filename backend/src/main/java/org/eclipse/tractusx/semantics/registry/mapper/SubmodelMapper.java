@@ -24,10 +24,11 @@ import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
 import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
 import org.eclipse.tractusx.semantics.registry.model.Submodel;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelEndpoint;
-import org.eclipse.tractusx.semantics.aas.registry.model.*;
-import org.eclipse.tractusx.semantics.registry.model.*;
-
-import org.mapstruct.*;
+import org.mapstruct.InheritInverseConfiguration;
+import org.mapstruct.InjectionStrategy;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 
 import java.util.List;
 import java.util.Set;
