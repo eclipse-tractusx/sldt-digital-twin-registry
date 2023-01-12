@@ -73,7 +73,7 @@
 		<guava.version>31.0.1-jre</guava.version>
 		<apache-commonse.version>1.10.0</apache-commonse.version>
 		<google.findbugs.version>3.0.2</google.findbugs.version>
-		<snakeyaml.version>1.31</snakeyaml.version>
+		<snakeyaml.version>1.32</snakeyaml.version>
 
 		<!-- logging -->
 		<slf4j.version>1.7.32</slf4j.version>
@@ -86,7 +86,7 @@
 		<!-- persistence -->
 		<mapstruct.version>1.4.2.Final</mapstruct.version>
 		<mapstruct.lombok.version>0.2.0</mapstruct.lombok.version>
-		<postgresql.version>42.5.0</postgresql.version>
+		<postgresql.version>42.5.1</postgresql.version>
 		<h2.version>2.1.214</h2.version>
 		<liquibase.version>4.9.1</liquibase.version>
 
