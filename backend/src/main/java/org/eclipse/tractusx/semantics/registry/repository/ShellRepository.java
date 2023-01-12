@@ -22,6 +22,7 @@ package org.eclipse.tractusx.semantics.registry.repository;
 import org.eclipse.tractusx.semantics.registry.model.projection.ShellMinimal;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -29,7 +30,7 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 @Repository
-public interface ShellRepository extends PagingAndSortingRepository<Shell, UUID>{
+public interface ShellRepository extends PagingAndSortingRepository<Shell, UUID>, CrudRepository<Shell,UUID> {
     Optional<Shell> findByIdExternal(String idExternal);
 
     @Query("select s.id, s.created_date from shell s where s.id_external = :idExternal")
@@ -54,15 +55,13 @@ public interface ShellRepository extends PagingAndSortingRepository<Shell, UUID>
     @Query(
             "select s.id_external from shell s where s.id in (" +
                     "select si.fk_shell_id from shell_identifier si " +
-                    "join (values :keyValueCombinations ) as t (input_key,input_value) " +
-                    "ON si.namespace = input_key " +
-                        "AND si.identifier = input_value " +
-                        "AND (si.external_subject_id is null or :tenantId = :owningTenantId or si.external_subject_id = :tenantId) " +
+                    "where concat(si.namespace,si.identifier) in (:keyValueCombinations) " +
+                    "and (si.external_subject_id is null or :tenantId = :owningTenantId or si.external_subject_id = :tenantId) " +
                     "group by si.fk_shell_id " +
                     "having count(*) = :keyValueCombinationsSize " +
             ")"
     )
-    List<String> findExternalShellIdsByIdentifiersByExactMatch(@Param("keyValueCombinations") List<String[]> keyValueCombinations,
+    List<String> findExternalShellIdsByIdentifiersByExactMatch(@Param("keyValueCombinations") List<String> keyValueCombinations,
                                                    @Param("keyValueCombinationsSize") int keyValueCombinationsSize,
                                                    @Param("tenantId") String tenantId,
                                                    @Param("owningTenantId") String owningTenantId);
@@ -80,14 +79,12 @@ public interface ShellRepository extends PagingAndSortingRepository<Shell, UUID>
     @Query(
             "select distinct s.id_external from shell s where s.id in (" +
                     "select si.fk_shell_id from shell_identifier si " +
-                    "join (values :keyValueCombinations ) as t (input_key,input_value) " +
-                    "ON si.namespace = input_key " +
-                        "AND si.identifier = input_value " +
-                        "AND (si.external_subject_id is null or :tenantId = :owningTenantId or si.external_subject_id = :tenantId) " +
+                    "where concat(si.namespace,si.identifier) in (:keyValueCombinations) " +
+                    "and (si.external_subject_id is null or :tenantId = :owningTenantId or si.external_subject_id = :tenantId) " +
                     "group by si.fk_shell_id " +
                     ")"
     )
-    List<String> findExternalShellIdsByIdentifiersByAnyMatch(@Param("keyValueCombinations") List<String[]> keyValueCombinations,
+    List<String> findExternalShellIdsByIdentifiersByAnyMatch(@Param("keyValueCombinations") List<String> keyValueCombinations,
                                                              @Param("tenantId") String tenantId,
                                                              @Param("owningTenantId") String owningTenantId);
 }
