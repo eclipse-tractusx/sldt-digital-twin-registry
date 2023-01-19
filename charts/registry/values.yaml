@@ -21,15 +21,16 @@
 enablePostgres: true
 
 registry:
-  image: registry:0.2.0-M4-multi-tenancy
+  image: ghcr.io/catenax-ng/registry:0.3.0-m1
   replicaCount: 1
   imagePullPolicy: IfNotPresent
   containerPort: 4243
   host: minikube
   ## If 'authentication' is set to false, no OAuth authentication is enforced
-  authentication: false
+  authentication: true
   idpIssuerUri: https://idp-url
   idpClientId: idpClientID
+  tenantId: test-12345
   service:
     port: 8080
     type: ClusterIP
@@ -42,8 +43,8 @@ registry:
     user: user
     password: password
   ingress:
-    enabled: true
-    tls: true
+    enabled: false
+    tls: false
     urlPrefix: /semantics/registry
     className: nginx
     annotations:

@@ -23,11 +23,11 @@ name: registry
 description: Tractus-X Digital Twin Registry Helm Chart
 
 type: application
-version: 0.2.4
-appVersion: 0.2.0-M4-multi-tenancy
+version: 0.3.0
+appVersion: 0.3.0-M1
 
 dependencies:
   - repository: https://charts.bitnami.com/bitnami
     name: postgresql
-    version: 11.1.9
+    version: 12.1.7
     condition: enablePostgres
