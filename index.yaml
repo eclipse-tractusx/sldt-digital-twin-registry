@@ -45,5 +45,5 @@ entries:
     type: application
     urls:
     - https://github.com/eclipse-tractusx/sldt-digital-twin-registry/releases/download/registry-0.2.3/registry-0.2.3.tgz
-    version: 0.2.4
+    version: 0.2.3
 generated: "2023-01-11T11:41:46.08988698Z"
