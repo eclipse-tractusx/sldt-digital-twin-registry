@@ -35,7 +35,7 @@ Run `docker build -t registry .`
 In case you want to publish your image into a remote container registry, apply the tag accordingly and `docker push` the image.
 
 ## Deploy using Helm and K8s
-If you have a running Kubernetes cluster available, you can deploy the Registry using our Helm Chart, which is located under `./deployment/registry`.
+If you have a running Kubernetes cluster available, you can deploy the Registry using our Helm Chart, which is located under `charts/registry`.
 In case you don't have a running cluster, you can set up one by yourself locally, using [minikube](https://minikube.sigs.k8s.io/docs/start/).
 In the following, we will use a minikube cluster for reference.
 
@@ -47,11 +47,11 @@ Before deploying the Registry, enable a few add-ons in your minikube cluster by 
 
 `minikube addons enable ingress`
 
-Fetch all dependencies by running `helm dep up deployment/registry`.
+Fetch all dependencies by running `helm dep up charts/registry`.
 
 In order to deploy the helm chart, first create a new namespace "semantics": `kubectl create namespace semantics`.
 
-Then run `helm install registry -n semantics ./deployment/registry`. This will set up a new helm deployment in the semantics namespace. By default, the deployment contains the Registry instance itself, and a Fuseki Triplestore.
+Then run `helm install registry -n semantics charts/registry`. This will set up a new helm deployment in the semantics namespace. By default, the deployment contains the Registry instance itself, and a Fuseki Triplestore.
 
 Check that the two containers are running by calling `kubectl get pod -n semantics`.
 
