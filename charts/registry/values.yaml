@@ -21,7 +21,11 @@
 enablePostgres: true
 
 registry:
-  image: ghcr.io/catenax-ng/registry:0.3.0-m1
+  image:
+      registry: ghcr.io/catenax-ng
+      repository: registry
+      # This version property overwrites the default image version. The default image version is the appVersion of the Chart.yaml.
+      version: ""
   replicaCount: 1
   imagePullPolicy: IfNotPresent
   containerPort: 4243
