@@ -21,15 +21,20 @@
 enablePostgres: true
 
 registry:
-  image: registry:0.2.0-M2-multi-tenancy
+  image:
+      registry: ghcr.io/catenax-ng
+      repository: sldt-digital-twin-registry
+      # This version property overwrites the default image version. The default image version is the appVersion of the Chart.yaml.
+      version: ""
   replicaCount: 1
   imagePullPolicy: IfNotPresent
   containerPort: 4243
   host: minikube
   ## If 'authentication' is set to false, no OAuth authentication is enforced
-  authentication: false
+  authentication: true
   idpIssuerUri: https://idp-url
   idpClientId: idpClientID
+  tenantId: test-12345
   service:
     port: 8080
     type: ClusterIP
@@ -42,8 +47,8 @@ registry:
     user: user
     password: password
   ingress:
-    enabled: true
-    tls: true
+    enabled: false
+    tls: false
     urlPrefix: /semantics/registry
     className: nginx
     annotations:

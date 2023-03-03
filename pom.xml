@@ -25,7 +25,7 @@
 	<parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.5</version> <!-- need to be repeated in properties section for technical purposes -->
+        <version>2.7.6</version> <!-- need to be repeated in properties section for technical purposes -->
         <relativePath/> <!-- lookup parent from repository and not the filesystem -->
     </parent>
 
@@ -65,16 +65,15 @@
 
 		<!-- version properties -->
 		<!-- framework and base stuff -->
-		<spring.boot.version>2.7.5</spring.boot.version>
+		<spring.boot.version>2.7.6</spring.boot.version>
 		<springdoc.version>1.6.6</springdoc.version>
-		<spring.security.version>5.7.5</spring.security.version>
 		<lombok.version>1.18.22</lombok.version>
 		<swagger-annotations.version>1.5.20</swagger-annotations.version>
 		<swagger-core-version>2.0.0</swagger-core-version>
 		<guava.version>31.0.1-jre</guava.version>
 		<apache-commonse.version>1.10.0</apache-commonse.version>
 		<google.findbugs.version>3.0.2</google.findbugs.version>
-		<snakeyaml.version>1.31</snakeyaml.version>
+		<snakeyaml.version>1.33</snakeyaml.version>
 
 		<!-- logging -->
 		<slf4j.version>1.7.32</slf4j.version>
@@ -87,7 +86,7 @@
 		<!-- persistence -->
 		<mapstruct.version>1.4.2.Final</mapstruct.version>
 		<mapstruct.lombok.version>0.2.0</mapstruct.lombok.version>
-		<postgresql.version>42.5.0</postgresql.version>
+		<postgresql.version>42.5.1</postgresql.version>
 		<h2.version>2.1.214</h2.version>
 		<liquibase.version>4.9.1</liquibase.version>
 
@@ -155,14 +154,6 @@
 						<artifactId>spring-boot-starter-logging</artifactId>
 					</exclusion>
 				</exclusions>
-			</dependency>
-			<!-- must be set explicitly cause of CVE-2022-31692. The newest springboot version not includes the fix.
-			TODO: Check if the newest version of springboot includes the security-core version > 5.7.5
-			 and if it applies remove the following dependency -->
-			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-core</artifactId>
-				<version>${spring.security.version}</version>
 			</dependency>
 			<!-- logging -->
 			<dependency>
