@@ -37,7 +37,7 @@ spec:
     spec:
       containers:
         - name: {{ $deployment_name }}
-          image: {{ .Values.registry.image }}
+          image: {{ .Values.registry.image.registry }}/{{ .Values.registry.image.repository }}:{{ .Values.registry.image.version | default .Chart.AppVersion }}
           imagePullPolicy: {{ .Values.registry.imagePullPolicy }}
           {{- if not .Values.registry.authentication }}
           args: ["--spring.profiles.active=local"]
