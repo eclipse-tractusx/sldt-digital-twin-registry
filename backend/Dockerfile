@@ -19,6 +19,11 @@
 ###############################################################
 
 # Docker buildfile to containerize the semantics layer
+FROM maven:3-eclipse-temurin-11-alpine AS builder
+COPY . /build
+WORKDIR /build
+RUN mvn package -DskipTests
+
 FROM eclipse-temurin:11-jre-alpine
 
 RUN addgroup -S spring \
@@ -30,7 +35,9 @@ USER spring:spring
 
 WORKDIR /service
 
-COPY ./target/digital-twin-registry-backend*.jar app.jar
+COPY --from=builder /build/backend/target/digital-twin-registry-backend*.jar app.jar
+
+COPY backend/Dockerfile *legal /legal/
 
 ENV JAVA_TOOL_OPTIONS "-Xms512m -Xmx2048m"
 EXPOSE 4243
