@@ -23,7 +23,7 @@ enablePostgres: true
 registry:
   image:
       registry: ghcr.io/catenax-ng
-      repository: registry
+      repository: sldt-digital-twin-registry
       # This version property overwrites the default image version. The default image version is the appVersion of the Chart.yaml.
       version: ""
   replicaCount: 1
