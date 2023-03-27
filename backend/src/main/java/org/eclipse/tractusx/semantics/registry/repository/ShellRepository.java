@@ -33,7 +33,7 @@ import java.util.*;
 public interface ShellRepository extends PagingAndSortingRepository<Shell, UUID>, CrudRepository<Shell,UUID> {
     Optional<Shell> findByIdExternal(String idExternal);
 
-    @Query("select s.id, s.created_date from shell s where s.id_external = :idExternal")
+    @Query("select s.id, s.created_date, s.tenant_id from shell s where s.id_external = :idExternal")
     Optional<ShellMinimal> findMinimalRepresentationByIdExternal(String idExternal);
 
     List<Shell> findShellsByIdExternalIsIn(Set<String> idExternals);
@@ -61,7 +61,7 @@ public interface ShellRepository extends PagingAndSortingRepository<Shell, UUID>
                     "having count(*) = :keyValueCombinationsSize " +
             ")"
     )
-    List<String> findExternalShellIdsByIdentifiersByExactMatch(@Param("keyValueCombinations") List<String[]> keyValueCombinations,
+    List<String> findExternalShellIdsByIdentifiersByExactMatch(@Param("keyValueCombinations") List<String>  keyValueCombinations,
                                                    @Param("keyValueCombinationsSize") int keyValueCombinationsSize,
                                                    @Param("tenantId") String tenantId);
 
@@ -83,6 +83,6 @@ public interface ShellRepository extends PagingAndSortingRepository<Shell, UUID>
                     "group by si.fk_shell_id " +
                     ")"
     )
-    List<String> findExternalShellIdsByIdentifiersByAnyMatch(@Param("keyValueCombinations") List<String[]> keyValueCombinations,
+    List<String> findExternalShellIdsByIdentifiersByAnyMatch(@Param("keyValueCombinations") List<String> keyValueCombinations,
                                                              @Param("tenantId") String tenantId);
 }
