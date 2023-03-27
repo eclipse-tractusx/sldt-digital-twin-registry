@@ -54,10 +54,8 @@ public interface ShellRepository extends PagingAndSortingRepository<Shell, UUID>
     @Query(
             "select s.id_external from shell s where s.id in (" +
                     "select si.fk_shell_id from shell_identifier si " +
-                    "join (values :keyValueCombinations ) as t (input_key,input_value) " +
-                    "ON si.namespace = input_key " +
-                        "AND si.identifier = input_value " +
-                        "AND (si.external_subject_id is null or :tenantId = s.tenant_id or si.external_subject_id = :tenantId) " +
+                    "where concat(si.namespace,si.identifier) in (:keyValueCombinations) " +
+                    "AND (si.external_subject_id is null or :tenantId = s.tenant_id or si.external_subject_id = :tenantId) " +
                     "group by si.fk_shell_id " +
                     "having count(*) = :keyValueCombinationsSize " +
             ")"
@@ -79,10 +77,8 @@ public interface ShellRepository extends PagingAndSortingRepository<Shell, UUID>
     @Query(
             "select distinct s.id_external from shell s where s.id in (" +
                     "select si.fk_shell_id from shell_identifier si " +
-                    "join (values :keyValueCombinations ) as t (input_key,input_value) " +
-                    "ON si.namespace = input_key " +
-                        "AND si.identifier = input_value " +
-                        "AND (si.external_subject_id is null or :tenantId = s.tenant_id or si.external_subject_id = :tenantId) " +
+                    "where concat(si.namespace,si.identifier) in (:keyValueCombinations) " +
+                    "AND (si.external_subject_id is null or :tenantId = s.tenant_id or si.external_subject_id = :tenantId) " +
                     "group by si.fk_shell_id " +
                     ")"
     )
