@@ -25,7 +25,7 @@
 	<parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.6</version> <!-- need to be repeated in properties section for technical purposes -->
+        <version>3.0.1</version> <!-- need to be repeated in properties section for technical purposes -->
         <relativePath/> <!-- lookup parent from repository and not the filesystem -->
     </parent>
 
@@ -60,20 +60,24 @@
 		<licence_distribution>repo</licence_distribution>
 		<licence_comments>An Eclipse Project</licence_comments>
 		<!-- build properties -->
-		<java.version>11</java.version>
+		<java.version>17</java.version>
 		<maven.minimum.version>3.3.9</maven.minimum.version>
 
 		<!-- version properties -->
 		<!-- framework and base stuff -->
-		<spring.boot.version>2.7.6</spring.boot.version>
-		<springdoc.version>1.6.6</springdoc.version>
-		<lombok.version>1.18.22</lombok.version>
+		<spring.boot.version>3.0.1</spring.boot.version>
+		<springdoc.version>1.6.14</springdoc.version>
+		<lombok.version>1.18.24</lombok.version>
 		<swagger-annotations.version>1.5.20</swagger-annotations.version>
+		<openapi-starter-webmvc-ui.version>2.0.2</openapi-starter-webmvc-ui.version>
 		<swagger-core-version>2.0.0</swagger-core-version>
 		<guava.version>31.0.1-jre</guava.version>
 		<apache-commonse.version>1.10.0</apache-commonse.version>
 		<google.findbugs.version>3.0.2</google.findbugs.version>
-		<snakeyaml.version>1.33</snakeyaml.version>
+		<snakeyaml.version>2.0</snakeyaml.version>
+		<jakarta.validation.version>3.0.2</jakarta.validation.version>
+		<jakarta.servlet.api.version>5.0.0</jakarta.servlet.api.version>
+		<json.version>20220924</json.version>
 
 		<!-- logging -->
 		<slf4j.version>1.7.32</slf4j.version>
@@ -81,14 +85,14 @@
 
 		<!-- json, xml, formats, ... -->
 		<jackson.version>2.13.1</jackson.version>
-		<jackson.databind.version>2.14.0</jackson.databind.version>
+		<jackson.databind.version>2.14.1</jackson.databind.version>
 
 		<!-- persistence -->
-		<mapstruct.version>1.4.2.Final</mapstruct.version>
+		<mapstruct.version>1.5.3.Final</mapstruct.version>
 		<mapstruct.lombok.version>0.2.0</mapstruct.lombok.version>
 		<postgresql.version>42.5.1</postgresql.version>
 		<h2.version>2.1.214</h2.version>
-		<liquibase.version>4.9.1</liquibase.version>
+		<liquibase.version>4.19.1</liquibase.version>
 
 		<!-- test libs -->
 		<assertj.version>3.18.1</assertj.version>
@@ -179,22 +183,20 @@
 					</exclusion>
 				</exclusions>
 			</dependency>
-			<!-- Tempory fix for a finding in snakeyaml v1.30, remove once new Spring Boot release contains fix -->
 			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter-validation</artifactId>
-				<version>${spring.boot.version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>org.yaml</groupId>
-						<artifactId>snakeyaml</artifactId>
-					</exclusion>
-				</exclusions>
+				<groupId>jakarta.validation</groupId>
+				<artifactId>jakarta.validation-api</artifactId>
+				<version>${jakarta.validation.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.yaml</groupId>
-				<artifactId>snakeyaml</artifactId>
-				<version>${snakeyaml.version}</version>
+				<groupId>jakarta.servlet</groupId>
+				<artifactId>jakarta.servlet-api</artifactId>
+				<version>${jakarta.servlet.api.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.json</groupId>
+				<artifactId>json</artifactId>
+				<version>${json.version}</version>
 			</dependency>
 
 			<!-- Open API Stuff -->
@@ -211,9 +213,9 @@
 				<version>${swagger-core-version}</version>
 			</dependency>
 			<dependency>
-				<groupId>io.swagger</groupId>
-				<artifactId>swagger-annotations</artifactId>
-				<version>${swagger-annotations.version}</version>
+				<groupId>org.springdoc</groupId>
+				<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+				<version>${openapi-starter-webmvc-ui.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.openapitools</groupId>
@@ -244,6 +246,17 @@
 				<groupId>org.liquibase</groupId>
 				<artifactId>liquibase-core</artifactId>
 				<version>${liquibase.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.yaml</groupId>
+						<artifactId>snakeyaml</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.yaml</groupId>
+				<artifactId>snakeyaml</artifactId>
+				<version>${snakeyaml.version}</version>
 			</dependency>
 
 			<!-- Persistence -->
@@ -361,7 +374,7 @@
 				<plugin>
 				<groupId>org.openapitools</groupId>
 				<artifactId>openapi-generator-maven-plugin</artifactId>
-				<version>5.4.0</version>
+				<version>6.2.1</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>

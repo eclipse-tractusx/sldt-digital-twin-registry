@@ -54,32 +54,46 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jdbc</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>spring-data-jdbc</artifactId>
-                    <groupId>org.springframework.data</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
-        <!--
-            2.4.2 is version packed with spring boot 2.7.3.
-            There is an issue in 2.4.2 and 2.4.1 with array bind parameters e.g. join (values :keyValueCombinations ).
-            We use this feature in the for ShellRepository.
-            Downgrading to 2.4.0 resolves the issue. Related issue is here:
-            https://github.com/spring-projects/spring-data-relational/issues/1323
-        -->
+        <!-- Springboot 3 requires Jakarta 6. But Jetty is not compatible with Jakarta 6 yet. But the tests needs jakarta in version 6.0.0.
+          Temporary solution until jetty will be compatible with Jakarta (version +12.See https://www.eclipse.org/lists/jetty-users/msg10348.html):
+          1. Define jakarta dependency with 6.0.0 and scope test. Add dot to end of groupId.
+          2. Define jakarta dependency with 5.0.0 to run the application successfuly.
+          -> Maven run the tests first then compile.
+          TODO: If new jetty is available, remove the test dependency and use jakarta in version 6.0.0
+          -->
         <dependency>
-            <artifactId>spring-data-jdbc</artifactId>
-            <groupId>org.springframework.data</groupId>
-            <version>2.4.0</version>
+            <groupId>jakarta.servlet.</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
         <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.yaml</groupId>
+                    <artifactId>snakeyaml</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -106,11 +120,6 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- Tempory fix for a finding in snakeyaml v1.30, remove once new Spring Boot release contains fix -->
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-        </dependency>
 
         <!-- persistence -->
         <dependency>
@@ -135,12 +144,8 @@
             <artifactId>swagger-annotations</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-annotations</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-ui</artifactId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -167,6 +172,10 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
         </dependency>
     </dependencies>
 
@@ -204,6 +213,7 @@
                                 <packageName>org.eclipse.tractusx</packageName>
                                 <useBeanValidation>true</useBeanValidation>
                                 <useSpringfox>false</useSpringfox>
+                                <useSpringBoot3>true</useSpringBoot3>
                             </configOptions>
                             <invokerPackage>org.eclipse.tractusx.semantics</invokerPackage>
                         </configuration>

@@ -716,11 +716,6 @@ components:
           minLength: 1
           maxLength: 500
     Reference:
-      type: object
-      oneOf:
-      - $ref: '#/components/schemas/GlobalReference'
-      #- $ref: '#/components/schemas/ModelReference'
-    GlobalReference:
       required:
       - value
       properties:
