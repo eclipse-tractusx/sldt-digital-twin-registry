@@ -28,8 +28,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
@@ -38,10 +39,11 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Profile("!local")
 @Configuration
-public class OAuthSecurityConfig extends WebSecurityConfigurerAdapter {
+public class OAuthSecurityConfig {
 
     /**
      * Applies the jwt token based security configuration.
@@ -49,32 +51,33 @@ public class OAuthSecurityConfig extends WebSecurityConfigurerAdapter {
      * The OpenAPI generator does not support roles.
      * API Paths are authorized in this method with path and method based matchers.
      */
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
+    @Bean
+    protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
+         http
           .authorizeRequests(auth -> auth
-            .antMatchers(HttpMethod.OPTIONS).permitAll()
+            .requestMatchers(HttpMethod.OPTIONS).permitAll()
              // fetch endpoint is allowed for reader
-            .mvcMatchers(HttpMethod.POST,"/**/registry/**/fetch").access("@authorizationEvaluator.hasRoleViewDigitalTwin()")
+            .requestMatchers(HttpMethod.POST,"/**/registry/**/fetch").access("@authorizationEvaluator.hasRoleViewDigitalTwin()")
              // others are HTTP method based
-            .antMatchers(HttpMethod.GET,"/**/registry/**").access("@authorizationEvaluator.hasRoleViewDigitalTwin()")
-            .antMatchers(HttpMethod.POST,"/**/registry/**").access("@authorizationEvaluator.hasRoleAddDigitalTwin()")
-            .antMatchers(HttpMethod.PUT,"/**/registry/**").access("@authorizationEvaluator.hasRoleUpdateDigitalTwin()")
-            .antMatchers(HttpMethod.DELETE,"/**/registry/**").access("@authorizationEvaluator.hasRoleDeleteDigitalTwin()")
+            .requestMatchers(HttpMethod.GET,"/**/registry/**").access("@authorizationEvaluator.hasRoleViewDigitalTwin()")
+            .requestMatchers(HttpMethod.POST,"/**/registry/**").access("@authorizationEvaluator.hasRoleAddDigitalTwin()")
+            .requestMatchers(HttpMethod.PUT,"/**/registry/**").access("@authorizationEvaluator.hasRoleUpdateDigitalTwin()")
+            .requestMatchers(HttpMethod.DELETE,"/**/registry/**").access("@authorizationEvaluator.hasRoleDeleteDigitalTwin()")
              // lookup
              // query endpoint is allowed for reader
-            .antMatchers(HttpMethod.POST,"/**/lookup/**/query/**").access("@authorizationEvaluator.hasRoleViewDigitalTwin()")
+            .requestMatchers(HttpMethod.POST,"/**/lookup/**/query/**").access("@authorizationEvaluator.hasRoleViewDigitalTwin()")
              // others are HTTP method based
-            .antMatchers(HttpMethod.GET,"/**/lookup/**").access("@authorizationEvaluator.hasRoleViewDigitalTwin()")
-            .antMatchers(HttpMethod.POST,"/**/lookup/**").access("@authorizationEvaluator.hasRoleAddDigitalTwin()")
-            .antMatchers(HttpMethod.PUT,"/**/lookup/**").access("@authorizationEvaluator.hasRoleUpdateDigitalTwin()")
-            .antMatchers(HttpMethod.DELETE,"/**/lookup/**").access("@authorizationEvaluator.hasRoleDeleteDigitalTwin()")
+            .requestMatchers(HttpMethod.GET,"/**/lookup/**").access("@authorizationEvaluator.hasRoleViewDigitalTwin()")
+            .requestMatchers(HttpMethod.POST,"/**/lookup/**").access("@authorizationEvaluator.hasRoleAddDigitalTwin()")
+            .requestMatchers(HttpMethod.PUT,"/**/lookup/**").access("@authorizationEvaluator.hasRoleUpdateDigitalTwin()")
+            .requestMatchers(HttpMethod.DELETE,"/**/lookup/**").access("@authorizationEvaluator.hasRoleDeleteDigitalTwin()")
           )
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
           .oauth2ResourceServer()
           .jwt();
+         return http.build();
     }
 
     @Bean

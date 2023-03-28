@@ -24,13 +24,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.eclipse.tractusx.semantics.registry.model.support.DatabaseExceptionTranslation;
 import org.eclipse.tractusx.semantics.registry.service.EntityNotFoundException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -44,6 +43,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import org.eclipse.tractusx.semantics.aas.registry.model.Error;
 import org.eclipse.tractusx.semantics.aas.registry.model.ErrorResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
 
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
@@ -51,7 +51,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
    @Override
    protected ResponseEntity<Object> handleMethodArgumentNotValid( final MethodArgumentNotValidException ex,
          final HttpHeaders headers,
-         final HttpStatus status, final WebRequest request ) {
+         final HttpStatusCode status, final WebRequest request ) {
       final String path = ((ServletWebRequest) request).getRequest().getRequestURI();
       final Map<String, Object> errors = ex.getBindingResult()
                                            .getFieldErrors()
