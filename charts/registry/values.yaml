@@ -118,5 +118,5 @@ keycloak:
   # authorize requests to the digital twin registry.
   # Make sure to remove the '--hostname' property when deploying
   # in a non-test scanrio
-  command: ["/bin/sh","-c"]
+  command: ["/bin/sh", "-c"]
   args: ["kc.sh import --file /opt/keycloak/data/import/default-realm-import.json; kc.sh start-dev --hostname=registry-keycloak --hostname-strict=false --proxy=edge"]
