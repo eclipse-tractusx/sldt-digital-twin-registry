@@ -64,8 +64,8 @@ jobs:
              echo "::set-output name=changed::true"
           fi
       - name: Run chart-testing (lint)
-        run: ct lint --validate-maintainers=false --target-branch ${{ github.event.repository.default_branch }}
+        run: ct lint --validate-maintainers=false --target-branch ${{ github.event.repository.default_branch }} --config charts/chart-testing-config.yaml
 
       - name: Run chart-testing (install)
-        run: ct install --charts charts/registry
+        run: ct install --charts charts/registry --config charts/chart-testing-config.yaml
         if: steps.list-changed.outputs.changed == 'true'
