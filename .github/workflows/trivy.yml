@@ -79,7 +79,7 @@ jobs:
         run: mvn clean package
         
       - name: Build Image
-        run: docker build -t registry ./backend
+        run: docker build -t registry -f ./backend/Dockerfile .
         
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
