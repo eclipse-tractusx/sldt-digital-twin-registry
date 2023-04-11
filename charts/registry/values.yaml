@@ -45,7 +45,7 @@ registry:
   # validating the issuer claim in an access token
   idpIssuerUri: ""
   idpClientId: default-client
-  tenantId: ""
+  tenantId: default-tenant
   service:
     port: 8080
     type: ClusterIP
