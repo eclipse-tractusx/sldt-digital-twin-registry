@@ -93,11 +93,12 @@ keycloak:
   postgresql:
     enabled: false
   externalDatabase:
-    host: registry-postgresql
-    port: 5432
-    user: default-user
-    password: password
-    database: default-database
+    # host: registry-postgresql
+    # port: 5432
+    # user: default-user
+    # password: password
+    # database: default-database
+    existingSecret: keycloak-database-credentials
   auth:
     adminUser: admin
     adminPassword: "admin"
