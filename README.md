@@ -92,6 +92,10 @@ The Helm Chart can be configured using the following parameters (incomplete list
 | `postgresql.auth.password`     | Password for authentication at the database  | `TFLIykCd4rUvSjbs` |
 | `postgresql.auth.database`     | Database name  | `registry` |
 
+### Prerequisites
+- Kubernetes 1.19+
+- Helm 3.10.2+
+- PV provisioner support in the underlying infrastructure
 
 ## Notice for Docker image
 
