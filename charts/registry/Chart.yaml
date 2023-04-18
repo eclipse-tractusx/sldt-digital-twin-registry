@@ -23,7 +23,7 @@ name: registry
 description: Tractus-X Digital Twin Registry Helm Chart
 
 type: application
-version: 0.2.9
+version: 0.2.10
 appVersion: 0.2.0-M7-multi-tenancy
 
 dependencies:
