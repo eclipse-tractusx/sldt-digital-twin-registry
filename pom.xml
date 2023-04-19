@@ -145,7 +145,19 @@
 						<groupId>org.springframework.boot</groupId>
 						<artifactId>spring-boot-starter-tomcat</artifactId>
 					</exclusion>
+					<!-- Exlude spring-expression because of CVE-2023-20863 (spring-expression in version 6.0.7) -->
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-expression</artifactId>
+					</exclusion>
 				</exclusions>
+			</dependency>
+			<!-- add explicit dependency spring-expression because of CVE-2023-20863 (spring-expression in version 6.0.7).
+			Remove after spring-boot-starter-web includes the newest version of spring-expression-->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-expression</artifactId>
+				<version>6.0.8</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.boot</groupId>

@@ -36,13 +36,13 @@ spec:
         app: {{ $deployment_name }}
     spec:
       securityContext:
-        runAsUser: 1000
+        runAsUser: 100
       containers:
         - name: {{ $deployment_name }}
           image: {{ .Values.registry.image.registry }}/{{ .Values.registry.image.repository }}:{{ .Values.registry.image.version | default .Chart.AppVersion }}
           imagePullPolicy: {{ .Values.registry.imagePullPolicy }}
           securityContext:
-            runAsUser: 1000
+            runAsUser: 100
             allowPrivilegeEscalation: false
           {{- if not .Values.registry.authentication }}
           args: ["--spring.profiles.active=local"]
