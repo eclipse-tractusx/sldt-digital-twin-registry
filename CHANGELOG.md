@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.2.0-M11-multi-tenancy
+### Added
+
+## fixed
+- Update dependencies.md
+
+## 0.2.0-M10-multi-tenancy
+### Added
+
+## fixed
+- Fix cve-2023-20863 (update spring-core to 6.0.8)
+
 ## 0.2.0-M9-multi-tenancy
 ### Added
 
