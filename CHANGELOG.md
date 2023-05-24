@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## 0.3.1-M1
 This version includes changes for the decentralized digital twin registry.
 ### Added
+
+## fixed
+- fix CVE-2023-20862
+- fix CVE-2023-20873
+
+## 0.3.1-M1
+This version includes changes for the decentralized digital twin registry.
+### Added
 - Create INSTALL.md
 - Rename documentation.md to README.md
 - Add .tractusx file
