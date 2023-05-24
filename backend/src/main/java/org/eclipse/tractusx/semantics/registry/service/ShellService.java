@@ -110,14 +110,16 @@ public class ShellService {
 
     @Transactional(readOnly = true)
     public List<String> findExternalShellIdsByIdentifiersByExactMatch(Set<ShellIdentifier> shellIdentifiers) {
-        List<String[]> keyValueCombinations = shellIdentifiers.stream().map(shellIdentifier -> new String[]{shellIdentifier.getKey(), shellIdentifier.getValue()}).collect(Collectors.toList());
+        List<String> keyValueCombinations=shellIdentifiers.stream().map( shellIdentifier -> shellIdentifier.getKey()+shellIdentifier.getValue()).toList();
+
         return shellRepository.findExternalShellIdsByIdentifiersByExactMatch(keyValueCombinations,
                 keyValueCombinations.size(), tenantAware.getTenantId(), owningTenantId);
     }
 
     @Transactional(readOnly = true)
     public List<String> findExternalShellIdsByIdentifiersByAnyMatch(Set<ShellIdentifier> shellIdentifiers) {
-        List<String[]> keyValueCombinations = shellIdentifiers.stream().map(shellIdentifier -> new String[]{shellIdentifier.getKey(), shellIdentifier.getValue()}).collect(Collectors.toList());
+        List<String> keyValueCombinations=shellIdentifiers.stream().map( shellIdentifier -> shellIdentifier.getKey()+shellIdentifier.getValue()).toList();
+
         return shellRepository.findExternalShellIdsByIdentifiersByAnyMatch(keyValueCombinations, tenantAware.getTenantId(), owningTenantId);
     }
 

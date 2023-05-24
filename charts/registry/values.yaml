@@ -1,6 +1,6 @@
 ###############################################################
-# Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
-# Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+# Copyright (c) 2021, 2023 Robert Bosch Manufacturing Solutions GmbH
+# Copyright (c) 2021, 2023 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -18,19 +18,34 @@
 # SPDX-License-Identifier: Apache-2.0
 ###############################################################
 
+
+# enables the default postgres database
 enablePostgres: true
+# enables the default keycloak identity provider
+# relies on a postgres instance
+enableKeycloak: true
 
 registry:
-  image: ghcr.io/catenax-ng/registry:0.3.0-m1
+  image:
+    registry: ghcr.io/catenax-ng
+    repository: sldt-digital-twin-registry
+    # This version property overwrites the default image version.
+    # The default image version is the appVersion of the Chart.yaml.
+    version: ""
   replicaCount: 1
   imagePullPolicy: IfNotPresent
   containerPort: 4243
   host: minikube
   ## If 'authentication' is set to false, no OAuth authentication is enforced
   authentication: true
-  idpIssuerUri: https://idp-url
-  idpClientId: idpClientID
-  tenantId: test-12345
+  # Issuer url for the dtr (resource server),
+  # make sure that the url points to an externally resolvable hostname.
+  # If no value is committed, and the integrated Keycloak is enabled,
+  # the K8s internal service name is used, which is a problem, when
+  # validating the issuer claim in an access token
+  idpIssuerUri: ""
+  idpClientId: default-client
+  tenantId: default-tenant
   service:
     port: 8080
     type: ClusterIP
@@ -40,20 +55,21 @@ registry:
     ## The url, user, and password parameter will be ignored if 'enablePostgres' is set to true.
     ## In that case the postgresql auth parameters are used.
     url: jdbc:postgresql://database:5432
-    user: user
-    password: password
+    user: default-user
+    password: ""
   ingress:
     enabled: false
     tls: false
     urlPrefix: /semantics/registry
     className: nginx
-    annotations:
-      cert-manager.io/cluster-issuer: selfsigned-cluster-issuer
-      nginx.ingress.kubernetes.io/rewrite-target: /$2
-      nginx.ingress.kubernetes.io/use-regex: "true"
-      nginx.ingress.kubernetes.io/enable-cors: "true"
-      nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
-      nginx.ingress.kubernetes.io/x-forwarded-prefix: /semantics/registry
+    annotations: {}
+      # Add annotations for the ingress, e.g.:
+      # cert-manager.io/cluster-issuer: selfsigned-cluster-issuer
+      # nginx.ingress.kubernetes.io/rewrite-target: /$2
+      # nginx.ingress.kubernetes.io/use-regex: "true"
+      # nginx.ingress.kubernetes.io/enable-cors: "true"
+      # nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+      # nginx.ingress.kubernetes.io/x-forwarded-prefix: /semantics/registry
   resources:
     limits:
       memory: "1024Mi"
@@ -69,6 +85,39 @@ postgresql:
     ports:
       postgresql: 5432
   auth:
-    username: catenax
+    username: default-user
     password: password
-    database: registry
+    database: default-database
+
+keycloak:
+  postgresql:
+    enabled: false
+  externalDatabase:
+    # host: registry-postgresql
+    # port: 5432
+    # user: default-user
+    # password: password
+    # database: default-database
+    existingSecret: keycloak-database-credentials
+  auth:
+    adminUser: admin
+    adminPassword: "admin"
+  service:
+    type: ClusterIP
+  extraVolumes:
+    - name: init-script-vol
+      configMap:
+        name: init-script-vol
+  # Mounting a keycloak realm configuration file
+  fullnameOverride: registry-keycloak
+  extraVolumeMounts:
+    - mountPath: /opt/keycloak/data/import/default-realm-import.json
+      subPath: default-realm-import.json
+      name: init-script-vol
+  # Using a pre-configured Keycloak with a default realm,
+  # containing a test client and user with the necessary roles to
+  # authorize requests to the digital twin registry.
+  # Make sure to remove the '--hostname' property when deploying
+  # in a non-test scanrio
+  command: ["/bin/sh", "-c"]
+  args: ["kc.sh import --file /opt/keycloak/data/import/default-realm-import.json; kc.sh start-dev --hostname=registry-keycloak --hostname-strict=false --proxy=edge"]

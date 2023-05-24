@@ -20,8 +20,9 @@
 
 package org.eclipse.tractusx.semantics;
 
-import org.springdoc.core.SpringDocConfigProperties;
-import org.springdoc.core.SpringDocConfiguration;
+import org.springdoc.core.configuration.SpringDocConfiguration;
+import org.springdoc.core.properties.SpringDocConfigProperties;
+import org.springdoc.core.providers.ObjectMapperProvider;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
@@ -31,8 +32,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
-import org.springframework.security.web.server.authorization.AuthorizationContext;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -71,6 +72,11 @@ public class RegistryApplication {
 	@Bean
 	public SpringDocConfigProperties springDocConfigProperties() {
 		return new SpringDocConfigProperties();
+	}
+
+	@Bean
+	ObjectMapperProvider objectMapperProvider(SpringDocConfigProperties springDocConfigProperties){
+		return new ObjectMapperProvider( springDocConfigProperties );
 	}
 
 	@Bean

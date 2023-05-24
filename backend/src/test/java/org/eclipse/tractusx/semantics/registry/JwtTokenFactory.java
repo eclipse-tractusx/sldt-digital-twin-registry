@@ -19,8 +19,10 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry;
 
-import com.nimbusds.jose.shaded.json.JSONArray;
+import com.nimbusds.jose.shaded.gson.JsonArray;
 import lombok.Value;
+import net.minidev.json.JSONArray;
+
 import org.eclipse.tractusx.semantics.registry.security.AuthorizationEvaluator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
