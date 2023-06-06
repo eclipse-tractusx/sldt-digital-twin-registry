@@ -87,7 +87,7 @@ contact_url: '@project.url@'
 licence_url: '@licence_url@'
 organization_name: '@project.organization.name@'
 version: '@project.version@'
-    
+
 management:
   endpoint:
     health:
@@ -98,4 +98,4 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,prometheus
