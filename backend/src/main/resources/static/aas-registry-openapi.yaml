@@ -245,6 +245,31 @@ paths:
           description: Asset Administration Shell Descriptor deleted successfully
       x-semanticIds:
       - https://admin-shell.io/aas/API/DeleteAssetAdministrationShellDescriptorById/1/0/RC02
+  /registry/shell-descriptors/batch-delete:
+    post:
+      tags:
+        - Registry and Discovery Interface
+      summary: Deletes All Asset Administration Shell Descriptor, i.e. de-registers an AAS
+      operationId: BatchDeleteAssetAdministrationShellDescriptor
+      requestBody:
+        description: Delete all shell descriptors for the given identifications.
+        content:
+          application/json:
+            schema:
+              type: array
+              minLength: 1
+              maxItems: 10000
+              items:
+                $ref: '#/components/schemas/Identifier'
+            examples:
+              complete:
+                $ref: '#/components/examples/asset-administration-shell-descriptor-fetch-request'
+        required: true
+      responses:
+        "201":
+          description: Asset Administration Shell Descriptors deleted successfully
+      x-semanticIds:
+        - https://admin-shell.io/aas/API/BatchDeleteAssetAdministrationShellDescriptor/1/0/RC02
   /registry/shell-descriptors/{aasIdentifier}/submodel-descriptors:
     get:
       tags:

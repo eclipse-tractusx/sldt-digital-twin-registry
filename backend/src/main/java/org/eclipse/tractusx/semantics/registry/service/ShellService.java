@@ -234,4 +234,16 @@ public class ShellService {
         }).collect(Collectors.toList());
     }
 
+    @Transactional
+    public void deleteAllShell(List<String> aasIdentifierList) {
+        List<UUID> shellListFromDb = findShellMinimalListByExternalIdList(aasIdentifierList);
+        Iterable<UUID>iterableShellIdList = shellListFromDb;
+        shellRepository.deleteAllById(iterableShellIdList);
+    }
+
+    private List<UUID> findShellMinimalListByExternalIdList(List<String> externalShellIdList) {
+        return shellRepository.findMinimalRepresentationListByIdExternalList(externalShellIdList)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Shell for identifier %s not found", externalShellIdList)));
+    }
+
 }

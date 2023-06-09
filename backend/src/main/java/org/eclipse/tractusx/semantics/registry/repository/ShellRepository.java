@@ -38,6 +38,9 @@ public interface ShellRepository extends PagingAndSortingRepository<Shell, UUID>
 
     List<Shell> findShellsByIdExternalIsIn(Set<String> idExternals);
 
+    @Query("select s.id from shell s where s.id_external in (:idExternalList)")
+    Optional<List<UUID>> findMinimalRepresentationListByIdExternalList(List<String> idExternalList);
+
     /**
      * Returns external shell ids for the given keyValueCombinations.
      * External shell ids matching the conditions below are returned:
