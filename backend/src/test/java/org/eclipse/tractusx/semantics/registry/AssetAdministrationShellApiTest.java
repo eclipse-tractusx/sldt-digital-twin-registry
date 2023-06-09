@@ -899,7 +899,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
         }
 
         @Test
-        public void testDeleteAllShellExpectSuccess() throws Exception {
+        void testDeleteAllShellExpectSuccess() throws Exception {
             ObjectNode shellPayload1 = createShell();
             performShellCreateRequest(toJson(shellPayload1));
 
@@ -924,7 +924,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
         }
 
         @Test
-        public void testDeleteAllShellExpectNotFound() throws Exception {
+        void testDeleteAllShellExpectNotFound() throws Exception {
             ObjectNode shellPayload1 = createShell();
             performShellCreateRequest(toJson(shellPayload1));
 
