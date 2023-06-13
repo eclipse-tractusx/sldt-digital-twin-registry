@@ -22,7 +22,7 @@ Check that the two containers are running by calling `kubectl get pod -n semanti
 To access the Registry API from the host, you need to configure the `Ingress` resource.
 By default, the Registry includes an `Ingress` that exposes the API on https://minikube/semantics/registry
 
-For that to work, you need to append `/etc/hosts` by running `echo "minikube $(minikube ip)" | sudo tee -a /etc/hosts`.
+For that to work, you need to append `/etc/hosts` by running `echo "$(minikube ip) minikube" | sudo tee -a /etc/hosts`.
 
 For automated certificate generation, use and configure [cert-manager](https://cert-manager.io/).
 By default, authentication is deactivated, please adjust `registry.authentication` if needed
