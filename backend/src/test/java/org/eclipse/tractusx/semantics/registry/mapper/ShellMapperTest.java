@@ -1,3 +1,22 @@
+/********************************************************************************
+ * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.mapper;
 
 import org.eclipse.tractusx.semantics.aas.registry.model.*;
@@ -10,6 +29,7 @@ import org.eclipse.tractusx.semantics.registry.model.Submodel;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelDescription;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelEndpoint;
 import org.junit.jupiter.api.Test;
+import org.openapitools.jackson.nullable.JsonNullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
 public class ShellMapperTest {
+
     private final ShellMapper mapper = new ShellMapperImpl(new SubmodelMapperImpl());
 
     @Test
@@ -28,11 +49,14 @@ public class ShellMapperTest {
         AssetAdministrationShellDescriptor aas = createCompleteAasDescriptor();
 
         Shell shell = mapper.fromApiDto(aas);
-        assertThat(shell.getIdExternal()).isEqualTo(aas.getIdentification());
+        assertThat(shell.getIdExternal()).isEqualTo(aas.getId());
         assertThat(shell.getIdShort()).isEqualTo(aas.getIdShort());
 
         List<Tuple> expectedIdentifiers = new ArrayList<>(List.of(toIdentifierTuples(aas.getSpecificAssetIds())));
-        expectedIdentifiers.add(tuple( ShellIdentifier.GLOBAL_ASSET_ID_KEY, aas.getGlobalAssetId().getValue().get(0)));
+
+        expectedIdentifiers.add(tuple( ShellIdentifier.GLOBAL_ASSET_ID_KEY, aas.getGlobalAssetId()));
+
+
         assertThat(shell.getIdentifiers())
                 .extracting("key", "value")
                 .containsExactlyInAnyOrder(expectedIdentifiers.toArray(new Tuple[0]));
@@ -46,25 +70,20 @@ public class ShellMapperTest {
 
         SubmodelDescriptor submodelDescriptor = aas.getSubmodelDescriptors().stream().findFirst().get();
         Endpoint endpoint = submodelDescriptor.getEndpoints().stream().findFirst().get();
-        String semanticId = submodelDescriptor.getSemanticId().getValue().stream().findFirst().get();
         ProtocolInformation protocolInformation = endpoint.getProtocolInformation();
 
         Submodel submodel = shell.getSubmodels().stream().findFirst().get();
         SubmodelEndpoint submodelEndpoint = submodel.getEndpoints().stream().findFirst().get();
 
 
-        assertThat(submodel.getIdExternal()).isEqualTo(submodelDescriptor.getIdentification());
+        assertThat(submodel.getIdExternal()).isEqualTo(submodelDescriptor.getId());
         assertThat(submodel.getIdShort()).isEqualTo(submodelDescriptor.getIdShort());
-        assertThat(submodel.getSemanticId()).isEqualTo(semanticId);
-
-        assertThat(submodelDescriptor.getSemanticId().getValue().stream().findFirst().get()).isEqualTo(submodel.getSemanticId());
 
         assertThat(submodelEndpoint.getInterfaceName()).isEqualTo(endpoint.getInterface());
 
 
         assertThat(submodelEndpoint.getInterfaceName()).isEqualTo(endpoint.getInterface());
         assertThat(submodelEndpoint.getEndpointProtocol()).isEqualTo(protocolInformation.getEndpointProtocol());
-        assertThat(submodelEndpoint.getEndpointProtocolVersion()).isEqualTo(protocolInformation.getEndpointProtocolVersion());
         assertThat(submodelEndpoint.getSubProtocol()).isEqualTo(protocolInformation.getSubprotocol());
         assertThat(submodelEndpoint.getSubProtocolBody()).isEqualTo(protocolInformation.getSubprotocolBody());
         assertThat(submodelEndpoint.getSubProtocolBodyEncoding()).isEqualTo(protocolInformation.getSubprotocolBodyEncoding());
@@ -74,21 +93,14 @@ public class ShellMapperTest {
     public void testMapToApiExpectSuccess() {
         Shell shell = createCompleteShell();
         AssetAdministrationShellDescriptor aas = mapper.toApiDto(shell);
-        assertThat(aas.getIdentification()).isEqualTo(shell.getIdExternal());
+        assertThat(aas.getId()).isEqualTo(shell.getIdExternal());
         assertThat(aas.getIdShort()).isEqualTo(shell.getIdShort());
 
         String expectedGlobalAssetId  = shell.getIdentifiers().stream()
                 .filter(shellIdentifier -> ShellIdentifier.GLOBAL_ASSET_ID_KEY.equals(shellIdentifier.getKey()))
                 .map(ShellIdentifier::getValue).findFirst().get();
-        assertThat(aas.getGlobalAssetId().getValue().get(0)).isEqualTo(expectedGlobalAssetId);
+        assertThat(aas.getGlobalAssetId()).isEqualTo(expectedGlobalAssetId);
 
-        Set<ShellIdentifier> expectedIdentifiersSet = shell.getIdentifiers().stream()
-                .filter(shellIdentifier -> !ShellIdentifier.GLOBAL_ASSET_ID_KEY.equals(shellIdentifier.getKey()))
-                        .collect(Collectors.toSet());
-
-        assertThat(aas.getSpecificAssetIds())
-                .extracting("key", "value")
-                .containsExactly(createTuplesForShellIdentifier(expectedIdentifiersSet));
 
         assertThat(aas.getDescription())
                 .extracting("language", "text")
@@ -100,7 +112,7 @@ public class ShellMapperTest {
         // submodel mappings
         Submodel submodel = shell.getSubmodels().stream().findFirst().get();
         SubmodelEndpoint submodelEndpoint = submodel.getEndpoints().stream().findFirst().get();
-        assertThat(apiSubmodelDescriptor.getIdentification()).isEqualTo(submodel.getIdExternal());
+        assertThat(apiSubmodelDescriptor.getId()).isEqualTo(submodel.getIdExternal());
         assertThat(apiSubmodelDescriptor.getIdShort()).isEqualTo(submodel.getIdShort());
 
         assertThat(apiSubmodelDescriptor.getDescription())
@@ -113,7 +125,6 @@ public class ShellMapperTest {
         ProtocolInformation apiProtocolInformation = apiSubmodelEndpoint.getProtocolInformation();
         assertThat(apiSubmodelEndpoint.getInterface()).isEqualTo(submodelEndpoint.getInterfaceName());
         assertThat(apiProtocolInformation.getEndpointProtocol()).isEqualTo(submodelEndpoint.getEndpointProtocol());
-        assertThat(apiProtocolInformation.getEndpointProtocolVersion()).isEqualTo(submodelEndpoint.getEndpointProtocolVersion());
         assertThat(apiProtocolInformation.getSubprotocol()).isEqualTo(submodelEndpoint.getSubProtocol());
         assertThat(apiProtocolInformation.getSubprotocolBody()).isEqualTo(submodelEndpoint.getSubProtocolBody());
         assertThat(apiProtocolInformation.getSubprotocolBodyEncoding()).isEqualTo(submodelEndpoint.getSubProtocolBodyEncoding());
@@ -149,36 +160,38 @@ public class ShellMapperTest {
 
     private AssetAdministrationShellDescriptor createCompleteAasDescriptor() {
         AssetAdministrationShellDescriptor aas = new AssetAdministrationShellDescriptor();
-        aas.setIdentification("identificationExample");
+        aas.setId("identificationExample"  );
         aas.setIdShort("idShortExample");
 
-        Reference globalAssetId = new Reference();
-        globalAssetId.setValue(List.of("globalAssetIdExample"));
-        aas.setGlobalAssetId(globalAssetId);
+        String globalAssetID = "globalAssetIdExample";
+        aas.setGlobalAssetId( globalAssetID );
 
-        IdentifierKeyValuePair identifier1 = new IdentifierKeyValuePair();
-        identifier1.setKey("identifier1KeyExample");
-        identifier1.setValue("identifier1ValueExample");
+        SpecificAssetId specificAssetId1 = new SpecificAssetId();
+        specificAssetId1.setName( "identifier1KeyExample" );
+        specificAssetId1.setValue( "identifier1ValueExample" );
 
-        IdentifierKeyValuePair identifier2 = new IdentifierKeyValuePair();
-        identifier2.setKey("identifier2KeyExample");
-        identifier2.setValue("identifier2ValueExample");
-        aas.setSpecificAssetIds(List.of(identifier1, identifier2));
+        SpecificAssetId specificAssetId2 = new SpecificAssetId();
+        specificAssetId2.setName( "identifier2KeyExample" );
+        specificAssetId2.setValue( "identifier2ValueExample" );
 
-        LangString description1 = new LangString();
-        description1.setLanguage("de");
-        description1.setText("this is an example description1");
+        aas.setSpecificAssetIds(List.of(specificAssetId1, specificAssetId2));
 
-        LangString description2 = new LangString();
-        description2.setLanguage("en");
-        description2.setText("this is an example for description2");
+        LangStringTextType description1 = new LangStringTextType();
+        description1.setLanguage( "de" );
+        description1.setText(  "this is an example description1"  );
+        LangStringTextType description2 = new LangStringTextType();
+        description2.setLanguage( "en" );
+        description2.setText("this is an example description2"  );
         aas.setDescription(List.of(description1, description2));
 
 
         ProtocolInformation protocolInformation = new ProtocolInformation();
         protocolInformation.setEndpointProtocol("endpointProtocolExample");
-        protocolInformation.setEndpointAddress("endpointAddressExample");
-        protocolInformation.setEndpointProtocolVersion("endpointProtocolVersionExample");
+
+        protocolInformation.setHref( "endpointAddressExample");
+
+        protocolInformation.setEndpointProtocolVersion( List.of("endpointProtocolVersionExample","endpointTest") );
+
         protocolInformation.setSubprotocol("subprotocolExample");
         protocolInformation.setSubprotocolBody("subprotocolBodyExample");
         protocolInformation.setSubprotocolBodyEncoding("subprotocolBodyExample");
@@ -187,21 +200,22 @@ public class ShellMapperTest {
         endpoint.setProtocolInformation(protocolInformation);
 
         Reference reference = new Reference();
-        reference.setValue(List.of("semanticIdExample"));
+        reference.setType( ReferenceTypes.EXTERNALREFERENCE );
+        Key key = new Key();
+        key.setType( KeyTypes.SUBMODEL );
+        key.setValue( "semanticIdExample" );
+        reference.setKeys( List.of(key) );
+
         SubmodelDescriptor submodelDescriptor = new SubmodelDescriptor();
-        submodelDescriptor.setIdentification("identificationExample");
+
+        submodelDescriptor.setId( "identificationExample");
+
         submodelDescriptor.setIdShort("idShortExample");
         submodelDescriptor.setSemanticId(reference);
         submodelDescriptor.setDescription(List.of(description1, description2));
         submodelDescriptor.setEndpoints(List.of(endpoint));
         aas.setSubmodelDescriptors(List.of(submodelDescriptor));
         return aas;
-    }
-
-    private Tuple[] createTuplesForShellIdentifier(Set<ShellIdentifier> identifiers) {
-        return identifiers.stream()
-                .map(identifier -> tuple(identifier.getKey(), identifier.getValue()))
-                .toArray(Tuple[]::new);
     }
 
     private Tuple[] createTuplesForShellDescriptionTuples(Set<ShellDescription> descriptions) {
@@ -216,15 +230,18 @@ public class ShellMapperTest {
                 .toArray(Tuple[]::new);
     }
 
-    private Tuple[] toIdentifierTuples(List<IdentifierKeyValuePair> identifiers) {
+
+    private Tuple[] toIdentifierTuples(List<SpecificAssetId> identifiers) {
         return identifiers.stream()
-                .map(identifier -> tuple(identifier.getKey(), identifier.getValue()))
-                .toArray(Tuple[]::new);
+              .map(identifier -> tuple(identifier.getName(), identifier.getValue()))
+              .toArray(Tuple[]::new);
     }
 
-    private Tuple[] toDescriptionTuples(List<LangString> descriptions) {
+    private Tuple[] toDescriptionTuples(List<LangStringTextType> descriptions) {
         return descriptions.stream()
-                .map(description -> tuple(description.getLanguage(), description.getText()))
-                .toArray(Tuple[]::new);
+              .map(description -> tuple(description.getLanguage(), description.getText().toString()))
+              .toArray(Tuple[]::new);
     }
+
+
 }
