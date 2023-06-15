@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -53,31 +53,37 @@ public class OAuthSecurityConfig {
      */
     @Bean
     protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
-         http
-          .authorizeRequests(auth -> auth
-            .requestMatchers(HttpMethod.OPTIONS).permitAll()
-             // fetch endpoint is allowed for reader
-            .requestMatchers(HttpMethod.POST,"/**/registry/**/fetch").access("@authorizationEvaluator.hasRoleViewDigitalTwin()")
-             // others are HTTP method based
-            .requestMatchers(HttpMethod.GET,"/**/registry/**").access("@authorizationEvaluator.hasRoleViewDigitalTwin()")
-            .requestMatchers(HttpMethod.POST,"/**/registry/**").access("@authorizationEvaluator.hasRoleAddDigitalTwin()")
-            .requestMatchers(HttpMethod.PUT,"/**/registry/**").access("@authorizationEvaluator.hasRoleUpdateDigitalTwin()")
-            .requestMatchers(HttpMethod.DELETE,"/**/registry/**").access("@authorizationEvaluator.hasRoleDeleteDigitalTwin()")
-             // lookup
-             // query endpoint is allowed for reader
-            .requestMatchers(HttpMethod.POST,"/**/lookup/**/query/**").access("@authorizationEvaluator.hasRoleViewDigitalTwin()")
-             // others are HTTP method based
-            .requestMatchers(HttpMethod.GET,"/**/lookup/**").access("@authorizationEvaluator.hasRoleViewDigitalTwin()")
-            .requestMatchers(HttpMethod.POST,"/**/lookup/**").access("@authorizationEvaluator.hasRoleAddDigitalTwin()")
-            .requestMatchers(HttpMethod.PUT,"/**/lookup/**").access("@authorizationEvaluator.hasRoleUpdateDigitalTwin()")
-            .requestMatchers(HttpMethod.DELETE,"/**/lookup/**").access("@authorizationEvaluator.hasRoleDeleteDigitalTwin()")
-          )
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-          .oauth2ResourceServer()
-          .jwt();
-         return http.build();
+        http
+              .authorizeRequests( auth -> auth
+                    .requestMatchers( HttpMethod.OPTIONS ).permitAll()
+
+                    .requestMatchers( HttpMethod.GET, "/**/shell-descriptors" ).access( "@authorizationEvaluator.hasRoleViewDigitalTwin()" )
+                    .requestMatchers( HttpMethod.GET, "/**/shell-descriptors/**" ).access( "@authorizationEvaluator.hasRoleViewDigitalTwin()" )
+                    .requestMatchers( HttpMethod.GET, "/**/shell-descriptors/**/submodel-descriptors" ).access( "@authorizationEvaluator.hasRoleViewDigitalTwin()" )
+                    .requestMatchers( HttpMethod.GET, "/**/shell-descriptors/**/submodel-descriptors/**" ).access( "@authorizationEvaluator.hasRoleViewDigitalTwin()" )
+                    // others are HTTP method based
+                    .requestMatchers( HttpMethod.POST, "/**/shell-descriptors" ).access( "@authorizationEvaluator.hasRoleAddDigitalTwin()" )
+                    .requestMatchers( HttpMethod.POST, "/**/shell-descriptors/**/submodel-descriptors" ).access( "@authorizationEvaluator.hasRoleAddDigitalTwin()" )
+                    .requestMatchers( HttpMethod.PUT, "/**/shell-descriptors/**" ).access( "@authorizationEvaluator.hasRoleUpdateDigitalTwin()" )
+                    .requestMatchers( HttpMethod.PUT, "/**/shell-descriptors/**/submodel-descriptors/**" ).access( "@authorizationEvaluator.hasRoleUpdateDigitalTwin()" )
+                    .requestMatchers( HttpMethod.DELETE, "/**/shell-descriptors/**" ).access( "@authorizationEvaluator.hasRoleDeleteDigitalTwin()" )
+                    .requestMatchers( HttpMethod.DELETE, "/**/shell-descriptors/**/submodel-descriptors/**" ).access( "@authorizationEvaluator.hasRoleDeleteDigitalTwin()" )
+
+                    // lookup
+                    // query endpoint is allowed for reader
+                    .requestMatchers( HttpMethod.POST, "/**/lookup/**/query/**" ).access( "@authorizationEvaluator.hasRoleViewDigitalTwin()" )
+                    // others are HTTP method based
+                    .requestMatchers( HttpMethod.GET, "/**/lookup/**" ).access( "@authorizationEvaluator.hasRoleViewDigitalTwin()" )
+                    .requestMatchers( HttpMethod.POST, "/**/lookup/**" ).access( "@authorizationEvaluator.hasRoleAddDigitalTwin()" )
+                    .requestMatchers( HttpMethod.PUT, "/**/lookup/**" ).access( "@authorizationEvaluator.hasRoleUpdateDigitalTwin()" )
+                    .requestMatchers( HttpMethod.DELETE, "/**/lookup/**" ).access( "@authorizationEvaluator.hasRoleDeleteDigitalTwin()" )
+              )
+              .csrf().disable()
+              .sessionManagement().sessionCreationPolicy( SessionCreationPolicy.STATELESS )
+              .and()
+              .oauth2ResourceServer()
+              .jwt();
+        return http.build();
     }
 
     @Bean
