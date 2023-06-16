@@ -63,5 +63,6 @@ jobs:
   call-image-release:
     uses: ./.github/workflows/publish-image-registry.yml
     needs: build
+    secrets: inherit
     with:
       tag: v${{ inputs.version }}
