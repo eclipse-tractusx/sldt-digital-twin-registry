@@ -22,10 +22,11 @@ on:
   push:
     branches:
       - main
-    # trigger events for SemVer like tags
-    tags:
-      - 'v*.*.*'
-      - 'v*.*.*-*'
+  workflow_call:
+    inputs:
+      tag:
+        type: string
+        required: true
 
 env:
   IMAGE_NAMESPACE: tractusx
@@ -35,8 +36,14 @@ jobs:
   build-image:
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout
+      - name: Checkout if push
+        if: ${{ github.event_name == 'push' }}
         uses: actions/checkout@v3
+      - name: Checkout if workflow_dispatch
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.tag }}
       - name: setup-java
         uses: actions/setup-java@v3
         with:
@@ -72,10 +79,11 @@ jobs:
           images: |
             ${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=ref,event=branch
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}
-            type=semver,pattern={{major}}.{{minor}}
+            type=ref,event=branch,enable=${{ inputs.tag == '' }}
+            type=semver,pattern={{version}},value=${{ inputs.tag }}
+            type=semver,pattern={{major}},value=${{ inputs.tag }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ inputs.tag }}
+            type=raw,value=latest,enable=${{ inputs.tag != '' }}
       - name: DockerHub login
         uses: docker/login-action@v2
         with:
