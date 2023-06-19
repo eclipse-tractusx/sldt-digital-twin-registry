@@ -107,6 +107,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                             MockMvcRequestBuilders
                                     .get(SHELL_BASE_PATH)
                                     .accept(MediaType.APPLICATION_JSON)
+                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                                     // test with wrong role
                                     .with(jwtTokenFactory.addTwin())
                     )
@@ -116,6 +117,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             mvc.perform(
                             MockMvcRequestBuilders
                                     .get(SHELL_BASE_PATH)
+                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                                     .accept(MediaType.APPLICATION_JSON)
                                     .with(jwtTokenFactory.readTwin())
                     )
@@ -129,6 +131,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             mvc.perform(
                             MockMvcRequestBuilders
                                     .get(SINGLE_SHELL_BASE_PATH, shellId )
+                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                                     .accept(MediaType.APPLICATION_JSON)
                                     // test with wrong role
                                     .with(jwtTokenFactory.deleteTwin())
@@ -139,6 +142,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             mvc.perform(
                             MockMvcRequestBuilders
                                     .get(SINGLE_SHELL_BASE_PATH, shellId )
+                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                                     .accept(MediaType.APPLICATION_JSON)
                                     .with(jwtTokenFactory.readTwin())
                     )
@@ -246,6 +250,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
            mvc.perform(
                            MockMvcRequestBuilders
                                    .get(SUB_MODEL_BASE_PATH,  shellId )
+                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                                    .accept(MediaType.APPLICATION_JSON)
                                    // test with wrong role
                                    .with(jwtTokenFactory.addTwin())
@@ -255,9 +260,10 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
 
            mvc.perform(
                            MockMvcRequestBuilders
-                                   .get(SUB_MODEL_BASE_PATH,  shellId )
-                                   .accept(MediaType.APPLICATION_JSON)
-                                   .with(jwtTokenFactory.readTwin())
+                                    .get(SUB_MODEL_BASE_PATH,  shellId )
+                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.readTwin())
                    )
                    .andDo(MockMvcResultHandlers.print())
                    .andExpect(status().isOk());
@@ -377,6 +383,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             mvc.perform(
                             MockMvcRequestBuilders
                                     .get(SINGLE_LOOKUP_SHELL_BASE_PATH, shellId)
+                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                                     .accept(MediaType.APPLICATION_JSON)
                                     .with(jwtTokenFactory.deleteTwin())
                     )
@@ -386,6 +393,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             mvc.perform(
                             MockMvcRequestBuilders
                                     .get(SINGLE_LOOKUP_SHELL_BASE_PATH, shellId)
+                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                                     .accept(MediaType.APPLICATION_JSON)
                                     .with(jwtTokenFactory.readTwin())
                     )
@@ -592,6 +600,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                                     .get(SHELL_BASE_PATH)
                                     .queryParam("pageSize", "100")
                                     .accept(MediaType.APPLICATION_JSON)
+                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                                     .with(jwtTokenFactory.allRoles())
                     )
                     .andDo(MockMvcResultHandlers.print())
@@ -606,6 +615,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                                     .get(SHELL_BASE_PATH)
                                     .queryParam("pageSize", "100")
                                     .accept(MediaType.APPLICATION_JSON)
+                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
                                     .with(jwtTokenFactory.tenantTwo().allRoles())
                     )
                     .andDo(MockMvcResultHandlers.print())
@@ -632,6 +642,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             mvc.perform(
                             MockMvcRequestBuilders
                                     .get(SINGLE_SHELL_BASE_PATH, shellId)
+                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                                     .accept(MediaType.APPLICATION_JSON)
                                     .with(jwtTokenFactory.allRoles())
                     )
@@ -644,6 +655,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             mvc.perform(
                             MockMvcRequestBuilders
                                     .get(SINGLE_SHELL_BASE_PATH, shellId)
+                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
                                     .accept(MediaType.APPLICATION_JSON)
                                     .with(jwtTokenFactory.tenantTwo().allRoles())
                     )
@@ -672,6 +684,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             mvc.perform(
                             MockMvcRequestBuilders
                                     .post(SHELL_BASE_PATH + "/fetch")
+                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                                     .content(toJson(queryPayload))
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .with(jwtTokenFactory.allRoles())
@@ -685,6 +698,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             mvc.perform(
                             MockMvcRequestBuilders
                                     .post(SHELL_BASE_PATH + "/fetch")
+                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(toJson(queryPayload))
                                     .with(jwtTokenFactory.tenantTwo().allRoles())
@@ -714,6 +728,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             mvc.perform(
                             MockMvcRequestBuilders
                                     .post(SINGLE_LOOKUP_SHELL_BASE_PATH, shellId)
+                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                                     .accept(MediaType.APPLICATION_JSON)
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(toJson(specificAssetIds))
@@ -726,6 +741,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             mvc.perform(
                             MockMvcRequestBuilders
                                     .get(SINGLE_LOOKUP_SHELL_BASE_PATH, shellId)
+                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                                     .accept(MediaType.APPLICATION_JSON)
                                     .with(jwtTokenFactory.allRoles())
                     )
@@ -738,6 +754,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             mvc.perform(
                             MockMvcRequestBuilders
                                     .get(SINGLE_LOOKUP_SHELL_BASE_PATH, shellId)
+                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
                                     .accept(MediaType.APPLICATION_JSON)
                                     .with(jwtTokenFactory.tenantTwo().allRoles())
                     )
@@ -770,6 +787,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                                     .get(LOOKUP_SHELL_BASE_PATH)
                                     .queryParam("assetIds", toJson(specificAssetIds))
                                     .accept(MediaType.APPLICATION_JSON)
+                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                                     .with(jwtTokenFactory.allRoles())
                     )
                     .andDo(MockMvcResultHandlers.print())
@@ -786,6 +804,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                                     .get(LOOKUP_SHELL_BASE_PATH)
                                     .queryParam("assetIds", toJson(specificAssetIdsWithTenantTwoIncluded))
                                     .accept(MediaType.APPLICATION_JSON)
+                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
                                     .with(jwtTokenFactory.tenantTwo().allRoles())
                     )
                     .andDo(MockMvcResultHandlers.print())
@@ -802,6 +821,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                                     .get(LOOKUP_SHELL_BASE_PATH)
                                     .queryParam("assetIds", toJson(specificAssetIdsTenantTwo))
                                     .accept(MediaType.APPLICATION_JSON)
+                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
                                     .with(jwtTokenFactory.tenantTwo().allRoles())
                     )
                     .andDo(MockMvcResultHandlers.print())
@@ -846,6 +866,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             mvc.perform(
                             MockMvcRequestBuilders
                                     .post(LOOKUP_SHELL_BASE_PATH + "/query")
+                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                                     .content(toJson(anyMatchAueryByAssetIds))
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .with(jwtTokenFactory.allRoles())
@@ -858,6 +879,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             mvc.perform(
                             MockMvcRequestBuilders
                                     .post(LOOKUP_SHELL_BASE_PATH + "/query")
+                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
                                     .content(toJson(anyMatchAueryByAssetIds))
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .with(jwtTokenFactory.tenantTwo().allRoles())

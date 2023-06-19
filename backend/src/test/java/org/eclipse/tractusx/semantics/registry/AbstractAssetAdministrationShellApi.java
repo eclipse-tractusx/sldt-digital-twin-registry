@@ -51,6 +51,8 @@ public abstract class AbstractAssetAdministrationShellApi {
     protected static final String SINGLE_LOOKUP_SHELL_BASE_PATH = "/lookup/shells/{shellIdentifier}";
     protected static final String SUB_MODEL_BASE_PATH = "/registry/shell-descriptors/{shellIdentifier}/submodel-descriptors";
     protected static final String SINGLE_SUB_MODEL_BASE_PATH = "/registry/shell-descriptors/{shellIdentifier}/submodel-descriptors/{submodelIdentifier}";
+    protected static final String EXTERNAL_SUBJECT_ID_HEADER = "external_subject_id";
+
 
 
 

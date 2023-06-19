@@ -80,6 +80,9 @@ public class JwtTokenFactory {
         return tenantOne.withoutRoles();
     }
 
+    public Tenant tenantOne() {
+        return tenantOne;
+    }
     public Tenant tenantTwo() {
         return tenantTwo;
     }

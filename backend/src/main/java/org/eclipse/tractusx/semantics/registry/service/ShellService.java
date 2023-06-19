@@ -53,7 +53,7 @@ public class ShellService {
     private final ShellRepository shellRepository;
     private final ShellIdentifierRepository shellIdentifierRepository;
     private final SubmodelRepository submodelRepository;
-    private final TenantAware tenantAware;
+    //private final TenantAware tenantAware;
     private final String owningTenantId;
 
     public ShellService(ShellRepository shellRepository,
@@ -64,7 +64,7 @@ public class ShellService {
         this.shellRepository = shellRepository;
         this.shellIdentifierRepository = shellIdentifierRepository;
         this.submodelRepository = submodelRepository;
-        this.tenantAware = tenantAware;
+        //this.tenantAware = tenantAware;
         this.owningTenantId = registryProperties.getIdm().getOwningTenantId();
     }
 
@@ -74,16 +74,16 @@ public class ShellService {
     }
 
     @Transactional(readOnly = true)
-    public Shell findShellByExternalId(String externalShellId) {
+    public Shell findShellByExternalId(String externalShellId,String externalSubjectId) {
         return shellRepository.findByIdExternal(externalShellId)
-                .map(shell -> shell.withIdentifiers(filterSpecificAssetIdsByTenantId(shell.getIdentifiers(), tenantAware.getTenantId())))
+                .map(shell -> shell.withIdentifiers(filterSpecificAssetIdsByTenantId(shell.getIdentifiers(), externalSubjectId)))
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Shell for identifier %s not found", externalShellId)));
     }
 
     @Transactional(readOnly = true)
-    public ShellCollectionDto findAllShells(int page, int pageSize) {
+    public ShellCollectionDto findAllShells(int page, int pageSize, String externalSubjectId) {
         Pageable pageable = PageRequest.of(page, pageSize, Sort.Direction.ASC, "createdDate");
-        Page<Shell> shellsPage = filterSpecificAssetIdsByTenantId(shellRepository.findAll(pageable));
+        Page<Shell> shellsPage = filterSpecificAssetIdsByTenantId(shellRepository.findAll(pageable), externalSubjectId);
         return ShellCollectionDto.builder()
                 .currentPage(pageable.getPageNumber())
                 .totalItems((int) shellsPage.getTotalElements())
@@ -93,9 +93,8 @@ public class ShellService {
                 .build();
     }
 
-    private Page<Shell> filterSpecificAssetIdsByTenantId(Page<Shell> shells){
-        String tenantId = tenantAware.getTenantId();
-        return shells.map(shell ->  shell.withIdentifiers(filterSpecificAssetIdsByTenantId(shell.getIdentifiers(), tenantId)));
+    private Page<Shell> filterSpecificAssetIdsByTenantId(Page<Shell> shells, String externalSubjectId){
+        return shells.map(shell ->  shell.withIdentifiers(filterSpecificAssetIdsByTenantId(shell.getIdentifiers(), externalSubjectId)));
     }
 
     private Set<ShellIdentifier> filterSpecificAssetIdsByTenantId(Set<ShellIdentifier> shellIdentifiers, String tenantId) {
@@ -109,25 +108,24 @@ public class ShellService {
     }
 
     @Transactional(readOnly = true)
-    public List<String> findExternalShellIdsByIdentifiersByExactMatch(Set<ShellIdentifier> shellIdentifiers) {
+    public List<String> findExternalShellIdsByIdentifiersByExactMatch(Set<ShellIdentifier> shellIdentifiers, String externalSubjectId) {
         List<String> keyValueCombinations=shellIdentifiers.stream().map( shellIdentifier -> shellIdentifier.getKey()+shellIdentifier.getValue()).toList();
 
         return shellRepository.findExternalShellIdsByIdentifiersByExactMatch(keyValueCombinations,
-                keyValueCombinations.size(), tenantAware.getTenantId(), owningTenantId);
+                keyValueCombinations.size(), externalSubjectId, owningTenantId);
     }
 
     @Transactional(readOnly = true)
-    public List<String> findExternalShellIdsByIdentifiersByAnyMatch(Set<ShellIdentifier> shellIdentifiers) {
+    public List<String> findExternalShellIdsByIdentifiersByAnyMatch(Set<ShellIdentifier> shellIdentifiers, String externalSubjectId) {
         List<String> keyValueCombinations=shellIdentifiers.stream().map( shellIdentifier -> shellIdentifier.getKey()+shellIdentifier.getValue()).toList();
 
-        return shellRepository.findExternalShellIdsByIdentifiersByAnyMatch(keyValueCombinations, tenantAware.getTenantId(), owningTenantId);
+        return shellRepository.findExternalShellIdsByIdentifiersByAnyMatch(keyValueCombinations, externalSubjectId, owningTenantId);
     }
 
     @Transactional(readOnly = true)
-    public List<Shell> findShellsByExternalShellIds(Set<String> externalShellIds) {
-        String tenantId = tenantAware.getTenantId();
+    public List<Shell> findShellsByExternalShellIds(Set<String> externalShellIds, String externalSubjectId) {
         return shellRepository.findShellsByIdExternalIsIn(externalShellIds).stream()
-                .map(shell ->  shell.withIdentifiers(filterSpecificAssetIdsByTenantId(shell.getIdentifiers(), tenantId)))
+                .map(shell ->  shell.withIdentifiers(filterSpecificAssetIdsByTenantId(shell.getIdentifiers(), externalSubjectId)))
                 .collect(Collectors.toList());
     }
 
@@ -146,9 +144,9 @@ public class ShellService {
     }
 
     @Transactional(readOnly = true)
-    public Set<ShellIdentifier> findShellIdentifiersByExternalShellId(String externalShellId) {
+    public Set<ShellIdentifier> findShellIdentifiersByExternalShellId(String externalShellId, String externalSubjectId) {
         ShellMinimal shellId = findShellMinimalByExternalId(externalShellId);
-        return filterSpecificAssetIdsByTenantId(shellIdentifierRepository.findByShellId(shellId.getId()), tenantAware.getTenantId());
+        return filterSpecificAssetIdsByTenantId(shellIdentifierRepository.findByShellId(shellId.getId()), externalSubjectId);
     }
 
     @Transactional

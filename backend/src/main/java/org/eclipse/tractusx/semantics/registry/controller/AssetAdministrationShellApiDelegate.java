@@ -38,6 +38,7 @@ import org.eclipse.tractusx.semantics.registry.model.Submodel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.context.request.NativeWebRequest;
 
 import java.util.Collections;
@@ -68,13 +69,13 @@ public class AssetAdministrationShellApiDelegate implements RegistryApiDelegate,
     }
 
     @Override
-    public ResponseEntity<AssetAdministrationShellDescriptorCollection> getAllAssetAdministrationShellDescriptors(Integer page, Integer pageSize) {
-        return new ResponseEntity<>(shellMapper.toApiDto(shellService.findAllShells(page, pageSize)), HttpStatus.OK);
+    public ResponseEntity<AssetAdministrationShellDescriptorCollection> getAllAssetAdministrationShellDescriptors(Integer page, Integer pageSize, @RequestHeader String externalSubjectId) {
+        return new ResponseEntity<>(shellMapper.toApiDto(shellService.findAllShells(page, pageSize, externalSubjectId)), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<AssetAdministrationShellDescriptorCollectionBase> postFetchAssetAdministrationShellDescriptor(List<String> shellIdentifications) {
-        List<Shell> shellsByExternalShellIds = shellService.findShellsByExternalShellIds(new HashSet<>(shellIdentifications));
+    public ResponseEntity<AssetAdministrationShellDescriptorCollectionBase> postFetchAssetAdministrationShellDescriptor(List<String> shellIdentifications,@RequestHeader String externalSubjectId) {
+        List<Shell> shellsByExternalShellIds = shellService.findShellsByExternalShellIds(new HashSet<>(shellIdentifications),externalSubjectId);
         return new ResponseEntity<>(new AssetAdministrationShellDescriptorCollectionBase()
                         .items(shellMapper.toApiDto(shellsByExternalShellIds)), HttpStatus.OK);
     }
@@ -92,14 +93,14 @@ public class AssetAdministrationShellApiDelegate implements RegistryApiDelegate,
     }
 
     @Override
-    public ResponseEntity<List<SubmodelDescriptor>> getAllSubmodelDescriptors(String aasIdentifier) {
-        Shell savedShell = shellService.findShellByExternalId(aasIdentifier);
+    public ResponseEntity<List<SubmodelDescriptor>> getAllSubmodelDescriptors(String aasIdentifier, @RequestHeader String externalSubjectId) {
+        Shell savedShell = shellService.findShellByExternalId(aasIdentifier, externalSubjectId);
         return new ResponseEntity<>(submodelMapper.toApiDto(savedShell.getSubmodels()), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<AssetAdministrationShellDescriptor> getAssetAdministrationShellDescriptorById(String aasIdentifier) {
-        Shell saved = shellService.findShellByExternalId(aasIdentifier);
+    public ResponseEntity<AssetAdministrationShellDescriptor> getAssetAdministrationShellDescriptorById(String aasIdentifier, @RequestHeader String externalSubjectId) {
+        Shell saved = shellService.findShellByExternalId(aasIdentifier, externalSubjectId);
         return new ResponseEntity<>(shellMapper.toApiDto(saved), HttpStatus.OK);
     }
 
@@ -144,17 +145,17 @@ public class AssetAdministrationShellApiDelegate implements RegistryApiDelegate,
     }
 
     @Override
-    public ResponseEntity<List<String>> getAllAssetAdministrationShellIdsByAssetLink(List<IdentifierKeyValuePair> assetIds) {
+    public ResponseEntity<List<String>> getAllAssetAdministrationShellIdsByAssetLink(List<IdentifierKeyValuePair> assetIds, @RequestHeader String externalSubjectId) {
         if( assetIds == null || assetIds.isEmpty()){
             return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
         }
-        List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByExactMatch(shellMapper.fromApiDto(assetIds));
+        List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByExactMatch(shellMapper.fromApiDto(assetIds), externalSubjectId);
         return new ResponseEntity<>(externalIds, HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<List<IdentifierKeyValuePair>> getAllAssetLinksById(String aasIdentifier) {
-        Set<ShellIdentifier> identifiers = shellService.findShellIdentifiersByExternalShellId(aasIdentifier);
+    public ResponseEntity<List<IdentifierKeyValuePair>> getAllAssetLinksById(String aasIdentifier, @RequestHeader String externalSubjectId) {
+        Set<ShellIdentifier> identifiers = shellService.findShellIdentifiersByExternalShellId(aasIdentifier,externalSubjectId);
         return new ResponseEntity<>(shellMapper.toApiDto(identifiers), HttpStatus.OK);
     }
 
@@ -172,9 +173,9 @@ public class AssetAdministrationShellApiDelegate implements RegistryApiDelegate,
     }
 
     @Override
-    public ResponseEntity<List<String>> postQueryAllAssetAdministrationShellIds(ShellLookup shellLookup) {
+    public ResponseEntity<List<String>> postQueryAllAssetAdministrationShellIds(ShellLookup shellLookup,String externalSubjectId) {
         List<IdentifierKeyValuePair> assetIds = shellLookup.getQuery().getAssetIds();
-        List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByAnyMatch(shellMapper.fromApiDto(assetIds));
+        List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByAnyMatch(shellMapper.fromApiDto(assetIds),externalSubjectId);
         return new ResponseEntity<>(externalIds, HttpStatus.OK);
     }
 }

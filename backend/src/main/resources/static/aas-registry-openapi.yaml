@@ -59,6 +59,7 @@ paths:
               - 100
             default: 10
             description: Size of the pages that the results should be partitioned in
+        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       responses:
         "200":
           description: Requested Asset Administration Shell Descriptors
@@ -142,6 +143,8 @@ paths:
         - Registry and Discovery Interface
       summary: Returns shell descriptors for the given identifications.
       operationId: PostFetchAssetAdministrationShellDescriptor
+      parameters:
+        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       requestBody:
         description: Asset Administration Shell Descriptor object
         content:
@@ -183,6 +186,7 @@ paths:
         explode: false
         schema:
           type: string
+      - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       responses:
         "200":
           description: Requested Asset Administration Shell Descriptor
@@ -260,6 +264,7 @@ paths:
         explode: false
         schema:
           type: string
+      - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       responses:
         "200":
           description: Requested Submodel Descriptors
@@ -443,6 +448,7 @@ paths:
             examples:
               complete:
                 $ref: '#/components/examples/lookup-shells-by-aas-identifier-query'
+      - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       responses:
         "200":
           description: Requested Asset Administration Shell ids
@@ -473,6 +479,7 @@ paths:
         explode: false
         schema:
           type: string
+      - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       responses:
         "200":
           description: Requested Asset identifier key-value-pairs
@@ -555,6 +562,8 @@ paths:
         - Registry and Discovery Interface
       summary: Returns a list of Asset Administration Shell ids based on Asset identifier key-value-pairs.
       operationId: PostQueryAllAssetAdministrationShellIds
+      parameters:
+        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       requestBody:
         description: Asset Administration Shell Descriptor object
         content:
@@ -891,7 +900,13 @@ components:
     CatenaXOpenId:
       type: openIdConnect
       openIdConnectUrl: ../.well-known/openid-configuration
-
+  parameters:
+    ExternalSubjectIdHeader:
+      in: header
+      name: external_subject_id
+      schema:
+        type: String
+        description: Incoming external_subject_id/bpn
   examples:
     minimal-asset-administration-shell-descriptor:
       value:
