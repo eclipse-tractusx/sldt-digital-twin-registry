@@ -897,6 +897,56 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                     .andExpect(jsonPath("$.items[*].identification",
                             hasItems(getId(shellPayload1), getId(shellPayload2)) ));
         }
+
+        @Test
+        void testDeleteAllShellExpectSuccess() throws Exception {
+            ObjectNode shellPayload1 = createShell();
+            performShellCreateRequest(toJson(shellPayload1));
+
+            ObjectNode shellPayload2 = createShell();
+            performShellCreateRequest(toJson(shellPayload2));
+
+            ArrayNode fetchTwoShellsById =  emptyArrayNode()
+                    .add(getId(shellPayload1))
+                    .add(getId(shellPayload2));
+
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .post(SHELL_BASE_PATH+ "/batch-delete")
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content((toJson(fetchTwoShellsById)))
+                                    .with(jwtTokenFactory.allRoles())
+
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isNoContent());
+        }
+
+        @Test
+        void testDeleteAllShellExpectNotFound() throws Exception {
+            ObjectNode shellPayload1 = createShell();
+            performShellCreateRequest(toJson(shellPayload1));
+
+            ObjectNode shellPayload2 = createShell();
+            performShellCreateRequest(toJson(shellPayload2));
+
+            ArrayNode fetchTwoShellsById =  emptyArrayNode()
+                    .add(getId(shellPayload1))
+                    .add(getId(shellPayload2));
+
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .post(SHELL_BASE_PATH+ "/batch-delete")
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content((toJson(fetchTwoShellsById)))
+                                    .with(jwtTokenFactory.allRoles())
+
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isNoContent());
+        }
     }
 
 }

@@ -177,5 +177,11 @@ public class AssetAdministrationShellApiDelegate implements RegistryApiDelegate,
         List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByAnyMatch(shellMapper.fromApiDto(assetIds));
         return new ResponseEntity<>(externalIds, HttpStatus.OK);
     }
+
+    @Override
+    public ResponseEntity<Void> batchDeleteAssetAdministrationShellDescriptor(List<String> aasIdentifierList) {
+        shellService.deleteAllShell(aasIdentifierList);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }
 

@@ -50,6 +50,8 @@ import java.util.stream.Collectors;
 @Service
 public class ShellService {
 
+    private static final String SHELL_NOT_FOUND = "Shell for identifier %s not found";
+
     private final ShellRepository shellRepository;
     private final ShellIdentifierRepository shellIdentifierRepository;
     private final SubmodelRepository submodelRepository;
@@ -77,7 +79,7 @@ public class ShellService {
     public Shell findShellByExternalId(String externalShellId) {
         return shellRepository.findByIdExternal(externalShellId)
                 .map(shell -> shell.withIdentifiers(filterSpecificAssetIdsByTenantId(shell.getIdentifiers(), tenantAware.getTenantId())))
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Shell for identifier %s not found", externalShellId)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format(SHELL_NOT_FOUND, externalShellId)));
     }
 
     @Transactional(readOnly = true)
@@ -206,7 +208,7 @@ public class ShellService {
 
     private ShellMinimal findShellMinimalByExternalId(String externalShellId) {
         return shellRepository.findMinimalRepresentationByIdExternal(externalShellId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Shell for identifier %s not found", externalShellId)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format(SHELL_NOT_FOUND, externalShellId)));
     }
 
     /**
@@ -232,6 +234,18 @@ public class ShellService {
                         e.getMessage()), shell.getIdExternal(), HttpStatus.BAD_REQUEST.value());
             }
         }).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteAllShell(List<String> aasIdentifierList) {
+        List<UUID> shellListFromDb = findShellMinimalListByExternalIdList(aasIdentifierList);
+        Iterable<UUID>iterableShellIdList = shellListFromDb;
+        shellRepository.deleteAllById(iterableShellIdList);
+    }
+
+    private List<UUID> findShellMinimalListByExternalIdList(List<String> externalShellIdList) {
+        return shellRepository.findMinimalRepresentationListByIdExternalList(externalShellIdList)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(SHELL_NOT_FOUND, externalShellIdList)));
     }
 
 }
