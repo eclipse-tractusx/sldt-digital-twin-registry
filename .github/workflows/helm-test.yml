@@ -69,3 +69,10 @@ jobs:
       - name: Run chart-testing (install)
         run: ct install --charts charts/registry --config charts/chart-testing-config.yaml
         if: steps.list-changed.outputs.changed == 'true'
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: aas-registry-e2e-test-report
+          path: /opt/report.html
