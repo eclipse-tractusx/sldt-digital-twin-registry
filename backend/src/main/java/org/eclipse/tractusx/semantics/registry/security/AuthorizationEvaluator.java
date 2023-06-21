@@ -50,11 +50,9 @@ import static org.eclipse.tractusx.semantics.registry.security.AuthorizationEval
 public class AuthorizationEvaluator {
 
     private final String clientId;
-    private final String tenantClaimName;
 
-    public AuthorizationEvaluator(String clientId, String tenantClaimName) {
+    public AuthorizationEvaluator(String clientId) {
         this.clientId = clientId;
-        this.tenantClaimName = tenantClaimName;
     }
 
     public boolean hasRoleViewDigitalTwin() {

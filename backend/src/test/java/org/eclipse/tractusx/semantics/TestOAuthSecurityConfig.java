@@ -43,8 +43,7 @@ public class TestOAuthSecurityConfig {
     @Bean
     public JwtTokenFactory jwtTokenFactory(RegistryProperties registryProperties){
         return new JwtTokenFactory(
-                registryProperties.getIdm().getPublicClientId(),
-                registryProperties.getIdm().getTenantIdClaimName()
+                registryProperties.getIdm().getPublicClientId()
         );
     }
 }
