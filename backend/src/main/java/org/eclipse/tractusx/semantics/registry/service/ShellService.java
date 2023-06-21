@@ -32,7 +32,6 @@ import org.eclipse.tractusx.semantics.registry.model.support.DatabaseExceptionTr
 import org.eclipse.tractusx.semantics.registry.repository.ShellIdentifierRepository;
 import org.eclipse.tractusx.semantics.registry.repository.ShellRepository;
 import org.eclipse.tractusx.semantics.registry.repository.SubmodelRepository;
-import org.eclipse.tractusx.semantics.registry.security.TenantAware;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -53,18 +52,15 @@ public class ShellService {
     private final ShellRepository shellRepository;
     private final ShellIdentifierRepository shellIdentifierRepository;
     private final SubmodelRepository submodelRepository;
-    //private final TenantAware tenantAware;
     private final String owningTenantId;
 
     public ShellService(ShellRepository shellRepository,
                         ShellIdentifierRepository shellIdentifierRepository,
                         SubmodelRepository submodelRepository,
-                        TenantAware tenantAware,
                         RegistryProperties registryProperties) {
         this.shellRepository = shellRepository;
         this.shellIdentifierRepository = shellIdentifierRepository;
         this.submodelRepository = submodelRepository;
-        //this.tenantAware = tenantAware;
         this.owningTenantId = registryProperties.getIdm().getOwningTenantId();
     }
 

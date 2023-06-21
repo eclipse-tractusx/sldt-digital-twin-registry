@@ -38,9 +38,4 @@ public class LocalOauthSecurityConfig {
                 .csrf().disable()
                 .headers().frameOptions().disable().and().build();
     }
-
-    @Bean
-    public TenantAware tenantAware(){
-        return new NoOpTenantAware();
-    }
 }
