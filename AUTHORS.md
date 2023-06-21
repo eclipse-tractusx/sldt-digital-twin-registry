@@ -12,5 +12,7 @@ The following people have contributed to this repository:
 * Artur Trzewik, T-Systems International GmbH, https://github.com/a-trzewik
 * Sven Erik Jeroschewski, Bosch.IO GmbH
 * Johannes Kristan, Bosch.IO GmbH, Johannes.Kristan@bosch.io
+* Simone Lindner, external.simone.lindner@bosch.com
+* Aggarwal Sahil, Robert Bosch GmbH, sahil.aggarwal@de.bosch.com
 
 Please add yourself to this list, if you contribute to the content.

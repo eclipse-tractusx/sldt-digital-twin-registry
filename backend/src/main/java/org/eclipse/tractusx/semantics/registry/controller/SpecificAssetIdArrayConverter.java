@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,8 +19,8 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.controller;
 
+import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
 import org.springframework.core.convert.converter.Converter;
-import org.eclipse.tractusx.semantics.aas.registry.model.IdentifierKeyValuePair;
 import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 
@@ -32,13 +32,13 @@ import java.util.List;
  */
 @Component
 @RequiredArgsConstructor
-public class IdentifierKeyValuePairArrayConverter implements Converter<String[], List<IdentifierKeyValuePair>> {
+public class SpecificAssetIdArrayConverter implements Converter<String[], List<SpecificAssetId>>{
 
-    private final IdentifierKeyValuePairConverter singleConverter;
+    private final SpecificAssetIdConverter singleConverter;
 
     @Override
-    public List<IdentifierKeyValuePair> convert(String[] source) {
-        List<IdentifierKeyValuePair> result = new ArrayList<>(source.length);
+    public List<SpecificAssetId> convert(String[] source) {
+        List<SpecificAssetId> result = new ArrayList<>(source.length);
         for (int count = 0; count < source.length; count++) {
             result.addAll(singleConverter.convert(source[count]));
         }

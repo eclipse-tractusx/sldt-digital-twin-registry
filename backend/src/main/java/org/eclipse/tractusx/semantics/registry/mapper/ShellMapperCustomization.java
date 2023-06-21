@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -20,9 +20,12 @@
 package org.eclipse.tractusx.semantics.registry.mapper;
 
 import com.google.common.base.Strings;
+import org.checkerframework.checker.units.qual.K;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
-import org.eclipse.tractusx.semantics.aas.registry.model.IdentifierKeyValuePair;
+// import org.eclipse.tractusx.semantics.aas.registry.model.IdentifierKeyValuePair;
+import org.eclipse.tractusx.semantics.aas.registry.model.Key;
 import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
+import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
 
@@ -56,15 +59,9 @@ public class ShellMapperCustomization {
     public static void shellIdentifierToGlobalAssetId(Shell shell, AssetAdministrationShellDescriptor apiDto) {
         Optional<Reference> globalAssetId = extractGlobalAssetId(shell.getIdentifiers());
         // there are no immutable objects for the generated ones, mapping to api objects is done in mutable way
-        globalAssetId.ifPresent(apiDto::setGlobalAssetId);
+        globalAssetId.ifPresent(reference -> apiDto.setGlobalAssetId(reference.getKeys().get(0).getValue()));
     }
 
-    public static void removeGlobalAssetIdIdentifier(List<IdentifierKeyValuePair> specificAssetIds){
-        if(specificAssetIds == null || specificAssetIds.isEmpty()){
-            return;
-        }
-        specificAssetIds.removeIf(identifierKeyValuePair -> ShellIdentifier.GLOBAL_ASSET_ID_KEY.equals(identifierKeyValuePair.getKey()) );
-    }
 
     private static Optional<Reference> extractGlobalAssetId(Set<ShellIdentifier> shellIdentifiers){
         if(shellIdentifiers == null || shellIdentifiers.isEmpty()){
@@ -76,23 +73,29 @@ public class ShellMapperCustomization {
                 .findFirst();
         return globalAssetId.map(value -> {
             Reference reference = new Reference();
-            reference.setValue(List.of(globalAssetId.get().getValue()));
+            Key key = new Key();
+            key.setValue(globalAssetId.get().getValue());
+            reference.setKeys(List.of(key));
             return reference;
         });
     }
 
-    private static Optional<ShellIdentifier> extractGlobalAssetId(Reference globalAssetIdReference){
+    private static Optional<ShellIdentifier> extractGlobalAssetId(String globalAssetIdReference){
         if (globalAssetIdReference == null) {
             return Optional.empty();
         }
-        List<String> value = globalAssetIdReference.getValue();
-        if(value == null || value.isEmpty()){
-            return Optional.empty();
-        }
-        String globalAssetId = value.get(0);
+
+        String globalAssetId =globalAssetIdReference;
         if(Strings.isNullOrEmpty(globalAssetId)){
             return Optional.empty();
         }
         return Optional.of(new ShellIdentifier(null, ShellIdentifier.GLOBAL_ASSET_ID_KEY, globalAssetId, null, null));
+    }
+
+    public static void removeGlobalAssetIdIdentifier(List<SpecificAssetId> specificAssetIds){
+        if(specificAssetIds == null || specificAssetIds.isEmpty()){
+            return;
+        }
+        specificAssetIds.removeIf(identifierKeyValuePair -> ShellIdentifier.GLOBAL_ASSET_ID_KEY.equals(identifierKeyValuePair.getName()) );
     }
 }

@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -22,8 +22,8 @@ package org.eclipse.tractusx.semantics.registry.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.eclipse.tractusx.semantics.aas.registry.model.IdentifierKeyValuePair;
 import org.apache.commons.text.StringEscapeUtils;
+import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -33,20 +33,20 @@ import java.util.List;
  * This converter is required so that Spring is able to convert single query parameters to custom objects.
  */
 @Component
-public class IdentifierKeyValuePairConverter implements Converter<String, List<IdentifierKeyValuePair>> {
+public class SpecificAssetIdConverter implements Converter<String, List<SpecificAssetId>>{
 
     private final ObjectMapper objectMapper;
 
-    IdentifierKeyValuePairConverter(ObjectMapper objectMapper){
+    SpecificAssetIdConverter(ObjectMapper objectMapper){
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public List<IdentifierKeyValuePair> convert(String source) {
+    public List<SpecificAssetId> convert(String source) {
         try {
             String processedSource = removeLineBreaks(source);
             if(processedSource.startsWith("{")) {
-                return List.of(objectMapper.readValue(processedSource,IdentifierKeyValuePair.class));
+                return List.of(objectMapper.readValue(processedSource,SpecificAssetId.class));
             } else {
                 return objectMapper.readValue(processedSource, new TypeReference<>() {
                 });
@@ -66,4 +66,5 @@ public class IdentifierKeyValuePairConverter implements Converter<String, List<I
                 .replace("\"{", "{")
                 .replace("}\"", "}");
     }
+
 }
