@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,22 +19,22 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.repository;
 
-import org.eclipse.tractusx.semantics.registry.model.projection.ShellMinimal;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
-import org.springframework.data.jdbc.repository.query.Query;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.eclipse.tractusx.semantics.registry.model.projection.ShellMinimal;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
 @Repository
-public interface ShellRepository extends PagingAndSortingRepository<Shell, UUID>, CrudRepository<Shell,UUID> {
-    Optional<Shell> findByIdExternal(String idExternal);
+public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecificationExecutor<Shell> {
+   Optional<Shell> findByIdExternal( String idExternal );
 
-    @Query("select s.id, s.created_date from shell s where s.id_external = :idExternal")
-    Optional<ShellMinimal> findMinimalRepresentationByIdExternal(String idExternal);
+   @Query( "SELECT new org.eclipse.tractusx.semantics.registry.model.projection.ShellMinimal(s.id,s.createdDate) FROM Shell s where s.idExternal = :idExternal" )
+   Optional<ShellMinimal> findMinimalRepresentationByIdExternal(@Param("idExternal") String idExternal );
 
     List<Shell> findShellsByIdExternalIsIn(Set<String> idExternals);
 
@@ -52,14 +52,14 @@ public interface ShellRepository extends PagingAndSortingRepository<Shell, UUID>
      * @param keyValueCombinationsSize the size of the key value combinations
      * @return external shell ids for the given key value combinations
      */
-    @Query(
+    @Query(value =
             "select s.id_external from shell s where s.id in (" +
                     "select si.fk_shell_id from shell_identifier si " +
                     "where concat(si.namespace,si.identifier) in (:keyValueCombinations) " +
                     "and (si.external_subject_id is null or :tenantId = :owningTenantId or si.external_subject_id = :tenantId) " +
                     "group by si.fk_shell_id " +
                     "having count(*) = :keyValueCombinationsSize " +
-            ")"
+            "order by s.created_date asc)",nativeQuery = true
     )
     List<String> findExternalShellIdsByIdentifiersByExactMatch(@Param("keyValueCombinations") List<String> keyValueCombinations,
                                                    @Param("keyValueCombinationsSize") int keyValueCombinationsSize,
@@ -76,13 +76,13 @@ public interface ShellRepository extends PagingAndSortingRepository<Shell, UUID>
      * @param keyValueCombinations the keys values to search for as tuples
      * @return external shell ids for the given key value combinations
      */
-    @Query(
+    @Query(value =
             "select distinct s.id_external from shell s where s.id in (" +
                     "select si.fk_shell_id from shell_identifier si " +
                     "where concat(si.namespace,si.identifier) in (:keyValueCombinations) " +
                     "and (si.external_subject_id is null or :tenantId = :owningTenantId or si.external_subject_id = :tenantId) " +
                     "group by si.fk_shell_id " +
-                    ")"
+                    ")",nativeQuery = true
     )
     List<String> findExternalShellIdsByIdentifiersByAnyMatch(@Param("keyValueCombinations") List<String> keyValueCombinations,
                                                              @Param("tenantId") String tenantId,

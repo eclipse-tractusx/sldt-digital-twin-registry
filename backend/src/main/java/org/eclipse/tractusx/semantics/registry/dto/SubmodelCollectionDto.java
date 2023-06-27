@@ -17,34 +17,15 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ********************************************************************************/
-package org.eclipse.tractusx.semantics.registry.model;
+package org.eclipse.tractusx.semantics.registry.dto;
 
-import jakarta.persistence.*;
-import lombok.*;
-import java.util.UUID;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
-@Entity
-@Getter
-@Setter
-@Table
-@NoArgsConstructor
-@AllArgsConstructor
-@With
-public class SubmodelDescription {
-
-   @GeneratedValue( strategy = GenerationType.IDENTITY )
-   @Id
-   @Column( name = "id" )
-   private UUID id;
-
-   @Column
-   private String language;
-   @Column
-   private String text;
-
-   @JsonBackReference
-   @ManyToOne( fetch = FetchType.LAZY, optional = false )
-   @JoinColumn( name = "fk_submodel_id" )
-   private Submodel submodel;
+import java.util.List;
+import org.eclipse.tractusx.semantics.registry.model.Submodel;
+import lombok.Builder;
+import lombok.Value;
+@Value
+@Builder
+public class SubmodelCollectionDto {
+    List<Submodel> items;
+    String cursor;
 }

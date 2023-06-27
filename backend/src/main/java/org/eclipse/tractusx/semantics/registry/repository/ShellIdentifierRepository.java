@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,19 +19,19 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.repository;
 
+import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
-import org.springframework.data.jdbc.repository.query.Modifying;
-import org.springframework.data.jdbc.repository.query.Query;
-import org.springframework.data.repository.CrudRepository;
-
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import java.util.Set;
 import java.util.UUID;
 
-public interface ShellIdentifierRepository extends CrudRepository<ShellIdentifier, UUID> {
+public interface ShellIdentifierRepository extends JpaRepository<ShellIdentifier, UUID> {
 
     @Modifying
-    @Query("delete from shell_identifier si where si.fk_shell_id = :shellId and si.namespace != :keyToIgnore")
+    @Query(value = "delete from shell_identifier si where si.fk_shell_id = :shellId and si.namespace != :keyToIgnore",nativeQuery = true)
     void deleteShellIdentifiersByShellId(UUID shellId, String keyToIgnore);
 
-    Set<ShellIdentifier> findByShellId(UUID shellId);
+    Set<ShellIdentifier> findByShellId( Shell shellId);
 }

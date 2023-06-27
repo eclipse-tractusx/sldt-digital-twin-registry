@@ -1,6 +1,6 @@
 ###############################################################
-# Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
-# Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+# Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+# Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -721,10 +721,15 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                maxItems: 10000
-                items:
-                  $ref: '#/components/schemas/Identifier'
+                allOf:
+                  - $ref: '#/components/schemas/PagedResult'
+                  - type: object
+                    properties:
+                      result:
+                        type: array
+                        maxItems: 10000
+                        items:
+                          type: string
               examples:
                 complete:
                   $ref: '#/components/examples/lookup-shells-by-aas-identifier-response'
@@ -1422,7 +1427,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Reference'
-      example: { "id": "https://admin-shell.io/zvei/nameplate/1/0/Nameplate", "endpoints": [ { "protocolInformation": { "endpointAddress": "https://localhost:1234", "endpointProtocolVersion": "1.1" }, "interface": "AAS-1.0" }, { "protocolInformation": { "endpointAddress": "opc.tcp://localhost:4840" }, "interface": "AAS-1.0" }, { "protocolInformation": { "endpointAddress": "https://localhost:5678", "endpointProtocolVersion": "1.1", "subprotocol": "OPC UA Basic SOAP", "subprotocolBody": "ns=2;s=MyAAS", "subprotocolBodyEncoding": "application/soap+xml" }, "interface": "AAS-1.0" } ] }
+      example: {"endpoints": [{"interface": "interfaceNameExample","protocolInformation": {"href": "endpointAddressExample","endpointProtocol": "endpointProtocolExample","endpointProtocolVersion": [ "e"],"subprotocol": "subprotocolExample","subprotocolBody": "subprotocolBodyExample","subprotocolBodyEncoding": "subprotocolBodyExample","securityAttributes": [{"type": "NONE" }]}}],"idShort": "idShortExample","id": "341f63de-728a-4b6d-9c72-c0d9ba4f8c7d","semanticId": {"type": "ExternalReference","keys": [{"type": "Submodel","value": "semanticIdExample"}]},"description": [{"language": "de","text": "hello text"},{"language": "en","text": "hello s"}]}
       allOf:
         - $ref: '#/components/schemas/Descriptor'
     Result:

@@ -29,13 +29,12 @@ import org.eclipse.tractusx.semantics.registry.model.Submodel;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelDescription;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelEndpoint;
 import org.junit.jupiter.api.Test;
-import org.openapitools.jackson.nullable.JsonNullable;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
@@ -115,9 +114,11 @@ public class ShellMapperTest {
         assertThat(apiSubmodelDescriptor.getId()).isEqualTo(submodel.getIdExternal());
         assertThat(apiSubmodelDescriptor.getIdShort()).isEqualTo(submodel.getIdShort());
 
+        SubmodelDescription submodelDescription = new SubmodelDescription(UUID.randomUUID(),"en","example submodel description",null);
+
         assertThat(apiSubmodelDescriptor.getDescription())
                 .extracting("language", "text")
-                .contains(createTuplesForSubmodelDescriptionTuples(submodel.getDescriptions()));
+                .contains(createTuplesForSubmodelDescriptionTuples(Set.of(submodelDescription)));
 
         assertThat(apiSubmodelDescriptor.getEndpoints()).hasSize(1);
         Endpoint apiSubmodelEndpoint = apiSubmodelDescriptor.getEndpoints().stream().findFirst().get();
@@ -128,6 +129,10 @@ public class ShellMapperTest {
         assertThat(apiProtocolInformation.getSubprotocol()).isEqualTo(submodelEndpoint.getSubProtocol());
         assertThat(apiProtocolInformation.getSubprotocolBody()).isEqualTo(submodelEndpoint.getSubProtocolBody());
         assertThat(apiProtocolInformation.getSubprotocolBodyEncoding()).isEqualTo(submodelEndpoint.getSubProtocolBodyEncoding());
+
+        assertThat( aas.getAssetKind().equals( shell.getShellKind() ) );
+        assertThat( aas.getAssetType().equals( shell.getShellType() ) );
+        assertThat( aas.getDisplayName()).hasSize( 1 );
     }
 
     private Shell createCompleteShell() {
@@ -136,8 +141,14 @@ public class ShellMapperTest {
         ShellIdentifier shellIdentifier3 = new ShellIdentifier(UUID.randomUUID(), ShellIdentifier.GLOBAL_ASSET_ID_KEY, "exampleGlobalAssetId", null, null);
         Set<ShellIdentifier> shellIdentifiers = Set.of(shellIdentifier1, shellIdentifier2, shellIdentifier3);
 
-        ShellDescription shellDescription1 = new ShellDescription(UUID.randomUUID(), "en", "example description1");
-        ShellDescription shellDescription2 = new ShellDescription(UUID.randomUUID(), "de", "exampleDescription2");
+        ShellDescription shellDescription1 = new ShellDescription(UUID.randomUUID(), "en", "example description1",null);
+        ShellDescription shellDescription2 = new ShellDescription(UUID.randomUUID(), "de", "exampleDescription2",null);
+
+        SubmodelDescription submodelDescription = new SubmodelDescription(UUID.randomUUID(),"en","example submodel description",null);
+        SubmodelEndpoint submodelEndpoint = new SubmodelEndpoint(UUID.randomUUID(), "interfaceExample",
+                                      "endpointAddressExample", "endpointProtocolExample",
+                                      "endpointProtocolVersionExample", "subProtocolExample"
+                                      , "subProtocolBodyExample", "subProtocolEncodingExample",null);
 
         Set<ShellDescription> shellDescriptions = Set.of(shellDescription1, shellDescription2);
 
@@ -145,21 +156,26 @@ public class ShellMapperTest {
         Submodel submodel = new Submodel(UUID.randomUUID(),
                 "submodelIdExternal",
                 "submodelIdShort", "submodelSemanticId",
-                Set.of(new SubmodelDescription(UUID.randomUUID(), "en", "example submodel description")),
-                Set.of(new SubmodelEndpoint(UUID.randomUUID(), "interfaceExample",
-                        "endpointAddressExample", "endpointProtocolExample",
-                        "endpointProtocolVersionExample", "subProtocolExample"
-                        , "subProtocolBodyExample", "subProtocolEncodingExample"
-                )),
-                null
-        );
+                Set.of( submodelDescription),
+              Set.of( submodelEndpoint),
+              Instant.now(),null  );
+
+        // TODO: 28.06.2023 adjust Tests to new data model
+
+        ShellDisplayName shellDisplayName = new ShellDisplayName( UUID.randomUUID(), "de", "Display name" ,null);
 
         return new Shell(UUID.randomUUID(), "idExternalExample", "idShortExample",
-                shellIdentifiers, shellDescriptions, Set.of(submodel), null,null);
+                shellIdentifiers, shellDescriptions, Set.of(submodel),Set.of(shellDisplayName), null,null, ShellKind.INSTANCE, "shellType");
     }
 
     private AssetAdministrationShellDescriptor createCompleteAasDescriptor() {
         AssetAdministrationShellDescriptor aas = new AssetAdministrationShellDescriptor();
+
+        LangStringNameType displayName = new LangStringNameType();
+        displayName.setLanguage("de");
+        displayName.setText("this is an example description1");
+        aas.setDisplayName(List.of(displayName));
+
         aas.setId("identificationExample"  );
         aas.setIdShort("idShortExample");
 

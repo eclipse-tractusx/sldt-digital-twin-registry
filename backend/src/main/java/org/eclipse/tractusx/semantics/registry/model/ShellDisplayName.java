@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -36,23 +36,20 @@ import lombok.*;
 @JsonIdentityInfo(
       generator = ObjectIdGenerators.PropertyGenerator.class,
       property = "id")
-public class ShellIdentifier {
+public class ShellDisplayName {
 
-    public static final String GLOBAL_ASSET_ID_KEY = "globalAssetId";
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   @Column(name="id")
+   private UUID id;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
-    private UUID id;
-    @Column(name = "namespace")
-    private String key;
-    @Column(name = "identifier")
-    private String value;
-    @Column(name = "external_subject_id")
-    private String externalSubjectId;
+   @Column
+   private String language;
+   @Column
+   private String text;
 
-    @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "fk_shell_id")
-    private Shell shellId;
+   @JsonBackReference
+   @ManyToOne(fetch = FetchType.LAZY)
+   @JoinColumn(name = "fk_shell_id")
+   private Shell shellId;
 }

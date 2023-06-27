@@ -31,8 +31,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -829,9 +827,9 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     )
                     .andDo(MockMvcResultHandlers.print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$", hasSize(1)))
+                    .andExpect(jsonPath("$.result", hasSize(1)))
                     // ensure that only three results match
-                    .andExpect(jsonPath("$", contains(shellPayload.getId())));
+                    .andExpect(jsonPath("$.result", contains(shellPayload.getId())));
 
             // test with tenantTwo assetId included
 
@@ -846,7 +844,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     )
                     .andDo(MockMvcResultHandlers.print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$", hasSize(0)));
+                  .andExpect(jsonPath("$.result", hasSize(0)));
 
             // Test lookup with one assetId for tenant two and one without tenantId
 
@@ -859,9 +857,9 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     )
                     .andDo(MockMvcResultHandlers.print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$", hasSize(1)))
+                    .andExpect(jsonPath("$.result", hasSize(1)))
                     // ensure that only three results match
-                    .andExpect(jsonPath("$", contains(shellPayload.getId())));
+                    .andExpect(jsonPath("$.result", contains(shellPayload.getId())));
         }
 
     }
