@@ -694,6 +694,7 @@ paths:
             application/json:
               schema:
                 type: array
+                maxItems: 10000
                 items:
                   $ref: '#/components/schemas/SpecificAssetId'
               examples:
@@ -917,6 +918,7 @@ components:
           properties:
             result:
               type: array
+              maxItems: 10000
               items:
                 $ref: '#/components/schemas/AssetAdministrationShellDescriptor'
     PagedResult:
@@ -943,6 +945,7 @@ components:
               type: string
             endpoints:
               minItems: 1
+              maxItems: 10000
               type: array
               items:
                 $ref: '#/components/schemas/Endpoint'
@@ -961,10 +964,12 @@ components:
               type: string
             specificAssetIds:
               type: array
+              maxItems: 10000
               items:
                 $ref: '#/components/schemas/SpecificAssetId'
             submodelDescriptors:
               type: array
+              maxItems: 10000
               items:
                 $ref: '#/components/schemas/SubmodelDescriptor'
     Descriptor:
@@ -972,14 +977,17 @@ components:
       properties:
         description:
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/LangStringTextType'
         displayName:
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/LangStringNameType'
         extensions:
           minItems: 1
+          maxItems: 10000
           type: array
           items:
             $ref: '#/components/schemas/Extension'
@@ -1023,6 +1031,7 @@ components:
               type: string
             refersTo:
               minItems: 1
+              maxItems: 10000
               type: array
               items:
                 $ref: '#/components/schemas/Reference'
@@ -1033,6 +1042,7 @@ components:
           $ref: '#/components/schemas/Reference'
         supplementalSemanticIds:
           minItems: 1
+          maxItems: 10000
           type: array
           items:
             $ref: '#/components/schemas/Reference'
@@ -1048,6 +1058,7 @@ components:
           $ref: '#/components/schemas/ReferenceTypes'
         keys:
           minItems: 1
+          maxItems: 10000
           type: array
           items:
             $ref: '#/components/schemas/Key'
@@ -1156,6 +1167,7 @@ components:
       properties:
         embeddedDataSpecifications:
           minItems: 1
+          maxItems: 10000
           type: array
           items:
             $ref: '#/components/schemas/EmbeddedDataSpecification'
@@ -1176,10 +1188,12 @@ components:
             preferredName:
               minItems: 1
               type: array
+              maxItems: 10000
               items:
                 $ref: '#/components/schemas/LangStringPreferredNameTypeIec61360'
             shortName:
               minItems: 1
+              maxItems: 10000
               type: array
               items:
                 $ref: '#/components/schemas/LangStringShortNameTypeIec61360'
@@ -1201,6 +1215,7 @@ components:
               $ref: '#/components/schemas/DataTypeIec61360'
             definition:
               minItems: 1
+              maxItems: 10000
               type: array
               items:
                 $ref: '#/components/schemas/LangStringDefinitionTypeIec61360'
@@ -1291,6 +1306,7 @@ components:
       properties:
         valueReferencePairs:
           minItems: 1
+          maxItems: 10000
           type: array
           items:
             $ref: '#/components/schemas/ValueReferencePair'
@@ -1334,6 +1350,7 @@ components:
           type: string
         endpointProtocolVersion:
           type: array
+          maxItems: 10000
           items:
             maxLength: 128
             type: string
@@ -1348,6 +1365,7 @@ components:
           type: string
         securityAttributes:
           minItems: 1
+          maxItems: 10000
           type: array
           items:
             $ref: '#/components/schemas/ProtocolInformation_securityAttributes'
@@ -1377,6 +1395,7 @@ components:
           $ref: '#/components/schemas/AdministrativeInformation'
         endpoints:
           minItems: 1
+          maxItems: 10000
           type: array
           items:
             $ref: '#/components/schemas/Endpoint'
@@ -1392,6 +1411,7 @@ components:
           $ref: '#/components/schemas/Reference'
         supplementalSemanticId:
           minItems: 1
+          maxItems: 10000
           type: array
           items:
             $ref: '#/components/schemas/Reference'
@@ -1403,6 +1423,7 @@ components:
       properties:
         messages:
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/Message'
     Message:
@@ -1436,6 +1457,7 @@ components:
           properties:
             result:
               type: array
+              maxItems: 10000
               items:
                 $ref: '#/components/schemas/SubmodelDescriptor'
     ServiceDescription:
@@ -1443,6 +1465,7 @@ components:
       properties:
         profiles:
           minItems: 1
+          maxItems: 10000
           type: array
           items:
             type: string
