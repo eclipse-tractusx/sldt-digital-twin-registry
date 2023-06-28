@@ -31,6 +31,8 @@ info:
     name: CC BY 4.0
     url: https://creativecommons.org/licenses/by/4.0/
   version: V3.0_SSP-001
+security:
+  - bearerAuth: []
 servers:
   - url: "{protocol}://{host_name}:{port}/api/{version_prefix}"
     variables:
@@ -846,6 +848,11 @@ paths:
                 complete:
                   $ref: '#/components/examples/lookup-shells-by-aas-identifier-response'
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     ShellLookup:
       type: object
