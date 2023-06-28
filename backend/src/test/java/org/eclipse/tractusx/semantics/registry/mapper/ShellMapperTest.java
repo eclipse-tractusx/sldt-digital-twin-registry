@@ -40,7 +40,9 @@ import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellDescription;
+import org.eclipse.tractusx.semantics.registry.model.ShellDisplayName;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
+import org.eclipse.tractusx.semantics.registry.model.ShellKind;
 import org.eclipse.tractusx.semantics.registry.model.Submodel;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelDescription;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelEndpoint;
@@ -134,6 +136,10 @@ public class ShellMapperTest {
         assertThat(apiProtocolInformation.getSubprotocol()).isEqualTo(submodelEndpoint.getSubProtocol());
         assertThat(apiProtocolInformation.getSubprotocolBody()).isEqualTo(submodelEndpoint.getSubProtocolBody());
         assertThat(apiProtocolInformation.getSubprotocolBodyEncoding()).isEqualTo(submodelEndpoint.getSubProtocolBodyEncoding());
+
+        assertThat( aas.getAssetKind().equals( shell.getShellKind() ) );
+        assertThat( aas.getAssetType().equals( shell.getShellType() ) );
+        assertThat( aas.getDisplayName()).hasSize( 1 );
     }
 
     private Shell createCompleteShell() {
@@ -159,9 +165,12 @@ public class ShellMapperTest {
                 )),
                 null
         );
+        // TODO: 28.06.2023 adjust Tests to new data model
+
+        ShellDisplayName shellDisplayName = new ShellDisplayName( UUID.randomUUID(), "de", "Display name" );
 
         return new Shell(UUID.randomUUID(), "idExternalExample", "idShortExample",
-                shellIdentifiers, shellDescriptions, Set.of(submodel), null,null);
+                shellIdentifiers, shellDescriptions, Set.of(submodel), null,null, ShellKind.INSTANCE, "shellType", Set.of(shellDisplayName));
     }
 
     private AssetAdministrationShellDescriptor createCompleteAasDescriptor() {

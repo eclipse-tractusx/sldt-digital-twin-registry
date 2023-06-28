@@ -19,17 +19,17 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
+import java.time.Instant;
+import java.util.Set;
+import java.util.UUID;
 
-import lombok.Value;
-import lombok.With;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 
-import java.time.Instant;
-import java.util.Set;
-import java.util.UUID;
+import lombok.Value;
+import lombok.With;
 
 @Value
 @With
@@ -53,5 +53,12 @@ public class Shell {
 
     @LastModifiedDate
     Instant lastModifiedDate;
+
+    ShellKind shellKind;
+
+    String shellType;
+
+    @MappedCollection(idColumn = "fk_shell_id")
+    Set<ShellDisplayName> displayNames;
 
 }
