@@ -19,9 +19,25 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.mapper;
 
-import org.eclipse.tractusx.semantics.aas.registry.model.*;
-import org.eclipse.tractusx.semantics.registry.model.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 import org.assertj.core.groups.Tuple;
+import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
+import org.eclipse.tractusx.semantics.aas.registry.model.Endpoint;
+import org.eclipse.tractusx.semantics.aas.registry.model.Key;
+import org.eclipse.tractusx.semantics.aas.registry.model.KeyTypes;
+import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
+import org.eclipse.tractusx.semantics.aas.registry.model.ProtocolInformation;
+import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
+import org.eclipse.tractusx.semantics.aas.registry.model.ReferenceTypes;
+import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
+import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellDescription;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
@@ -29,16 +45,6 @@ import org.eclipse.tractusx.semantics.registry.model.Submodel;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelDescription;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelEndpoint;
 import org.junit.jupiter.api.Test;
-import org.openapitools.jackson.nullable.JsonNullable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
 public class ShellMapperTest {
 
