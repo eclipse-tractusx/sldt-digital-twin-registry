@@ -20,8 +20,8 @@
 
 databaseChangeLog:
   - changeSet:
-      id: 29062023-02
-      author: slindner
+      id: 27012022-01
+      author: fmisir
       changes:
         - createTable:
             tableName: SHELL
@@ -53,16 +53,6 @@ databaseChangeLog:
                   type: timestamp
                   constraints:
                     nullable: false
-              - column:
-                  name: SHELL_KIND
-                  type: varchar(255)
-                  constraints:
-                    nullable: true
-              - column:
-                  name: SHELL_TYPE
-                  type: varchar(255)
-                  constraints:
-                    nullable: true
         - addUniqueConstraint:
             columnNames: ID_EXTERNAL
             constraintName: SHELL_AK_01
@@ -149,49 +139,6 @@ databaseChangeLog:
             baseTableName: SHELL_DESCRIPTION
             baseColumnNames: FK_SHELL_ID
             constraintName: SHELL_DESCRIPTION_FK_SHELL
-            onDelete: CASCADE
-            onUpdate: RESTRICT
-            referencedColumnNames: ID
-            referencedTableName: SHELL
-            validate: true
-  - changeSet:
-      id: 26062023-01
-      author: slindner
-      changes:
-        - createTable:
-            tableName: SHELL_DISPLAYNAME
-            columns:
-              - column:
-                  name: ID
-                  type: ${uuid_type}
-                  defaultValueComputed: ${uuid_function}
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: LANGUAGE
-                  type: nvarchar(10)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: TEXT
-                  type: nvarchar(500)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: FK_SHELL_ID
-                  type: ${uuid_type}
-                  constraints:
-                    nullable: false
-        - addUniqueConstraint:
-            columnNames:  LANGUAGE, FK_SHELL_ID
-            constraintName:  SHELL_DISPLAYNAME_AK_01
-            tableName:  SHELL_DISPLAYNAME
-            validate:  true
-        - addForeignKeyConstraint:
-            baseTableName: SHELL_DISPLAYNAME
-            baseColumnNames: FK_SHELL_ID
-            constraintName: SHELL_DISPLAYNAME_FK_SHELL
             onDelete: CASCADE
             onUpdate: RESTRICT
             referencedColumnNames: ID
@@ -440,3 +387,63 @@ databaseChangeLog:
                   name: IDENTIFIER
               - column:
                   name: EXTERNAL_SUBJECT_ID
+  - changeSet:
+      id: 03072023-01
+      author: slindner
+      changes:
+        - addColumn:
+            tableName: SHELL
+            columns:
+              - column:
+                  name: SHELL_KIND
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: SHELL_TYPE
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+  - changeSet:
+      id: 03072023-02
+      author: slindner
+      changes:
+        - createTable:
+            tableName: SHELL_DISPLAY_NAME
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: LANGUAGE
+                  type: nvarchar(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: TEXT
+                  type: nvarchar(500)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SHELL_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            columnNames:  LANGUAGE, FK_SHELL_ID
+            constraintName:  SHELL_DISPLAY_NAME_AK_01
+            tableName:  SHELL_DISPLAY_NAME
+            validate:  true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_DISPLAY_NAME
+            baseColumnNames: FK_SHELL_ID
+            constraintName: SHELL_DISPLAY_NAME_FK_SHELL
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL
+            validate: true
