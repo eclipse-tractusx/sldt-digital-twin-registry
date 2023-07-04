@@ -61,8 +61,7 @@ public class Shell {
     @MappedCollection(idColumn = "fk_shell_id")
     Set<ShellDisplayName> displayNames;
 
-    /*
     @MappedCollection(idColumn = "fk_shell_id")
     Set<ShellExtension> shellExtensions;
-*/
+
 }

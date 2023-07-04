@@ -19,26 +19,32 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.MappedCollection;
 
 public class ShellExtension {
 
    @Id
    UUID id;
- /*
-   private ShellReference/Reference semanticId;
 
-   private List<ShellReference/Reference> supplementalSemanticIds = null;
-*/
+   @Column("semantic_id")
+   private Reference semanticId;
+
+   @MappedCollection(idColumn = "fk_shell_supplemental_id")
+   private List<Reference> supplementalSemanticIds = null;
+
    private String name;
 
    private DataTypeXsd valueType;
 
    private String value;
 
- //  private List<ShellReference/Reference> refersTo = null;
+   @MappedCollection(idColumn = "fk_shell_ext_refers_id")
+   private List<Reference> refersTo = null;
 
 
 }

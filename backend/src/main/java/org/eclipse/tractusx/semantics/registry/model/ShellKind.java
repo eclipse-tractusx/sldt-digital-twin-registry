@@ -26,9 +26,18 @@ public enum ShellKind {
 
    TYPE("Type");
 
-   private String kind;
+   private String value;
 
-   ShellKind(String kind) {
-      this.kind = kind;
+   ShellKind(String value ) {
+      this.value = value;
+   }
+
+   public String getValue() {
+      return value;
+   }
+
+   @Override
+   public String toString() {
+      return String.valueOf(value);
    }
 }

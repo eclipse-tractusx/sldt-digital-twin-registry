@@ -47,4 +47,7 @@ public class Submodel {
 
     @Column( "fk_shell_id")
     UUID shellId;
+
+    @MappedCollection(idColumn = "fk_submodel_id")
+    Set<SubmodelDisplayName> displayNames;
 }

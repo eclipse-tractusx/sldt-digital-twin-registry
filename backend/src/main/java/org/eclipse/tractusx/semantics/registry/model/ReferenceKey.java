@@ -7,9 +7,11 @@ import org.springframework.data.annotation.Id;
 import lombok.Value;
 
 @Value
-public class SubmodelDisplayName {
+public class ReferenceKey {
+
    @Id
    UUID id;
-   String language;
-   String text;
+   private ReferenceKeyType type;
+   private String value;
+
 }

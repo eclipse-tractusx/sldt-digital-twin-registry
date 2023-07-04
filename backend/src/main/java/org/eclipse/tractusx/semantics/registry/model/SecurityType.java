@@ -10,7 +10,18 @@ public enum SecurityType {
 
    private String value;
 
-SecurityType (String value){
+   SecurityType (String value){
       this.value = value;
    }
+
+   public String getValue() {
+      return value;
+   }
+
+   @Override
+   public String toString() {
+      return String.valueOf(value);
+   }
+
+
 }
