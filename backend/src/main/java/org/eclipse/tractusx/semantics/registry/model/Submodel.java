@@ -19,15 +19,15 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
+import java.util.Set;
+import java.util.UUID;
 
-import lombok.Value;
-import lombok.With;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 
-import java.util.Set;
-import java.util.UUID;
+import lombok.Value;
+import lombok.With;
 
 @Value
 @With

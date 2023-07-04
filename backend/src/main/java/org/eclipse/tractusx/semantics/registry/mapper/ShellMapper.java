@@ -50,7 +50,8 @@ public interface ShellMapper {
           @Mapping(target = "submodels", source = "submodelDescriptors"),
           @Mapping(target = "shellType", source = "assetType"),
           @Mapping(target = "shellKind", source = "assetKind"),
-          @Mapping(target = "id", ignore = true)
+          @Mapping(target = "id", ignore = true),
+          @Mapping(target = "displayNames", source = "displayName")
     })
     Shell fromApiDto(AssetAdministrationShellDescriptor apiDto);
 

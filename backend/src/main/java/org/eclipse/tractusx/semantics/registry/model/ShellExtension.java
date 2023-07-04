@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -23,23 +23,22 @@ import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
 
-import lombok.Value;
+public class ShellExtension {
 
-@Value
-public class SubmodelEndpoint {
-    @Id
-    UUID id;
-    String interfaceName;
-    String endpointAddress;
-    String endpointProtocol;
-    String endpointProtocolVersion;
-    String subProtocol;
-    String subProtocolBody;
-    String subProtocolBodyEncoding;
-/*
-    @MappedCollection(idColumn = "fk_submodel_endpoint_id")
-    List<SecurityAttribute> securityAttributes;
+   @Id
+   UUID id;
+ /*
+   private ShellReference/Reference semanticId;
+
+   private List<ShellReference/Reference> supplementalSemanticIds = null;
 */
+   private String name;
+
+   private DataTypeXsd valueType;
+
+   private String value;
+
+ //  private List<ShellReference/Reference> refersTo = null;
 
 
 }

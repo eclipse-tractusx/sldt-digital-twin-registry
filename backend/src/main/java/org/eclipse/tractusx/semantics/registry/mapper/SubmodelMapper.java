@@ -19,7 +19,13 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.mapper;
 
-
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.tractusx.semantics.aas.registry.model.Endpoint;
 import org.eclipse.tractusx.semantics.aas.registry.model.Key;
@@ -37,13 +43,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface SubmodelMapper {
@@ -51,7 +50,8 @@ public interface SubmodelMapper {
             @Mapping(target="idExternal", source="id"),
             @Mapping(target = "descriptions", source = "description"),
             @Mapping(target="semanticId", source = "semanticId"),
-            @Mapping(target = "id", ignore = true)
+            @Mapping(target = "id", ignore = true),
+            @Mapping(target = "displayNames", source = "displayName")
     })
     Submodel fromApiDto(SubmodelDescriptor apiDto);
 
@@ -65,11 +65,11 @@ public interface SubmodelMapper {
             @Mapping(target="subProtocolBody", source = "protocolInformation.subprotocolBody"),
             @Mapping(target="subProtocolBodyEncoding", source = "protocolInformation.subprotocolBodyEncoding"),
             @Mapping(target = "endpointProtocolVersion", source = "protocolInformation.endpointProtocolVersion" , qualifiedByName = "endpointProtocolVersionMapping"),
+  //          @Mapping( target = "securityAttributes", source = "protocolInformation.securityAttributes")
     })
     SubmodelEndpoint fromApiDto(Endpoint apiDto);
 
-    //TODO:Change the data base column to List of String
-    @Named("endpointProtocolVersionMapping")
+   @Named("endpointProtocolVersionMapping")
     default String endpointProtocolVersion(List<String> endpointProtocolVersions) {
        return Optional.ofNullable(endpointProtocolVersions).map(endpointPVs -> String.join(",", endpointPVs)).orElse(null);
     }

@@ -29,9 +29,11 @@ import java.util.UUID;
 
 import org.assertj.core.groups.Tuple;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
+import org.eclipse.tractusx.semantics.aas.registry.model.AssetKind;
 import org.eclipse.tractusx.semantics.aas.registry.model.Endpoint;
 import org.eclipse.tractusx.semantics.aas.registry.model.Key;
 import org.eclipse.tractusx.semantics.aas.registry.model.KeyTypes;
+import org.eclipse.tractusx.semantics.aas.registry.model.LangStringNameType;
 import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
 import org.eclipse.tractusx.semantics.aas.registry.model.ProtocolInformation;
 import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
@@ -45,6 +47,7 @@ import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
 import org.eclipse.tractusx.semantics.registry.model.ShellKind;
 import org.eclipse.tractusx.semantics.registry.model.Submodel;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelDescription;
+import org.eclipse.tractusx.semantics.registry.model.SubmodelDisplayName;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelEndpoint;
 import org.junit.jupiter.api.Test;
 
@@ -95,6 +98,15 @@ public class ShellMapperTest {
         assertThat(submodelEndpoint.getSubProtocol()).isEqualTo(protocolInformation.getSubprotocol());
         assertThat(submodelEndpoint.getSubProtocolBody()).isEqualTo(protocolInformation.getSubprotocolBody());
         assertThat(submodelEndpoint.getSubProtocolBodyEncoding()).isEqualTo(protocolInformation.getSubprotocolBodyEncoding());
+
+        // new Fields Submodel
+        assertThat(submodel.getDisplayNames().stream().findFirst().get().getLanguage()).isEqualTo( submodelDescriptor.getDisplayName().stream().findFirst().get().getLanguage() );
+
+
+        // new Fields AAS / Shell
+        assertThat( shell.getShellKind().getValue() ).isEqualTo( aas.getAssetKind().getValue() );
+        assertThat(shell.getShellType()).isEqualTo( aas.getAssetType() );
+        assertThat(shell.getDisplayNames().stream().findFirst().get().getLanguage()).isEqualTo( aas.getDisplayName().stream().findFirst().get().getLanguage() );
     }
 
     @Test
@@ -137,9 +149,16 @@ public class ShellMapperTest {
         assertThat(apiProtocolInformation.getSubprotocolBody()).isEqualTo(submodelEndpoint.getSubProtocolBody());
         assertThat(apiProtocolInformation.getSubprotocolBodyEncoding()).isEqualTo(submodelEndpoint.getSubProtocolBodyEncoding());
 
+        //new submodel fields
+       assertThat( submodel.getDisplayNames().stream().findFirst().get().getLanguage() ).isEqualTo( apiSubmodelDescriptor.getDisplayName().get( 0 ).getLanguage() );
+        assertThat( submodel.getDisplayNames().stream().findFirst().get().getLanguage() ).isEqualTo( apiSubmodelDescriptor.getDisplayName().stream().findFirst().get().getLanguage() );
+        assertThat( submodel.getDisplayNames().stream().findFirst().get().getText() ).isEqualTo( apiSubmodelDescriptor.getDisplayName().stream().findFirst().get().getText() );
+
+        // new Shell fields
         assertThat( aas.getAssetKind().equals( shell.getShellKind() ) );
         assertThat( aas.getAssetType().equals( shell.getShellType() ) );
         assertThat( aas.getDisplayName()).hasSize( 1 );
+        assertThat( aas.getDisplayName().stream().findFirst().get().getText() ).isEqualTo( shell.getDisplayNames().stream().findFirst().get().getText() );
     }
 
     private Shell createCompleteShell() {
@@ -153,7 +172,9 @@ public class ShellMapperTest {
 
         Set<ShellDescription> shellDescriptions = Set.of(shellDescription1, shellDescription2);
 
+        //SecurityAttribute securityAttribute = new SecurityAttribute(UUID.randomUUID(), SecurityType.W3C_DID, "key", "value");
 
+        SubmodelDisplayName submodelDisplayName = new SubmodelDisplayName( UUID.randomUUID(), "de", "Submodel display name" );
         Submodel submodel = new Submodel(UUID.randomUUID(),
                 "submodelIdExternal",
                 "submodelIdShort", "submodelSemanticId",
@@ -163,8 +184,11 @@ public class ShellMapperTest {
                         "endpointProtocolVersionExample", "subProtocolExample"
                         , "subProtocolBodyExample", "subProtocolEncodingExample"
                 )),
-                null
+                null,
+              Set.of(submodelDisplayName)
         );
+
+
         // TODO: 28.06.2023 adjust Tests to new data model
 
         ShellDisplayName shellDisplayName = new ShellDisplayName( UUID.randomUUID(), "de", "Display name" );
@@ -180,6 +204,14 @@ public class ShellMapperTest {
 
         String globalAssetID = "globalAssetIdExample";
         aas.setGlobalAssetId( globalAssetID );
+
+        aas.setAssetType( "AssetType" );
+        aas.setAssetKind( AssetKind.INSTANCE );
+
+        LangStringNameType aasDisplayName = new LangStringNameType();
+        aasDisplayName.setLanguage( "en" );
+        aasDisplayName.setText( "AAS Display Name" );
+        aas.setDisplayName(List.of( aasDisplayName) );
 
         SpecificAssetId specificAssetId1 = new SpecificAssetId();
         specificAssetId1.setName( "identifier1KeyExample" );
@@ -226,6 +258,12 @@ public class ShellMapperTest {
         submodelDescriptor.setId( "identificationExample");
 
         submodelDescriptor.setIdShort("idShortExample");
+
+        LangStringNameType submodelDisplayName = new LangStringNameType();
+        submodelDisplayName.setLanguage( "en" );
+        submodelDisplayName.setText( "AAS Display Name" );
+        submodelDescriptor.setDisplayName( List.of(submodelDisplayName) );
+
         submodelDescriptor.setSemanticId(reference);
         submodelDescriptor.setDescription(List.of(description1, description2));
         submodelDescriptor.setEndpoints(List.of(endpoint));
