@@ -530,7 +530,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
         - addUniqueConstraint:
-            columnNames:  LANGUAGE, FK_SHELL_ID
+            columnNames:  VALUE, FK_SHELL_ID
             constraintName:  SHELL_EXTENSION_AK_01
             tableName:  SHELL_EXTENSION
             validate:  true
@@ -542,4 +542,56 @@ databaseChangeLog:
             onUpdate: RESTRICT
             referencedColumnNames: ID
             referencedTableName: SHELL
+            validate: true
+  - changeSet:
+      id: 04072023-03
+      author: slindner
+      changes:
+        - createTable:
+            tableName: REFERENCE
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: FK_SHELL_SUPPLEMENTAL_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SHELL_EXT_REFERS_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            columnNames:  ID, TYPE
+            constraintName:  REFERENCE_AK_01
+            tableName:  REFERENCE
+            validate:  true
+        - addForeignKeyConstraint:
+            baseTableName: REFERENCE
+            baseColumnNames: FK_SHELL_SUPPLEMENTAL_ID
+            constraintName: REF_FK_SHELL_EXT_SUPPLEMENTAL
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_EXTENSION
+            validate: true
+        - addForeignKeyConstraint:
+            baseTableName: REFERENCE
+            baseColumnNames: FK_SHELL_EXT_REFERS_ID
+            constraintName: REF_FK_SHELL_EXT_REFERS
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_EXTENSION
             validate: true
