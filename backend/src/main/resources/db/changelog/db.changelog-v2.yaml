@@ -1,6 +1,6 @@
 ###############################################################
-# Copyright (c) 2021, 2023 Robert Bosch Manufacturing Solutions GmbH
-# Copyright (c) 2021, 2023 Contributors to the Eclipse Foundation
+# Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+# Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -18,20 +18,12 @@
 # SPDX-License-Identifier: Apache-2.0
 ###############################################################
 
-apiVersion: v2
-name: registry
-description: Tractus-X Digital Twin Registry Helm Chart
-
-type: application
-version: 0.3.6
-appVersion: 0.3.5-M1
-
-dependencies:
-  - repository: https://charts.bitnami.com/bitnami
-    name: postgresql
-    version: 12.1.7
-    condition: enablePostgres
-  - repository: https://charts.bitnami.com/bitnami
-    name: keycloak
-    version: 13.3.0
-    condition: enableKeycloak
+databaseChangeLog:
+  - changeSet:
+      id: 05072023-01
+      author: agg3fe
+      changes:
+        - modifyDataType:
+            tableName: SUBMODEL_ENDPOINT
+            columnName: SUB_PROTOCOL_BODY
+            newDataType: NVARCHAR(2000)
