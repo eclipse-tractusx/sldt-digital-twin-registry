@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.3.6-M1
+### Added
+- This version includes changes for updating the subprotocolbody length from 50 to 2000 char.
+## fixed
+
 ## 0.3.5-M1
 This version includes changes for updating the application to AAS version 3.0.
 The old AAS version is no longer supported. Only the API version 3.0 is supported.
