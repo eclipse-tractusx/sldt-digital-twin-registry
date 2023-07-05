@@ -11,7 +11,6 @@ public class ReferenceKey {
 
    @Id
    UUID id;
-   private ReferenceKeyType type;
-   private String value;
-
+   ReferenceKeyType type;
+   String value;
 }

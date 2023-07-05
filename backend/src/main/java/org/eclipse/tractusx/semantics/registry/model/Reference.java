@@ -8,21 +8,19 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 
 import lombok.Value;
-import lombok.With;
 
 @Value
-@With
+
 public class Reference {
 
    @Id
    UUID id;
-
-   private String type;
+   String type;
 
    @MappedCollection(idColumn = "fk_reference_id")
-   private List<ReferenceKey> keys = null;
+   List<ReferenceKey> keys;
 
-   @Column("referred_semantic_id" )
-   private ReferenceParent referredSemanticId;
+   @Column("fk_referred_semantic_id" )
+   ReferenceParent referredSemanticId;
 
 }

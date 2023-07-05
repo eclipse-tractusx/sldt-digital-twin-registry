@@ -14,9 +14,9 @@ public class ReferenceParent {
    @Id
    UUID id;
 
-   private String type;
+   String type;
 
    @MappedCollection(idColumn = "fk_reference_parent_id")
-   private List<ReferenceKey> keys = null;
+   List<ReferenceKey> keys;
 
 }

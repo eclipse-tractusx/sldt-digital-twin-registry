@@ -26,25 +26,27 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 
+import lombok.Value;
+
+@Value
 public class ShellExtension {
 
    @Id
    UUID id;
 
    @Column("semantic_id")
-   private Reference semanticId;
+   Reference semanticId;
 
    @MappedCollection(idColumn = "fk_shell_supplemental_id")
-   private List<Reference> supplementalSemanticIds = null;
+   List<Reference> supplementalSemanticIds;
 
-   private String name;
+   String name;
 
-   private DataTypeXsd valueType;
+   DataTypeXsd valueType;
 
-   private String value;
+   String value;
 
    @MappedCollection(idColumn = "fk_shell_ext_refers_id")
-   private List<Reference> refersTo = null;
-
+   List<Reference> refersTo;
 
 }

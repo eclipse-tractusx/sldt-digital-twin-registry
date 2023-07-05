@@ -40,9 +40,14 @@ import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
 import org.eclipse.tractusx.semantics.aas.registry.model.ReferenceTypes;
 import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
+import org.eclipse.tractusx.semantics.registry.model.DataTypeXsd;
+import org.eclipse.tractusx.semantics.registry.model.ReferenceKey;
+import org.eclipse.tractusx.semantics.registry.model.ReferenceKeyType;
+import org.eclipse.tractusx.semantics.registry.model.ReferenceParent;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellDescription;
 import org.eclipse.tractusx.semantics.registry.model.ShellDisplayName;
+import org.eclipse.tractusx.semantics.registry.model.ShellExtension;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
 import org.eclipse.tractusx.semantics.registry.model.ShellKind;
 import org.eclipse.tractusx.semantics.registry.model.Submodel;
@@ -190,11 +195,34 @@ public class ShellMapperTest {
 
 
         // TODO: 28.06.2023 adjust Tests to new data model
+        // TODO: 05.07.2023 why are the list of keys not in the construtors // adjust test for extensions 
 
         ShellDisplayName shellDisplayName = new ShellDisplayName( UUID.randomUUID(), "de", "Display name" );
 
+
+
+        ReferenceKey shellKey = new ReferenceKey( UUID.randomUUID(), ReferenceKeyType.ASSETADMINISTRATIONSHELL, "shellkey value" );
+        ReferenceParent shellParent = new ReferenceParent( UUID.randomUUID(), "ExternalReference", List.of(shellKey) );
+
+        org.eclipse.tractusx.semantics.registry.model.Reference shellReference =
+              new org.eclipse.tractusx.semantics.registry.model.Reference( UUID.randomUUID(),
+                    "ExternalReference",
+                    List.of(shellKey),
+                    shellParent);
+
+        ShellExtension shellExtension = new ShellExtension(
+              UUID.randomUUID(),
+              shellReference,
+              List.of(shellReference),
+              "shell extension",
+              DataTypeXsd.BOOLEAN,
+              "shell extension value",
+              List.of(shellReference)
+        );
+
         return new Shell(UUID.randomUUID(), "idExternalExample", "idShortExample",
-                shellIdentifiers, shellDescriptions, Set.of(submodel), null,null, ShellKind.INSTANCE, "shellType", Set.of(shellDisplayName));
+                shellIdentifiers, shellDescriptions, Set.of(submodel), null,null, ShellKind.INSTANCE, "shellType", Set.of(shellDisplayName),
+              Set.of(shellExtension));
     }
 
     private AssetAdministrationShellDescriptor createCompleteAasDescriptor() {
@@ -246,6 +274,7 @@ public class ShellMapperTest {
         endpoint.setInterface("interfaceNameExample");
         endpoint.setProtocolInformation(protocolInformation);
 
+        // reference of  openapi
         Reference reference = new Reference();
         reference.setType( ReferenceTypes.EXTERNALREFERENCE );
         Key key = new Key();

@@ -29,7 +29,6 @@ import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellDescription;
-import org.eclipse.tractusx.semantics.registry.model.ShellDisplayName;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.InheritInverseConfiguration;
@@ -51,13 +50,13 @@ public interface ShellMapper {
           @Mapping(target = "shellType", source = "assetType"),
           @Mapping(target = "shellKind", source = "assetKind"),
           @Mapping(target = "id", ignore = true),
-          @Mapping(target = "displayNames", source = "displayName")
+          @Mapping(target = "displayNames", source = "displayName"),
+          @Mapping(target = "shellExtensions", source = "extensions"),
+
     })
     Shell fromApiDto(AssetAdministrationShellDescriptor apiDto);
 
     ShellDescription mapShellDescription (LangStringTextType description);
-
-   ShellDisplayName mapShellDisplayName (LangStringTextType displayName);
 
     @Mappings({
           @Mapping(target = "key", source = "name"),
@@ -76,13 +75,14 @@ public interface ShellMapper {
          @Mapping(source = "identifiers", target = "specificAssetIds"),
          @Mapping(source = "descriptions", target = "description"),
          @Mapping(source = "submodels", target = "submodelDescriptors"),
+          @Mapping(source = "displayNames", target = "displayName"),
+          @Mapping(source = "shellExtensions", target = "extensions"),
     })
     @InheritInverseConfiguration
     AssetAdministrationShellDescriptor toApiDto(Shell shell);
 
    LangStringTextType mapAssetDescription (ShellDescription description);
 
-   LangStringTextType mapAssetDisplayName (ShellDisplayName shellDisplayName);
 
     @Mappings({
          @Mapping(source = "items", target = "result"),

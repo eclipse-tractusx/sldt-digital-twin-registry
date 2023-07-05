@@ -433,11 +433,6 @@ databaseChangeLog:
                   type: ${uuid_type}
                   constraints:
                     nullable: false
-        - addUniqueConstraint:
-            columnNames:  LANGUAGE, FK_SHELL_ID
-            constraintName:  SHELL_DISPLAY_NAME_AK_01
-            tableName:  SHELL_DISPLAY_NAME
-            validate:  true
         - addForeignKeyConstraint:
             baseTableName: SHELL_DISPLAY_NAME
             baseColumnNames: FK_SHELL_ID
@@ -476,11 +471,6 @@ databaseChangeLog:
                   type: ${uuid_type}
                   constraints:
                     nullable: false
-        - addUniqueConstraint:
-            columnNames: LANGUAGE, FK_SUBMODEL_ID
-            constraintName: SUBMODEL_DISPLAY_NAME_AK_01
-            tableName: SUBMODEL_DISPLAY_NAME
-            validate: true
         - addForeignKeyConstraint:
             baseTableName: SUBMODEL_DISPLAY_NAME
             baseColumnNames: FK_SUBMODEL_ID
@@ -529,11 +519,6 @@ databaseChangeLog:
                   type: ${uuid_type}
                   constraints:
                     nullable: false
-        - addUniqueConstraint:
-            columnNames:  VALUE, FK_SHELL_ID
-            constraintName:  SHELL_EXTENSION_AK_01
-            tableName:  SHELL_EXTENSION
-            validate:  true
         - addForeignKeyConstraint:
             baseTableName: SHELL_EXTENSION
             baseColumnNames: FK_SHELL_ID
@@ -572,11 +557,11 @@ databaseChangeLog:
                   type: ${uuid_type}
                   constraints:
                     nullable: false
-        - addUniqueConstraint:
-            columnNames:  ID, TYPE
-            constraintName:  REFERENCE_AK_01
-            tableName:  REFERENCE
-            validate:  true
+              - column:
+                  name: FK_REFERRED_SEMANTIC_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: false
         - addForeignKeyConstraint:
             baseTableName: REFERENCE
             baseColumnNames: FK_SHELL_SUPPLEMENTAL_ID
@@ -594,4 +579,76 @@ databaseChangeLog:
             onUpdate: RESTRICT
             referencedColumnNames: ID
             referencedTableName: SHELL_EXTENSION
+            validate: true
+        - createTable:
+            tableName: REFERENCE_PARENT
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: REFERENCE
+            baseColumnNames: FK_REFERRED_SEMANTIC_ID
+            constraintName: REF_FK_REFERRED_SEMANTIC_ID
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: REFERENCE_PARENT
+            validate: true
+        - createTable:
+            tableName: REFERENCE_KEY
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: VALUE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: FK_REFERENCE_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_REFERENCE_PARENT_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: REFERENCE_KEY
+            baseColumnNames: FK_REFERENCE_PARENT_ID
+            constraintName: REF_FK_REFERENCE_PARENT_ID
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: REFERENCE_PARENT
+            validate: true
+        - addForeignKeyConstraint:
+            baseTableName: REFERENCE_KEY
+            baseColumnNames: FK_REFERENCE_ID
+            constraintName: REF_FK_REFERENCE_ID
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: REFERENCE
             validate: true
