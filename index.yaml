@@ -2,6 +2,25 @@ apiVersion: v1
 entries:
   registry:
   - apiVersion: v2
+    appVersion: 0.3.7-M1
+    created: "2023-07-05T15:37:07.6264559Z"
+    dependencies:
+    - condition: enablePostgres
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.1.7
+    - condition: enableKeycloak
+      name: keycloak
+      repository: https://charts.bitnami.com/bitnami
+      version: 13.3.0
+    description: Tractus-X Digital Twin Registry Helm Chart
+    digest: d7b0d63c26ebf6e4af80c82eb10bc0b60dd3876c52a97170c133f8661db2ea2b
+    name: registry
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/sldt-digital-twin-registry/releases/download/registry-0.3.8/registry-0.3.8.tgz
+    version: 0.3.8
+  - apiVersion: v2
     appVersion: 0.3.6-M1
     created: "2023-07-05T14:19:56.021279498Z"
     dependencies:
@@ -410,4 +429,4 @@ entries:
     urls:
     - https://github.com/eclipse-tractusx/sldt-digital-twin-registry/releases/download/v0.2.0-M3-multi-tenancy/registry-0.2.3.tgz
     version: 0.2.3
-generated: "2023-07-05T14:19:56.021639202Z"
+generated: "2023-07-05T15:37:07.626832103Z"
