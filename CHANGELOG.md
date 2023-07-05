@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.3.7-M1
+### Added
+
+## fixed
+- In this version, fix is given for adjusting openapiyml for length of subprotocolbody field to 2000 from 128 char.
+
 ## 0.3.6-M1
 ### Added
 - This version includes changes for updating the subprotocolbody length from 50 to 2000 char.
