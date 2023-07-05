@@ -1,6 +1,6 @@
 ###############################################################
-# Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
-# Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+# Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+# Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -19,25 +19,11 @@
 ###############################################################
 
 databaseChangeLog:
-  - property:
-      name: uuid_type
-      value: uuid
-      dbms: postgresql, h2
-  - property:
-      name: uuid_function
-      value: uuid_generate_v4()
-      dbms: postgresql
-  - property:
-      name: uuid_function
-      value: random_uuid()
-      dbms: h2
-
-  - include:
-      file: db.changelog-extensions.yaml
-      relativeToChangelogFile: true
-  - include:
-      file: db.changelog-v1.yaml
-      relativeToChangelogFile: true
-  - include:
-      file: db.changelog-v2.yaml
-      relativeToChangelogFile: true
+  - changeSet:
+      id: 05072023-01
+      author: agg3fe
+      changes:
+        - modifyDataType:
+            tableName: SUBMODEL_ENDPOINT
+            columnName: SUB_PROTOCOL_BODY
+            newDataType: NVARCHAR(2000)
