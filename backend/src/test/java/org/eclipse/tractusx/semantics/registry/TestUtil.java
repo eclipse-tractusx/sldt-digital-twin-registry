@@ -19,10 +19,25 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry;
 
-import org.eclipse.tractusx.semantics.aas.registry.model.*;
-
 import java.util.List;
 import java.util.UUID;
+
+import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
+import org.eclipse.tractusx.semantics.aas.registry.model.AssetKind;
+import org.eclipse.tractusx.semantics.aas.registry.model.DataTypeDefXsd;
+import org.eclipse.tractusx.semantics.aas.registry.model.Endpoint;
+import org.eclipse.tractusx.semantics.aas.registry.model.Extension;
+import org.eclipse.tractusx.semantics.aas.registry.model.Key;
+import org.eclipse.tractusx.semantics.aas.registry.model.KeyTypes;
+import org.eclipse.tractusx.semantics.aas.registry.model.LangStringNameType;
+import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
+import org.eclipse.tractusx.semantics.aas.registry.model.ProtocolInformation;
+import org.eclipse.tractusx.semantics.aas.registry.model.ProtocolInformationSecurityAttributes;
+import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
+import org.eclipse.tractusx.semantics.aas.registry.model.ReferenceParent;
+import org.eclipse.tractusx.semantics.aas.registry.model.ReferenceTypes;
+import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
+import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
 
 public class TestUtil {
 
@@ -33,6 +48,9 @@ public class TestUtil {
         displayName.setLanguage("de");
         displayName.setText("this is an example description1");
         aas.setDisplayName(List.of(displayName));
+
+        aas.setAssetType( "AssetType" );
+        aas.setAssetKind( AssetKind.INSTANCE );
 
         aas.setId("fb7ebcc2-5731-4948-aeaa-c9e9692decf5");
 
@@ -57,6 +75,33 @@ public class TestUtil {
         aas.setDescription(List.of(description1, description2));
 
         aas.setDescription(List.of(description1, description2));
+
+       ReferenceParent aasReferenceParent = new ReferenceParent();
+
+        aasReferenceParent.setType( ReferenceTypes.EXTERNALREFERENCE );
+        Key parentKey = new Key();
+        parentKey.setValue( "AAS RefernParent key" );
+        parentKey.setType( KeyTypes.ASSETADMINISTRATIONSHELL );
+        aasReferenceParent.setKeys( List.of(parentKey) );
+
+        Reference aasReference = new Reference();
+        aasReference.setType( ReferenceTypes.EXTERNALREFERENCE );
+        Key aasKey = new Key();
+        aasKey.setType( KeyTypes.ASSETADMINISTRATIONSHELL );
+        aasKey.setValue( "AAS extension key" );
+        aasReference.setKeys( List.of(aasKey) );
+        aasReference.setReferredSemanticId( aasReferenceParent );
+
+        Extension aasExtension = new Extension();
+        aasExtension.setSemanticId( aasReference );
+        aasExtension.setSupplementalSemanticIds( List.of(aasReference) );
+        aasExtension.setValue( "AAS extension value" );
+        aasExtension.setName( "AAS extension name" );
+        aasExtension.setValueType( DataTypeDefXsd.ANYURI );
+        aasExtension.setRefersTo( List.of(aasReference) );
+
+        aas.setExtensions( List.of(aasExtension) );
+
 
         ProtocolInformation protocolInformation = new ProtocolInformation();
         protocolInformation.setEndpointProtocol("endpointProtocolExample");

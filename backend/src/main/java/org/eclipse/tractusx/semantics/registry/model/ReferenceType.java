@@ -19,27 +19,29 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
-import java.util.List;
-import java.util.UUID;
+public enum ReferenceType {
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.MappedCollection;
+      EXTERNALREFERENCE("ExternalReference"),
 
-import lombok.Value;
+      MODELREFERENCE("ModelReference");
 
-@Value
-public class ReferenceParent {
+      String value;
 
-   @Id
-   UUID id;
+      ReferenceType(String value) {
+         this.value = value;
+      }
 
-   ReferenceType type;
+   public String getValue() {
+      return value;
+   }
 
-   @MappedCollection(idColumn = "fk_reference_parent_id")
-   List<ReferenceKey> keys;
+   public String getType() {
+      return value;
+   }
 
-   @Column("fk_referred_semantic_id" )
-   UUID referenceID;
 
+   @Override
+   public String toString() {
+      return String.valueOf(value);
+   }
 }

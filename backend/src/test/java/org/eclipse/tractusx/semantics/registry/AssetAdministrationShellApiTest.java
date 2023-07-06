@@ -19,26 +19,26 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.eclipse.tractusx.semantics.aas.registry.model.*;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.List;
+import java.util.UUID;
+
+import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
+import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
+import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
+import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.util.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.List;
 
-import java.util.UUID;
-
-import static org.assertj.core.api.AssertionsForClassTypes.notIn;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class AssetAdministrationShellApiTest extends AbstractAssetAdministrationShellApi {
 
@@ -51,6 +51,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
       public void testCreateShellExpectSuccess() throws Exception {
          AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
          shellPayload.setId( UUID.randomUUID().toString() );
+
          performShellCreateRequest( mapper.writeValueAsString( shellPayload ) );
 
          AssetAdministrationShellDescriptor onlyRequiredFieldsShell = new AssetAdministrationShellDescriptor();
@@ -731,7 +732,9 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
          AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
          shellPayload.setGlobalAssetId( globalAssetId );
-         performShellCreateRequest( mapper.writeValueAsString( shellPayload ) );
+         String payload = mapper.writeValueAsString( shellPayload );
+         performShellCreateRequest(payload );
+         //performShellCreateRequest( mapper.writeValueAsString( shellPayload ) );
 
          // for lookup global asset id is handled as specificAssetIds
          ArrayNode globalAssetIdForSampleQuery = emptyArrayNode().add(

@@ -30,7 +30,9 @@ import java.util.UUID;
 import org.assertj.core.groups.Tuple;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetKind;
+import org.eclipse.tractusx.semantics.aas.registry.model.DataTypeDefXsd;
 import org.eclipse.tractusx.semantics.aas.registry.model.Endpoint;
+import org.eclipse.tractusx.semantics.aas.registry.model.Extension;
 import org.eclipse.tractusx.semantics.aas.registry.model.Key;
 import org.eclipse.tractusx.semantics.aas.registry.model.KeyTypes;
 import org.eclipse.tractusx.semantics.aas.registry.model.LangStringNameType;
@@ -44,6 +46,7 @@ import org.eclipse.tractusx.semantics.registry.model.DataTypeXsd;
 import org.eclipse.tractusx.semantics.registry.model.ReferenceKey;
 import org.eclipse.tractusx.semantics.registry.model.ReferenceKeyType;
 import org.eclipse.tractusx.semantics.registry.model.ReferenceParent;
+import org.eclipse.tractusx.semantics.registry.model.ReferenceType;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellDescription;
 import org.eclipse.tractusx.semantics.registry.model.ShellDisplayName;
@@ -112,6 +115,14 @@ public class ShellMapperTest {
         assertThat( shell.getShellKind().getValue() ).isEqualTo( aas.getAssetKind().getValue() );
         assertThat(shell.getShellType()).isEqualTo( aas.getAssetType() );
         assertThat(shell.getDisplayNames().stream().findFirst().get().getLanguage()).isEqualTo( aas.getDisplayName().stream().findFirst().get().getLanguage() );
+        assertThat( shell.getShellExtensions() ).hasSize( 1 );
+
+        ShellExtension shellExtension = shell.getShellExtensions().stream().findFirst().get();
+        Extension aasExtension = aas.getExtensions().stream().findFirst().get();
+        assertThat(shell.getShellExtensions()).hasSize( 1 );
+        assertThat( shellExtension.getName() ).isEqualTo(aasExtension.getName()  );
+        assertThat( shellExtension.getRefersTo() ).hasSize( 1 );
+
     }
 
     @Test
@@ -164,6 +175,8 @@ public class ShellMapperTest {
         assertThat( aas.getAssetType().equals( shell.getShellType() ) );
         assertThat( aas.getDisplayName()).hasSize( 1 );
         assertThat( aas.getDisplayName().stream().findFirst().get().getText() ).isEqualTo( shell.getDisplayNames().stream().findFirst().get().getText() );
+        assertThat( aas.getExtensions() ).hasSize( 1 );
+        assertThat( aas.getExtensions().stream().findFirst().get().getName() ).isEqualTo( shell.getShellExtensions().stream().findFirst().get().getName() );
     }
 
     private Shell createCompleteShell() {
@@ -195,20 +208,19 @@ public class ShellMapperTest {
 
 
         // TODO: 28.06.2023 adjust Tests to new data model
-        // TODO: 05.07.2023 why are the list of keys not in the construtors // adjust test for extensions 
+        // TODO: 05.07.2023 adjust test for extensions / Reference!
 
         ShellDisplayName shellDisplayName = new ShellDisplayName( UUID.randomUUID(), "de", "Display name" );
 
 
-
-        ReferenceKey shellKey = new ReferenceKey( UUID.randomUUID(), ReferenceKeyType.ASSETADMINISTRATIONSHELL, "shellkey value" );
-        ReferenceParent shellParent = new ReferenceParent( UUID.randomUUID(), "ExternalReference", List.of(shellKey) );
+        ReferenceKey shellKey = new ReferenceKey( UUID.randomUUID(), ReferenceKeyType.ASSETADMINISTRATIONSHELL, "shellkey value", null, null );
+        ReferenceParent shellParent = new ReferenceParent( UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, List.of(shellKey), null );
 
         org.eclipse.tractusx.semantics.registry.model.Reference shellReference =
               new org.eclipse.tractusx.semantics.registry.model.Reference( UUID.randomUUID(),
-                    "ExternalReference",
+                    ReferenceType.EXTERNALREFERENCE,
                     List.of(shellKey),
-                    shellParent);
+                    shellParent, null, null, null);
 
         ShellExtension shellExtension = new ShellExtension(
               UUID.randomUUID(),
@@ -259,6 +271,34 @@ public class ShellMapperTest {
         description2.setText("this is an example description2"  );
         aas.setDescription(List.of(description1, description2));
 
+        // shell reference and extension
+        org.eclipse.tractusx.semantics.aas.registry.model.ReferenceParent aasReferenceParent
+              = new org.eclipse.tractusx.semantics.aas.registry.model.ReferenceParent();
+
+        aasReferenceParent.setType( ReferenceTypes.EXTERNALREFERENCE );
+        Key parentKey = new Key();
+        parentKey.setValue( "AAS RefernParent key" );
+        parentKey.setType( KeyTypes.ASSETADMINISTRATIONSHELL );
+        aasReferenceParent.setKeys( List.of(parentKey) );
+
+        Reference aasReference = new Reference();
+        aasReference.setType( ReferenceTypes.EXTERNALREFERENCE );
+        Key aasKey = new Key();
+        aasKey.setType( KeyTypes.ASSETADMINISTRATIONSHELL );
+        aasKey.setValue( "AAS extension key" );
+        aasReference.setKeys( List.of(aasKey) );
+        aasReference.setReferredSemanticId( aasReferenceParent );
+
+
+        Extension aasExtension = new Extension();
+        aasExtension.setSemanticId( aasReference );
+        aasExtension.setSupplementalSemanticIds( List.of(aasReference) );
+        aasExtension.setValue( "AAS extension value" );
+        aasExtension.setName( "AAS extension name" );
+        aasExtension.setValueType( DataTypeDefXsd.ANYURI );
+        aasExtension.setRefersTo( List.of(aasReference) );
+
+        aas.setExtensions( List.of(aasExtension) );
 
         ProtocolInformation protocolInformation = new ProtocolInformation();
         protocolInformation.setEndpointProtocol("endpointProtocolExample");

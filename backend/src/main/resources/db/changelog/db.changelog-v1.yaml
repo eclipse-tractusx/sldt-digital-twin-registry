@@ -562,6 +562,11 @@ databaseChangeLog:
                   type: ${uuid_type}
                   constraints:
                     nullable: false
+              - column:
+                  name: SHELL_EXTENSION_KEY
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: false
         - addForeignKeyConstraint:
             baseTableName: REFERENCE
             baseColumnNames: FK_SHELL_SUPPLEMENTAL_ID
