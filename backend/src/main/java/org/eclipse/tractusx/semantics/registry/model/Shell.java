@@ -82,6 +82,7 @@ public class Shell {
     private String shellType;
 
     public void setDisplayNames(Set<ShellDisplayName> displayNames) {
+        if(displayNames==null) {displayNames = new HashSet<>();}
         this.displayNames = displayNames;
         for(ShellDisplayName s : displayNames) {
             s.setShellId(this);
@@ -89,6 +90,7 @@ public class Shell {
     }
 
     public void setSubmodels(Set<Submodel> submodels) {
+        if(submodels==null) {submodels = new HashSet<>();}
         this.submodels = submodels;
         for(Submodel s : submodels) {
             s.setShellId(this);
@@ -106,6 +108,7 @@ public class Shell {
     }
 
     public void setIdentifiers(Set<ShellIdentifier> identifiers) {
+        if(identifiers==null) {identifiers = new HashSet<>();}
         this.identifiers = identifiers;
         for(ShellIdentifier s : identifiers) {
             s.setShellId(this);
@@ -113,6 +116,7 @@ public class Shell {
     }
 
     public void setDescriptions(Set<ShellDescription> descriptions) {
+        if(descriptions==null) {descriptions = new HashSet<>();}
         this.descriptions = descriptions;
         for(ShellDescription s : descriptions) {
             s.setShellId(this);
