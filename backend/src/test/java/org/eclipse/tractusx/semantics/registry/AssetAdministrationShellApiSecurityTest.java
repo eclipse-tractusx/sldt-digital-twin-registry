@@ -614,7 +614,8 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.items").exists())
                     .andExpect(jsonPath("$.items[*].identification", hasItem(getId(shellPayload))))
-                    .andExpect(jsonPath("$.items[*].specificAssetIds[*].value", hasItems(tenantTwoAssetIdValue, withoutTenantAssetIdValue)))
+                    .andExpect(jsonPath("$.items[*].specificAssetIds[*].value", hasItems(tenantTwoAssetIdValue)))
+                    .andExpect(jsonPath("$.items[*].specificAssetIds[*].value", not(hasItem(withoutTenantAssetIdValue))))
                     .andExpect(jsonPath("$.items[*].specificAssetIds[*].value", not(hasItem(tenantThreeAssetIdValue))));
         }
 
@@ -652,7 +653,8 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     .andDo(MockMvcResultHandlers.print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.identification", equalTo(shellId)))
-                    .andExpect(jsonPath("$.specificAssetIds[*].value", hasItems(tenantTwoAssetIdValue, withoutTenantAssetIdValue)))
+                    .andExpect(jsonPath("$.specificAssetIds[*].value", hasItems(tenantTwoAssetIdValue)))
+                    .andExpect(jsonPath("$.specificAssetIds[*].value", not(hasItem(withoutTenantAssetIdValue))))
                     .andExpect(jsonPath("$.specificAssetIds[*].value", not(hasItem(tenantThreeAssetIdValue))));
         }
 
@@ -694,7 +696,8 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     .andDo(MockMvcResultHandlers.print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.items[*].identification", hasItem(shellId)))
-                    .andExpect(jsonPath("$.items[*].specificAssetIds[*].value", hasItems(tenantTwoAssetIdValue, withoutTenantAssetIdValue)))
+                    .andExpect(jsonPath("$.items[*].specificAssetIds[*].value", hasItems(tenantTwoAssetIdValue)))
+                    .andExpect(jsonPath("$.items[*].specificAssetIds[*].value", not(hasItem(withoutTenantAssetIdValue))))
                     .andExpect(jsonPath("$.items[*].specificAssetIds[*].value", not(hasItem(tenantThreeAssetIdValue))));
         }
 
@@ -745,7 +748,8 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     )
                     .andDo(MockMvcResultHandlers.print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$[*].value", hasItems(tenantTwoAssetIdValue, withoutTenantAssetIdValue)))
+                    .andExpect(jsonPath("$[*].value", hasItems(tenantTwoAssetIdValue)))
+                    .andExpect(jsonPath("$[*].value", not(hasItem(withoutTenantAssetIdValue))))
                     .andExpect(jsonPath("$[*].value", not(hasItem(tenantThreeAssetIdValue))));
         }
 
