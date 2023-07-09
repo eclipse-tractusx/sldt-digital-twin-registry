@@ -104,7 +104,7 @@ public class ShellService {
             return shellIdentifiers;
         }
         return shellIdentifiers.stream()
-                .filter(shellIdentifier -> shellIdentifier.getExternalSubjectId() == null ||
+                .filter(shellIdentifier -> shellIdentifier.getExternalSubjectId() != null &&
                         shellIdentifier.getExternalSubjectId().equals(tenantId)).collect(Collectors.toSet());
     }
 

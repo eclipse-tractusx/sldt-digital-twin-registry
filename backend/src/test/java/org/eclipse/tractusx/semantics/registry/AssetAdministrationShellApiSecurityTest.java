@@ -28,6 +28,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
@@ -651,16 +652,17 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             // test with tenant two
             mvc.perform(
                             MockMvcRequestBuilders
-                                    .get(SHELL_BASE_PATH)
+                                    .get(SINGLE_SHELL_BASE_PATH, shellPayload.getId())
                                     .queryParam("pageSize", "100")
                                     .accept(MediaType.APPLICATION_JSON)
                                     .with(jwtTokenFactory.tenantTwo().allRoles())
                     )
                     .andDo(MockMvcResultHandlers.print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.result").exists())
-                    .andExpect(jsonPath("$.result[*].specificAssetIds[*].value", hasItems("identifier1ValueExample", "identifier2ValueExample")))
-                    .andExpect(jsonPath("$.result[*].specificAssetIds[*].value", not(hasItem("tenantThreeAssetIdValue"))));
+                    .andExpect(jsonPath("$.specificAssetIds[*].value", hasSize( 0 )))
+                    .andExpect(jsonPath("$.specificAssetIds[*].value", not(hasItem("identifier1ValueExample"))))
+                    .andExpect(jsonPath("$.specificAssetIds[*].value", not(hasItem("identifier2ValueExample"))))
+                    .andExpect(jsonPath("$.specificAssetIds[*].value", not(hasItem("tenantThreeAssetIdValue"))));
         }
 
         @Test
@@ -700,7 +702,8 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     .andDo(MockMvcResultHandlers.print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.id", equalTo(shellId)))
-                    .andExpect(jsonPath("$.specificAssetIds[*].value", hasItems("tenantTwoAssetIdValue", "withoutTenantAssetIdValue")))
+                    .andExpect(jsonPath("$.specificAssetIds[*].value", hasItems("tenantTwoAssetIdValue")))
+                    .andExpect(jsonPath("$.specificAssetIds[*].value", not(hasItem("withoutTenantAssetIdValue"))))
                     .andExpect(jsonPath("$.specificAssetIds[*].value", not(hasItem("tenantThreeAssetIdValue"))));
         }
 

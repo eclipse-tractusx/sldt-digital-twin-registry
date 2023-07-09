@@ -39,7 +39,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 
 public class JwtTokenFactory {
 
-    private static final String TENANT_ONE = "TENANT_ONE";
+    private static final String TENANT_ONE = "TENANT_OWNER";
     private static final String TENANT_TWO = "TENANT_TWO";
     private static final String TENANT_THREE = "TENANT_THREE";
 

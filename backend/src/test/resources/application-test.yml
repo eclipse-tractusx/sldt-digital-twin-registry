@@ -39,7 +39,7 @@ spring:
 
 registry:
   idm:
-    owning-tenant-id: TENANT_ONE
+    owning-tenant-id: TENANT_OWNER
 
 logging:
   level:
