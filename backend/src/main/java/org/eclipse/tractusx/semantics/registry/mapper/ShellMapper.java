@@ -80,7 +80,8 @@ public interface ShellMapper {
    LangStringTextType mapAssetDisplayName (ShellDisplayName shellDisplayName);
 
     @Mappings({
-         @Mapping(source = "items", target = "result"),
+          @Mapping(source = "items", target = "result"),
+          @Mapping(source = "cursor", target = "pagingMetadata.cursor"),
     })
    GetAssetAdministrationShellDescriptorsResult toApiDto( ShellCollectionDto shell);
 

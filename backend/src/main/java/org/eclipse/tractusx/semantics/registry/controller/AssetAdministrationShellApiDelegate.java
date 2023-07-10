@@ -89,7 +89,6 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
           AssetKind assetKind, String assetType ) {
         ShellCollectionDto dto =  shellService.findAllShells(limit, cursor);
         GetAssetAdministrationShellDescriptorsResult result = shellMapper.toApiDto(dto);
-        result.setPagingMetadata( new PagedResultPagingMetadata().cursor( dto.getCursor() ) );
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -98,7 +97,6 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
         Shell savedShell = shellService.findShellByExternalId(aasIdentifier);
         SubmodelCollectionDto dto = shellService.findAllSubmodel( limit,cursor, savedShell);
         GetSubmodelDescriptorsResult result= submodelMapper.toApiDto( dto );
-        result.setPagingMetadata(  new PagedResultPagingMetadata().cursor( dto.getCursor() )  );
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -117,10 +115,7 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     @Override
     public ResponseEntity<AssetAdministrationShellDescriptor> postAssetAdministrationShellDescriptor( AssetAdministrationShellDescriptor assetAdministrationShellDescriptor ) {
         Shell shell = shellMapper.fromApiDto(assetAdministrationShellDescriptor);
-        shell.getIdentifiers().forEach( shellIdentifier -> shellIdentifier.setShellId( shell ) );
-        shell.getSubmodels().forEach( submodel -> submodel.setShellId( shell ) );
-        shell.getDescriptions().forEach( description -> description.setShellId( shell ) );
-        shell.getDisplayNames().forEach( description -> description.setShellId( shell ) );
+        shellService.mapShellCollection( shell );
         Shell saved = shellService.save(shell);
         return new ResponseEntity<>(shellMapper.toApiDto(saved), HttpStatus.CREATED);
     }

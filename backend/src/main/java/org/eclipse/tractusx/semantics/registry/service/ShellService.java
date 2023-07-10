@@ -67,6 +67,7 @@ public class ShellService {
     private final String owningTenantId;
 
     private final String SORT_FIELD_NAME = "createdDate";
+    private final int MAXIMUM_RECORDS = 1000;
 
     public ShellService(ShellRepository shellRepository,
                         ShellIdentifierRepository shellIdentifierRepository,
@@ -86,6 +87,13 @@ public class ShellService {
           throw new DuplicateKeyException("An AssetAdministrationShell for the given identification does already exists."  );
         }
        return shellRepository.save(shell);
+    }
+
+    public void mapShellCollection(Shell shell){
+         shell.getIdentifiers().forEach( shellIdentifier -> shellIdentifier.setShellId( shell ) );
+         shell.getSubmodels().forEach( submodel -> submodel.setShellId( shell ) );
+         shell.getDescriptions().forEach( description -> description.setShellId( shell ) );
+         shell.getDisplayNames().forEach( description -> description.setShellId( shell ) );
     }
 
     @Transactional(readOnly = true)
@@ -143,11 +151,8 @@ public class ShellService {
             .build();
    }
 
-   private static Integer getPageSize( Integer pageSize ) {
-      if ( pageSize == null ) {
-         pageSize = Integer.MAX_VALUE;
-      }
-      return pageSize;
+   private Integer getPageSize( Integer pageSize ) {
+      return pageSize == null ? MAXIMUM_RECORDS : pageSize;
    }
 
    private Specification<Submodel> hasShellFkId( Shell shellId ) {

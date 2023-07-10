@@ -45,7 +45,9 @@ public class ShellCursor {
       var decodedBytes = Base64.getDecoder().decode( encodedCursorValue );
       var decodedValue = new String( decodedBytes );
       String value = substringBetween( decodedValue, "*" );
-      return Instant.parse( value );
+      try {
+         return Instant.parse( value );
+      }catch ( Exception e ){throw new IllegalArgumentException("Invalid cursor value");}
    }
 
    public String getEncodedCursor( Instant field, boolean hasNextElements ) {

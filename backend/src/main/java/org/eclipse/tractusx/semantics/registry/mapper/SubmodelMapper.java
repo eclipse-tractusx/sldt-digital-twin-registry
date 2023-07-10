@@ -88,6 +88,7 @@ public interface SubmodelMapper {
 
    @Mappings({
          @Mapping(source = "items", target = "result"),
+         @Mapping(source = "cursor", target = "pagingMetadata.cursor"),
    })
    GetSubmodelDescriptorsResult toApiDto( SubmodelCollectionDto shell);
 

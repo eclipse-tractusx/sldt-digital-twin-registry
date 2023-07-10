@@ -29,9 +29,5 @@ import java.util.List;
 @Builder
 public class ShellCollectionDto {
     List<Shell> items;
-    Integer totalItems;
-    Integer currentPage;
-    Integer totalPages;
-    Integer itemCount;
     String cursor;
 }
