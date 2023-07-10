@@ -302,7 +302,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
          mvc.perform(
                      MockMvcRequestBuilders
-                           .post( SINGLE_LOOKUP_SHELL_BASE_PATH, shellId )
+                           .post( SINGLE_LOOKUP_SHELL_BASE_PATH, getEncodedValue(shellId ) )
                            .accept( MediaType.APPLICATION_JSON )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( toJson( specificAssetIds ) )
@@ -331,7 +331,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
          mvc.perform(
                      MockMvcRequestBuilders
-                           .post( SINGLE_LOOKUP_SHELL_BASE_PATH, shellId )
+                           .post( SINGLE_LOOKUP_SHELL_BASE_PATH, getEncodedValue(shellId  ) )
                            .accept( MediaType.APPLICATION_JSON )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( toJson( specificAssetIds ) )
@@ -360,7 +360,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                .add( specificAssetId( "key1", "value1" ) );
          mvc.perform(
                      MockMvcRequestBuilders
-                           .post( SINGLE_LOOKUP_SHELL_BASE_PATH, "notexistingshell" )
+                           .post( SINGLE_LOOKUP_SHELL_BASE_PATH,getEncodedValue("notexistingshell" )  )
                            .accept( MediaType.APPLICATION_JSON )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( toJson( specificAssetIds ) )
@@ -382,7 +382,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( SINGLE_LOOKUP_SHELL_BASE_PATH, shellId )
+                           .get( SINGLE_LOOKUP_SHELL_BASE_PATH, getEncodedValue(shellId ) )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -395,7 +395,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
       public void testGetSpecificIdsExpectNotFound() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( SINGLE_LOOKUP_SHELL_BASE_PATH, "notexistingshell", "notexistingsubmodel" )
+                           .get( SINGLE_LOOKUP_SHELL_BASE_PATH, getEncodedValue("notexistingshell" ), getEncodedValue("notexistingsubmodel" ) )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -487,7 +487,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( SINGLE_SUB_MODEL_BASE_PATH, shellPayload1.getId(), submodelId )
+                           .get( SINGLE_SUB_MODEL_BASE_PATH,getEncodedValue( shellPayload1.getId() ), getEncodedValue( submodelId ))
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -539,7 +539,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
          mvc.perform(
                      MockMvcRequestBuilders
-                           .put( SINGLE_SUB_MODEL_BASE_PATH, shellId, submodelId )
+                           .put( SINGLE_SUB_MODEL_BASE_PATH, getEncodedValue( shellId ), getEncodedValue( submodelId ) )
                            .accept( MediaType.APPLICATION_JSON )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( mapper.writeValueAsString( submodel ) )
@@ -551,7 +551,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          // verify that anything expect the identification can be updated
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( SINGLE_SUB_MODEL_BASE_PATH, shellId, submodelId )
+                           .get( SINGLE_SUB_MODEL_BASE_PATH, getEncodedValue( shellId ), getEncodedValue( submodelId ))
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
