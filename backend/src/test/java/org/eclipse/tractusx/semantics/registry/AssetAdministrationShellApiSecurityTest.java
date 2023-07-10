@@ -798,7 +798,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$", hasSize(0)));
 
-            // Test lookup with one assetId for tenant two and one without tenantId
+            // Test lookup with no assetId for tenant two and one without tenantId because without tenantId is only visible for the owner
             ArrayNode specificAssetIdsTenantTwo = emptyArrayNode()
                     .add(specificAssetId(keyPrefix + "findExternalShellIdQueryKey_2", "value_2"))
                     .add(specificAssetId(keyPrefix + "findExternalShellIdQueryKey_2_1", "value_2_1"));
@@ -812,9 +812,25 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     )
                     .andDo(MockMvcResultHandlers.print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$", hasSize(1)))
-                    // ensure that only three results match
-                    .andExpect(jsonPath("$", contains(getId(firstShellPayload))));
+                    .andExpect(jsonPath("$", hasSize(0)));
+
+
+           // Test lookup with one assetId for tenant two
+           ArrayNode specificAssetIdsOnlyForTenantTwo = emptyArrayNode()
+                 .add(specificAssetId(keyPrefix + "findExternalShellIdQueryKey_2_1", "value_2_1"));
+
+           mvc.perform(
+                       MockMvcRequestBuilders
+                             .get(LOOKUP_SHELL_BASE_PATH)
+                             .queryParam("assetIds", toJson(specificAssetIdsOnlyForTenantTwo))
+                             .accept(MediaType.APPLICATION_JSON)
+                             .with(jwtTokenFactory.tenantTwo().allRoles())
+                 )
+                 .andDo(MockMvcResultHandlers.print())
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$", hasSize(1)))
+                 // ensure that only three results match
+                 .andExpect(jsonPath("$", contains(getId(firstShellPayload))));
         }
 
         @Test
@@ -870,8 +886,8 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     )
                     .andDo(MockMvcResultHandlers.print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$", hasSize(2)))
-                    .andExpect(jsonPath("$", containsInAnyOrder(getId(firstShellPayload), getId(secondShellPayload))));
+                    .andExpect(jsonPath("$", hasSize(1)))
+                    .andExpect(jsonPath("$", containsInAnyOrder(getId(secondShellPayload))));
         }
 
     }
