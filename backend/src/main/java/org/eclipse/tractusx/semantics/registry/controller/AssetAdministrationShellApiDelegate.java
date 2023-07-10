@@ -72,13 +72,14 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     @Override
-    public ResponseEntity<Void> deleteAllAssetLinksById(String aasIdentifier) {
-        shellService.deleteAllIdentifiers(aasIdentifier);
+    public ResponseEntity<Void> deleteAllAssetLinksById(byte[] aasIdentifier) {
+
+        shellService.deleteAllIdentifiers(getDecodedId(aasIdentifier));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     @Override
-    public ResponseEntity<Void> deleteSubmodelDescriptorByIdThroughSuperpath( String aasIdentifier, String submodelIdentifier ) {
-        shellService.deleteSubmodel(aasIdentifier, submodelIdentifier);
+    public ResponseEntity<Void> deleteSubmodelDescriptorByIdThroughSuperpath( byte[] aasIdentifier, byte[] submodelIdentifier ) {
+        shellService.deleteSubmodel(getDecodedId( aasIdentifier ), getDecodedId( submodelIdentifier ));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
     }
@@ -95,8 +96,8 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
 
     @Override
     // new todo: correct implementation
-    public ResponseEntity<GetSubmodelDescriptorsResult> getAllSubmodelDescriptorsThroughSuperpath( String aasIdentifier, Integer limit, String cursor ) {
-        Shell savedShell = shellService.findShellByExternalId(aasIdentifier);
+    public ResponseEntity<GetSubmodelDescriptorsResult> getAllSubmodelDescriptorsThroughSuperpath( byte[] aasIdentifier, Integer limit, String cursor ) {
+        Shell savedShell = shellService.findShellByExternalId(getDecodedId( aasIdentifier ));
         Set<Submodel> submodels = savedShell.getSubmodels();
         List<SubmodelDescriptor> descriptorResults = submodelMapper.toApiDto( submodels );
         GetSubmodelDescriptorsResult result = new GetSubmodelDescriptorsResult();
@@ -105,14 +106,21 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
 
     @Override
-    public ResponseEntity<AssetAdministrationShellDescriptor> getAssetAdministrationShellDescriptorById( String aasIdentifier ) {
-            Shell saved = shellService.findShellByExternalId(aasIdentifier);
-           return new ResponseEntity<>(shellMapper.toApiDto(saved), HttpStatus.OK);
+    public ResponseEntity<AssetAdministrationShellDescriptor> getAssetAdministrationShellDescriptorById( byte[] aasIdentifier ) {
+        String decodedAasIdentifier = getDecodedId( aasIdentifier );
+        Shell saved = shellService.findShellByExternalId(decodedAasIdentifier);
+        return new ResponseEntity<>(shellMapper.toApiDto(saved), HttpStatus.OK);
+    }
+
+    private static String getDecodedId( byte[] aasIdentifier ) {
+        byte[] decodedBytes = Base64.getUrlDecoder().decode( aasIdentifier );
+        String decodedAasIdentifier = new String(decodedBytes);
+        return decodedAasIdentifier;
     }
 
     @Override
-    public ResponseEntity<SubmodelDescriptor> getSubmodelDescriptorByIdThroughSuperpath( String aasIdentifier, String submodelIdentifier ) {
-        Submodel submodel = shellService.findSubmodelByExternalId(aasIdentifier, submodelIdentifier);
+    public ResponseEntity<SubmodelDescriptor> getSubmodelDescriptorByIdThroughSuperpath( byte[] aasIdentifier, byte[] submodelIdentifier ) {
+        Submodel submodel = shellService.findSubmodelByExternalId(getDecodedId( aasIdentifier ), getDecodedId( submodelIdentifier ));
         return new ResponseEntity<>(submodelMapper.toApiDto(submodel), HttpStatus.OK);
     }
 
@@ -123,9 +131,9 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
 
     @Override
-    public ResponseEntity<SubmodelDescriptor> postSubmodelDescriptorThroughSuperpath( String aasIdentifier, SubmodelDescriptor submodelDescriptor ) {
+    public ResponseEntity<SubmodelDescriptor> postSubmodelDescriptorThroughSuperpath( byte[] aasIdentifier, SubmodelDescriptor submodelDescriptor ) {
         Submodel toBeSaved = submodelMapper.fromApiDto(submodelDescriptor);
-        Submodel savedSubModel = shellService.save(aasIdentifier, toBeSaved);
+        Submodel savedSubModel = shellService.save(getDecodedId( aasIdentifier ), toBeSaved);
         return new ResponseEntity<>(submodelMapper.toApiDto(savedSubModel), HttpStatus.CREATED);
     }
 
@@ -137,9 +145,9 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
 
     @Override
-    public ResponseEntity<Void> putSubmodelDescriptorByIdThroughSuperpath( String aasIdentifier, String submodelIdentifier, SubmodelDescriptor submodelDescriptor ) {
+    public ResponseEntity<Void> putSubmodelDescriptorByIdThroughSuperpath( byte[] aasIdentifier, byte[] submodelIdentifier, SubmodelDescriptor submodelDescriptor ) {
         Submodel submodel = submodelMapper.fromApiDto( submodelDescriptor );
-        shellService.update( aasIdentifier, submodelIdentifier, submodel.withIdExternal( submodelIdentifier ) );
+        shellService.update( getDecodedId( aasIdentifier ), getDecodedId( submodelIdentifier ), submodel.withIdExternal( getDecodedId( submodelIdentifier ) ) );
         return new ResponseEntity<>( HttpStatus.NO_CONTENT );
     }
 
@@ -155,14 +163,14 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
 
     @Override
-        public ResponseEntity<List<SpecificAssetId>> getAllAssetLinksById(String aasIdentifier) {
-            Set<ShellIdentifier> identifiers = shellService.findShellIdentifiersByExternalShellId(aasIdentifier);
+        public ResponseEntity<List<SpecificAssetId>> getAllAssetLinksById(byte[] aasIdentifier) {
+            Set<ShellIdentifier> identifiers = shellService.findShellIdentifiersByExternalShellId(getDecodedId( aasIdentifier ));
             return new ResponseEntity<>(shellMapper.toApiDto(identifiers), HttpStatus.OK);
         }
 
         @Override
-    public ResponseEntity<List<SpecificAssetId>> postAllAssetLinksById(String aasIdentifier, List<SpecificAssetId> specificAssetId) {
-        Set<ShellIdentifier> shellIdentifiers = shellService.save(aasIdentifier, shellMapper.fromApiDto(specificAssetId));
+    public ResponseEntity<List<SpecificAssetId>> postAllAssetLinksById(byte[] aasIdentifier, List<SpecificAssetId> specificAssetId) {
+        Set<ShellIdentifier> shellIdentifiers = shellService.save(getDecodedId( aasIdentifier ), shellMapper.fromApiDto(specificAssetId));
         List<SpecificAssetId> list = shellMapper.toApiDto(shellIdentifiers);
         return new ResponseEntity<>(list, HttpStatus.CREATED);
     }
