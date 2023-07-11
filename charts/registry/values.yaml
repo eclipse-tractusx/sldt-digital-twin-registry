@@ -27,8 +27,8 @@ enableKeycloak: true
 
 registry:
   image:
-    registry: ghcr.io/catenax-ng
-    repository: sldt-digital-twin-registry
+    registry: docker.io
+    repository: tractusx/sldt-digital-twin-registry
     # This version property overwrites the default image version.
     # The default image version is the appVersion of the Chart.yaml.
     version: ""

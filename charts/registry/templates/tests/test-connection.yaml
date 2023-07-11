@@ -10,6 +10,9 @@ spec:
       image: python:3.8-slim
       workingDir: /tests
       command: ['./test-script.sh']
+      securityContext:
+        runAsUser: 100
+        allowPrivilegeEscalation: false
       volumeMounts:
         - name: test-script
           mountPath: /tests

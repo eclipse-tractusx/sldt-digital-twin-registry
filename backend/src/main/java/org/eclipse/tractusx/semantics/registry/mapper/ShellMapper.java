@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -20,49 +20,61 @@
 package org.eclipse.tractusx.semantics.registry.mapper;
 
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
-import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptorCollection;
-import org.eclipse.tractusx.semantics.aas.registry.model.BatchResult;
-import org.eclipse.tractusx.semantics.aas.registry.model.IdentifierKeyValuePair;
-import org.eclipse.tractusx.semantics.registry.dto.BatchResultDto;
+import org.eclipse.tractusx.semantics.aas.registry.model.GetAssetAdministrationShellDescriptorsResult;
+import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
+import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
+import org.eclipse.tractusx.semantics.registry.model.ShellDescription;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
 import org.mapstruct.*;
 
 import java.util.List;
 import java.util.Set;
 
-@Mapper(uses = {SubmodelMapper.class}, componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
+
+@Mapper(uses = {SubmodelMapper.class}, componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR ,nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE )
 public interface ShellMapper {
     @Mappings({
-            @Mapping(target = "idExternal", source = "identification"),
-            @Mapping(target = "identifiers", source = "specificAssetIds"),
-            @Mapping(target = "descriptions", source = "description"),
-            @Mapping(target = "submodels", source = "submodelDescriptors"),
+          @Mapping(target = "idExternal", source = "id"),
+          @Mapping(target = "identifiers", source = "specificAssetIds"),
+          @Mapping(target = "descriptions", source = "description"),
+          @Mapping(target = "submodels", source = "submodelDescriptors"),
+          @Mapping(target = "id", ignore = true)
     })
     Shell fromApiDto(AssetAdministrationShellDescriptor apiDto);
 
-    List<Shell> fromListApiDto(List<AssetAdministrationShellDescriptor> apiDto);
-
-    ShellIdentifier fromApiDto(IdentifierKeyValuePair apiDto);
-
-    Set<ShellIdentifier> fromApiDto(List<IdentifierKeyValuePair> apiDto);
-
-    AssetAdministrationShellDescriptorCollection toApiDto( ShellCollectionDto shell);
+    ShellDescription mapShellDescription (LangStringTextType description);
 
     @Mappings({
-            @Mapping(target = "identification", source = "idExternal"),
+          @Mapping(target = "key", source = "name"),
     })
-    BatchResult toApiDto( BatchResultDto batchResult);
+    ShellIdentifier fromApiDto(SpecificAssetId apiDto);
 
-    List<BatchResult> toListApiDto(List<BatchResultDto> batchResults);
+    Set<ShellIdentifier> fromApiDto(List<SpecificAssetId> apiDto);
 
+    @Mappings({
+          @Mapping(target = "name", source = "key"),
+    })
+    SpecificAssetId fromDtoApi(ShellIdentifier apiDto);
+
+    @Mappings({
+         @Mapping(source = "idExternal", target = "id"),
+         @Mapping(source = "identifiers", target = "specificAssetIds"),
+         @Mapping(source = "descriptions", target = "description"),
+         @Mapping(source = "submodels", target = "submodelDescriptors"),
+    })
     @InheritInverseConfiguration
     AssetAdministrationShellDescriptor toApiDto(Shell shell);
 
-    List<AssetAdministrationShellDescriptor> toApiDto(List<Shell> shell);
+   LangStringTextType mapAssetDescription (ShellDescription description);
 
-    List<IdentifierKeyValuePair> toApiDto(Set<ShellIdentifier> shell);
+    @Mappings({
+         @Mapping(source = "items", target = "result"),
+    })
+   GetAssetAdministrationShellDescriptorsResult toApiDto( ShellCollectionDto shell);
+
+   List<SpecificAssetId> toApiDto(Set<ShellIdentifier> shell);
 
     @AfterMapping
     default Shell convertGlobalAssetIdToShellIdentifier(AssetAdministrationShellDescriptor apiDto, @MappingTarget Shell shell){
@@ -74,9 +86,8 @@ public interface ShellMapper {
         ShellMapperCustomization.shellIdentifierToGlobalAssetId(shell, apiDto);
     }
 
-    @AfterMapping
-    default void removeGlobalAssetIdFromIdentifiers(@MappingTarget List<IdentifierKeyValuePair> apiDto){
-        ShellMapperCustomization.removeGlobalAssetIdIdentifier(apiDto);
-    }
-
+   @AfterMapping
+   default void removeGlobalAssetIdFromIdentifiers(@MappingTarget List<SpecificAssetId> apiDto){
+      ShellMapperCustomization.removeGlobalAssetIdIdentifier(apiDto);
+   }
 }
