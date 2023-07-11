@@ -121,8 +121,9 @@ public class ShellMapperTest {
         Extension aasExtension = aas.getExtensions().stream().findFirst().get();
         assertThat(shell.getShellExtensions()).hasSize( 1 );
         assertThat( shellExtension.getName() ).isEqualTo(aasExtension.getName()  );
-        assertThat( shellExtension.getRefersTo() ).hasSize( 1 );
-
+       assertThat( shellExtension.getRefersTo() ).hasSize( 1 );
+       assertThat( shellExtension.getSupplementalSemanticIds() ).hasSize( 1 );
+       assertThat(shellExtension.getSupplementalSemanticIds().stream().findFirst().get().getType()).isEqualTo( ReferenceType.EXTERNALREFERENCE );
     }
 
     @Test
@@ -176,7 +177,11 @@ public class ShellMapperTest {
         assertThat( aas.getDisplayName()).hasSize( 1 );
         assertThat( aas.getDisplayName().stream().findFirst().get().getText() ).isEqualTo( shell.getDisplayNames().stream().findFirst().get().getText() );
         assertThat( aas.getExtensions() ).hasSize( 1 );
-        assertThat( aas.getExtensions().stream().findFirst().get().getName() ).isEqualTo( shell.getShellExtensions().stream().findFirst().get().getName() );
+        Extension aasExtension = aas.getExtensions().stream().findFirst().get();
+        assertThat( aasExtension.getName() ).isEqualTo( shell.getShellExtensions().stream().findFirst().get().getName() );
+        assertThat( aasExtension.getRefersTo() ).hasSize( 1 );
+        assertThat( aasExtension.getSupplementalSemanticIds() ).hasSize( 1 );
+        assertThat( aasExtension.getSupplementalSemanticIds().get( 0 ).getType() ).isEqualTo( ReferenceTypes.MODELREFERENCE );
     }
 
     private Shell createCompleteShell() {
@@ -213,28 +218,29 @@ public class ShellMapperTest {
         ShellDisplayName shellDisplayName = new ShellDisplayName( UUID.randomUUID(), "de", "Display name" );
 
 
-        ReferenceKey shellKey = new ReferenceKey( UUID.randomUUID(), ReferenceKeyType.ASSETADMINISTRATIONSHELL, "shellkey value", null, null );
-        ReferenceParent shellParent = new ReferenceParent( UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, List.of(shellKey), null );
+        ReferenceKey shellKey = new ReferenceKey( UUID.randomUUID(), ReferenceKeyType.ASSETADMINISTRATIONSHELL, "shellkey value");
+        ReferenceParent shellParent = new ReferenceParent( UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(shellKey) );
 
-        org.eclipse.tractusx.semantics.registry.model.Reference shellReference =
-              new org.eclipse.tractusx.semantics.registry.model.Reference( UUID.randomUUID(),
-                    ReferenceType.EXTERNALREFERENCE,
-                    List.of(shellKey),
-                    shellParent, null, null, null);
+
+        org.eclipse.tractusx.semantics.registry.model.Reference shellReference1 =
+              new org.eclipse.tractusx.semantics.registry.model.Reference(UUID.randomUUID(), ReferenceType.MODELREFERENCE, Set.of(shellKey),shellParent);
+
+
+        org.eclipse.tractusx.semantics.registry.model.Reference shellReference2 =
+              new org.eclipse.tractusx.semantics.registry.model.Reference( UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(shellKey), shellParent);
 
         ShellExtension shellExtension = new ShellExtension(
               UUID.randomUUID(),
-              shellReference,
-              List.of(shellReference),
+              shellReference1,
+              Set.of(shellReference1),
               "shell extension",
               DataTypeXsd.BOOLEAN,
               "shell extension value",
-              List.of(shellReference)
+              Set.of(shellReference2)
         );
 
         return new Shell(UUID.randomUUID(), "idExternalExample", "idShortExample",
-                shellIdentifiers, shellDescriptions, Set.of(submodel), null,null, ShellKind.INSTANCE, "shellType", Set.of(shellDisplayName),
-              Set.of(shellExtension));
+              shellIdentifiers, shellDescriptions, Set.of(submodel), null,null, ShellKind.INSTANCE, "shellType", Set.of(shellDisplayName), Set.of(shellExtension));
     }
 
     private AssetAdministrationShellDescriptor createCompleteAasDescriptor() {

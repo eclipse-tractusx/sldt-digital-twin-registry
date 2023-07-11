@@ -85,20 +85,29 @@ public class TestUtil {
         aasReferenceParent.setKeys( List.of(parentKey) );
 
         Reference aasReference = new Reference();
-        aasReference.setType( ReferenceTypes.EXTERNALREFERENCE );
+        aasReference.setType( ReferenceTypes.MODELREFERENCE );
         Key aasKey = new Key();
         aasKey.setType( KeyTypes.ASSETADMINISTRATIONSHELL );
         aasKey.setValue( "AAS extension key" );
         aasReference.setKeys( List.of(aasKey) );
         aasReference.setReferredSemanticId( aasReferenceParent );
 
-        Extension aasExtension = new Extension();
+       Reference aasReference2 = new Reference();
+       aasReference2.setType( ReferenceTypes.EXTERNALREFERENCE );
+       Key aasKey2 = new Key();
+       aasKey2.setType( KeyTypes.ASSETADMINISTRATIONSHELL );
+       aasKey2.setValue( "AAS extension key" );
+       aasReference2.setKeys( List.of(aasKey2) );
+       aasReference2.setReferredSemanticId( aasReferenceParent );
+
+
+       Extension aasExtension = new Extension();
         aasExtension.setSemanticId( aasReference );
         aasExtension.setSupplementalSemanticIds( List.of(aasReference) );
         aasExtension.setValue( "AAS extension value" );
         aasExtension.setName( "AAS extension name" );
         aasExtension.setValueType( DataTypeDefXsd.ANYURI );
-        aasExtension.setRefersTo( List.of(aasReference) );
+        aasExtension.setRefersTo( List.of(aasReference2) );
 
         aas.setExtensions( List.of(aasExtension) );
 
@@ -133,7 +142,7 @@ public class TestUtil {
         extension.setRefersTo(List.of(reference));
         extension.addSupplementalSemanticIdsItem(reference);
 
-        aas.setExtensions(List.of(extension));
+  //      aas.setExtensions(List.of(extension));
 
         SubmodelDescriptor submodelDescriptor = new SubmodelDescriptor();
 

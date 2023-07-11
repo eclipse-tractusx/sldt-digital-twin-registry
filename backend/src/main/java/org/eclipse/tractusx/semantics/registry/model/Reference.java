@@ -19,7 +19,7 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
@@ -27,9 +27,10 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 
 import lombok.Value;
+import lombok.With;
 
 @Value
-
+@With
 public class Reference {
 
    @Id
@@ -38,18 +39,8 @@ public class Reference {
    ReferenceType type;
 
    @MappedCollection(idColumn = "fk_reference_id")
-   List<ReferenceKey> keys;
+   Set<ReferenceKey> keys;
 
    @Column("fk_referred_semantic_id" )
    ReferenceParent referredSemanticId;
-
-   @Column("shell_extension_key")
-   UUID shellExtensionID;
-
-   @Column("fk_shell_supplemental_id")
-   UUID shellExtensionSupplementalID;
-
-   @Column("fk_shell_ext_refers_id")
-   UUID shellExtensionRefersToID;
-
 }

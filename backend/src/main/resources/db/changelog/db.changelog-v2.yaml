@@ -126,22 +126,17 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: SEMANTIC_ID
-                  type: nvarchar(2000)
-                  constraints:
-                    nullable: true
-              - column:
                   name: NAME
                   type: nvarchar(255)
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: VALUE_TYPE
                   type: nvarchar(255)
                   constraints:
                     nullable: true
               - column:
-                  name: VALUE
+                  name: SHELL_EXT_VALUE
                   type: nvarchar(255)
                   constraints:
                     nullable: true
@@ -177,30 +172,34 @@ databaseChangeLog:
                   name: TYPE
                   type: nvarchar(2000)
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
-                  name: FK_SHELL_SUPPLEMENTAL_ID
+                  name: FK_SHELL_EXT_SEMANTIC_ID
                   type: ${uuid_type}
                   constraints:
-                    nullable: false
+                    nullable: true
+              - column:
+                  name: FK_SHELL_EXT_SUPPLEMENTAL_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
               - column:
                   name: FK_SHELL_EXT_REFERS_ID
                   type: ${uuid_type}
                   constraints:
-                    nullable: false
-              - column:
-                  name: FK_REFERRED_SEMANTIC_ID
-                  type: ${uuid_type}
-                  constraints:
-                    nullable: false
-              - column:
-                  name: SHELL_EXTENSION_KEY
-                  type: ${uuid_type}
-                  constraints:
-                    nullable: false
+                    nullable: true
         - addForeignKeyConstraint:
             baseTableName: REFERENCE
-            baseColumnNames: FK_SHELL_SUPPLEMENTAL_ID
+            baseColumnNames: FK_SHELL_EXT_SEMANTIC_ID
+            constraintName: REF_FK_SHELL_EXT_SEMANTIC
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_EXTENSION
+            validate: true
+        - addForeignKeyConstraint:
+            baseTableName: REFERENCE
+            baseColumnNames: FK_SHELL_EXT_SUPPLEMENTAL_ID
             constraintName: REF_FK_SHELL_EXT_SUPPLEMENTAL
             onDelete: CASCADE
             onUpdate: RESTRICT
@@ -230,20 +229,20 @@ databaseChangeLog:
                   name: TYPE
                   type: nvarchar(2000)
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: FK_REFERRED_SEMANTIC_ID
                   type: ${uuid_type}
                   constraints:
-                    nullable: false
+                    nullable: true
         - addForeignKeyConstraint:
-            baseTableName: REFERENCE
+            baseTableName: REFERENCE_PARENT
             baseColumnNames: FK_REFERRED_SEMANTIC_ID
             constraintName: REF_FK_REFERRED_SEMANTIC_ID
             onDelete: CASCADE
             onUpdate: RESTRICT
             referencedColumnNames: ID
-            referencedTableName: REFERENCE_PARENT
+            referencedTableName: REFERENCE
             validate: true
         - createTable:
             tableName: REFERENCE_KEY
@@ -259,22 +258,22 @@ databaseChangeLog:
                   name: TYPE
                   type: nvarchar(2000)
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
-                  name: VALUE
+                  name: REF_KEY_VALUE
                   type: nvarchar(2000)
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
                   name: FK_REFERENCE_ID
                   type: ${uuid_type}
                   constraints:
-                    nullable: false
+                    nullable: true
               - column:
                   name: FK_REFERENCE_PARENT_ID
                   type: ${uuid_type}
                   constraints:
-                    nullable: false
+                    nullable: true
         - addForeignKeyConstraint:
             baseTableName: REFERENCE_KEY
             baseColumnNames: FK_REFERENCE_PARENT_ID
@@ -293,3 +292,10 @@ databaseChangeLog:
             referencedColumnNames: ID
             referencedTableName: REFERENCE
             validate: true
+  - changeSet:
+      id: 11072023-01
+      author: slindner
+      changes:
+        - dropNotNullConstraint:
+            tableName: SHELL
+            columnName: ID_SHORT

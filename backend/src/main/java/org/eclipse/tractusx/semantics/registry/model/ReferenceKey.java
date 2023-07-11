@@ -24,21 +24,23 @@ import java.util.UUID;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Value
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class ReferenceKey {
 
    @Id
    UUID id;
    ReferenceKeyType type;
+
+   @Column("ref_key_value")
    String value;
-
-   @Column("fk_reference_id")
-   UUID referenceID;
-   @Column("fk_reference_parent_id")
-   UUID referenceParentID;
-
 }
 
 

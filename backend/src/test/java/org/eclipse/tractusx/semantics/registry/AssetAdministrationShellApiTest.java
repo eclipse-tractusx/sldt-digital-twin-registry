@@ -56,7 +56,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
          AssetAdministrationShellDescriptor onlyRequiredFieldsShell = new AssetAdministrationShellDescriptor();
          onlyRequiredFieldsShell.setId( UUID.randomUUID().toString() );
-         onlyRequiredFieldsShell.setIdShort( "idShortExample" );
+
          performShellCreateRequest( mapper.writeValueAsString( onlyRequiredFieldsShell ) );
 
       }

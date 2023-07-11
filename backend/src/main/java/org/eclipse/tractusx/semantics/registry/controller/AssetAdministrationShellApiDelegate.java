@@ -19,12 +19,22 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.controller;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import org.eclipse.tractusx.semantics.aas.registry.api.DescriptionApiDelegate;
 import org.eclipse.tractusx.semantics.aas.registry.api.LookupApiDelegate;
 import org.eclipse.tractusx.semantics.aas.registry.api.ShellDescriptorsApiDelegate;
-import org.eclipse.tractusx.semantics.aas.registry.model.*;
+import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
+import org.eclipse.tractusx.semantics.aas.registry.model.AssetKind;
+import org.eclipse.tractusx.semantics.aas.registry.model.GetAssetAdministrationShellDescriptorsResult;
+import org.eclipse.tractusx.semantics.aas.registry.model.GetSubmodelDescriptorsResult;
+import org.eclipse.tractusx.semantics.aas.registry.model.ServiceDescription;
+import org.eclipse.tractusx.semantics.aas.registry.model.ShellLookup;
+import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
+import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
 import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
 import org.eclipse.tractusx.semantics.registry.mapper.ShellMapper;
 import org.eclipse.tractusx.semantics.registry.mapper.SubmodelMapper;
@@ -58,7 +68,6 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
 
     @Override
-    // TODO: 21.06.2023 implement correct and not just give back dummy, implement test cases for this endpoint 
     public ResponseEntity<ServiceDescription> getDescription() {
         ServiceDescription serviceDescription = new ServiceDescription();
         serviceDescription.setProfiles( List.of( ServiceDescription.ProfilesEnum.ASSETADMINISTRATIONSHELLREPOSITORYSERVICESPECIFICATION_V3_0_MINIMALPROFILE, 
@@ -94,7 +103,6 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
 
     @Override
-    // new todo: correct implementation
     public ResponseEntity<GetSubmodelDescriptorsResult> getAllSubmodelDescriptorsThroughSuperpath( String aasIdentifier, Integer limit, String cursor ) {
         Shell savedShell = shellService.findShellByExternalId(aasIdentifier);
         Set<Submodel> submodels = savedShell.getSubmodels();

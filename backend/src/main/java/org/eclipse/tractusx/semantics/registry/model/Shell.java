@@ -28,10 +28,18 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.With;
 
-@Value
+
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+//@Value
 @With
 public class Shell {
     @Id
