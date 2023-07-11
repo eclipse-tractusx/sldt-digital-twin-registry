@@ -176,34 +176,34 @@ public class ShellService {
 
    @Transactional( readOnly = true )
    public GetAllAssetAdministrationShellIdsByAssetLink200Response findExternalShellIdsByIdentifiersByExactMatch( Set<ShellIdentifier> shellIdentifiers,
-         Integer limit, String cursor ) {
+         Integer pageSize, String cursor ) {
       List<String> keyValueCombinations = shellIdentifiers.stream().map( shellIdentifier -> shellIdentifier.getKey() + shellIdentifier.getValue() ).toList();
 
       List<String> queryResult = shellRepository.findExternalShellIdsByIdentifiersByExactMatch( keyValueCombinations,
             keyValueCombinations.size(), tenantAware.getTenantId(), owningTenantId );
-      limit = getPageSize( limit );
+      pageSize = getPageSize( pageSize );
 
       int startIndex = getCursorDecoded( cursor, queryResult );
-      List<String> assedtIdList = queryResult.subList( startIndex, queryResult.size() ).stream().limit( limit ).collect( Collectors.toList() );
+      List<String> assetIdList = queryResult.subList( startIndex, queryResult.size() ).stream().limit( pageSize ).collect( Collectors.toList() );
 
-      String nextCursor = getCursorEncoded( queryResult, assedtIdList );
+      String nextCursor = getCursorEncoded( queryResult, assetIdList );
       GetAllAssetAdministrationShellIdsByAssetLink200Response response= new GetAllAssetAdministrationShellIdsByAssetLink200Response();
-      response.setResult( assedtIdList );
+      response.setResult( assetIdList );
       response.setPagingMetadata( new PagedResultPagingMetadata().cursor( nextCursor ) );
       return response;
    }
 
-   private static String getCursorEncoded( List<String> queryResult, List<String> assedtIdList ) {
+   private String getCursorEncoded( List<String> queryResult, List<String> assetIdList ) {
       if( queryResult.size()>0) {
-         if ( !assedtIdList.get( assedtIdList.size() - 1 ).equals( queryResult.get( queryResult.size() - 1 ) ) ) {
-            String lastEle = assedtIdList.get( assedtIdList.size() - 1 );
+         if ( !assetIdList.get( assetIdList.size() - 1 ).equals( queryResult.get( queryResult.size() - 1 ) ) ) {
+            String lastEle = assetIdList.get( assetIdList.size() - 1 );
             return Base64.getEncoder().encodeToString( lastEle.getBytes() );
          }
       }
       return null;
    }
 
-   private static int getCursorDecoded( String cursor, List<String> queryResult ) {
+   private int getCursorDecoded( String cursor, List<String> queryResult ) {
       if ( cursor != null ) {
          var decodedBytes = Base64.getDecoder().decode( cursor );
          var decodedValue = new String( decodedBytes );
@@ -240,7 +240,7 @@ public class ShellService {
       }
    }
 
-   private static ObjectMapper getObjectMapper() {
+   private ObjectMapper getObjectMapper() {
       ObjectMapper mapper = new ObjectMapper();
       mapper.registerModule( new JavaTimeModule() );
       mapper.setSerializationInclusion( JsonInclude.Include.NON_NULL );
