@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.tractusx.semantics.aas.registry.model.Endpoint;
+import org.eclipse.tractusx.semantics.aas.registry.model.Extension;
 import org.eclipse.tractusx.semantics.aas.registry.model.Key;
 import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
 import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
@@ -36,6 +37,7 @@ import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
 import org.eclipse.tractusx.semantics.registry.model.Submodel;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelDescription;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelEndpoint;
+import org.eclipse.tractusx.semantics.registry.model.SubmodelExtension;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
@@ -51,13 +53,26 @@ public interface SubmodelMapper {
             @Mapping(target = "descriptions", source = "description"),
             @Mapping(target="semanticId", source = "semanticId"),
             @Mapping(target = "id", ignore = true),
-            @Mapping(target = "displayNames", source = "displayName")
+            @Mapping(target = "displayNames", source = "displayName"),
+          @Mapping(target = "submodelExtensions", source = "extensions")
     })
     Submodel fromApiDto(SubmodelDescriptor apiDto);
 
    SubmodelDescription mapShellDescription (LangStringTextType description);
 
-    @Mappings({
+   @Mappings({
+         @Mapping(target="submodSemanticId", source = "semanticId"),
+         @Mapping(target="submodSupplementalIds", source = "supplementalSemanticIds"),
+         @Mapping(target="name", source = "name"),
+         @Mapping(target="valueType", source = "valueType"),
+         @Mapping(target="value", source = "value"),
+         @Mapping(target="refersTo", source = "refersTo")
+   })
+   SubmodelExtension mapSubmodelExtension (Extension submodelExtensions);
+
+
+
+   @Mappings({
             @Mapping(target="interfaceName", source = "interface"),
             @Mapping(target="endpointAddress", source = "protocolInformation.href"),
             @Mapping(target="endpointProtocol", source = "protocolInformation.endpointProtocol"),
@@ -93,8 +108,22 @@ public interface SubmodelMapper {
 
    LangStringTextType mapSubModelDescription (SubmodelDescription description);
 
+   @Mappings({
+         @Mapping(source = "submodelExtensions", target = "extensions"),
+   })
    @InheritInverseConfiguration
    List<SubmodelDescriptor> toApiDto( Set<Submodel> submodels );
+
+   @Mappings({
+         @Mapping(source="submodSemanticId", target = "semanticId"),
+         @Mapping(source="submodSupplementalIds", target = "supplementalSemanticIds"),
+         @Mapping(source="name", target = "name"),
+         @Mapping(source="valueType", target = "valueType"),
+         @Mapping(source="value", target = "value"),
+         @Mapping(source="refersTo", target = "refersTo")
+   })
+   Extension mapExtension (SubmodelExtension submodelExtension);
+
 
    default String map(Reference reference) {
       return Optional.ofNullable(reference).map(Reference::getKeys)

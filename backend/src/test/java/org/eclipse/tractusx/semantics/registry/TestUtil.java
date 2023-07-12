@@ -131,30 +131,47 @@ public class TestUtil {
         endpoint.setInterface("interfaceNameExample");
         endpoint.setProtocolInformation(protocolInformation);
 
-        Reference reference = new Reference();
-        reference.setType(ReferenceTypes.EXTERNALREFERENCE);
+        Reference semanticIDReference = new Reference();
+       semanticIDReference.setType(ReferenceTypes.EXTERNALREFERENCE);
         Key key = new Key();
         key.setType(KeyTypes.SUBMODEL);
         key.setValue("semanticIdExample");
-        reference.setKeys(List.of(key));
+       semanticIDReference.setKeys(List.of(key));
 
-        Extension extension = new Extension();
-        extension.setRefersTo(List.of(reference));
-        extension.addSupplementalSemanticIdsItem(reference);
+       //SubmodelDescriptor Extension:
+       Key submodelExtensionKey = new Key();
+       submodelExtensionKey.setType( KeyTypes.SUBMODEL );
+       submodelExtensionKey.setValue( "submodelExtensionIdExample" );
 
-  //      aas.setExtensions(List.of(extension));
+       ReferenceParent sumodelExtensionParent = new ReferenceParent();
+       sumodelExtensionParent.setType( ReferenceTypes.MODELREFERENCE );
+       sumodelExtensionParent.setKeys( List.of(submodelExtensionKey) );
+
+       Reference submodelExtensionRef = new Reference();
+       submodelExtensionRef.setType( ReferenceTypes.MODELREFERENCE );
+       submodelExtensionRef.setReferredSemanticId( sumodelExtensionParent );
+       submodelExtensionRef.setKeys( List.of(submodelExtensionKey) );
+
+       Extension submodelExtension = new Extension();
+       submodelExtension.setRefersTo( List.of(submodelExtensionRef) );
+       submodelExtension.setSupplementalSemanticIds( List.of(submodelExtensionRef) );
+       submodelExtension.setName( "Submodel Extension name" );
+       submodelExtension.setValue( "Submodel Extension value" );
+       submodelExtension.setValueType( DataTypeDefXsd.STRING );
+       submodelExtension.setSemanticId( submodelExtensionRef );
 
         SubmodelDescriptor submodelDescriptor = new SubmodelDescriptor();
 
         submodelDescriptor.setId(UUID.randomUUID().toString());
 
         submodelDescriptor.setIdShort("idShortExample");
-        submodelDescriptor.setSemanticId(reference);
-        specificAssetId1.setSupplementalSemanticIds(List.of(reference));
-        specificAssetId2.setSupplementalSemanticIds(List.of(reference));
+        submodelDescriptor.setSemanticId(semanticIDReference);
+        specificAssetId1.setSupplementalSemanticIds(List.of(semanticIDReference));
+        specificAssetId2.setSupplementalSemanticIds(List.of(semanticIDReference));
 
         submodelDescriptor.setDescription(List.of(description1, description2));
         submodelDescriptor.setEndpoints(List.of(endpoint));
+       submodelDescriptor.setExtensions( List.of(submodelExtension) );
         aas.setEndpoints(List.of(endpoint));
         aas.setSubmodelDescriptors(List.of(submodelDescriptor));
 

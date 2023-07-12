@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -26,32 +26,35 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.With;
 
-@Value
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @With
-public class Submodel {
-    @Id
-    UUID id;
+public class SubmodelExtension {
+   @Id
+   UUID id;
 
-    String idExternal;
-    String idShort;
-    String semanticId;
+   @Column("fk_submod_ext_semantic_id")
+   Reference submodSemanticId;
 
-    @MappedCollection(idColumn = "fk_submodel_id")
-    Set<SubmodelDescription> descriptions;
+   @MappedCollection(idColumn="fk_submod_ext_supplemental_id")
+   Set<Reference> submodSupplementalIds;
 
-    @MappedCollection(idColumn = "fk_submodel_id")
-    Set<SubmodelEndpoint> endpoints;
+   String name;
 
-    @Column( "fk_shell_id")
-    UUID shellId;
+   DataTypeXsd valueType;
 
-    @MappedCollection(idColumn = "fk_submodel_id")
-    Set<SubmodelDisplayName> displayNames;
+   @Column("submod_ext_value")
+   String value;
 
-    @MappedCollection(idColumn = "fk_submodel_id")
-    Set<SubmodelExtension> submodelExtensions;
+   @MappedCollection(idColumn = "fk_submod_ext_refers_id" )
+   Set<Reference> refersTo;
 
 }
