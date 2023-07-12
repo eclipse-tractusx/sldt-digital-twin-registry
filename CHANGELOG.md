@@ -54,6 +54,12 @@ This version includes changes for the decentralized digital twin registry.
 
 ## fixed
 
+## 0.2.0-M13-multi-tenancy
+### Added
+- Provide functionality to return only specificAssetIds for consumer (not owner of twins) which matched the externalSubjectIds
+
+## fixed
+
 ## 0.2.0-M12-multi-tenancy
 ### Added
 - Create INSTALL.md
