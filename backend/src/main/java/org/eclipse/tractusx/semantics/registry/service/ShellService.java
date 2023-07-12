@@ -93,7 +93,8 @@ public class ShellService {
         return shells.map(shell ->  shell.withIdentifiers(filterSpecificAssetIdsByTenantId(shell.getIdentifiers(), externalSubjectId)));
     }
 
-    private Set<ShellIdentifier> filterSpecificAssetIdsByTenantId(Set<ShellIdentifier> shellIdentifiers, String tenantId) {
+    private Set<ShellIdentifier> filterSpecificAssetIdsByTenantId(Set<ShellIdentifier> shellIdentifiers, String externalSubjectId) {
+        String tenantId = (externalSubjectId == null) ? "" : externalSubjectId;
         // the owning tenant should always see all identifiers
         if(tenantId.equals(owningTenantId)){
             return shellIdentifiers;
