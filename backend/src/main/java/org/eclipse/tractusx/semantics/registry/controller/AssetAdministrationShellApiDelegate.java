@@ -89,7 +89,7 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
           AssetKind assetKind, String assetType, @RequestHeader String externalSubjectId ) {
         Integer page = 0 ;
         Integer pageSize = 100;
-        ShellCollectionDto dto =  shellService.findAllShells(page, pageSize,externalSubjectId);
+        ShellCollectionDto dto =  shellService.findAllShells(page, pageSize,getExternalSubjectIdOrEmpty(externalSubjectId));
         GetAssetAdministrationShellDescriptorsResult result = shellMapper.toApiDto(dto);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -97,7 +97,7 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     @Override
     // new todo: correct implementation
     public ResponseEntity<GetSubmodelDescriptorsResult> getAllSubmodelDescriptorsThroughSuperpath( String aasIdentifier, Integer limit, String cursor, @RequestHeader String externalSubjectId  ) {
-        Shell savedShell = shellService.findShellByExternalId(aasIdentifier, externalSubjectId);
+        Shell savedShell = shellService.findShellByExternalId(aasIdentifier, getExternalSubjectIdOrEmpty(externalSubjectId));
         Set<Submodel> submodels = savedShell.getSubmodels();
         List<SubmodelDescriptor> descriptorResults = submodelMapper.toApiDto( submodels );
         GetSubmodelDescriptorsResult result = new GetSubmodelDescriptorsResult();
@@ -107,7 +107,7 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
 
     @Override
     public ResponseEntity<AssetAdministrationShellDescriptor> getAssetAdministrationShellDescriptorById( String aasIdentifier, @RequestHeader String externalSubjectId ) {
-            Shell saved = shellService.findShellByExternalId(aasIdentifier, externalSubjectId);
+            Shell saved = shellService.findShellByExternalId(aasIdentifier, getExternalSubjectIdOrEmpty(externalSubjectId));
            return new ResponseEntity<>(shellMapper.toApiDto(saved), HttpStatus.OK);
     }
 
@@ -151,13 +151,13 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
         if (assetIds == null || assetIds.isEmpty()) {
             return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
         }
-        List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByExactMatch(shellMapper.fromApiDto(assetIds), externalSubjectId);
+        List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByExactMatch(shellMapper.fromApiDto(assetIds), getExternalSubjectIdOrEmpty(externalSubjectId));
         return new ResponseEntity<>(externalIds, HttpStatus.OK);
     }
 
     @Override
         public ResponseEntity<List<SpecificAssetId>> getAllAssetLinksById(String aasIdentifier, @RequestHeader String externalSubjectId) {
-            Set<ShellIdentifier> identifiers = shellService.findShellIdentifiersByExternalShellId(aasIdentifier, externalSubjectId);
+            Set<ShellIdentifier> identifiers = shellService.findShellIdentifiersByExternalShellId(aasIdentifier, getExternalSubjectIdOrEmpty(externalSubjectId));
             return new ResponseEntity<>(shellMapper.toApiDto(identifiers), HttpStatus.OK);
         }
 
@@ -171,8 +171,12 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     @Override
     public ResponseEntity<List<String>> postQueryAllAssetAdministrationShellIds(ShellLookup shellLookup, @RequestHeader String externalSubjectId) {
         List<SpecificAssetId> assetIds = shellLookup.getQuery().getAssetIds();
-        List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByAnyMatch(shellMapper.fromApiDto(assetIds), externalSubjectId);
+        List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByAnyMatch(shellMapper.fromApiDto(assetIds), getExternalSubjectIdOrEmpty(externalSubjectId));
         return new ResponseEntity<>(externalIds, HttpStatus.OK);
     }
-}
+
+        private String getExternalSubjectIdOrEmpty(String externalSubjectId) {
+            return (null ==externalSubjectId) ? "" : externalSubjectId;
+        }
+    }
 
