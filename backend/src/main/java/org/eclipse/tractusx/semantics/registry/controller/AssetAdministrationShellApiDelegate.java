@@ -131,15 +131,17 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     @Override
     public ResponseEntity<Void> putAssetAdministrationShellDescriptorById( String aasIdentifier, AssetAdministrationShellDescriptor assetAdministrationShellDescriptor ) {
         Shell shell = shellMapper.fromApiDto( assetAdministrationShellDescriptor );
-        shell.setIdExternal( aasIdentifier );
-        shellService.update( aasIdentifier, shell );
+        Shell shellFromDb = shellService.findShellByExternalId( aasIdentifier );
+        shellService.update( shell.withId( shellFromDb.getId() ).withIdExternal(aasIdentifier  ),aasIdentifier);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Override
     public ResponseEntity<Void> putSubmodelDescriptorByIdThroughSuperpath( String aasIdentifier, String submodelIdentifier, SubmodelDescriptor submodelDescriptor ) {
         Submodel submodel = submodelMapper.fromApiDto( submodelDescriptor );
-        shellService.update( aasIdentifier, submodelIdentifier, submodel.withIdExternal( submodelIdentifier ) );
+        Submodel fromDB = shellService.findSubmodelByExternalId( aasIdentifier,submodelIdentifier );
+        shellService.deleteSubmodel(aasIdentifier,  submodelIdentifier);
+        shellService.update( aasIdentifier, submodel.withIdExternal( submodelIdentifier ).withId( fromDB.getId() ) );
         return new ResponseEntity<>( HttpStatus.NO_CONTENT );
     }
 

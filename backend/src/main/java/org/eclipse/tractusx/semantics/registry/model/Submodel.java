@@ -57,12 +57,12 @@ public class Submodel {
 
     @JsonManagedReference
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "submodel")
+    @OneToMany(cascade = CascadeType.ALL,orphanRemoval=true, mappedBy = "submodel")
     private Set<SubmodelDescription> descriptions= new HashSet<>();
 
     @JsonManagedReference
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "submodel")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true,mappedBy = "submodel")
     private Set<SubmodelEndpoint> endpoints= new HashSet<>();
 
     @JsonBackReference

@@ -48,10 +48,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.extern.slf4j.Slf4j;
@@ -229,25 +225,12 @@ public class ShellService {
     }
 
    @Transactional
-   public void update( String externalShellId, Shell shell ) {
-
-      Shell shellFromDb = findShellByExternalId( externalShellId );
-      ObjectMapper mapper = getObjectMapper();
-      try {
-         mapper.updateValue(shell,shellFromDb );
-      } catch ( JsonMappingException e ) {
-         log.error( "Something went wrong during mapping. {}",e.getMessage() );
-         throw new RuntimeException( e );
-      }
+   public void update( Shell shell,String aasIdentifier) {
+        deleteShell(  aasIdentifier);
+        mapShellCollection( shell );
+        try {save( shell );}
+        catch ( Exception e ){throw new IllegalArgumentException( e.getMessage() );}
    }
-
-   private ObjectMapper getObjectMapper() {
-      ObjectMapper mapper = new ObjectMapper();
-      mapper.registerModule( new JavaTimeModule() );
-      mapper.setSerializationInclusion( JsonInclude.Include.NON_NULL );
-      return mapper;
-   }
-
    @Transactional
     public void deleteShell(String externalShellId) {
         ShellMinimal shellFromDb = findShellMinimalByExternalId(externalShellId);
@@ -291,22 +274,12 @@ public class ShellService {
    }
 
    @Transactional
-   public void update( String externalShellId, String externalSubmodelId, Submodel submodel ) {
+   public void update( String externalShellId, Submodel submodel) {
       Shell shellFromDb = findShellByExternalId( externalShellId );
-      Submodel subModelId = findSubmodelMinimalByExternalId( shellFromDb.getId(), externalSubmodelId );
-
-      ObjectMapper mapper = getObjectMapper();
-      try {
-         mapper.updateValue( submodel
-               .withShellId( shellFromDb )
-               .withId( subModelId.getId() )
-               .withShellId( shellFromDb ), subModelId );
-
-      } catch ( Exception e ) {
-         log.error( "Something went wrong during mapping. {}",e.getMessage() );
-         throw new RuntimeException( e );
-      }
-      submodelRepository.save( subModelId );
+      submodel.setShellId( shellFromDb );
+      submodel.getDescriptions().forEach( desc-> desc.setSubmodel( submodel ) );
+      submodel.getEndpoints().forEach( end -> end.setSubmodel( submodel ) );
+      submodelRepository.save(submodel  );
    }
 
    @Transactional

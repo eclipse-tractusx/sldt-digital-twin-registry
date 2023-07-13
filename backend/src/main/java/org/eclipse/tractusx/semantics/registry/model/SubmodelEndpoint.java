@@ -54,7 +54,7 @@ public class SubmodelEndpoint {
    private String subProtocolBodyEncoding;
 
    @JsonBackReference
-   @ManyToOne( fetch = FetchType.LAZY, optional = false )
+   @ManyToOne( fetch = FetchType.LAZY, optional = false,cascade = {CascadeType.MERGE}  )
    @JoinColumn( name = "fk_submodel_id" )
    private Submodel submodel;
 }

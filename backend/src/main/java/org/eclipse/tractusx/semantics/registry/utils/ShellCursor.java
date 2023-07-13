@@ -47,14 +47,13 @@ public class ShellCursor {
       }catch ( Exception e ){throw new IllegalArgumentException("Invalid cursor value");}
    }
 
-   private static String getDecodedValue( String encodedCursorValue ) {
+   private String getDecodedValue( String encodedCursorValue ) {
       if ( encodedCursorValue == null || encodedCursorValue.isEmpty() ) {
          throw new IllegalArgumentException( "Given Cursor is not valid." );
       }
       var decodedBytes = Base64.getDecoder().decode( encodedCursorValue );
       var decodedValue = new String( decodedBytes );
-      String value = substringBetween( decodedValue, "*" );
-      return value;
+      return substringBetween( decodedValue, "*" );
    }
 
    public String getEncodedCursorShell( Instant field, boolean hasNextElements ) {

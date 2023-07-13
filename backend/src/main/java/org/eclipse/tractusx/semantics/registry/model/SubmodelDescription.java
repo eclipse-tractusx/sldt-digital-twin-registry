@@ -44,7 +44,7 @@ public class SubmodelDescription {
    private String text;
 
    @JsonBackReference
-   @ManyToOne( fetch = FetchType.LAZY, optional = false )
+   @ManyToOne( fetch = FetchType.LAZY, optional = false,cascade = {CascadeType.MERGE} )
    @JoinColumn( name = "fk_submodel_id" )
    private Submodel submodel;
 }
