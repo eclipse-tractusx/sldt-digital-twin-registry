@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.3.8-M1
 ### Added
+- Update functionality to get bpn from HEADER (Edc-Bpn) instead of token and use it to search for specificAssetIds.
 
 ## fixed
 - In this version, fix is given for adjusting SemanticID in submodel response. This is only temporary workaround.
