@@ -92,6 +92,7 @@ paths:
             minLength: 1
             #     pattern: "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
             type: string
+        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       responses:
         "200":
           description: Requested Asset Administration Shell Descriptors
@@ -193,6 +194,7 @@ paths:
           explode: false
           schema:
             type: string
+        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       #          format: byte
       responses:
         "200":
@@ -361,6 +363,7 @@ paths:
           description: A server-generated identifier retrieved from pagingMetadata that specifies from which position the result listing should continue
           schema:
             type: string
+        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       responses:
         "200":
           description: Requested Submodel Descriptors
@@ -715,6 +718,7 @@ paths:
           required: false
           schema:
             type: string
+        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       responses:
         "200":
           description: Requested Asset Administration Shell ids
@@ -745,6 +749,7 @@ paths:
           explode: false
           schema:
             type: string
+        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       responses:
         "200":
           description: Requested Asset identifier key-value-pairs
@@ -827,6 +832,8 @@ paths:
         - Registry and Discovery Interface
       summary: Returns a list of Asset Administration Shell ids based on Asset identifier key-value-pairs.
       operationId: PostQueryAllAssetAdministrationShellIds
+      parameters:
+        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       requestBody:
         description: Asset Administration Shell Descriptor object
         content:
@@ -1603,6 +1610,12 @@ components:
       explode: false
       schema:
         type: string
+    ExternalSubjectIdHeader:
+      in: header
+      name: Edc-Bpn
+      schema:
+        type: String
+        description: Incoming external_subject_id/bpn
   #        format: byte
   examples:
     lookup-shells-by-aas-identifier-query:

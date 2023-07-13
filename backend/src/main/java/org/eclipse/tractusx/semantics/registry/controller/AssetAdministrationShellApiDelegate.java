@@ -35,6 +35,7 @@ import org.eclipse.tractusx.semantics.registry.service.ShellService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.context.request.NativeWebRequest;
 
 @Service
@@ -85,18 +86,18 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
 
     @Override
     public ResponseEntity<GetAssetAdministrationShellDescriptorsResult> getAllAssetAdministrationShellDescriptors( Integer limit, String cursor,
-          AssetKind assetKind, String assetType ) {
+          AssetKind assetKind, String assetType, @RequestHeader String externalSubjectId ) {
         Integer page = 0 ;
         Integer pageSize = 100;
-        ShellCollectionDto dto =  shellService.findAllShells(page, pageSize);
+        ShellCollectionDto dto =  shellService.findAllShells(page, pageSize,getExternalSubjectIdOrEmpty(externalSubjectId));
         GetAssetAdministrationShellDescriptorsResult result = shellMapper.toApiDto(dto);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @Override
     // new todo: correct implementation
-    public ResponseEntity<GetSubmodelDescriptorsResult> getAllSubmodelDescriptorsThroughSuperpath( String aasIdentifier, Integer limit, String cursor ) {
-        Shell savedShell = shellService.findShellByExternalId(aasIdentifier);
+    public ResponseEntity<GetSubmodelDescriptorsResult> getAllSubmodelDescriptorsThroughSuperpath( String aasIdentifier, Integer limit, String cursor, @RequestHeader String externalSubjectId  ) {
+        Shell savedShell = shellService.findShellByExternalId(aasIdentifier, getExternalSubjectIdOrEmpty(externalSubjectId));
         Set<Submodel> submodels = savedShell.getSubmodels();
         List<SubmodelDescriptor> descriptorResults = submodelMapper.toApiDto( submodels );
         GetSubmodelDescriptorsResult result = new GetSubmodelDescriptorsResult();
@@ -105,8 +106,8 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
 
     @Override
-    public ResponseEntity<AssetAdministrationShellDescriptor> getAssetAdministrationShellDescriptorById( String aasIdentifier ) {
-            Shell saved = shellService.findShellByExternalId(aasIdentifier);
+    public ResponseEntity<AssetAdministrationShellDescriptor> getAssetAdministrationShellDescriptorById( String aasIdentifier, @RequestHeader String externalSubjectId ) {
+            Shell saved = shellService.findShellByExternalId(aasIdentifier, getExternalSubjectIdOrEmpty(externalSubjectId));
            return new ResponseEntity<>(shellMapper.toApiDto(saved), HttpStatus.OK);
     }
 
@@ -145,18 +146,18 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
 
     @Override
     public ResponseEntity<List<String>> getAllAssetAdministrationShellIdsByAssetLink(List<SpecificAssetId> assetIds,
-    Integer limit, String cursor) {
+    Integer limit, String cursor, @RequestHeader String externalSubjectId) {
         // TODO: Implement cursor based pag.
         if (assetIds == null || assetIds.isEmpty()) {
             return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
         }
-        List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByExactMatch(shellMapper.fromApiDto(assetIds));
+        List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByExactMatch(shellMapper.fromApiDto(assetIds), getExternalSubjectIdOrEmpty(externalSubjectId));
         return new ResponseEntity<>(externalIds, HttpStatus.OK);
     }
 
     @Override
-        public ResponseEntity<List<SpecificAssetId>> getAllAssetLinksById(String aasIdentifier) {
-            Set<ShellIdentifier> identifiers = shellService.findShellIdentifiersByExternalShellId(aasIdentifier);
+        public ResponseEntity<List<SpecificAssetId>> getAllAssetLinksById(String aasIdentifier, @RequestHeader String externalSubjectId) {
+            Set<ShellIdentifier> identifiers = shellService.findShellIdentifiersByExternalShellId(aasIdentifier, getExternalSubjectIdOrEmpty(externalSubjectId));
             return new ResponseEntity<>(shellMapper.toApiDto(identifiers), HttpStatus.OK);
         }
 
@@ -168,10 +169,14 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
 
     @Override
-    public ResponseEntity<List<String>> postQueryAllAssetAdministrationShellIds(ShellLookup shellLookup) {
+    public ResponseEntity<List<String>> postQueryAllAssetAdministrationShellIds(ShellLookup shellLookup, @RequestHeader String externalSubjectId) {
         List<SpecificAssetId> assetIds = shellLookup.getQuery().getAssetIds();
-        List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByAnyMatch(shellMapper.fromApiDto(assetIds));
+        List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByAnyMatch(shellMapper.fromApiDto(assetIds), getExternalSubjectIdOrEmpty(externalSubjectId));
         return new ResponseEntity<>(externalIds, HttpStatus.OK);
     }
-}
+
+        private String getExternalSubjectIdOrEmpty(String externalSubjectId) {
+            return (null ==externalSubjectId) ? "" : externalSubjectId;
+        }
+    }
 

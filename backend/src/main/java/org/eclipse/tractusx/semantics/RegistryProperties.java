@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -46,12 +46,6 @@ public class RegistryProperties {
          */
         @NotEmpty(message = "public client id must not be empty")
         private String publicClientId;
-
-        /**
-         * The tenant id claim name in the jwt token.
-         */
-        @NotEmpty(message = "tenantId claimName must not be empty")
-        private String tenantIdClaimName;
 
         /**
          * The owning tenant id to which this AAS Registry belongs to.
