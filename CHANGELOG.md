@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.3.8-M1
+### Added
+- Update functionality to get bpn from HEADER (Edc-Bpn) instead of token and use it to search for specificAssetIds.
+
+## fixed
+- In this version, fix is given for adjusting SemanticID in submodel response. This is only temporary workaround.
+
 ## 0.3.7-M1
 ### Added
 
@@ -51,6 +58,12 @@ This version includes changes for the decentralized digital twin registry.
 - Rename documentation.md to README.md
 - Add .tractusx file
 - CODE_OF_CONDUCT.md
+
+## fixed
+
+## 0.2.0-M13-multi-tenancy
+### Added
+- Provide functionality to return only specificAssetIds for consumer (not owner of twins) which matched the externalSubjectIds
 
 ## fixed
 

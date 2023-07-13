@@ -158,7 +158,7 @@ The Swagger UI of the AAS Registry is integrated with IAM. You can check the Swa
 
 ### Visibility of specificAssetIds based on tenantId/BPN
 You can control the visibility of specificAssetIds based on the tenantId/BPN.
-- You can provide the tenantId/BPN as attribute to a specificAssetId. Only users having the same tenantId/BPN in the access token are able to see the specificAssetId.
+- You can provide the tenantId/BPN as attribute to a specificAssetId. Only users having the same tenantId/BPN in the Header are able to see the specificAssetId.
 - The specificAssetIds of Digital Twins you created will always be shown to you.
 
 Detailed example:
