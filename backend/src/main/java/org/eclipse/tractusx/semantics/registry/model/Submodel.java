@@ -65,10 +65,6 @@ public class Submodel {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "submodel")
     private Set<SubmodelEndpoint> endpoints= new HashSet<>();
 
-    @Column
-    @CreatedDate
-    private Instant createdDate;
-
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_shell_id")

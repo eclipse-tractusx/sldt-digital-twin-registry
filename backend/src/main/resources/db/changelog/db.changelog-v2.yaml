@@ -118,15 +118,3 @@ databaseChangeLog:
             referencedColumnNames: ID
             referencedTableName: SUBMODEL
             validate: true
-  - changeSet:
-      id: 06072023-04
-      author: agg3fe
-      changes:
-        - addColumn:
-            tableName: SUBMODEL
-            columns:
-              - column:
-                  name: CREATED_DATE
-                  type: timestamp
-                  constraints:
-                    nullable: false

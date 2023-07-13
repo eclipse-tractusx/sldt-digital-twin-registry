@@ -66,7 +66,8 @@ public class ShellService {
     private final TenantAware tenantAware;
     private final String owningTenantId;
 
-    private final String SORT_FIELD_NAME = "createdDate";
+    private final String SORT_FIELD_NAME_SHELL = "createdDate";
+   private final String SORT_FIELD_NAME_SUBMODEL = "id";
     private final int MAXIMUM_RECORDS = 1000;
 
     public ShellService(ShellRepository shellRepository,
@@ -108,7 +109,7 @@ public class ShellService {
 
       pageSize = getPageSize( pageSize );
       ShellCursor cursor = new ShellCursor( pageSize, cursorVal );
-      var specification = new ShellSpecification<Shell>( SORT_FIELD_NAME, cursor );
+      var specification = new ShellSpecification<Shell>( SORT_FIELD_NAME_SHELL, cursor );
 
       Page<Shell> shellPage = filterSpecificAssetIdsByTenantId( shellRepository.findAll( specification, ofSize( cursor.getRecordSize() ) ) );
       var shellsPage = shellPage.getContent();
@@ -116,7 +117,7 @@ public class ShellService {
       String nextCursor=null;
 
       if(shellsPage.size()>0) {
-         nextCursor = cursor.getEncodedCursor(
+         nextCursor = cursor.getEncodedCursorShell(
                shellsPage.get( shellsPage.size() - 1 ).getCreatedDate(),
                shellPage.hasNext() );
       }
@@ -132,7 +133,7 @@ public class ShellService {
       pageSize = getPageSize( pageSize );
 
       ShellCursor cursor = new ShellCursor( pageSize, cursorVal );
-      var specification = new ShellSpecification<Submodel>( SORT_FIELD_NAME, cursor );
+      var specification = new ShellSpecification<Submodel>( SORT_FIELD_NAME_SUBMODEL, cursor );
       Page<Submodel> shellPage = submodelRepository.findAll( Specification.allOf( hasShellFkId( assetID ).and( specification ) ),
             ofSize( cursor.getRecordSize() ) );
 
@@ -140,8 +141,8 @@ public class ShellService {
       String nextCursor=null;
 
       if(shellsPage.size()>0) {
-         nextCursor = cursor.getEncodedCursor(
-               shellsPage.get( shellsPage.size() - 1 ).getCreatedDate(),
+         nextCursor = cursor.getEncodedCursorSubmodel(
+               shellsPage.get( shellsPage.size() - 1 ).getId(),
                shellPage.hasNext()
          );
       }

@@ -19,6 +19,7 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.utils;
 
+import java.time.Instant;
 import org.springframework.data.jpa.domain.Specification;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -35,12 +36,17 @@ public class ShellSpecification<T> implements Specification<T> {
    @Override
    public Predicate toPredicate( Root<T> root, CriteriaQuery<?> cq, CriteriaBuilder criteriaBuilder ) {
       Predicate predicate = applyFilter( root, criteriaBuilder );
-      cq.orderBy( criteriaBuilder.asc( root.get( sortFieldName ) ) );
+      cq.orderBy( criteriaBuilder.asc(criteriaBuilder.coalesce( root.get( sortFieldName ), Instant.now() ) ));
       return predicate;
    }
 
    private Predicate applyFilter( Root<T> root, CriteriaBuilder criteriaBuilder ) {
-      var searchValue = shellCursor.getSearchCursor();
-      return criteriaBuilder.greaterThan( root.get( sortFieldName ), searchValue );
+      if(root.toString().contains( "Shell" )){
+         var searchValue = shellCursor.getShellSearchCursor();
+         return criteriaBuilder.greaterThan( root.get( sortFieldName ), searchValue );
+      }else{
+         var searchValue = shellCursor.getSubmodelSearchCursor();
+         return criteriaBuilder.greaterThan( root.get( sortFieldName ), searchValue );
+      }
    }
 }

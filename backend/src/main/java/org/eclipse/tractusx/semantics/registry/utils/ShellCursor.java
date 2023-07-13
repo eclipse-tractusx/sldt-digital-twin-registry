@@ -25,6 +25,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Base64;
+import java.util.UUID;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -38,19 +40,24 @@ public class ShellCursor {
       return nextPageCursor != null && !nextPageCursor.isEmpty();
    }
 
-   public Instant getDecodedCursor( String encodedCursorValue ) {
+   public Instant getDecodedInstant( String encodedCursorValue ) {
+      String value = getDecodedValue( encodedCursorValue );
+      try {
+         return Instant.parse( value );
+      }catch ( Exception e ){throw new IllegalArgumentException("Invalid cursor value");}
+   }
+
+   private static String getDecodedValue( String encodedCursorValue ) {
       if ( encodedCursorValue == null || encodedCursorValue.isEmpty() ) {
          throw new IllegalArgumentException( "Given Cursor is not valid." );
       }
       var decodedBytes = Base64.getDecoder().decode( encodedCursorValue );
       var decodedValue = new String( decodedBytes );
       String value = substringBetween( decodedValue, "*" );
-      try {
-         return Instant.parse( value );
-      }catch ( Exception e ){throw new IllegalArgumentException("Invalid cursor value");}
+      return value;
    }
 
-   public String getEncodedCursor( Instant field, boolean hasNextElements ) {
+   public String getEncodedCursorShell( Instant field, boolean hasNextElements ) {
       requireNonNull( field );
       if ( !hasNextElements )
          return null;
@@ -58,10 +65,24 @@ public class ShellCursor {
       return Base64.getEncoder().encodeToString( valueToEncode.getBytes() );
    }
 
-   public Instant getSearchCursor() {
+   public String getEncodedCursorSubmodel( UUID field, boolean hasNextElements ) {
+      requireNonNull( field );
+      if ( !hasNextElements )
+         return null;
+      var valueToEncode = "*" + field + "* - " + LocalDateTime.now();
+      return Base64.getEncoder().encodeToString( valueToEncode.getBytes() );
+   }
+
+   public Instant getShellSearchCursor() {
       if ( !hasCursorReceived() )
          return ZonedDateTime.now().minusYears( 5 ).toInstant();
 
-      return getDecodedCursor( nextPageCursor );
+      return getDecodedInstant( nextPageCursor );
+   }
+
+   public UUID getSubmodelSearchCursor() {
+      if ( !hasCursorReceived() )
+         return UUID.fromString("00000000-0000-0000-0000-000000000000");
+      return UUID.fromString( getDecodedValue( nextPageCursor ));
    }
 }

@@ -157,8 +157,7 @@ public class ShellMapperTest {
                 "submodelIdExternal",
                 "submodelIdShort", "submodelSemanticId",
                 Set.of( submodelDescription),
-              Set.of( submodelEndpoint),
-              Instant.now(),null  );
+              Set.of( submodelEndpoint),null  );
 
         // TODO: 28.06.2023 adjust Tests to new data model
 
