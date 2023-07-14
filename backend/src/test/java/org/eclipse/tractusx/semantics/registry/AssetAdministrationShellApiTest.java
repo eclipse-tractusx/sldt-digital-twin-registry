@@ -86,6 +86,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          mvc.perform(
                      MockMvcRequestBuilders
                            .get( SINGLE_SHELL_BASE_PATH, shellId )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -115,6 +116,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          mvc.perform(
                      MockMvcRequestBuilders
                            .get( SHELL_BASE_PATH )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .queryParam( "limit", "100" )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
@@ -137,6 +139,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          mvc.perform(
                      MockMvcRequestBuilders
                            .put( SINGLE_SHELL_BASE_PATH, shellId )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( mapper.writeValueAsString( shellPayload ) )
@@ -148,6 +151,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          mvc.perform(
                      MockMvcRequestBuilders
                            .get( SINGLE_SHELL_BASE_PATH, shellId )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -190,6 +194,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                      MockMvcRequestBuilders
                            .put( SINGLE_SHELL_BASE_PATH, shellId )
                            .accept( MediaType.APPLICATION_JSON )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( mapper.writeValueAsString( shellPayload ) )
                            .with( jwtTokenFactory.allRoles() )
@@ -202,6 +207,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          mvc.perform(
                      MockMvcRequestBuilders
                            .get( SINGLE_SHELL_BASE_PATH, shellId )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -326,6 +332,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          mvc.perform(
                      MockMvcRequestBuilders
                            .post( SINGLE_LOOKUP_SHELL_BASE_PATH, shellId )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( toJson( specificAssetIds ) )
@@ -340,6 +347,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          mvc.perform(
                      MockMvcRequestBuilders
                            .get( SINGLE_SHELL_BASE_PATH, shellId )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -377,6 +385,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          mvc.perform(
                      MockMvcRequestBuilders
                            .get( SINGLE_LOOKUP_SHELL_BASE_PATH, shellId )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -418,6 +427,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          mvc.perform(
                      MockMvcRequestBuilders
                            .get( SINGLE_SHELL_BASE_PATH, shellId )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )

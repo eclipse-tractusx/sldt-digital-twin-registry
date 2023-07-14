@@ -23,8 +23,8 @@ name: registry
 description: Tractus-X Digital Twin Registry Helm Chart
 
 type: application
-version: 0.3.8
-appVersion: 0.3.7-M1
+version: 0.3.9
+appVersion: 0.3.8-M1
 
 dependencies:
   - repository: https://charts.bitnami.com/bitnami
