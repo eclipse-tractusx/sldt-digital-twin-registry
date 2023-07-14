@@ -26,6 +26,7 @@ import org.eclipse.tractusx.semantics.aas.registry.api.LookupApiDelegate;
 import org.eclipse.tractusx.semantics.aas.registry.api.ShellDescriptorsApiDelegate;
 import org.eclipse.tractusx.semantics.aas.registry.model.*;
 import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
+import org.eclipse.tractusx.semantics.registry.dto.SubmodelCollectionDto;
 import org.eclipse.tractusx.semantics.registry.mapper.ShellMapper;
 import org.eclipse.tractusx.semantics.registry.mapper.SubmodelMapper;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
@@ -79,7 +80,7 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
     @Override
     public ResponseEntity<Void> deleteSubmodelDescriptorByIdThroughSuperpath( String aasIdentifier, String submodelIdentifier ) {
-        shellService.deleteSubmodel(aasIdentifier, submodelIdentifier);
+        shellService.deleteSubmodel(aasIdentifier, submodelIdentifier,getExternalSubjectIdOrEmpty( null ));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
     }
@@ -87,9 +88,7 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     @Override
     public ResponseEntity<GetAssetAdministrationShellDescriptorsResult> getAllAssetAdministrationShellDescriptors( Integer limit, String cursor,
           AssetKind assetKind, String assetType, @RequestHeader String externalSubjectId ) {
-        Integer page = 0 ;
-        Integer pageSize = 100;
-        ShellCollectionDto dto =  shellService.findAllShells(page, pageSize,getExternalSubjectIdOrEmpty(externalSubjectId));
+        ShellCollectionDto dto =  shellService.findAllShells(limit, cursor,getExternalSubjectIdOrEmpty(externalSubjectId));
         GetAssetAdministrationShellDescriptorsResult result = shellMapper.toApiDto(dto);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -97,11 +96,9 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     @Override
     // new todo: correct implementation
     public ResponseEntity<GetSubmodelDescriptorsResult> getAllSubmodelDescriptorsThroughSuperpath( String aasIdentifier, Integer limit, String cursor, @RequestHeader String externalSubjectId  ) {
-        Shell savedShell = shellService.findShellByExternalId(aasIdentifier, getExternalSubjectIdOrEmpty(externalSubjectId));
-        Set<Submodel> submodels = savedShell.getSubmodels();
-        List<SubmodelDescriptor> descriptorResults = submodelMapper.toApiDto( submodels );
-        GetSubmodelDescriptorsResult result = new GetSubmodelDescriptorsResult();
-        result.setResult( descriptorResults );
+        Shell savedShell = shellService.findShellByExternalId(aasIdentifier,getExternalSubjectIdOrEmpty(externalSubjectId));
+        SubmodelCollectionDto dto = shellService.findAllSubmodel( limit,cursor, savedShell);
+        GetSubmodelDescriptorsResult result= submodelMapper.toApiDto( dto );
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -113,65 +110,71 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
 
     @Override
     public ResponseEntity<SubmodelDescriptor> getSubmodelDescriptorByIdThroughSuperpath( String aasIdentifier, String submodelIdentifier ) {
-        Submodel submodel = shellService.findSubmodelByExternalId(aasIdentifier, submodelIdentifier);
+        Submodel submodel = shellService.findSubmodelByExternalId(aasIdentifier, submodelIdentifier,getExternalSubjectIdOrEmpty( null ));
         return new ResponseEntity<>(submodelMapper.toApiDto(submodel), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<AssetAdministrationShellDescriptor> postAssetAdministrationShellDescriptor( AssetAdministrationShellDescriptor assetAdministrationShellDescriptor ) {
-        Shell saved = shellService.save(shellMapper.fromApiDto(assetAdministrationShellDescriptor));
+        Shell shell = shellMapper.fromApiDto(assetAdministrationShellDescriptor);
+        shellService.mapShellCollection( shell );
+        Shell saved = shellService.save(shell);
         return new ResponseEntity<>(shellMapper.toApiDto(saved), HttpStatus.CREATED);
     }
 
     @Override
     public ResponseEntity<SubmodelDescriptor> postSubmodelDescriptorThroughSuperpath( String aasIdentifier, SubmodelDescriptor submodelDescriptor ) {
         Submodel toBeSaved = submodelMapper.fromApiDto(submodelDescriptor);
-        Submodel savedSubModel = shellService.save(aasIdentifier, toBeSaved);
+        toBeSaved.setIdExternal( submodelDescriptor.getId() );
+        Submodel savedSubModel = shellService.save(aasIdentifier, toBeSaved, getExternalSubjectIdOrEmpty(null));
         return new ResponseEntity<>(submodelMapper.toApiDto(savedSubModel), HttpStatus.CREATED);
     }
 
     @Override
     public ResponseEntity<Void> putAssetAdministrationShellDescriptorById( String aasIdentifier, AssetAdministrationShellDescriptor assetAdministrationShellDescriptor ) {
         Shell shell = shellMapper.fromApiDto( assetAdministrationShellDescriptor );
-        shellService.update( aasIdentifier, shell.withIdExternal( aasIdentifier ) );
+        Shell shellFromDb = shellService.findShellByExternalId( aasIdentifier,getExternalSubjectIdOrEmpty(null) );
+        shellService.update( shell.withId( shellFromDb.getId() ).withIdExternal(aasIdentifier  ),aasIdentifier);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Override
     public ResponseEntity<Void> putSubmodelDescriptorByIdThroughSuperpath( String aasIdentifier, String submodelIdentifier, SubmodelDescriptor submodelDescriptor ) {
         Submodel submodel = submodelMapper.fromApiDto( submodelDescriptor );
-        shellService.update( aasIdentifier, submodelIdentifier, submodel.withIdExternal( submodelIdentifier ) );
+        Submodel fromDB = shellService.findSubmodelByExternalId( aasIdentifier,submodelIdentifier,getExternalSubjectIdOrEmpty( null ) );
+        shellService.deleteSubmodel(aasIdentifier,  submodelIdentifier,getExternalSubjectIdOrEmpty( null ));
+        shellService.update( aasIdentifier, submodel.withIdExternal( submodelIdentifier ).withId( fromDB.getId() ) ,getExternalSubjectIdOrEmpty( "" ));
         return new ResponseEntity<>( HttpStatus.NO_CONTENT );
     }
 
     @Override
-    public ResponseEntity<List<String>> getAllAssetAdministrationShellIdsByAssetLink(List<SpecificAssetId> assetIds,
+    public ResponseEntity<GetAllAssetAdministrationShellIdsByAssetLink200Response> getAllAssetAdministrationShellIdsByAssetLink(List<SpecificAssetId> assetIds,
     Integer limit, String cursor, @RequestHeader String externalSubjectId) {
-        // TODO: Implement cursor based pag.
         if (assetIds == null || assetIds.isEmpty()) {
-            return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
+            return new ResponseEntity<>(new GetAllAssetAdministrationShellIdsByAssetLink200Response(), HttpStatus.OK);
         }
-        List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByExactMatch(shellMapper.fromApiDto(assetIds), getExternalSubjectIdOrEmpty(externalSubjectId));
-        return new ResponseEntity<>(externalIds, HttpStatus.OK);
+        GetAllAssetAdministrationShellIdsByAssetLink200Response result  =
+              shellService.findExternalShellIdsByIdentifiersByExactMatch(shellMapper.fromApiDto(assetIds), limit, cursor,getExternalSubjectIdOrEmpty(externalSubjectId));
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @Override
-        public ResponseEntity<List<SpecificAssetId>> getAllAssetLinksById(String aasIdentifier, @RequestHeader String externalSubjectId) {
-            Set<ShellIdentifier> identifiers = shellService.findShellIdentifiersByExternalShellId(aasIdentifier, getExternalSubjectIdOrEmpty(externalSubjectId));
+        public ResponseEntity<List<SpecificAssetId>> getAllAssetLinksById(String aasIdentifier,@RequestHeader String externalSubjectId) {
+            Set<ShellIdentifier> identifiers = shellService.findShellIdentifiersByExternalShellId(aasIdentifier,getExternalSubjectIdOrEmpty(externalSubjectId));
             return new ResponseEntity<>(shellMapper.toApiDto(identifiers), HttpStatus.OK);
         }
 
         @Override
     public ResponseEntity<List<SpecificAssetId>> postAllAssetLinksById(String aasIdentifier, List<SpecificAssetId> specificAssetId) {
-        Set<ShellIdentifier> shellIdentifiers = shellService.save(aasIdentifier, shellMapper.fromApiDto(specificAssetId));
+        Set<ShellIdentifier> shellIdentifiers = shellService.save(aasIdentifier, shellMapper.fromApiDto(specificAssetId),getExternalSubjectIdOrEmpty( null ));
         List<SpecificAssetId> list = shellMapper.toApiDto(shellIdentifiers);
         return new ResponseEntity<>(list, HttpStatus.CREATED);
     }
 
     @Override
-    public ResponseEntity<List<String>> postQueryAllAssetAdministrationShellIds(ShellLookup shellLookup, @RequestHeader String externalSubjectId) {
+    public ResponseEntity<List<String>> postQueryAllAssetAdministrationShellIds(ShellLookup shellLookup,@RequestHeader String externalSubjectId) {
         List<SpecificAssetId> assetIds = shellLookup.getQuery().getAssetIds();
-        List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByAnyMatch(shellMapper.fromApiDto(assetIds), getExternalSubjectIdOrEmpty(externalSubjectId));
+        List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByAnyMatch(shellMapper.fromApiDto(assetIds),getExternalSubjectIdOrEmpty(externalSubjectId));
         return new ResponseEntity<>(externalIds, HttpStatus.OK);
     }
 

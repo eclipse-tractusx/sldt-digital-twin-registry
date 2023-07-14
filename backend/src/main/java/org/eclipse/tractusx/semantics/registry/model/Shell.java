@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,39 +19,107 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
-
-import lombok.Value;
-import lombok.With;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.relational.core.mapping.MappedCollection;
-
 import java.time.Instant;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
-@Value
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Getter
+@Setter
+@Table
+@NoArgsConstructor
+@AllArgsConstructor
 @With
+@EntityListeners( AuditingEntityListener.class)
+@JsonIdentityInfo(
+      generator = ObjectIdGenerators.PropertyGenerator.class,
+      property = "id")
 public class Shell {
+
     @Id
-    UUID id;
-    String idExternal;
-    String idShort;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private UUID id;
 
-    @MappedCollection(idColumn = "fk_shell_id")
-    Set<ShellIdentifier> identifiers;
+    @Column(name = "id_external", nullable = false)
+    private String idExternal;
 
-    @MappedCollection(idColumn = "fk_shell_id")
-    Set<ShellDescription> descriptions;
+    @Column
+    private String idShort;
 
-    @MappedCollection(idColumn = "fk_shell_id")
-    Set<Submodel> submodels;
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellId")
+    private Set<ShellIdentifier> identifiers = new HashSet<>();
 
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellId")
+    private Set<ShellDescription> descriptions= new HashSet<>();
+
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellId")
+    private Set<Submodel> submodels = new HashSet<>();
+
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellId")
+    Set<ShellDisplayName> displayNames= new HashSet<>();
+
+    @Column
     @CreatedDate
-    Instant createdDate;
+    private Instant createdDate;
 
+    @Column
     @LastModifiedDate
-    Instant lastModifiedDate;
+    private Instant lastModifiedDate;
 
+    private ShellKind shellKind;
+    private String shellType;
+
+    public void setDisplayNames(Set<ShellDisplayName> displayNames) {
+        if(displayNames==null) {displayNames = new HashSet<>();}
+        this.displayNames = displayNames;
+        for(ShellDisplayName s : displayNames) {
+            s.setShellId(this);
+        }
+    }
+
+    public void setSubmodels(Set<Submodel> submodels) {
+        if(submodels==null) {submodels = new HashSet<>();}
+        this.submodels = submodels;
+        for(Submodel s : submodels) {
+            s.setShellId(this);
+        }
+    }
+
+    public void add(Submodel submodel) {
+        if (submodel != null) {
+            if (submodels == null) {
+                submodels = new HashSet<>();
+            }
+            submodels.add(submodel);
+            submodel.setShellId(this);
+        }
+    }
+
+    public void setIdentifiers(Set<ShellIdentifier> identifiers) {
+        if(identifiers==null) {identifiers = new HashSet<>();}
+        this.identifiers = identifiers;
+        for(ShellIdentifier s : identifiers) {
+            s.setShellId(this);
+        }
+    }
+
+    public void setDescriptions(Set<ShellDescription> descriptions) {
+        if(descriptions==null) {descriptions = new HashSet<>();}
+        this.descriptions = descriptions;
+        for(ShellDescription s : descriptions) {
+            s.setShellId(this);
+        }
+    }
 }

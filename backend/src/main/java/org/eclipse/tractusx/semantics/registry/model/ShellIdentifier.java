@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,29 +19,40 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
-
-
-import lombok.Value;
-import lombok.With;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-
 import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import jakarta.persistence.*;
+import lombok.*;
 
-@Value
+@Entity
+@Getter
+@Setter
+@Table
+@NoArgsConstructor
+@AllArgsConstructor
 @With
+@JsonIdentityInfo(
+      generator = ObjectIdGenerators.PropertyGenerator.class,
+      property = "id")
 public class ShellIdentifier {
 
     public static final String GLOBAL_ASSET_ID_KEY = "globalAssetId";
 
     @Id
-    UUID id;
-    @Column("namespace")
-    String key;
-    @Column("identifier")
-    String value;
-    @Column("external_subject_id")
-    String externalSubjectId;
-    @Column( "fk_shell_id")
-    UUID shellId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="id")
+    private UUID id;
+    @Column(name = "namespace")
+    private String key;
+    @Column(name = "identifier")
+    private String value;
+    @Column(name = "external_subject_id")
+    private String externalSubjectId;
+
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "fk_shell_id")
+    private Shell shellId;
 }
