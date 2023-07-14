@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,32 +19,12 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-import java.util.UUID;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
-@Entity
-@Getter
-@Setter
-@Table
-@NoArgsConstructor
-@AllArgsConstructor
-@With
-public class SubmodelDescription {
-
-   @GeneratedValue( strategy = GenerationType.IDENTITY )
-   @Id
-   @Column( name = "id" )
-   private UUID id;
-
-   @Column
-   private String language;
-   @Column
-   private String text;
-
-   @JsonBackReference
-   @ManyToOne( fetch = FetchType.LAZY, optional = false,cascade = {CascadeType.MERGE} )
-   @JoinColumn( name = "fk_submodel_id" )
-   private Submodel submodel;
+public enum ShellKind {
+   INSTANCE( "Instance" ),
+   NOTAPPLICABLE( "NotApplicable" ),
+   TYPE( "Type" );
+   private String kind;
+   ShellKind( String kind ) {
+      this.kind = kind;
+   }
 }

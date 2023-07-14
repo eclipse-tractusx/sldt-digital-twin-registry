@@ -27,3 +27,94 @@ databaseChangeLog:
             tableName: SUBMODEL_ENDPOINT
             columnName: SUB_PROTOCOL_BODY
             newDataType: NVARCHAR(2000)
+  - changeSet:
+      id: 06072023-01
+      author: slindner
+      changes:
+        - addColumn:
+            tableName: SHELL
+            columns:
+              - column:
+                  name: SHELL_KIND
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: SHELL_TYPE
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+  - changeSet:
+      id: 06072023-02
+      author: slindner
+      changes:
+        - createTable:
+            tableName: SHELL_DISPLAY_NAME
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: LANGUAGE
+                  type: nvarchar(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: TEXT
+                  type: nvarchar(500)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SHELL_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_DISPLAY_NAME
+            baseColumnNames: FK_SHELL_ID
+            constraintName: SHELL_DISPLAY_NAME_FK_SHELL
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL
+            validate: true
+  - changeSet:
+      id: 06072023-03
+      author: slindner
+      changes:
+        - createTable:
+            tableName: SUBMODEL_DISPLAY_NAME
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: LANGUAGE
+                  type: nvarchar(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: TEXT
+                  type: nvarchar(500)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SUBMODEL_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_DISPLAY_NAME
+            baseColumnNames: FK_SUBMODEL_ID
+            constraintName: SUBMODEL_DISPLAY_NAME_FK_SHELL
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL
+            validate: true
