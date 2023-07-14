@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,14 +19,19 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model.projection;
 
-import lombok.Value;
-
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Getter;
+import lombok.Setter;
 
-@Value
+@Getter
+@Setter
 public class ShellMinimal {
-    UUID id;
-    String idExternal;
-    Instant createdDate;
+    public UUID id;
+    public String idExternal=null;
+    public Instant createdDate;
+    public ShellMinimal(UUID id, Instant createdDate ){
+        this.id = id;
+        this.createdDate = createdDate;
+    }
 }

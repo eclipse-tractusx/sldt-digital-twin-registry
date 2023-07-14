@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -26,12 +26,9 @@ import org.eclipse.tractusx.semantics.aas.registry.model.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.util.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
 
 import java.util.UUID;
@@ -54,7 +51,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          shellPayload.setId( UUID.randomUUID().toString() );
          performShellCreateRequest( mapper.writeValueAsString( shellPayload ) );
 
-         AssetAdministrationShellDescriptor onlyRequiredFieldsShell = new AssetAdministrationShellDescriptor();
+         AssetAdministrationShellDescriptor onlyRequiredFieldsShell = TestUtil.createCompleteAasDescriptor();
          onlyRequiredFieldsShell.setId( UUID.randomUUID().toString() );
          onlyRequiredFieldsShell.setIdShort( "idShortExample" );
          performShellCreateRequest( mapper.writeValueAsString( onlyRequiredFieldsShell ) );
@@ -91,6 +88,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          mvc.perform(
                      MockMvcRequestBuilders
                            .get( SINGLE_SHELL_BASE_PATH, getEncodedValue( shellId ) )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -120,6 +118,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          mvc.perform(
                      MockMvcRequestBuilders
                            .get( SHELL_BASE_PATH )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .queryParam( "limit", "100" )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
@@ -142,6 +141,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          mvc.perform(
                      MockMvcRequestBuilders
                            .put( SINGLE_SHELL_BASE_PATH, shellId )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( mapper.writeValueAsString( shellPayload ) )
@@ -153,6 +153,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          mvc.perform(
                      MockMvcRequestBuilders
                            .get( SINGLE_SHELL_BASE_PATH, getEncodedValue( shellId ) )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -195,6 +196,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                      MockMvcRequestBuilders
                            .put( SINGLE_SHELL_BASE_PATH, shellId )
                            .accept( MediaType.APPLICATION_JSON )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( mapper.writeValueAsString( shellPayload ) )
                            .with( jwtTokenFactory.allRoles() )
@@ -207,6 +209,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          mvc.perform(
                      MockMvcRequestBuilders
                            .get( SINGLE_SHELL_BASE_PATH, getEncodedValue( shellId ) )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -293,7 +296,6 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
          AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
          shellPayload.setId( UUID.randomUUID().toString() );
-         shellPayload.setSpecificAssetIds( null );
          performShellCreateRequest( mapper.writeValueAsString( shellPayload ) );
          String shellId = shellPayload.getId();
          ArrayNode specificAssetIds = emptyArrayNode()
@@ -331,7 +333,8 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
          mvc.perform(
                      MockMvcRequestBuilders
-                           .post( SINGLE_LOOKUP_SHELL_BASE_PATH, getEncodedValue(shellId  ) )
+                           .post( SINGLE_LOOKUP_SHELL_BASE_PATH, getEncodedValue( shellId ) )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( toJson( specificAssetIds ) )
@@ -346,6 +349,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          mvc.perform(
                      MockMvcRequestBuilders
                            .get( SINGLE_SHELL_BASE_PATH, getEncodedValue( shellId ) )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -382,7 +386,8 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( SINGLE_LOOKUP_SHELL_BASE_PATH, getEncodedValue(shellId ) )
+                           .get( SINGLE_LOOKUP_SHELL_BASE_PATH, getEncodedValue( shellId ) )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -424,6 +429,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          mvc.perform(
                      MockMvcRequestBuilders
                            .get( SINGLE_SHELL_BASE_PATH, getEncodedValue( shellId ) )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -652,7 +658,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                )
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isOk() )
-               .andExpect( jsonPath( "$" ).isArray() );
+               .andExpect( content().string( "{}" ));
       }
 
       @Test
@@ -669,7 +675,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                )
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isOk() )
-               .andExpect( jsonPath( "$" ).isArray() );
+               .andExpect( content().string( "{}" ));
       }
 
       @Test
@@ -679,35 +685,38 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          shellPayload1.setId( UUID.randomUUID().toString() );
          performShellCreateRequest( mapper.writeValueAsString( shellPayload1 ) );
 
+         AssetAdministrationShellDescriptor shellPayload2 = TestUtil.createCompleteAasDescriptor();
+         shellPayload2.setId( UUID.randomUUID().toString() );
+         performShellCreateRequest( mapper.writeValueAsString( shellPayload2 ) );
+
          SpecificAssetId specificAssetId1 = TestUtil.createSpecificAssetId();
-         JsonNode node = mapper.createObjectNode()
-               .set( "specificAssetId", emptyArrayNode()
-                     .add( specificAssetId( "findExternalShellIdQueryKey_1", "value_1" ) )
-                     .add( specificAssetId( "findExternalShellIdQueryKey_2", "value_2" ) ) );
 
          mvc.perform(
                      MockMvcRequestBuilders
                            .get( LOOKUP_SHELL_BASE_PATH )
                            .queryParam( "assetIds", mapper.writeValueAsString( specificAssetId1 ) )
+                           .queryParam( "limit", "1" )
+                           .accept( MediaType.APPLICATION_JSON )
+                           .with( jwtTokenFactory.allRoles() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isOk() )
+               .andExpect( jsonPath( "$.paging_metadata.cursor" ).exists() );
+
+         // Test first shell match with single assetId
+
+         SpecificAssetId specificAssetId2 = TestUtil.createSpecificAssetId( "identifier99KeyExample", "identifier99ValueExample", null );
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( LOOKUP_SHELL_BASE_PATH )
+                           .queryParam( "assetIds", mapper.writeValueAsString( specificAssetId2 ) )
                            .queryParam( "limit", "10" )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
                .andDo( MockMvcResultHandlers.print() )
-               .andExpect( status().isOk() );
-
-         // Test first shell match with single assetId
-
-         SpecificAssetId specificAssetId2 = TestUtil.createSpecificAssetId( "identifier1KeyExample", "identifier1ValueExample", null );
-         mvc.perform(
-                     MockMvcRequestBuilders
-                           .get( LOOKUP_SHELL_BASE_PATH )
-                           .queryParam( "assetIds", mapper.writeValueAsString( specificAssetId2 ) )
-                           .accept( MediaType.APPLICATION_JSON )
-                           .with( jwtTokenFactory.allRoles() )
-               )
-               .andDo( MockMvcResultHandlers.print() )
-               .andExpect( status().isOk() );
+               .andExpect( status().isOk() )
+          .andExpect( jsonPath( "$.paging_metadata.cursor" ).doesNotExist() );
 
          //            // Test first and second shell match with common asssetId
 
@@ -722,7 +731,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                )
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isOk() )
-               .andExpect( jsonPath( "$", hasSize( 0 ) ) );
+               .andExpect( jsonPath( "$.result", hasSize( 0 ) ) );
       }
 
       @Test
@@ -731,6 +740,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          String globalAssetId = UUID.randomUUID().toString();
 
          AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+         shellPayload.setId( UUID.randomUUID().toString() );
          shellPayload.setGlobalAssetId( globalAssetId );
          performShellCreateRequest( mapper.writeValueAsString( shellPayload ) );
 
@@ -747,9 +757,9 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                )
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isOk() )
-               .andExpect( jsonPath( "$", hasSize( 1 ) ) )
+               .andExpect( jsonPath( "$.result", hasSize( 1 ) ) )
                // ensure that only three results match
-               .andExpect( jsonPath( "$", contains( shellPayload.getId() ) ) );
+               .andExpect( jsonPath( "$.result", contains( shellPayload.getId() ) ) );
       }
 
       @Test
@@ -763,7 +773,8 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                )
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isOk() )
-               .andExpect( jsonPath( "$", hasSize( 0 ) ) );
+               .andExpect( content().string( "{}" ));
+
       }
    }
 

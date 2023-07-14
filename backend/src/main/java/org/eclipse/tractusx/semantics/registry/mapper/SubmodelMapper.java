@@ -22,18 +22,23 @@ package org.eclipse.tractusx.semantics.registry.mapper;
 
 
 import org.eclipse.tractusx.semantics.aas.registry.model.Endpoint;
+import org.eclipse.tractusx.semantics.aas.registry.model.GetSubmodelDescriptorsResult;
 import org.eclipse.tractusx.semantics.aas.registry.model.Key;
+import org.eclipse.tractusx.semantics.aas.registry.model.KeyTypes;
 import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
 import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
 import org.eclipse.tractusx.semantics.aas.registry.model.ReferenceTypes;
 import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
+import org.eclipse.tractusx.semantics.registry.dto.SubmodelCollectionDto;
 import org.eclipse.tractusx.semantics.registry.model.Submodel;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelDescription;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelEndpoint;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Mappings;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -82,6 +87,12 @@ public interface SubmodelMapper {
         return versions;
     }
 
+   @Mappings({
+         @Mapping(source = "items", target = "result"),
+         @Mapping(source = "cursor", target = "pagingMetadata.cursor"),
+   })
+   GetSubmodelDescriptorsResult toApiDto( SubmodelCollectionDto shell);
+
     @Mappings({
             @Mapping(source = "endpointProtocolVersion", target = "protocolInformation.endpointProtocolVersion" , qualifiedByName = "protocolVersionDescriptor"),
     })
@@ -114,9 +125,19 @@ public interface SubmodelMapper {
         Reference reference = new Reference();
         reference.setType( ReferenceTypes.EXTERNALREFERENCE );
         Key key = new Key();
+        key.setType( KeyTypes.SUBMODEL );
         key.setValue( semanticId );
+        reference.setKeys( List.of(key) );
         return reference;
     }
 
+   @AfterMapping
+   default Submodel mapSemanticIds( SubmodelDescriptor apiDto, @MappingTarget Submodel submodel){
+      if(apiDto.getSemanticId().getKeys()!=null){
+         return submodel.withSemanticId( apiDto.getSemanticId().getKeys().get( 0 ).getValue() );
+      }else{
+         return submodel.withSemanticId( "" );
+      }
+   }
 
 }

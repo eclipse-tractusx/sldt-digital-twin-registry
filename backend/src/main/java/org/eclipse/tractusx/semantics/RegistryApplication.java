@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 T-Systems International GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021-2023 T-Systems International GmbH
+ * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -29,11 +29,10 @@ import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2Res
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -41,7 +40,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * Main Adapter Application
  */
 @SpringBootApplication
-@EnableJdbcAuditing
+@EnableJpaAuditing
 @EnableConfigurationProperties(RegistryProperties.class)
 @ComponentScan(basePackages = {"org.eclipse.tractusx.semantics", "org.openapitools.configuration"})
 public class RegistryApplication {

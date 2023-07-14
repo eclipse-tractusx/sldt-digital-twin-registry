@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,10 +19,12 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
-import jakarta.persistence.*;
-import lombok.*;
 import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Getter
@@ -31,11 +33,14 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 @NoArgsConstructor
 @AllArgsConstructor
 @With
-public class SubmodelDescription {
+@JsonIdentityInfo(
+      generator = ObjectIdGenerators.PropertyGenerator.class,
+      property = "id")
+public class ShellDisplayName {
 
-   @GeneratedValue( strategy = GenerationType.IDENTITY )
    @Id
-   @Column( name = "id" )
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   @Column(name="id")
    private UUID id;
 
    @Column
@@ -44,7 +49,7 @@ public class SubmodelDescription {
    private String text;
 
    @JsonBackReference
-   @ManyToOne( fetch = FetchType.LAZY, optional = false,cascade = {CascadeType.MERGE} )
-   @JoinColumn( name = "fk_submodel_id" )
-   private Submodel submodel;
+   @ManyToOne(fetch = FetchType.LAZY)
+   @JoinColumn(name = "fk_shell_id")
+   private Shell shellId;
 }

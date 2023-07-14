@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,7 +19,6 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry;
 
-import com.nimbusds.jose.shaded.gson.JsonArray;
 import lombok.Value;
 import net.minidev.json.JSONArray;
 
@@ -47,10 +46,10 @@ public class JwtTokenFactory {
     private final Tenant tenantTwo;
     private final Tenant tenantThree;
 
-    public JwtTokenFactory(String publicClientId, String tenantIdClaimName){
-        this.tenantOne = new Tenant(publicClientId, tenantIdClaimName, TENANT_ONE);
-        this.tenantTwo = new Tenant(publicClientId, tenantIdClaimName, TENANT_TWO);
-        this.tenantThree = new Tenant(publicClientId, tenantIdClaimName, TENANT_THREE);
+    public JwtTokenFactory(String publicClientId){
+        this.tenantOne = new Tenant(publicClientId, TENANT_ONE);
+        this.tenantTwo = new Tenant(publicClientId, TENANT_TWO);
+        this.tenantThree = new Tenant(publicClientId, TENANT_THREE);
     }
     public RequestPostProcessor allRoles(){
         return tenantOne.allRoles();
@@ -80,6 +79,9 @@ public class JwtTokenFactory {
         return tenantOne.withoutRoles();
     }
 
+    public Tenant tenantOne() {
+        return tenantOne;
+    }
     public Tenant tenantTwo() {
         return tenantTwo;
     }
@@ -90,7 +92,6 @@ public class JwtTokenFactory {
     @Value
     public static class Tenant{
         String publicClientId;
-        String tenantIdClaimName;
         String tenantId;
 
         public RequestPostProcessor allRoles(){
@@ -142,7 +143,6 @@ public class JwtTokenFactory {
                     .header("alg", "none")
                     .claim("sub", "user")
                     .claim("resource_access", Map.of(publicClientId, Map.of("roles", toJsonArray(roles) )))
-                    .claim(tenantIdClaimName, tenantId)
                     .build();
             Collection<GrantedAuthority> authorities = Collections.emptyList();
             return authentication(new JwtAuthenticationToken(jwt, authorities));

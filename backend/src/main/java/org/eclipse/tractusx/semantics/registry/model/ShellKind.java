@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,13 +17,14 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ********************************************************************************/
-package org.eclipse.tractusx.semantics.registry.security;
+package org.eclipse.tractusx.semantics.registry.model;
 
-public class NoOpTenantAware implements TenantAware{
-
-    @Override
-    public String getTenantId() {
-        return "NO_OP_TENANT";
-    }
-
+public enum ShellKind {
+   INSTANCE( "Instance" ),
+   NOTAPPLICABLE( "NotApplicable" ),
+   TYPE( "Type" );
+   private String kind;
+   ShellKind( String kind ) {
+      this.kind = kind;
+   }
 }
