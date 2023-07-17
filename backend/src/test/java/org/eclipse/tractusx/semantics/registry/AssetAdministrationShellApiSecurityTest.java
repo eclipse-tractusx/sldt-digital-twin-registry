@@ -191,7 +191,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
            String shellPayloadForUpdate = mapper.writeValueAsString(testAas);
             mvc.perform(
                             MockMvcRequestBuilders
-                                    .put(SINGLE_SHELL_BASE_PATH, shellId)
+                                    .put(SINGLE_SHELL_BASE_PATH, getEncodedValue(shellId))
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(shellPayloadForUpdate)
                                     // test with wrong role
@@ -203,7 +203,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
 
             mvc.perform(
                             MockMvcRequestBuilders
-                                    .put(SINGLE_SHELL_BASE_PATH, shellId )
+                                    .put(SINGLE_SHELL_BASE_PATH, getEncodedValue(shellId) )
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(shellPayloadForUpdate)
                                     .with(jwtTokenFactory.updateTwin())
@@ -217,7 +217,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
         public void testRbacForDelete() throws Exception {
             mvc.perform(
                             MockMvcRequestBuilders
-                                    .delete(SINGLE_SHELL_BASE_PATH, shellId )
+                                    .delete(SINGLE_SHELL_BASE_PATH, getEncodedValue(shellId) )
                                     // test with wrong role
                                     .with(jwtTokenFactory.readTwin())
                     )
@@ -226,7 +226,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
 
             mvc.perform(
                             MockMvcRequestBuilders
-                                    .delete(SINGLE_SHELL_BASE_PATH, shellId )
+                                    .delete(SINGLE_SHELL_BASE_PATH, getEncodedValue(shellId) )
                                     // test with wrong role
                                     .with(jwtTokenFactory.deleteTwin())
                     )

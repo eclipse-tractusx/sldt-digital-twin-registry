@@ -249,7 +249,7 @@ paths:
           explode: false
           schema:
             type: string
-      #          format: byte
+            format: byte
       requestBody:
         description: Asset Administration Shell Descriptor object
         content:
@@ -306,7 +306,7 @@ paths:
           explode: false
           schema:
             type: string
-      #          format: byte
+            format: byte
       responses:
         "204":
           description: Asset Administration Shell Descriptor deleted successfully
