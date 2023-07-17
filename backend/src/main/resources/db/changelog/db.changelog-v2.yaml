@@ -380,3 +380,119 @@ databaseChangeLog:
         - dropNotNullConstraint:
             tableName: SHELL
             columnName: ID_SHORT
+  - changeSet:
+      id: 13072023-01
+      author: slindner
+      changes:
+        - addColumn:
+            tableName: REFERENCE
+            columns:
+              - column:
+                  name: FK_SHELL_IDENTIFIER_SEMANTIC_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+              - column:
+                  name: FK_SHELL_IDENTIFIER_SUPPLEM_SEMANTIC_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: REFERENCE
+            baseColumnNames: FK_SHELL_IDENTIFIER_SEMANTIC_ID
+            constraintName: REF_FK_SHELL_IDENTIFIER_SEMANTIC_ID
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_IDENTIFIER
+            validate: true
+        - addForeignKeyConstraint:
+            baseTableName: REFERENCE
+            baseColumnNames: FK_SHELL_IDENTIFIER_SUPPLEM_SEMANTIC_ID
+            constraintName: REF_FK_SHELL_IDENTIFIER_SUPPLEM_SEMANTIC_ID
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_IDENTIFIER
+            validate: true
+  - changeSet:
+      id: 14072023-01
+      author: slindner
+      changes:
+        - dropIndex:
+            tableName: SHELL_IDENTIFIER
+            indexName: SHELL_IDENTIFIER_IX01
+        - createIndex:
+            tableName: SHELL_IDENTIFIER
+            indexName:  SHELL_IDENTIFIER_IX01
+            columns:
+              - column:
+                  name: NAMESPACE
+              - column:
+                  name: IDENTIFIER
+        - dropColumn:
+            tableName: SHELL_IDENTIFIER
+            columns:
+              - column:
+                  name: EXTERNAL_SUBJECT_ID
+                  type: nvarchar(30)
+        - addColumn:
+            tableName: REFERENCE
+            columns:
+              - column:
+                  name: FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: REFERENCE
+            baseColumnNames: FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID
+            constraintName: REF_FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_IDENTIFIER
+            validate: true
+  - changeSet:
+      id: 17072023-01
+      author: slindner
+      changes:
+        - createTable:
+            tableName: SUBMODEL_SECURITY_ATTRIBUTE
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(30)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ATTRIBUTE_KEY
+                  type: nvarchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ATTRIBUTE_VALUE
+                  type: nvarchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SUBMODEL_ENDPOINT_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_SECURITY_ATTRIBUTE
+            baseColumnNames: FK_SUBMODEL_ENDPOINT_ID
+            constraintName: REF_FK_FK_SUBMODEL_ENDPOINT_ID
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL_ENDPOINT
+            validate: true

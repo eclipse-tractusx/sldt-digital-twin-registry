@@ -22,20 +22,23 @@ package org.eclipse.tractusx.semantics.registry.model;
 import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 
 import lombok.Value;
 import lombok.With;
 
 @Value
 @With
-public class SecurityAttribute {
+public class SubmodelSecurityAttribute {
 
    @Id
    UUID id;
 
-   private SecurityType type;
+   private SubmodelSecurityType type;
 
+   @Column("attribute_key")
    private String key;
 
+   @Column("attribute_value")
    private String value;
 }

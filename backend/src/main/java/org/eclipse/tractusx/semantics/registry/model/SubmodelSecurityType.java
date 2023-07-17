@@ -19,7 +19,7 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
-public enum SecurityType {
+public enum SubmodelSecurityType {
 
    NONE("NONE"),
 
@@ -29,7 +29,7 @@ public enum SecurityType {
 
    private String value;
 
-   SecurityType (String value){
+   SubmodelSecurityType(String value){
       this.value = value;
    }
 

@@ -96,7 +96,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                )
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isOk() );
-         //.andExpect(content().json(toJson(shellPayload)));
+       //  .andExpect(content().json(toJson(shellPayload)));
       }
 
       @Test

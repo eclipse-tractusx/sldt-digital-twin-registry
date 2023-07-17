@@ -19,9 +19,11 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.MappedCollection;
 
 import lombok.Value;
 
@@ -30,16 +32,16 @@ public class SubmodelEndpoint {
     @Id
     UUID id;
     String interfaceName;
-    String endpointAddress;
+    String endpointAddress;  //href
     String endpointProtocol;
     String endpointProtocolVersion;
     String subProtocol;
     String subProtocolBody;
     String subProtocolBodyEncoding;
-/*
+
     @MappedCollection(idColumn = "fk_submodel_endpoint_id")
-    List<SecurityAttribute> securityAttributes;
-*/
+    Set<SubmodelSecurityAttribute> submodelSecurityAttribute;
+
 
 
 }

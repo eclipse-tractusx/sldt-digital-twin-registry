@@ -19,10 +19,17 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.service;
 
-import com.google.common.collect.ImmutableSet;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.registry.dto.BatchResultDto;
 import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
+import org.eclipse.tractusx.semantics.registry.model.ReferenceKey;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
 import org.eclipse.tractusx.semantics.registry.model.Submodel;
@@ -42,10 +49,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import com.google.common.collect.ImmutableSet;
 
 @Service
 public class ShellService {
@@ -103,17 +107,39 @@ public class ShellService {
         if(tenantId.equals(owningTenantId)){
             return shellIdentifiers;
         }
-        return shellIdentifiers.stream()
-                .filter(shellIdentifier -> shellIdentifier.getExternalSubjectId() == null ||
-                        shellIdentifier.getExternalSubjectId().equals(tenantId)).collect(Collectors.toSet());
+
+        //caused by type changed from String to Reference
+        Set<ShellIdentifier> externalSubjectIdSet = new HashSet<>();
+        for(ShellIdentifier ident : shellIdentifiers){
+            if(ident.getExternalSubjectId() == null ){
+                externalSubjectIdSet.add( ident );
+            } else {
+              Optional<ReferenceKey> optionalReferenceKey =
+                    ident.getExternalSubjectId()
+                    .getKeys().stream()
+                    .filter( referenceKey -> referenceKey.getValue().equals( tenantId ) )
+                    .findFirst();
+
+              if( optionalReferenceKey.isPresent() ) externalSubjectIdSet.add( ident );
+            }
+        }
+
+        return externalSubjectIdSet;
+//        return shellIdentifiers.stream()
+//                .filter(shellIdentifier -> shellIdentifier.getExternalSubjectId() == null ||
+//                        shellIdentifier.getExternalSubjectId().equals(tenantId)).collect(Collectors.toSet());
     }
 
     @Transactional(readOnly = true)
     public List<String> findExternalShellIdsByIdentifiersByExactMatch(Set<ShellIdentifier> shellIdentifiers) {
         List<String> keyValueCombinations=shellIdentifiers.stream().map( shellIdentifier -> shellIdentifier.getKey()+shellIdentifier.getValue()).toList();
 
-        return shellRepository.findExternalShellIdsByIdentifiersByExactMatch(keyValueCombinations,
-                keyValueCombinations.size(), tenantAware.getTenantId(), owningTenantId);
+        List<String> externalIds = shellRepository.findExternalShellIdsByIdentifiersByExactMatch(keyValueCombinations,
+              keyValueCombinations.size(), tenantAware.getTenantId(), owningTenantId);
+
+        return externalIds;
+//        return shellRepository.findExternalShellIdsByIdentifiersByExactMatch(keyValueCombinations,
+//                keyValueCombinations.size(), tenantAware.getTenantId(), owningTenantId);
     }
 
     @Transactional(readOnly = true)

@@ -49,6 +49,8 @@ public class TestUtil {
         displayName.setText("this is an example description1");
         aas.setDisplayName(List.of(displayName));
 
+        aas.setGlobalAssetId( "globalAssetId example" );
+
         aas.setAssetType( "AssetType" );
         aas.setAssetKind( AssetKind.INSTANCE );
 
@@ -56,15 +58,60 @@ public class TestUtil {
 
         aas.setIdShort("idShortExample");
 
+
+       ReferenceParent specificAssetIdRefParent = new ReferenceParent();
+       specificAssetIdRefParent.setType( ReferenceTypes.EXTERNALREFERENCE );
+       Key specificAssetIdParentKey = new Key();
+       specificAssetIdParentKey.setValue( "specificAssetId ReferenceParent key" );
+       specificAssetIdParentKey.setType( KeyTypes.ASSETADMINISTRATIONSHELL );
+       specificAssetIdRefParent.setKeys( List.of(specificAssetIdParentKey) );
+
+       Reference specificAssetIdReference = new Reference();
+       specificAssetIdReference.setType( ReferenceTypes.MODELREFERENCE );
+       Key specificAssetIdKey = new Key();
+       specificAssetIdKey.setType( KeyTypes.ASSETADMINISTRATIONSHELL );
+       specificAssetIdKey.setValue( "specificAssetIdReference key" );
+       specificAssetIdReference.setKeys( List.of(specificAssetIdKey) );
+       specificAssetIdReference.setReferredSemanticId( specificAssetIdRefParent );
+
+       Reference externalSubjectIdReference = new Reference();
+       externalSubjectIdReference.setType( ReferenceTypes.EXTERNALREFERENCE );
+       Key subjectIdKey = new Key();
+       subjectIdKey.setType( KeyTypes.ASSETADMINISTRATIONSHELL );
+       subjectIdKey.setValue( "ExternalSubject key value" );
+       externalSubjectIdReference.setKeys( List.of(subjectIdKey) );
+       externalSubjectIdReference.setReferredSemanticId( specificAssetIdRefParent );
+
+
+       Key assetIdKey = new Key();
+       assetIdKey.setType( KeyTypes.BASICEVENTELEMENT );
+       assetIdKey.setValue( "assetIdKey value" );
+
+       ReferenceParent assetIdParent = new ReferenceParent();
+       assetIdParent.setType( ReferenceTypes.EXTERNALREFERENCE );
+       assetIdParent.setKeys( List.of(assetIdKey) );
+
+       Reference assetIdReference = new Reference();
+       assetIdReference.setType( ReferenceTypes.EXTERNALREFERENCE );
+       assetIdReference.setKeys( List.of(assetIdKey) );
+       assetIdReference.setReferredSemanticId( assetIdParent );
+
         SpecificAssetId specificAssetId1 = new SpecificAssetId();
         specificAssetId1.setName("identifier1KeyExample");
         specificAssetId1.setValue("identifier1ValueExample");
+        specificAssetId1.setSemanticId( specificAssetIdReference );
+        specificAssetId1.setSupplementalSemanticIds( List.of(assetIdReference) );
+       // specificAssetId1.setExternalSubjectId(externalSubjectIdReference  );
 
-        SpecificAssetId specificAssetId2 = new SpecificAssetId();
-        specificAssetId2.setName("identifier2KeyExample");
-        specificAssetId2.setValue("identifier2ValueExample");
+       SpecificAssetId specificAssetId2 = new SpecificAssetId();
+       specificAssetId2.setName("identifier2KeyExample");
+       specificAssetId2.setValue("identifier2ValueExample");
+       specificAssetId2.setSemanticId( specificAssetIdReference );
+       specificAssetId2.setSupplementalSemanticIds( List.of(assetIdReference) );
+      // specificAssetId2.setExternalSubjectId( externalSubjectIdReference );
 
-        aas.setSpecificAssetIds(List.of(specificAssetId1, specificAssetId2));
+
+       aas.setSpecificAssetIds(List.of(specificAssetId1, specificAssetId2));
 
         LangStringTextType description1 = new LangStringTextType();
         description1.setLanguage("de");
@@ -125,6 +172,8 @@ public class TestUtil {
 
         ProtocolInformationSecurityAttributes securityAttributes = new ProtocolInformationSecurityAttributes();
         securityAttributes.setType(ProtocolInformationSecurityAttributes.TypeEnum.NONE);
+        securityAttributes.setKey( "Security Attribute key" );
+        securityAttributes.setValue( "Security Attribute value" );
         protocolInformation.setSecurityAttributes(List.of(securityAttributes));
 
         Endpoint endpoint = new Endpoint();
@@ -166,8 +215,6 @@ public class TestUtil {
 
         submodelDescriptor.setIdShort("idShortExample");
         submodelDescriptor.setSemanticId(semanticIDReference);
-        specificAssetId1.setSupplementalSemanticIds(List.of(semanticIDReference));
-        specificAssetId2.setSupplementalSemanticIds(List.of(semanticIDReference));
 
         submodelDescriptor.setDescription(List.of(description1, description2));
         submodelDescriptor.setEndpoints(List.of(endpoint));
@@ -207,11 +254,39 @@ public class TestUtil {
         protocolInformation.setSubprotocolBody("subprotocolBodyExample");
         protocolInformation.setSubprotocolBodyEncoding("subprotocolBodyExample");
 
+       ProtocolInformationSecurityAttributes securityAttributes = new ProtocolInformationSecurityAttributes();
+       securityAttributes.setType(ProtocolInformationSecurityAttributes.TypeEnum.NONE);
+       securityAttributes.setKey( "Security Attribute key" );
+       securityAttributes.setValue( "Security Attribute value" );
+       protocolInformation.setSecurityAttributes(List.of(securityAttributes));
+
         Endpoint endpoint = new Endpoint();
         endpoint.setInterface("interfaceNameExample");
         endpoint.setProtocolInformation(protocolInformation);
 
-        submodelDescriptor.setDescription(List.of(description1, description2));
+       Key submodelExtensionKey = new Key();
+       submodelExtensionKey.setType( KeyTypes.SUBMODEL );
+       submodelExtensionKey.setValue( "submodelExtensionIdExample" );
+
+       ReferenceParent sumodelExtensionParent = new ReferenceParent();
+       sumodelExtensionParent.setType( ReferenceTypes.MODELREFERENCE );
+       sumodelExtensionParent.setKeys( List.of(submodelExtensionKey) );
+
+       Reference submodelExtensionRef = new Reference();
+       submodelExtensionRef.setType( ReferenceTypes.MODELREFERENCE );
+       submodelExtensionRef.setReferredSemanticId( sumodelExtensionParent );
+       submodelExtensionRef.setKeys( List.of(submodelExtensionKey) );
+
+       Extension submodelExtension = new Extension();
+       submodelExtension.setRefersTo( List.of(submodelExtensionRef) );
+       submodelExtension.setSupplementalSemanticIds( List.of(submodelExtensionRef) );
+       submodelExtension.setName( "Submodel Extension name" );
+       submodelExtension.setValue( "Submodel Extension value" );
+       submodelExtension.setValueType( DataTypeDefXsd.STRING );
+       submodelExtension.setSemanticId( submodelExtensionRef );
+       submodelDescriptor.setExtensions( List.of(submodelExtension) );
+
+       submodelDescriptor.setDescription(List.of(description1, description2));
         submodelDescriptor.setEndpoints(List.of(endpoint));
 
         return submodelDescriptor;
@@ -222,12 +297,21 @@ public class TestUtil {
         specificAssetId1.setName("identifier1KeyExample");
         specificAssetId1.setValue("identifier1ValueExample");
 
+       Key assetIdKey = new Key();
+       assetIdKey.setType( KeyTypes.BASICEVENTELEMENT );
+       assetIdKey.setValue( "assetIdKey value" );
+
+       ReferenceParent assetIdParent = new ReferenceParent();
+       assetIdParent.setType( ReferenceTypes.EXTERNALREFERENCE );
+       assetIdParent.setKeys( List.of(assetIdKey) );
+
         Reference reference = new Reference();
         reference.setType(ReferenceTypes.EXTERNALREFERENCE);
         Key key = new Key();
         key.setType(KeyTypes.SUBMODEL);
         key.setValue("key");
         reference.setKeys(List.of(key));
+        reference.setReferredSemanticId( assetIdParent );
 
         specificAssetId1.setSupplementalSemanticIds(List.of(reference));
 
@@ -249,6 +333,24 @@ public class TestUtil {
 
             specificAssetId1.setExternalSubjectId(reference);
         }
-        return specificAssetId1;
+
+
+       Key assetIdKey = new Key();
+       assetIdKey.setType( KeyTypes.BASICEVENTELEMENT );
+       assetIdKey.setValue( "assetIdKey value" );
+
+       ReferenceParent assetIdParent = new ReferenceParent();
+       assetIdParent.setType( ReferenceTypes.EXTERNALREFERENCE );
+       assetIdParent.setKeys( List.of(assetIdKey) );
+
+       Reference assetIdReference = new Reference();
+       assetIdReference.setType( ReferenceTypes.EXTERNALREFERENCE );
+       assetIdReference.setKeys( List.of(assetIdKey) );
+       assetIdReference.setReferredSemanticId( assetIdParent );
+
+       specificAssetId1.setSemanticId( assetIdReference);
+       specificAssetId1.setSupplementalSemanticIds( List.of(assetIdReference) );
+
+       return specificAssetId1;
     }
 }

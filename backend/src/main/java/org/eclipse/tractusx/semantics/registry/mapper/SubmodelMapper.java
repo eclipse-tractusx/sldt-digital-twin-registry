@@ -80,7 +80,7 @@ public interface SubmodelMapper {
             @Mapping(target="subProtocolBody", source = "protocolInformation.subprotocolBody"),
             @Mapping(target="subProtocolBodyEncoding", source = "protocolInformation.subprotocolBodyEncoding"),
             @Mapping(target = "endpointProtocolVersion", source = "protocolInformation.endpointProtocolVersion" , qualifiedByName = "endpointProtocolVersionMapping"),
-  //          @Mapping( target = "securityAttributes", source = "protocolInformation.securityAttributes")
+            @Mapping( target = "submodelSecurityAttribute", source = "protocolInformation.securityAttributes")
     })
     SubmodelEndpoint fromApiDto(Endpoint apiDto);
 
@@ -99,6 +99,7 @@ public interface SubmodelMapper {
 
     @Mappings({
             @Mapping(source = "endpointProtocolVersion", target = "protocolInformation.endpointProtocolVersion" , qualifiedByName = "protocolVersionDescriptor"),
+          @Mapping( source = "submodelSecurityAttribute", target = "protocolInformation.securityAttributes")
     })
     @InheritInverseConfiguration
     Endpoint toApiDto(SubmodelEndpoint apiDto);

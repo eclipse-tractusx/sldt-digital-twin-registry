@@ -38,6 +38,7 @@ import org.eclipse.tractusx.semantics.aas.registry.model.KeyTypes;
 import org.eclipse.tractusx.semantics.aas.registry.model.LangStringNameType;
 import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
 import org.eclipse.tractusx.semantics.aas.registry.model.ProtocolInformation;
+import org.eclipse.tractusx.semantics.aas.registry.model.ProtocolInformationSecurityAttributes;
 import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
 import org.eclipse.tractusx.semantics.aas.registry.model.ReferenceTypes;
 import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
@@ -58,6 +59,8 @@ import org.eclipse.tractusx.semantics.registry.model.SubmodelDescription;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelDisplayName;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelEndpoint;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelExtension;
+import org.eclipse.tractusx.semantics.registry.model.SubmodelSecurityAttribute;
+import org.eclipse.tractusx.semantics.registry.model.SubmodelSecurityType;
 import org.junit.jupiter.api.Test;
 
 public class ShellMapperTest {
@@ -107,6 +110,8 @@ public class ShellMapperTest {
         assertThat(submodelEndpoint.getSubProtocol()).isEqualTo(protocolInformation.getSubprotocol());
         assertThat(submodelEndpoint.getSubProtocolBody()).isEqualTo(protocolInformation.getSubprotocolBody());
         assertThat(submodelEndpoint.getSubProtocolBodyEncoding()).isEqualTo(protocolInformation.getSubprotocolBodyEncoding());
+        assertThat( submodelEndpoint.getSubmodelSecurityAttribute() ).hasSize( 1 );
+        assertThat( submodelEndpoint.getSubmodelSecurityAttribute().stream().findFirst().get().getValue() ).isEqualTo("ProtocolSecurityArrtibute value");
 
         // new Fields Submodel
         assertThat(submodel.getDisplayNames().stream().findFirst().get().getLanguage())
@@ -129,8 +134,9 @@ public class ShellMapperTest {
         assertThat( shell.getShellKind().getValue() ).isEqualTo( aas.getAssetKind().getValue() );
         assertThat(shell.getShellType()).isEqualTo( aas.getAssetType() );
         assertThat(shell.getDisplayNames().stream().findFirst().get().getLanguage()).isEqualTo( aas.getDisplayName().stream().findFirst().get().getLanguage() );
-        assertThat( shell.getShellExtensions() ).hasSize( 1 );
 
+        //Extensioins
+        assertThat( shell.getShellExtensions() ).hasSize( 1 );
         ShellExtension shellExtension = shell.getShellExtensions().stream().findFirst().get();
         Extension aasExtension = aas.getExtensions().stream().findFirst().get();
         assertThat(shell.getShellExtensions()).hasSize( 1 );
@@ -138,6 +144,15 @@ public class ShellMapperTest {
        assertThat( shellExtension.getRefersTo() ).hasSize( 1 );
        assertThat( shellExtension.getSupplementalSemanticIds() ).hasSize( 1 );
        assertThat(shellExtension.getSupplementalSemanticIds().stream().findFirst().get().getType()).isEqualTo( ReferenceType.EXTERNALREFERENCE );
+
+       //specificAssetIds
+       assertThat( shell.getIdentifiers() ).hasSize( 3 );
+       ShellIdentifier  shellIdentifier = shell.getIdentifiers().stream().filter( shellIdentifier1 -> shellIdentifier1.getSemanticId() != null ).findFirst().get();
+       assertThat( shellIdentifier.getSemanticId().getType().getValue() )
+             .isEqualTo( aas.getSpecificAssetIds().get( 0 ).getSemanticId().getType().getValue() );
+       assertThat( shellIdentifier.getSupplementalSemanticIds() ).hasSize( 1 );
+       assertThat( shellIdentifier.getValue() ).isNotNull();
+       assertThat(shellIdentifier.getExternalSubjectId().getKeys().stream().findFirst().get().getValue()).isEqualTo( "ExternalSubject key value" );
     }
 
     @Test
@@ -179,6 +194,8 @@ public class ShellMapperTest {
         assertThat(apiProtocolInformation.getSubprotocol()).isEqualTo(submodelEndpoint.getSubProtocol());
         assertThat(apiProtocolInformation.getSubprotocolBody()).isEqualTo(submodelEndpoint.getSubProtocolBody());
         assertThat(apiProtocolInformation.getSubprotocolBodyEncoding()).isEqualTo(submodelEndpoint.getSubProtocolBodyEncoding());
+        assertThat( apiProtocolInformation.getSecurityAttributes() ).hasSize( 1 );
+        assertThat( apiProtocolInformation.getSecurityAttributes().get(0).getKey()).isEqualTo( "submodel security attribute key" );
 
         assertThat( submodel.getDisplayNames().stream().findFirst().get().getLanguage() )
               .isEqualTo( apiSubmodelDescriptor.getDisplayName().stream().findFirst().get().getLanguage() );
@@ -194,33 +211,53 @@ public class ShellMapperTest {
         assertThat( submodelDescriptorExtension.getSupplementalSemanticIds() ).hasSize( 1 );
 
 
+
         // new AAS fields
         assertThat( aas.getAssetKind().equals( shell.getShellKind() ) );
         assertThat( aas.getAssetType().equals( shell.getShellType() ) );
         assertThat( aas.getDisplayName()).hasSize( 1 );
         assertThat( aas.getDisplayName().stream().findFirst().get().getText() ).isEqualTo( shell.getDisplayNames().stream().findFirst().get().getText() );
-        assertThat( aas.getExtensions() ).hasSize( 1 );
 
+        //specificAssetIds
+        assertThat( aas.getSpecificAssetIds() ).hasSize( 2 );
+        assertThat( aas.getSpecificAssetIds().get( 0 ).getSemanticId() ).isNotNull();
+        assertThat( aas.getSpecificAssetIds().get( 0 ).getSemanticId().getType().getValue() )
+              .isEqualTo( shell.getIdentifiers().stream().findFirst().get().getSemanticId().getType().getValue() );
+        assertThat(aas.getSpecificAssetIds().get( 0 ).getExternalSubjectId()  ).isNotNull();
+        assertThat(aas.getSpecificAssetIds().get( 0 ).getExternalSubjectId().getKeys().get( 0 ).getValue()  ).isEqualTo( "specificExternalSubjectId" );
+
+        //Extensions
+        assertThat( aas.getExtensions() ).hasSize( 1 );
         Extension aasExtension = aas.getExtensions().stream().findFirst().get();
         assertThat( aasExtension.getName() ).isEqualTo( shell.getShellExtensions().stream().findFirst().get().getName() );
         assertThat( aasExtension.getRefersTo() ).hasSize( 1 );
         assertThat( aasExtension.getSupplementalSemanticIds() ).hasSize( 1 );
         assertThat( aasExtension.getSupplementalSemanticIds().get( 0 ).getType() ).isEqualTo( ReferenceTypes.MODELREFERENCE );
-
     }
 
     private Shell createCompleteShell() {
-        ShellIdentifier shellIdentifier1 = new ShellIdentifier(UUID.randomUUID(), "key1", "value1", null, null);
-        ShellIdentifier shellIdentifier2 = new ShellIdentifier(UUID.randomUUID(), "key1", "value1", null, null);
-        ShellIdentifier shellIdentifier3 = new ShellIdentifier(UUID.randomUUID(), ShellIdentifier.GLOBAL_ASSET_ID_KEY, "exampleGlobalAssetId", null, null);
+        ReferenceKey identifierKey = new ReferenceKey( UUID.randomUUID(), ReferenceKeyType.ASSETADMINISTRATIONSHELL, "identifierkey value");
+        ReferenceParent identifierParent = new ReferenceParent( UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(identifierKey) );
+        org.eclipse.tractusx.semantics.registry.model.Reference identifierReference =
+              new org.eclipse.tractusx.semantics.registry.model.Reference(UUID.randomUUID(), ReferenceType.MODELREFERENCE, Set.of(identifierKey),identifierParent);
+
+
+        ReferenceKey externalSubjectIdKey = new ReferenceKey( UUID.randomUUID(), ReferenceKeyType.ASSETADMINISTRATIONSHELL, "specificExternalSubjectId");
+        ReferenceParent externalSubjectId = new ReferenceParent( UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(externalSubjectIdKey) );
+        org.eclipse.tractusx.semantics.registry.model.Reference externalSubjectIdKeyReference =
+              new org.eclipse.tractusx.semantics.registry.model.Reference(UUID.randomUUID(), ReferenceType.MODELREFERENCE, Set.of(externalSubjectIdKey),externalSubjectId);
+
+
+
+        ShellIdentifier shellIdentifier1 = new ShellIdentifier(UUID.randomUUID(), "key1", "value1", externalSubjectIdKeyReference, null, identifierReference, Set.of(identifierReference));
+        ShellIdentifier shellIdentifier2 = new ShellIdentifier(UUID.randomUUID(), "key1", "value1", externalSubjectIdKeyReference, null, identifierReference, Set.of(identifierReference));
+        ShellIdentifier shellIdentifier3 = new ShellIdentifier(UUID.randomUUID(), ShellIdentifier.GLOBAL_ASSET_ID_KEY, "exampleGlobalAssetId", null, null, identifierReference, Set.of(identifierReference));
         Set<ShellIdentifier> shellIdentifiers = Set.of(shellIdentifier1, shellIdentifier2, shellIdentifier3);
 
         ShellDescription shellDescription1 = new ShellDescription(UUID.randomUUID(), "en", "example description1");
         ShellDescription shellDescription2 = new ShellDescription(UUID.randomUUID(), "de", "exampleDescription2");
 
         Set<ShellDescription> shellDescriptions = Set.of(shellDescription1, shellDescription2);
-
-        //SecurityAttribute securityAttribute = new SecurityAttribute(UUID.randomUUID(), SecurityType.W3C_DID, "key", "value");
 
         ReferenceKey submodelReferenceKey = new ReferenceKey(UUID.randomUUID(),ReferenceKeyType.SUBMODEL, "submodel reference key value" );
         ReferenceParent submodelReferenceParent = new ReferenceParent(UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(submodelReferenceKey));
@@ -233,16 +270,18 @@ public class ShellMapperTest {
                Set.of(submodelReferenceKey),
                submodelReferenceParent );
 
-
-//         SubmodelExtension submodelExtension = new SubmodelExtension( UUID.randomUUID(), submodelReference, Set.of(submodelReference),
-//               "SubmodelExtension", DataTypeXsd.STRING,"SubmodelExtension value", Set.of(submodelReference)  );
-
         SubmodelExtension submodelExtension = new SubmodelExtension( UUID.randomUUID(),submodelReference, Set.of(submodelReference),
               "SubmodelExtension", DataTypeXsd.STRING,"SubmodelExtension value", Set.of(submodelReference)  );
 
 
-
         SubmodelDisplayName submodelDisplayName = new SubmodelDisplayName( UUID.randomUUID(), "de", "Submodel display name" );
+
+        SubmodelSecurityAttribute submodelSecurityAttribute = new SubmodelSecurityAttribute(
+              UUID.randomUUID(),
+              SubmodelSecurityType.W3C_DID,
+              "submodel security attribute key",
+              "submodel security attribute value" );
+
         Submodel submodel = new Submodel(UUID.randomUUID(),
                 "submodelIdExternal",
                 "submodelIdShort", "submodelSemanticId",
@@ -250,7 +289,8 @@ public class ShellMapperTest {
                 Set.of(new SubmodelEndpoint(UUID.randomUUID(), "interfaceExample",
                         "endpointAddressExample", "endpointProtocolExample",
                         "endpointProtocolVersionExample", "subProtocolExample"
-                        , "subProtocolBodyExample", "subProtocolEncodingExample"
+                        , "subProtocolBodyExample", "subProtocolEncodingExample",
+                      Set.of(submodelSecurityAttribute)
                 )),
                 null,
               Set.of(submodelDisplayName),
@@ -263,14 +303,11 @@ public class ShellMapperTest {
 
         ShellDisplayName shellDisplayName = new ShellDisplayName( UUID.randomUUID(), "de", "Display name" );
 
-
         ReferenceKey shellKey = new ReferenceKey( UUID.randomUUID(), ReferenceKeyType.ASSETADMINISTRATIONSHELL, "shellkey value");
         ReferenceParent shellParent = new ReferenceParent( UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(shellKey) );
 
-
         org.eclipse.tractusx.semantics.registry.model.Reference shellReference1 =
               new org.eclipse.tractusx.semantics.registry.model.Reference(UUID.randomUUID(), ReferenceType.MODELREFERENCE, Set.of(shellKey),shellParent);
-
 
         org.eclipse.tractusx.semantics.registry.model.Reference shellReference2 =
               new org.eclipse.tractusx.semantics.registry.model.Reference( UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(shellKey), shellParent);
@@ -305,13 +342,44 @@ public class ShellMapperTest {
         aasDisplayName.setText( "AAS Display Name" );
         aas.setDisplayName(List.of( aasDisplayName) );
 
+        org.eclipse.tractusx.semantics.aas.registry.model.ReferenceParent specificAssetIdParent
+              = new org.eclipse.tractusx.semantics.aas.registry.model.ReferenceParent();
+        specificAssetIdParent.setType( ReferenceTypes.EXTERNALREFERENCE );
+        Key specificAssetIdParentKey = new Key();
+        specificAssetIdParentKey.setValue( "SpecificAssetId key RefernceParent key" );
+        specificAssetIdParentKey.setType( KeyTypes.ASSETADMINISTRATIONSHELL );
+        specificAssetIdParent.setKeys( List.of(specificAssetIdParentKey) );
+
+        Reference specificAssetIdReference = new Reference();
+        specificAssetIdReference.setType( ReferenceTypes.EXTERNALREFERENCE );
+        Key specificAssetIdKey = new Key();
+        specificAssetIdKey.setType( KeyTypes.ASSETADMINISTRATIONSHELL );
+        specificAssetIdKey.setValue( "SpecificAssetId key" );
+        specificAssetIdReference.setKeys( List.of(specificAssetIdKey) );
+        specificAssetIdReference.setReferredSemanticId( specificAssetIdParent );
+
+        Reference externalSubjectIdReference = new Reference();
+        externalSubjectIdReference.setType( ReferenceTypes.EXTERNALREFERENCE );
+        Key subjectIdKey = new Key();
+        subjectIdKey.setType( KeyTypes.ASSETADMINISTRATIONSHELL );
+        subjectIdKey.setValue( "ExternalSubject key value" );
+        externalSubjectIdReference.setKeys( List.of(subjectIdKey) );
+        externalSubjectIdReference.setReferredSemanticId( specificAssetIdParent );
+
+
         SpecificAssetId specificAssetId1 = new SpecificAssetId();
         specificAssetId1.setName( "identifier1KeyExample" );
         specificAssetId1.setValue( "identifier1ValueExample" );
+        specificAssetId1.setSemanticId(specificAssetIdReference  );
+        specificAssetId1.setSupplementalSemanticIds(List.of(specificAssetIdReference)  );
+        specificAssetId1.setExternalSubjectId( externalSubjectIdReference );
 
         SpecificAssetId specificAssetId2 = new SpecificAssetId();
         specificAssetId2.setName( "identifier2KeyExample" );
         specificAssetId2.setValue( "identifier2ValueExample" );
+        specificAssetId2.setSemanticId(specificAssetIdReference  );
+        specificAssetId2.setSupplementalSemanticIds(List.of(specificAssetIdReference)  );
+        specificAssetId2.setExternalSubjectId( externalSubjectIdReference );
 
         aas.setSpecificAssetIds(List.of(specificAssetId1, specificAssetId2));
 
@@ -362,9 +430,18 @@ public class ShellMapperTest {
         protocolInformation.setSubprotocol("subprotocolExample");
         protocolInformation.setSubprotocolBody("subprotocolBodyExample");
         protocolInformation.setSubprotocolBodyEncoding("subprotocolBodyExample");
+
+        ProtocolInformationSecurityAttributes securityAttributes = new ProtocolInformationSecurityAttributes();
+        securityAttributes.setKey( "ProtocolSecurityArrtibute key" );
+        securityAttributes.setValue( "ProtocolSecurityArrtibute value" );
+        securityAttributes.setType( ProtocolInformationSecurityAttributes.TypeEnum.RFC_TLSA );
+        protocolInformation.securityAttributes( List.of(securityAttributes) );
+
+
         Endpoint endpoint = new Endpoint();
         endpoint.setInterface("interfaceNameExample");
         endpoint.setProtocolInformation(protocolInformation);
+
 
         // reference of  openapi SemanticId
         Reference submodelSemanticReference = new Reference();

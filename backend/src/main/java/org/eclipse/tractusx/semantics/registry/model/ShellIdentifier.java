@@ -19,14 +19,15 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
+import java.util.Set;
+import java.util.UUID;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.MappedCollection;
 
 import lombok.Value;
 import lombok.With;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-
-import java.util.UUID;
 
 @Value
 @With
@@ -40,8 +41,19 @@ public class ShellIdentifier {
     String key;
     @Column("identifier")
     String value;
-    @Column("external_subject_id")
-    String externalSubjectId;
+    @Column("fk_shell_identifier_external_subject_id")
+    // String externalSubjectId;
+    Reference externalSubjectId;
     @Column( "fk_shell_id")
     UUID shellId;
+
+    @Column( "fk_shell_identifier_semantic_id")
+    Reference semanticId;
+
+    @MappedCollection(idColumn = "fk_shell_identifier_supplem_semantic_id")
+    Set<Reference> supplementalSemanticIds;
+
+    //Reference externalSubjectId
+    // globalAssetID will stay as it is - as ShellIentifier -> no need to rewrite lookup-Methods
+
 }

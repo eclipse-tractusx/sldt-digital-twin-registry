@@ -60,6 +60,7 @@ public interface ShellMapper {
 
     @Mappings({
           @Mapping(target = "key", source = "name"),
+          @Mapping(target = "supplementalSemanticIds", source = "supplementalSemanticIds")
     })
     ShellIdentifier fromApiDto(SpecificAssetId apiDto);
 
