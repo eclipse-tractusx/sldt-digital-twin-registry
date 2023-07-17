@@ -53,6 +53,15 @@ import org.eclipse.tractusx.semantics.registry.model.ShellDescription;
 import org.eclipse.tractusx.semantics.registry.model.ShellDisplayName;
 import org.eclipse.tractusx.semantics.registry.model.ShellExtension;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierExternalSubjectReference;
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierExternalSubjectReferenceKey;
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierExternalSubjectReferenceParent;
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierSemanticReference;
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierSemanticReferenceKey;
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierSemanticReferenceParent;
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierSupplemSemanticReference;
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierSupplemSemanticReferenceKey;
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierSupplemSemanticReferenceParent;
 import org.eclipse.tractusx.semantics.registry.model.ShellKind;
 import org.eclipse.tractusx.semantics.registry.model.Submodel;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelDescription;
@@ -210,8 +219,6 @@ public class ShellMapperTest {
         assertThat( submodelDescriptorExtension.getRefersTo() ).hasSize( 1 );
         assertThat( submodelDescriptorExtension.getSupplementalSemanticIds() ).hasSize( 1 );
 
-
-
         // new AAS fields
         assertThat( aas.getAssetKind().equals( shell.getShellKind() ) );
         assertThat( aas.getAssetType().equals( shell.getShellType() ) );
@@ -236,23 +243,83 @@ public class ShellMapperTest {
     }
 
     private Shell createCompleteShell() {
-        ReferenceKey identifierKey = new ReferenceKey( UUID.randomUUID(), ReferenceKeyType.ASSETADMINISTRATIONSHELL, "identifierkey value");
-        ReferenceParent identifierParent = new ReferenceParent( UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(identifierKey) );
-        org.eclipse.tractusx.semantics.registry.model.Reference identifierReference =
-              new org.eclipse.tractusx.semantics.registry.model.Reference(UUID.randomUUID(), ReferenceType.MODELREFERENCE, Set.of(identifierKey),identifierParent);
+
+        //ShellIdentifierExternalSubjectReference -> ExternalSubjectID
+        ShellIdentifierExternalSubjectReferenceKey externalSubjectReferenceKey =
+              new ShellIdentifierExternalSubjectReferenceKey(UUID.randomUUID(),ReferenceKeyType.ASSETADMINISTRATIONSHELL, "specificExternalSubjectId" );
+
+        ShellIdentifierExternalSubjectReferenceParent externalSubjectReferenceParent =
+              new ShellIdentifierExternalSubjectReferenceParent( UUID.randomUUID(),ReferenceType.MODELREFERENCE, Set.of(externalSubjectReferenceKey)  );
+
+        ShellIdentifierExternalSubjectReference externalSubjectReference = new ShellIdentifierExternalSubjectReference(UUID.randomUUID(),
+              ReferenceType.MODELREFERENCE,
+              Set.of(externalSubjectReferenceKey),
+              externalSubjectReferenceParent);
+
+        //ShellIdentifierSemanticReference -> semanticID
+        ShellIdentifierSemanticReferenceKey identifierSemanticReferenceKey =
+              new ShellIdentifierSemanticReferenceKey(UUID.randomUUID(), ReferenceKeyType.SUBMODEL, "semanticReferenceId");
+
+        ShellIdentifierSemanticReferenceParent identifierSemanticReferenceParent =
+              new ShellIdentifierSemanticReferenceParent(UUID.randomUUID(),ReferenceType.MODELREFERENCE, Set.of(identifierSemanticReferenceKey));
+
+        ShellIdentifierSemanticReference identifierSemanticReference = new ShellIdentifierSemanticReference(
+              UUID.randomUUID(),
+              ReferenceType.MODELREFERENCE,
+              Set.of(identifierSemanticReferenceKey),
+              identifierSemanticReferenceParent
+        );
+
+        //ShellIdentifierSupplemSemanticReference -> supplementalSemanticIds;
+        ShellIdentifierSupplemSemanticReferenceKey shellIdentifierSupplemSemanticReferenceKey =
+              new ShellIdentifierSupplemSemanticReferenceKey(UUID.randomUUID(),
+                    ReferenceKeyType.ASSETADMINISTRATIONSHELL,
+                    "supplemental semantic reference key");
+
+        ShellIdentifierSupplemSemanticReferenceParent shellIdentifierSupplemSemanticReferenceParent =
+              new ShellIdentifierSupplemSemanticReferenceParent(
+                    UUID.randomUUID(),
+                    ReferenceType.MODELREFERENCE,
+                    Set.of(shellIdentifierSupplemSemanticReferenceKey)
+              );
+
+        ShellIdentifierSupplemSemanticReference shellIdentifierSupplemSemanticReference = new ShellIdentifierSupplemSemanticReference(
+              UUID.randomUUID(),
+              ReferenceType.EXTERNALREFERENCE,
+              Set.of(shellIdentifierSupplemSemanticReferenceKey),
+              shellIdentifierSupplemSemanticReferenceParent
+        );
 
 
-        ReferenceKey externalSubjectIdKey = new ReferenceKey( UUID.randomUUID(), ReferenceKeyType.ASSETADMINISTRATIONSHELL, "specificExternalSubjectId");
-        ReferenceParent externalSubjectId = new ReferenceParent( UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(externalSubjectIdKey) );
-        org.eclipse.tractusx.semantics.registry.model.Reference externalSubjectIdKeyReference =
-              new org.eclipse.tractusx.semantics.registry.model.Reference(UUID.randomUUID(), ReferenceType.MODELREFERENCE, Set.of(externalSubjectIdKey),externalSubjectId);
+        ShellIdentifier shellIdentifier1 = new ShellIdentifier(
+              UUID.randomUUID(),
+              "key1",
+              "value1",
+              externalSubjectReference,
+              null,
+              identifierSemanticReference ,
+              Set.of(shellIdentifierSupplemSemanticReference));
 
+        ShellIdentifier shellIdentifier2 = new ShellIdentifier(
+              UUID.randomUUID(),
+              "key1",
+              "value2",
+              externalSubjectReference,
+              null,
+              identifierSemanticReference ,
+              Set.of(shellIdentifierSupplemSemanticReference));
 
+        ShellIdentifier shellIdentifier3 = new ShellIdentifier(
+              UUID.randomUUID(),
+              ShellIdentifier.GLOBAL_ASSET_ID_KEY,
+              "exampleGlobalAssetId",
+              null,
+              null,
+              identifierSemanticReference,
+              Set.of(shellIdentifierSupplemSemanticReference));
 
-        ShellIdentifier shellIdentifier1 = new ShellIdentifier(UUID.randomUUID(), "key1", "value1", externalSubjectIdKeyReference, null, identifierReference, Set.of(identifierReference));
-        ShellIdentifier shellIdentifier2 = new ShellIdentifier(UUID.randomUUID(), "key1", "value1", externalSubjectIdKeyReference, null, identifierReference, Set.of(identifierReference));
-        ShellIdentifier shellIdentifier3 = new ShellIdentifier(UUID.randomUUID(), ShellIdentifier.GLOBAL_ASSET_ID_KEY, "exampleGlobalAssetId", null, null, identifierReference, Set.of(identifierReference));
         Set<ShellIdentifier> shellIdentifiers = Set.of(shellIdentifier1, shellIdentifier2, shellIdentifier3);
+
 
         ShellDescription shellDescription1 = new ShellDescription(UUID.randomUUID(), "en", "example description1");
         ShellDescription shellDescription2 = new ShellDescription(UUID.randomUUID(), "de", "exampleDescription2");
@@ -324,6 +391,11 @@ public class ShellMapperTest {
 
         return new Shell(UUID.randomUUID(), "idExternalExample", "idShortExample",
               shellIdentifiers, shellDescriptions, Set.of(submodel), null,null, ShellKind.INSTANCE, "shellType", Set.of(shellDisplayName), Set.of(shellExtension));
+
+//        return new Shell(UUID.randomUUID(), "idExternalExample", "idShortExample",
+//              null, shellDescriptions, Set.of(submodel), null,null, ShellKind.INSTANCE, "shellType", Set.of(shellDisplayName), Set.of(shellExtension));
+
+
     }
 
     private AssetAdministrationShellDescriptor createCompleteAasDescriptor() {

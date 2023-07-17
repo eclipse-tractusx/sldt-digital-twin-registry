@@ -381,41 +381,6 @@ databaseChangeLog:
             tableName: SHELL
             columnName: ID_SHORT
   - changeSet:
-      id: 13072023-01
-      author: slindner
-      changes:
-        - addColumn:
-            tableName: REFERENCE
-            columns:
-              - column:
-                  name: FK_SHELL_IDENTIFIER_SEMANTIC_ID
-                  type: ${uuid_type}
-                  constraints:
-                    nullable: true
-              - column:
-                  name: FK_SHELL_IDENTIFIER_SUPPLEM_SEMANTIC_ID
-                  type: ${uuid_type}
-                  constraints:
-                    nullable: true
-        - addForeignKeyConstraint:
-            baseTableName: REFERENCE
-            baseColumnNames: FK_SHELL_IDENTIFIER_SEMANTIC_ID
-            constraintName: REF_FK_SHELL_IDENTIFIER_SEMANTIC_ID
-            onDelete: CASCADE
-            onUpdate: RESTRICT
-            referencedColumnNames: ID
-            referencedTableName: SHELL_IDENTIFIER
-            validate: true
-        - addForeignKeyConstraint:
-            baseTableName: REFERENCE
-            baseColumnNames: FK_SHELL_IDENTIFIER_SUPPLEM_SEMANTIC_ID
-            constraintName: REF_FK_SHELL_IDENTIFIER_SUPPLEM_SEMANTIC_ID
-            onDelete: CASCADE
-            onUpdate: RESTRICT
-            referencedColumnNames: ID
-            referencedTableName: SHELL_IDENTIFIER
-            validate: true
-  - changeSet:
       id: 14072023-01
       author: slindner
       changes:
@@ -436,23 +401,6 @@ databaseChangeLog:
               - column:
                   name: EXTERNAL_SUBJECT_ID
                   type: nvarchar(30)
-        - addColumn:
-            tableName: REFERENCE
-            columns:
-              - column:
-                  name: FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID
-                  type: ${uuid_type}
-                  constraints:
-                    nullable: true
-        - addForeignKeyConstraint:
-            baseTableName: REFERENCE
-            baseColumnNames: FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID
-            constraintName: REF_FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID
-            onDelete: CASCADE
-            onUpdate: RESTRICT
-            referencedColumnNames: ID
-            referencedTableName: SHELL_IDENTIFIER
-            validate: true
   - changeSet:
       id: 17072023-01
       author: slindner

@@ -29,9 +29,9 @@ import java.util.stream.Collectors;
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.registry.dto.BatchResultDto;
 import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
-import org.eclipse.tractusx.semantics.registry.model.ReferenceKey;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierExternalSubjectReferenceKey;
 import org.eclipse.tractusx.semantics.registry.model.Submodel;
 import org.eclipse.tractusx.semantics.registry.model.projection.ShellMinimal;
 import org.eclipse.tractusx.semantics.registry.model.projection.SubmodelMinimal;
@@ -108,26 +108,22 @@ public class ShellService {
             return shellIdentifiers;
         }
 
-        //caused by type changed from String to Reference
         Set<ShellIdentifier> externalSubjectIdSet = new HashSet<>();
         for(ShellIdentifier ident : shellIdentifiers){
             if(ident.getExternalSubjectId() == null ){
                 externalSubjectIdSet.add( ident );
             } else {
-              Optional<ReferenceKey> optionalReferenceKey =
-                    ident.getExternalSubjectId()
-                    .getKeys().stream()
-                    .filter( referenceKey -> referenceKey.getValue().equals( tenantId ) )
-                    .findFirst();
-
+                Optional<ShellIdentifierExternalSubjectReferenceKey> optionalReferenceKey =
+                ident.getExternalSubjectId()
+                      .getKeys()
+                      .stream()
+                      .filter( shellIdentifierExternalSubjectReferenceKey ->
+                      shellIdentifierExternalSubjectReferenceKey.getValue().equals( tenantId ))
+                      .findFirst();
               if( optionalReferenceKey.isPresent() ) externalSubjectIdSet.add( ident );
             }
         }
-
         return externalSubjectIdSet;
-//        return shellIdentifiers.stream()
-//                .filter(shellIdentifier -> shellIdentifier.getExternalSubjectId() == null ||
-//                        shellIdentifier.getExternalSubjectId().equals(tenantId)).collect(Collectors.toSet());
     }
 
     @Transactional(readOnly = true)

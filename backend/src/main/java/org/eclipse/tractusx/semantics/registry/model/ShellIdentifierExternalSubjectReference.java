@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -26,38 +26,25 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 
-import lombok.Value;
-import lombok.With;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Value
-@With
-public class ShellIdentifier {
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+public class ShellIdentifierExternalSubjectReference {
+   @Id
+   UUID id;
 
-    public static final String GLOBAL_ASSET_ID_KEY = "globalAssetId";
+   ReferenceType type;
 
-    @Id
-    UUID id;
+   @MappedCollection(idColumn = "fk_si_external_subject_reference_id")
+   Set<ShellIdentifierExternalSubjectReferenceKey> keys;
 
-    @Column("namespace")
-    String key;
-
-    @Column("identifier")
-    String value;
-
-    @Column("fk_shell_identifier_external_subject_id")
-    ShellIdentifierExternalSubjectReference externalSubjectId;
-
-
-    @Column( "fk_shell_id")
-    UUID shellId;
-
-    @Column( "fk_shell_identifier_semantic_id")
-    ShellIdentifierSemanticReference semanticId;
-
-    @MappedCollection(idColumn = "fk_shell_identifier_supplem_semantic_id")
-    Set<ShellIdentifierSupplemSemanticReference> supplementalSemanticIds;
-
-    //Reference externalSubjectId
-    // globalAssetID will stay as it is - as ShellIentifier -> no need to rewrite lookup-Methods
+   @Column("fk_si_external_subject_referred_semantic_id" )
+   ShellIdentifierExternalSubjectReferenceParent referredSemanticId;
 
 }

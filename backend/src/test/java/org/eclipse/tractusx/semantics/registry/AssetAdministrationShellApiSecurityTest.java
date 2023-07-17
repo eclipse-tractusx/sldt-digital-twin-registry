@@ -19,10 +19,19 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.eclipse.tractusx.semantics.aas.registry.model.*;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.List;
+import java.util.UUID;
+
+import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
+import org.eclipse.tractusx.semantics.aas.registry.model.Key;
+import org.eclipse.tractusx.semantics.aas.registry.model.KeyTypes;
+import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
+import org.eclipse.tractusx.semantics.aas.registry.model.ReferenceTypes;
+import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
+import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -31,13 +40,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.List;
-import java.util.UUID;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  *  This class contains test to verify Authentication and RBAC based Authorization for all API endpoints.
@@ -634,6 +639,10 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
 
             AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
             shellPayload.setId(UUID.randomUUID().toString());
+            List<SpecificAssetId> shellpayloadSpecificAssetIDs = shellPayload.getSpecificAssetIds();
+            shellpayloadSpecificAssetIDs.forEach( specificAssetId -> specificAssetId.setExternalSubjectId( null ) );
+            shellPayload.setSpecificAssetIds( shellpayloadSpecificAssetIDs );
+
             performShellCreateRequest(mapper.writeValueAsString(shellPayload));
 
 
@@ -817,8 +826,8 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
 
             performShellCreateRequest(mapper.writeValueAsString(shellPayload));
 
-            SpecificAssetId sa1 = TestUtil.createSpecificAssetId(keyPrefix + "findExternal_2","value_2",null);
-            SpecificAssetId sa2 = TestUtil.createSpecificAssetId(keyPrefix + "findExternal_2_1","value_2_1",null);
+            SpecificAssetId sa1 = TestUtil.createSpecificAssetId(keyPrefix + "findExternal_2_1","value_2_1",jwtTokenFactory.tenantTwo().getTenantId());
+            SpecificAssetId sa2 = TestUtil.createSpecificAssetId(keyPrefix + "findExternal_2_2","value_2_2",jwtTokenFactory.tenantThree().getTenantId());
 
             mvc.perform(
                             MockMvcRequestBuilders

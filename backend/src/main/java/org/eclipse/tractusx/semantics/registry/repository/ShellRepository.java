@@ -19,15 +19,18 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.repository;
 
-import org.eclipse.tractusx.semantics.registry.model.projection.ShellMinimal;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
 import org.eclipse.tractusx.semantics.registry.model.Shell;
+import org.eclipse.tractusx.semantics.registry.model.projection.ShellMinimal;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.util.*;
 
 @Repository
 public interface ShellRepository extends PagingAndSortingRepository<Shell, UUID>, CrudRepository<Shell,UUID> {
@@ -53,13 +56,29 @@ public interface ShellRepository extends PagingAndSortingRepository<Shell, UUID>
      * @return external shell ids for the given key value combinations
      */
     @Query(
-            "select s.id_external from shell s where s.id in (" +
-                    "select si.fk_shell_id from shell_identifier si " +
-                    "where concat(si.namespace,si.identifier) in (:keyValueCombinations) " +
-                    "and (si.external_subject_id is null or :tenantId = :owningTenantId or si.external_subject_id = :tenantId) " +
-                    "group by si.fk_shell_id " +
-                    "having count(*) = :keyValueCombinationsSize " +
-            ")"
+//            "select s.id_external from shell s where s.id in (" +
+//                    "select si.fk_shell_id from shell_identifier si " +
+//                    "where concat(si.namespace,si.identifier) in (:keyValueCombinations) " +
+//                    "and (:tenantId = :owningTenantId or :tenantId = "
+//                  + "select ref_key_value from reference_key where fk_reference_id = (select id from reference  where fk_shell_identifier_external_subject_id "
+//                  + " = si.id)) " +
+//                    "group by si.fk_shell_id " +
+//                    "having count(*) = :keyValueCombinationsSize " +
+//            ")"
+
+          "select s.id_external from shell s where s.id in (" +
+          "select si.fk_shell_id from shell_identifier si " +
+          "where concat(si.namespace,si.identifier) in (:keyValueCombinations) " +
+          "and (:tenantId = :owningTenantId or :tenantId in (" +
+                "Select rk.ref_key_value, s.id_external from reference_key rk "+
+          "Join reference r on rk.fk_reference_id = r.id "+
+          "Join shell_identifier si on si.id = r.fk_shell_identifier_external_subject_id "+
+          "Join shell s on s.id = si.fk_shell_id )"
+                + ") "
+                + "group by si.fk_shell_id " +
+          "having count(*) = :keyValueCombinationsSize " +
+           ")"
+
     )
     List<String> findExternalShellIdsByIdentifiersByExactMatch(@Param("keyValueCombinations") List<String> keyValueCombinations,
                                                    @Param("keyValueCombinationsSize") int keyValueCombinationsSize,

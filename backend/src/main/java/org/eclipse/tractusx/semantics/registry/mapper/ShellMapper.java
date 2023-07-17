@@ -25,11 +25,15 @@ import java.util.Set;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
 import org.eclipse.tractusx.semantics.aas.registry.model.GetAssetAdministrationShellDescriptorsResult;
 import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
+import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
 import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellDescription;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierExternalSubjectReference;
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierSemanticReference;
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierSupplemSemanticReference;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.InjectionStrategy;
@@ -60,9 +64,17 @@ public interface ShellMapper {
 
     @Mappings({
           @Mapping(target = "key", source = "name"),
-          @Mapping(target = "supplementalSemanticIds", source = "supplementalSemanticIds")
+          @Mapping(target = "supplementalSemanticIds", source = "supplementalSemanticIds"),
+          @Mapping(target = "semanticId", source = "semanticId"),
+          @Mapping(target = "externalSubjectId", source = "externalSubjectId"),
     })
     ShellIdentifier fromApiDto(SpecificAssetId apiDto);
+
+   ShellIdentifierSupplemSemanticReference maptoShellIdentifierSupplemSemanticReference ( Reference supplementalSemanticId );
+
+   ShellIdentifierSemanticReference maptoShellIdentifierSemanticReference ( Reference semanticId );
+
+   ShellIdentifierExternalSubjectReference maptoShellIdentifierExternalSubjectReference ( Reference externalSubjectId );
 
     Set<ShellIdentifier> fromApiDto(List<SpecificAssetId> apiDto);
 
