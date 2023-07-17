@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,29 +19,51 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.util.Set;
 import java.util.UUID;
 
-import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 
-import lombok.Value;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
-@Value
+@Entity
+@Getter
+@Setter
+@Table
+@NoArgsConstructor
+@AllArgsConstructor
+@With
 public class SubmodelEndpoint {
-    @Id
-    UUID id;
-    String interfaceName;
-    String endpointAddress;  //href
-    String endpointProtocol;
-    String endpointProtocolVersion;
-    String subProtocol;
-    String subProtocolBody;
-    String subProtocolBodyEncoding;
+
+   @GeneratedValue( strategy = GenerationType.IDENTITY )
+   @Id
+   @Column( name = "id" )
+   private UUID id;
+
+   @Column
+   private String interfaceName;
+   @Column
+   private String endpointAddress;
+   @Column
+   private String endpointProtocol;
+   @Column
+   private String endpointProtocolVersion;
+   @Column
+   private String subProtocol;
+   @Column
+   private String subProtocolBody;
+   @Column
+   private String subProtocolBodyEncoding;
+
+   @JsonBackReference
+   @ManyToOne( fetch = FetchType.LAZY, optional = false,cascade = {CascadeType.MERGE}  )
+   @JoinColumn( name = "fk_submodel_id" )
+   private Submodel submodel;
 
     @MappedCollection(idColumn = "fk_submodel_endpoint_id")
     Set<SubmodelSecurityAttribute> submodelSecurityAttribute;
-
-
 
 }

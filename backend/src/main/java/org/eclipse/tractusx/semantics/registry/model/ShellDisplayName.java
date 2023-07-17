@@ -20,16 +20,36 @@
 package org.eclipse.tractusx.semantics.registry.model;
 
 import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import jakarta.persistence.*;
+import lombok.*;
 
-import org.springframework.data.annotation.Id;
-
-import lombok.Value;
-
-@Value
-
+@Entity
+@Getter
+@Setter
+@Table
+@NoArgsConstructor
+@AllArgsConstructor
+@With
+@JsonIdentityInfo(
+      generator = ObjectIdGenerators.PropertyGenerator.class,
+      property = "id")
 public class ShellDisplayName {
+
    @Id
-   UUID id;
-   String language;
-   String text;
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   @Column(name="id")
+   private UUID id;
+
+   @Column
+   private String language;
+   @Column
+   private String text;
+
+   @JsonBackReference
+   @ManyToOne(fetch = FetchType.LAZY)
+   @JoinColumn(name = "fk_shell_id")
+   private Shell shellId;
 }

@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,34 +19,58 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
-import java.util.Set;
-import java.util.UUID;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
+import java.time.Instant;
+import java.util.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 
-import lombok.Value;
-import lombok.With;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import jakarta.persistence.*;
+import lombok.*;
 
-@Value
+@Entity
+@Getter
+@Setter
+@Table
+@NoArgsConstructor
+@AllArgsConstructor
 @With
+@JsonIdentityInfo(
+      generator = ObjectIdGenerators.PropertyGenerator.class,
+      property = "id")
+@EntityListeners( AuditingEntityListener.class)
 public class Submodel {
     @Id
-    UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="id")
+    private UUID id;
 
-    String idExternal;
-    String idShort;
-    String semanticId;
+    @Column
+    private String idExternal;
+    @Column
+    private String idShort;
+    @Column
+    private String semanticId;
 
-    @MappedCollection(idColumn = "fk_submodel_id")
-    Set<SubmodelDescription> descriptions;
+    @JsonManagedReference
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL,orphanRemoval=true, mappedBy = "submodel")
+    private Set<SubmodelDescription> descriptions= new HashSet<>();
 
-    @MappedCollection(idColumn = "fk_submodel_id")
-    Set<SubmodelEndpoint> endpoints;
+    @JsonManagedReference
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true,mappedBy = "submodel")
+    private Set<SubmodelEndpoint> endpoints= new HashSet<>();
 
-    @Column( "fk_shell_id")
-    UUID shellId;
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fk_shell_id")
+    private Shell shellId;
 
     @MappedCollection(idColumn = "fk_submodel_id")
     Set<SubmodelDisplayName> displayNames;
@@ -54,4 +78,17 @@ public class Submodel {
     @MappedCollection(idColumn = "fk_submodel_id")
     Set<SubmodelExtension> submodelExtensions;
 
+    public void setDescriptions(Set<SubmodelDescription> descriptions) {
+        this.descriptions = descriptions;
+        for(SubmodelDescription s : descriptions) {
+            s.setSubmodel(this);
+        }
+    }
+
+    public void setEndpoints(Set<SubmodelEndpoint> endpoints) {
+        this.endpoints = endpoints;
+        for(SubmodelEndpoint s : endpoints) {
+            s.setSubmodel(this);
+        }
+    }
 }

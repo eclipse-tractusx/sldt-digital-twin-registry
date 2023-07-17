@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (c) 2021-2022 T-Systems International GmbH
-    Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+    Copyright (c) 2021-2023 T-Systems International GmbH
+    Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
 
     See the NOTICE file(s) distributed with this work for additional
     information regarding copyright ownership.
@@ -53,7 +53,7 @@
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jdbc</artifactId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
         <!-- Springboot 3 requires Jakarta 6. But Jetty is not compatible with Jakarta 6 yet. But the tests needs jakarta in version 6.0.0.
           Temporary solution until jetty will be compatible with Jakarta (version +12.See https://www.eclipse.org/lists/jetty-users/msg10348.html):

@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -20,12 +20,8 @@
 package org.eclipse.tractusx.semantics.registry.security;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import java.util.Collection;
@@ -51,14 +47,12 @@ import static org.eclipse.tractusx.semantics.registry.security.AuthorizationEval
  *
  */
 @Slf4j
-public class AuthorizationEvaluator implements TenantAware {
+public class AuthorizationEvaluator {
 
     private final String clientId;
-    private final String tenantClaimName;
 
-    public AuthorizationEvaluator(String clientId, String tenantClaimName) {
+    public AuthorizationEvaluator(String clientId) {
         this.clientId = clientId;
-        this.tenantClaimName = tenantClaimName;
     }
 
     public boolean hasRoleViewDigitalTwin() {
@@ -103,26 +97,6 @@ public class AuthorizationEvaluator implements TenantAware {
 
         Collection<String> rolesList = (Collection<String> ) roles;
         return rolesList.contains(role);
-    }
-
-    @Override
-    public String getTenantId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(!(authentication instanceof JwtAuthenticationToken)){
-            throw new InvalidBearerTokenException("Authentication method not supported");
-        }
-
-        JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) (authentication);
-        Map<String, Object> claims = jwtAuthenticationToken.getToken().getClaims();
-
-        Object tenantIdFromClaim = claims.get(tenantClaimName);
-        if(tenantIdFromClaim == null ){
-            throw new InvalidBearerTokenException(String.format("No claim for %s found.", tenantClaimName));
-        }
-        if(!(tenantIdFromClaim instanceof String )){
-            throw new InvalidBearerTokenException(String.format("Invalid type for Claim %s. Expected type is String.", tenantClaimName));
-        }
-        return (String) tenantIdFromClaim;
     }
 
     /**

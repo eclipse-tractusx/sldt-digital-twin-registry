@@ -72,6 +72,15 @@ import org.eclipse.tractusx.semantics.registry.model.SubmodelSecurityAttribute;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelSecurityType;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
+
 public class ShellMapperTest {
 
     private final ShellMapper mapper = new ShellMapperImpl(new SubmodelMapperImpl());
@@ -190,9 +199,11 @@ public class ShellMapperTest {
         assertThat(apiSubmodelDescriptor.getId()).isEqualTo(submodel.getIdExternal());
         assertThat(apiSubmodelDescriptor.getIdShort()).isEqualTo(submodel.getIdShort());
 
+        SubmodelDescription submodelDescription = new SubmodelDescription(UUID.randomUUID(),"en","example submodel description",null);
+
         assertThat(apiSubmodelDescriptor.getDescription())
                 .extracting("language", "text")
-                .contains(createTuplesForSubmodelDescriptionTuples(submodel.getDescriptions()));
+                .contains(createTuplesForSubmodelDescriptionTuples(Set.of(submodelDescription)));
 
         assertThat(apiSubmodelDescriptor.getEndpoints()).hasSize(1);
         Endpoint apiSubmodelEndpoint = apiSubmodelDescriptor.getEndpoints().stream().findFirst().get();
@@ -320,6 +331,14 @@ public class ShellMapperTest {
 
         Set<ShellIdentifier> shellIdentifiers = Set.of(shellIdentifier1, shellIdentifier2, shellIdentifier3);
 
+        ShellDescription shellDescription1 = new ShellDescription(UUID.randomUUID(), "en", "example description1",null);
+        ShellDescription shellDescription2 = new ShellDescription(UUID.randomUUID(), "de", "exampleDescription2",null);
+
+        SubmodelDescription submodelDescription = new SubmodelDescription(UUID.randomUUID(),"en","example submodel description",null);
+        SubmodelEndpoint submodelEndpoint = new SubmodelEndpoint(UUID.randomUUID(), "interfaceExample",
+                                      "endpointAddressExample", "endpointProtocolExample",
+                                      "endpointProtocolVersionExample", "subProtocolExample"
+                                      , "subProtocolBodyExample", "subProtocolEncodingExample",null);
 
         ShellDescription shellDescription1 = new ShellDescription(UUID.randomUUID(), "en", "example description1");
         ShellDescription shellDescription2 = new ShellDescription(UUID.randomUUID(), "de", "exampleDescription2");
@@ -400,6 +419,12 @@ public class ShellMapperTest {
 
     private AssetAdministrationShellDescriptor createCompleteAasDescriptor() {
         AssetAdministrationShellDescriptor aas = new AssetAdministrationShellDescriptor();
+
+        LangStringNameType displayName = new LangStringNameType();
+        displayName.setLanguage("de");
+        displayName.setText("this is an example description1");
+        aas.setDisplayName(List.of(displayName));
+
         aas.setId("identificationExample"  );
         aas.setIdShort("idShortExample");
 

@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,10 +17,15 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  ********************************************************************************/
-package org.eclipse.tractusx.semantics.registry.security;
+package org.eclipse.tractusx.semantics.registry.dto;
 
-public interface TenantAware {
-
-    String getTenantId();
-
+import java.util.List;
+import org.eclipse.tractusx.semantics.registry.model.Submodel;
+import lombok.Builder;
+import lombok.Value;
+@Value
+@Builder
+public class SubmodelCollectionDto {
+    List<Submodel> items;
+    String cursor;
 }

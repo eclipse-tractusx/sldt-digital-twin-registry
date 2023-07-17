@@ -1,6 +1,6 @@
 ###############################################################
-# Copyright (c) 2023 Robert Bosch Manufacturing Solutions GmbH
-# Copyright (c) 2023 Contributors to the Eclipse Foundation
+# Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+# Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -17,9 +17,18 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 ###############################################################
+
 databaseChangeLog:
   - changeSet:
-      id: 03072023-01
+      id: 05072023-01
+      author: agg3fe
+      changes:
+        - modifyDataType:
+            tableName: SUBMODEL_ENDPOINT
+            columnName: SUB_PROTOCOL_BODY
+            newDataType: NVARCHAR(2000)
+  - changeSet:
+      id: 06072023-01
       author: slindner
       changes:
         - addColumn:
@@ -36,7 +45,7 @@ databaseChangeLog:
                   constraints:
                     nullable: true
   - changeSet:
-      id: 03072023-02
+      id: 06072023-02
       author: slindner
       changes:
         - createTable:
@@ -74,7 +83,7 @@ databaseChangeLog:
             referencedTableName: SHELL
             validate: true
   - changeSet:
-      id: 04072023-01
+      id: 06072023-03
       author: slindner
       changes:
         - createTable:
@@ -106,90 +115,6 @@ databaseChangeLog:
             baseTableName: SUBMODEL_DISPLAY_NAME
             baseColumnNames: FK_SUBMODEL_ID
             constraintName: SUBMODEL_DISPLAY_NAME_FK_SHELL
-            onDelete: CASCADE
-            onUpdate: RESTRICT
-            referencedColumnNames: ID
-            referencedTableName: SUBMODEL
-            validate: true
-  - changeSet:
-      id: 04072023-02
-      author: slindner
-      changes:
-        - createTable:
-            tableName: SHELL_EXTENSION
-            columns:
-              - column:
-                  name: ID
-                  type: ${uuid_type}
-                  defaultValueComputed: ${uuid_function}
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: NAME
-                  type: nvarchar(255)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: VALUE_TYPE
-                  type: nvarchar(255)
-                  constraints:
-                    nullable: true
-              - column:
-                  name: SHELL_EXT_VALUE
-                  type: nvarchar(255)
-                  constraints:
-                    nullable: true
-              - column:
-                  name: FK_SHELL_ID
-                  type: ${uuid_type}
-                  constraints:
-                    nullable: false
-        - addForeignKeyConstraint:
-            baseTableName: SHELL_EXTENSION
-            baseColumnNames: FK_SHELL_ID
-            constraintName: SHELL_EXTENSION_FK_SHELL
-            onDelete: CASCADE
-            onUpdate: RESTRICT
-            referencedColumnNames: ID
-            referencedTableName: SHELL
-            validate: true
-        - createTable:
-            tableName: SUBMODEL_EXTENSION
-            columns:
-              - column:
-                  name: ID
-                  type: ${uuid_type}
-                  defaultValueComputed: ${uuid_function}
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: NAME
-                  type: nvarchar(255)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: VALUE_TYPE
-                  type: nvarchar(255)
-                  constraints:
-                    nullable: true
-              - column:
-                  name: SUBMOD_EXT_VALUE
-                  type: nvarchar(255)
-                  constraints:
-                    nullable: true
-              - column:
-                  name: FK_SUBMODEL_ID
-                  type: ${uuid_type}
-                  constraints:
-                    nullable: false
-        - addForeignKeyConstraint:
-            baseTableName: SUBMODEL_EXTENSION
-            baseColumnNames: FK_SUBMODEL_ID
-            constraintName: SUBMODEL_EXTENSION_FK_SHELL
-            onDelete: CASCADE
-            onUpdate: RESTRICT
             referencedColumnNames: ID
             referencedTableName: SUBMODEL
             validate: true

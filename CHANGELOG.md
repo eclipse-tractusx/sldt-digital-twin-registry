@@ -4,6 +4,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.3.9-M1
+### Added
+- In this new version, Cursor pagination is provided for search instead of classical offset pagination in previous version.
+
+## fixed
+- In this version, Spring-jdbc is converted to spring-jpa.
+
+## 0.3.8-M1
+### Added
+- Update functionality to get bpn from HEADER (Edc-Bpn) instead of token and use it to search for specificAssetIds.
+
+## fixed
+- In this version, fix is given for adjusting SemanticID in submodel response. This is only temporary workaround.
+
+## 0.3.7-M1
+### Added
+
+## fixed
+- In this version, fix is given for adjusting openapiyml for length of subprotocolbody field to 2000 from 128 char.
+
+## 0.3.6-M1
+### Added
+- This version includes changes for updating the subprotocolbody length from 50 to 2000 char.
+## fixed
+
 ## 0.3.5-M1
 This version includes changes for updating the application to AAS version 3.0.
 The old AAS version is no longer supported. Only the API version 3.0 is supported.
@@ -40,6 +65,12 @@ This version includes changes for the decentralized digital twin registry.
 - Rename documentation.md to README.md
 - Add .tractusx file
 - CODE_OF_CONDUCT.md
+
+## fixed
+
+## 0.2.0-M13-multi-tenancy
+### Added
+- Provide functionality to return only specificAssetIds for consumer (not owner of twins) which matched the externalSubjectIds
 
 ## fixed
 

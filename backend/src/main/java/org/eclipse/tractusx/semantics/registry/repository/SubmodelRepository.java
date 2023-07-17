@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,20 +19,21 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.repository;
 
-import org.eclipse.tractusx.semantics.registry.model.projection.SubmodelMinimal;
-import org.eclipse.tractusx.semantics.registry.model.Submodel;
-import org.springframework.data.jdbc.repository.query.Query;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
-
 import java.util.Optional;
 import java.util.UUID;
 
+import org.eclipse.tractusx.semantics.registry.model.Shell;
+import org.eclipse.tractusx.semantics.registry.model.Submodel;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
 @Repository
-public interface SubmodelRepository extends CrudRepository<Submodel, UUID> {
+public interface SubmodelRepository extends JpaRepository<Submodel, UUID> , JpaSpecificationExecutor<Submodel> {
 
-    Optional<Submodel> findByShellIdAndIdExternal(UUID shellId, String externalId);
-
-    @Query("select s.id from submodel s where s.fk_shell_id = :shellId and s.id_external = :externalId")
-    Optional<SubmodelMinimal> findMinimalRepresentationByShellIdAndIdExternal(UUID shellId, String externalId);
+   Optional<Submodel> findByShellIdAndIdExternal( Shell shellId, String externalId );
+   @Query( value = "select s from Submodel s where s.shellId.id = :shellId and s.idExternal = :externalId")
+   Optional<Submodel> findMinimalRepresentationByShellIdAndIdExternal(@Param("shellId") UUID shellId,@Param("externalId") String externalId );
 }
