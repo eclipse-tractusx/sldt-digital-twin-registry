@@ -21,6 +21,7 @@ package org.eclipse.tractusx.semantics.registry;
 
 import org.eclipse.tractusx.semantics.aas.registry.model.*;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -179,5 +180,9 @@ public class TestUtil {
             specificAssetId1.setExternalSubjectId(reference);
         }
         return specificAssetId1;
+    }
+
+    public static String getEncodedValue(String shellId){
+       return Base64.getUrlEncoder().encodeToString(shellId.getBytes());
     }
 }
