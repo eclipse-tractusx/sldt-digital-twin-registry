@@ -25,8 +25,6 @@ import java.util.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.data.relational.core.mapping.MappedCollection;
-
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -83,8 +81,19 @@ public class Shell {
     private ShellKind shellKind;
     private String shellType;
 
-    @MappedCollection(idColumn = "fk_shell_id")
-    Set<ShellExtension> shellExtensions;
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellId")
+    //@MappedCollection(idColumn = "fk_shell_id")
+    Set<ShellExtension> shellExtensions= new HashSet<>();
+
+
+    public void setShellExtensions(Set<ShellExtension> shellExtensions) {
+        if(shellExtensions==null) {shellExtensions = new HashSet<>();}
+        this.shellExtensions = shellExtensions;
+        for(ShellExtension s : shellExtensions) {
+            s.setShellId(this);
+        }
+    }
 
     public void setDisplayNames(Set<ShellDisplayName> displayNames) {
         if(displayNames==null) {displayNames = new HashSet<>();}

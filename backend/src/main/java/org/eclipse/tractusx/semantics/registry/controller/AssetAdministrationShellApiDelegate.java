@@ -29,6 +29,7 @@ import org.eclipse.tractusx.semantics.aas.registry.api.LookupApiDelegate;
 import org.eclipse.tractusx.semantics.aas.registry.api.ShellDescriptorsApiDelegate;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetKind;
+import org.eclipse.tractusx.semantics.aas.registry.model.GetAllAssetAdministrationShellIdsByAssetLink200Response;
 import org.eclipse.tractusx.semantics.aas.registry.model.GetAssetAdministrationShellDescriptorsResult;
 import org.eclipse.tractusx.semantics.aas.registry.model.GetSubmodelDescriptorsResult;
 import org.eclipse.tractusx.semantics.aas.registry.model.ServiceDescription;
@@ -127,6 +128,7 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     public ResponseEntity<AssetAdministrationShellDescriptor> postAssetAdministrationShellDescriptor( AssetAdministrationShellDescriptor assetAdministrationShellDescriptor ) {
         Shell shell = shellMapper.fromApiDto(assetAdministrationShellDescriptor);
         shellService.mapShellCollection( shell );
+        shellService.mapSubmodel( shell );
         Shell saved = shellService.save(shell);
         return new ResponseEntity<>(shellMapper.toApiDto(saved), HttpStatus.CREATED);
     }

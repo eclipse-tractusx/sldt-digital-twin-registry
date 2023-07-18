@@ -19,29 +19,52 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.MappedCollection;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.With;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@Entity
 @Getter
 @Setter
+@Table
+@NoArgsConstructor
+@AllArgsConstructor
+@With
+@JsonIdentityInfo(
+      generator = ObjectIdGenerators.PropertyGenerator.class,
+      property = "id")
 public class ReferenceParent {
 
+   @GeneratedValue( strategy = GenerationType.IDENTITY )
    @Id
+   @Column( name = "id" )
    UUID id;
 
+   @Column
    ReferenceType type;
 
-   @MappedCollection(idColumn = "fk_reference_parent_id")
-   Set<ReferenceKey> keys;
+   @JsonManagedReference
+   @OneToMany(cascade = CascadeType.ALL,mappedBy = "referenceParent")
+   //@MappedCollection(idColumn = "fk_reference_parent_id")
+   Set<ReferenceKey> keys= new HashSet<>();
 
 }

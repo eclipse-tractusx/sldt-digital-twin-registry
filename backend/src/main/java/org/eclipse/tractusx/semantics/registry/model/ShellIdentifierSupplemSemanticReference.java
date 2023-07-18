@@ -22,30 +22,47 @@ package org.eclipse.tractusx.semantics.registry.model;
 import java.util.Set;
 import java.util.UUID;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.MappedCollection;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.With;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@Entity
 @Getter
 @Setter
+@Table
+@NoArgsConstructor
+@AllArgsConstructor
+@With
 public class ShellIdentifierSupplemSemanticReference {
 
    @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
    UUID id;
 
    ReferenceType type;
 
-   @MappedCollection(idColumn = "fk_reference_id")
+   @JsonManagedReference
+   @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellIdentifierSupplemSemanticReference")
+   // @MappedCollection(idColumn = "fk_reference_id")
    Set<ShellIdentifierSupplemSemanticReferenceKey> keys;
 
-   @Column("fk_referred_semantic_id" )
+   @JsonManagedReference
+   @OneToOne(cascade = CascadeType.ALL, mappedBy = "shellIdentifierSupplemSemanticReference")
+  /// @Column("fk_referred_semantic_id" )
    ShellIdentifierSupplemSemanticReferenceParent referredSemanticId;
+
+   @JsonBackReference
+   @ManyToOne(fetch = FetchType.LAZY, optional = false)
+   @JoinColumn(name = "fk_shell_identifier_supplem_semantic_id")
+   private ShellIdentifier shellIdentifier;
 
 }

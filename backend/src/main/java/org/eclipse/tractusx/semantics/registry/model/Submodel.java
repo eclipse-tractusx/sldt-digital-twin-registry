@@ -23,8 +23,6 @@ import java.time.Instant;
 import java.util.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.data.relational.core.mapping.MappedCollection;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -72,13 +70,36 @@ public class Submodel {
     @JoinColumn(name = "fk_shell_id")
     private Shell shellId;
 
-    @MappedCollection(idColumn = "fk_submodel_id")
-    Set<SubmodelDisplayName> displayNames;
+    @JsonManagedReference
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true,mappedBy = "submodel")
+    //@MappedCollection(idColumn = "fk_submodel_id")
+    private Set<SubmodelDisplayName> displayNames= new HashSet<>();
 
-    @MappedCollection(idColumn = "fk_submodel_id")
-    Set<SubmodelExtension> submodelExtensions;
+    @JsonManagedReference
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true,mappedBy = "submodel")
+    //@MappedCollection(idColumn = "fk_submodel_id")
+    Set<SubmodelExtension> submodelExtensions= new HashSet<>();
+
+    public void setDisplayNames(Set<SubmodelDisplayName> displayNames) {
+        if(displayNames==null) {displayNames = new HashSet<>();}
+        this.displayNames = displayNames;
+        for(SubmodelDisplayName s : displayNames) {
+            s.setSubmodel(this);
+        }
+    }
+
+    public void setSubmodelExtensions(Set<SubmodelExtension> submodelExtensions) {
+        if(submodelExtensions==null) {submodelExtensions = new HashSet<>();}
+        this.submodelExtensions = submodelExtensions;
+        for(SubmodelExtension s : submodelExtensions) {
+            s.setSubmodel(this);
+        }
+    }
 
     public void setDescriptions(Set<SubmodelDescription> descriptions) {
+        if(descriptions==null) {descriptions = new HashSet<>();}
         this.descriptions = descriptions;
         for(SubmodelDescription s : descriptions) {
             s.setSubmodel(this);
@@ -86,6 +107,7 @@ public class Submodel {
     }
 
     public void setEndpoints(Set<SubmodelEndpoint> endpoints) {
+        if(endpoints==null) {endpoints = new HashSet<>();}
         this.endpoints = endpoints;
         for(SubmodelEndpoint s : endpoints) {
             s.setSubmodel(this);

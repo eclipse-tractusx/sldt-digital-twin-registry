@@ -22,29 +22,58 @@ package org.eclipse.tractusx.semantics.registry.model;
 import java.util.Set;
 import java.util.UUID;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.MappedCollection;
+import org.hibernate.annotations.CollectionId;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.With;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@Entity
 @Getter
 @Setter
+@Table
+@NoArgsConstructor
+@AllArgsConstructor
+@With
 public class ShellIdentifierExternalSubjectReference {
+
    @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
    UUID id;
 
+   @Column
    ReferenceType type;
 
-   @MappedCollection(idColumn = "fk_si_external_subject_reference_id")
+   @JsonManagedReference
+   @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellIdentifierExternalSubjectReference")
+ //  @MappedCollection(idColumn = "fk_si_external_subject_reference_id")
    Set<ShellIdentifierExternalSubjectReferenceKey> keys;
 
-   @Column("fk_si_external_subject_referred_semantic_id" )
+   @JsonManagedReference
+   @OneToOne(cascade = CascadeType.ALL, mappedBy = "shellIdentifierExternalSubjectReference")
+  // @Column("fk_si_external_subject_referred_semantic_id" )
    ShellIdentifierExternalSubjectReferenceParent referredSemanticId;
 
+   @JsonBackReference
+   @OneToOne(fetch = FetchType.LAZY, optional = false)
+   @JoinColumn(name = "fk_shell_identifier_external_subject_id")
+   private ShellIdentifier shellIdentifier;
+   
 }

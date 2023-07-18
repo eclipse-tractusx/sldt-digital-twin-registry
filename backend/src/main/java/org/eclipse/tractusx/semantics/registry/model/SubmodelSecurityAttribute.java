@@ -21,24 +21,49 @@ package org.eclipse.tractusx.semantics.registry.model;
 
 import java.util.UUID;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.Value;
 import lombok.With;
 
-@Value
+@Entity
+@Getter
+@Setter
+@Table
+@NoArgsConstructor
+@AllArgsConstructor
 @With
 public class SubmodelSecurityAttribute {
 
+   @GeneratedValue( strategy = GenerationType.IDENTITY )
    @Id
+   @Column( name = "id" )
    UUID id;
 
    private SubmodelSecurityType type;
 
-   @Column("attribute_key")
+   @Column(name = "attribute_key")
    private String key;
 
-   @Column("attribute_value")
+   @Column(name = "attribute_value")
    private String value;
+
+   @JsonBackReference
+   @ManyToOne( fetch = FetchType.LAZY, optional = false,cascade = { CascadeType.MERGE}  )
+   @JoinColumn( name = "fk_submodel_endpoint_id" )
+   private SubmodelEndpoint submodelEndpoint;
 }

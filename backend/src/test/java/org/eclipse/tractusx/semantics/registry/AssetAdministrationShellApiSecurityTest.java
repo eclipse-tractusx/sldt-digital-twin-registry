@@ -46,6 +46,10 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  *  This class contains test to verify Authentication and RBAC based Authorization for all API endpoints.
  *  Every API endpoint is tested explicitly.

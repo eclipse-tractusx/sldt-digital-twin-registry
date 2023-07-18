@@ -45,6 +45,7 @@ public class ShellDisplayName {
 
    @Column
    private String language;
+
    @Column
    private String text;
 

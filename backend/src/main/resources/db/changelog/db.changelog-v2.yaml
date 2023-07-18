@@ -119,6 +119,88 @@ databaseChangeLog:
             referencedTableName: SUBMODEL
             validate: true
   - changeSet:
+      id: 05072023-03
+      author: slindner
+      changes:
+        - createTable:
+            tableName: SHELL_EXTENSION
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: NAME
+                  type: nvarchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: VALUE_TYPE
+                  type: nvarchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: SHELL_EXT_VALUE
+                  type: nvarchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: FK_SHELL_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_EXTENSION
+            baseColumnNames: FK_SHELL_ID
+            constraintName: SHELL_EXTENSION_FK_SHELL
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL
+            validate: true
+        - createTable:
+            tableName: SUBMODEL_EXTENSION
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: NAME
+                  type: nvarchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: VALUE_TYPE
+                  type: nvarchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: SUBMOD_EXT_VALUE
+                  type: nvarchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: FK_SUBMODEL_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_EXTENSION
+            baseColumnNames: FK_SUBMODEL_ID
+            constraintName: SUBMODEL_EXTENSION_FK_SHELL
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL
+            validate: true
+  - changeSet:
       id: 04072023-03
       author: slindner
       changes:
@@ -138,21 +220,6 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: FK_SHELL_EXT_SEMANTIC_ID
-                  type: ${uuid_type}
-                  constraints:
-                    nullable: true
-              - column:
-                  name: FK_SHELL_EXT_SUPPLEMENTAL_ID
-                  type: ${uuid_type}
-                  constraints:
-                    nullable: true
-              - column:
-                  name: FK_SHELL_EXT_REFERS_ID
-                  type: ${uuid_type}
-                  constraints:
-                    nullable: true
-              - column:
                   name: FK_SUBMOD_EXT_SEMANTIC_ID
                   type: ${uuid_type}
                   constraints:
@@ -167,33 +234,6 @@ databaseChangeLog:
                   type: ${uuid_type}
                   constraints:
                     nullable: true
-        - addForeignKeyConstraint:
-            baseTableName: REFERENCE
-            baseColumnNames: FK_SHELL_EXT_SEMANTIC_ID
-            constraintName: REF_FK_SHELL_EXT_SEMANTIC
-            onDelete: CASCADE
-            onUpdate: RESTRICT
-            referencedColumnNames: ID
-            referencedTableName: SHELL_EXTENSION
-            validate: true
-        - addForeignKeyConstraint:
-            baseTableName: REFERENCE
-            baseColumnNames: FK_SHELL_EXT_SUPPLEMENTAL_ID
-            constraintName: REF_FK_SHELL_EXT_SUPPLEMENTAL
-            onDelete: CASCADE
-            onUpdate: RESTRICT
-            referencedColumnNames: ID
-            referencedTableName: SHELL_EXTENSION
-            validate: true
-        - addForeignKeyConstraint:
-            baseTableName: REFERENCE
-            baseColumnNames: FK_SHELL_EXT_REFERS_ID
-            constraintName: REF_FK_SHELL_EXT_REFERS
-            onDelete: CASCADE
-            onUpdate: RESTRICT
-            referencedColumnNames: ID
-            referencedTableName: SHELL_EXTENSION
-            validate: true
         - addForeignKeyConstraint:
             baseTableName: REFERENCE
             baseColumnNames: FK_SUBMOD_EXT_SEMANTIC_ID

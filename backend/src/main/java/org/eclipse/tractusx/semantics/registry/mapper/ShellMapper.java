@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
+import org.eclipse.tractusx.semantics.aas.registry.model.Extension;
 import org.eclipse.tractusx.semantics.aas.registry.model.GetAssetAdministrationShellDescriptorsResult;
 import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
 import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
@@ -31,6 +32,10 @@ import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellDescription;
 import org.eclipse.tractusx.semantics.registry.model.ShellDisplayName;
+import org.eclipse.tractusx.semantics.registry.model.ShellExtension;
+import org.eclipse.tractusx.semantics.registry.model.ShellExtensionRefersToReference;
+import org.eclipse.tractusx.semantics.registry.model.ShellExtensionSemanticIdReference;
+import org.eclipse.tractusx.semantics.registry.model.ShellExtensionSupplemSemanticIdReference;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierExternalSubjectReference;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierSemanticReference;
@@ -57,6 +62,7 @@ public interface ShellMapper {
           @Mapping(target = "id", ignore = true),
           @Mapping(target = "displayNames", source = "displayName"),
           @Mapping(target = "shellExtensions", source = "extensions"),
+
     })
     Shell fromApiDto(AssetAdministrationShellDescriptor apiDto);
 
@@ -77,6 +83,20 @@ public interface ShellMapper {
    ShellIdentifierSemanticReference maptoShellIdentifierSemanticReference ( Reference semanticId );
 
    ShellIdentifierExternalSubjectReference maptoShellIdentifierExternalSubjectReference ( Reference externalSubjectId );
+
+   @Mappings({
+         @Mapping(target = "supplementalSemanticIds", source = "supplementalSemanticIds"),
+         @Mapping(target = "semanticId", source = "semanticId"),
+         @Mapping(target = "refersTo", source = "refersTo"),
+   })
+   ShellExtension fromApiDto( Extension apiDto);
+
+   ShellExtensionSupplemSemanticIdReference maptoShellExtensionSupplemSemanticReference ( Reference supplementalSemanticId );
+
+   ShellExtensionSemanticIdReference maptoShellExtensionSemanticReference ( Reference semanticId );
+
+   ShellExtensionRefersToReference maptoShellExtensionRefersToReference ( Reference refersTo );
+
 
     Set<ShellIdentifier> fromApiDto(List<SpecificAssetId> apiDto);
 

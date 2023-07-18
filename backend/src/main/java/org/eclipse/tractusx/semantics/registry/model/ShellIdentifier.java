@@ -22,11 +22,10 @@ package org.eclipse.tractusx.semantics.registry.model;
 import java.util.Set;
 import java.util.UUID;
 
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.MappedCollection;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
@@ -53,21 +52,29 @@ public class ShellIdentifier {
     private String key;
     @Column(name = "identifier")
     private String value;
-    @Column(name = "external_subject_id")
-    private String externalSubjectId;
+
+//    @Column(name = "external_subject_id")
+//    private String externalSubjectId;
+
+
+    @JsonManagedReference
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "shellIdentifier")
+    //@Column(name = "fk_shell_identifier_external_subject_id")
+    private ShellIdentifierExternalSubjectReference externalSubjectId;
 
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "fk_shell_id")
     private Shell shellId;
 
-    @Column("fk_shell_identifier_external_subject_id")
-    ShellIdentifierExternalSubjectReference externalSubjectId;
-
-    @Column( "fk_shell_identifier_semantic_id")
+    @JsonManagedReference
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "shellIdentifier")
+    //@Column( "fk_shell_identifier_semantic_id")
     ShellIdentifierSemanticReference semanticId;
 
-    @MappedCollection(idColumn = "fk_shell_identifier_supplem_semantic_id")
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellIdentifier")
+    //@MappedCollection(idColumn = "fk_shell_identifier_supplem_semantic_id")
     Set<ShellIdentifierSupplemSemanticReference> supplementalSemanticIds;
 
 }

@@ -25,9 +25,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -48,7 +46,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.With;
 
-
 @Entity
 @Getter
 @Setter
@@ -56,42 +53,27 @@ import lombok.With;
 @NoArgsConstructor
 @AllArgsConstructor
 @With
-@JsonIdentityInfo(
-      generator = ObjectIdGenerators.PropertyGenerator.class,
-      property = "id")
-public class ShellExtension {
+public class ShellExtensionSupplemSemanticIdReference {
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    UUID id;
 
-   String name;
-
-   @Column(name = "shell_ext_value")
-   String value;
-
-   DataTypeXsd valueType;
+   ReferenceType type;
 
    @JsonBackReference
    @ManyToOne(fetch = FetchType.LAZY)
-   @JoinColumn(name = "fk_shell_id")
-   private Shell shellId;
+   @JoinColumn(name = "fk_shell_ext_supplemental_id")
+   private ShellExtension shellExtension;
 
 
    @JsonManagedReference
-   @OneToOne(cascade = CascadeType.ALL, mappedBy = "shellExtension")
-   //@Column(name = "fk_shell_ext_semantic_id")
-   ShellExtensionSemanticIdReference semanticId;
+   @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellExtensionSupplemSemanticIdReference")
+   //@MappedCollection(idColumn = "fk_shell_extension_supplem_semantic_reference_id")
+   Set<ShellExtensionSupplemSemanticIdReferenceKey> keys;
 
-
-   @JsonManagedReference
-   @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellExtension")
-   //@MappedCollection(idColumn = "fk_shell_ext_supplemental_id")
-   Set<ShellExtensionSupplemSemanticIdReference> supplementalSemanticIds;
-
-   @JsonManagedReference
-   @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellExtension")
-   //@MappedCollection(idColumn = "fk_shell_ext_refers_id")
-   Set<ShellExtensionRefersToReference> refersTo;
+   @OneToOne(cascade = CascadeType.ALL, mappedBy = "shellExtensionSupplemSemanticIdReference")
+   //@Column(name="fk_shell_extension_supplem_semantic_referred_id" )
+   ShellExtensionSupplemSemanticIdReferenceParent referredSemanticId;
 
 }

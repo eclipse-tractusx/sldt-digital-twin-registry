@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.tractusx.semantics.aas.registry.model.Endpoint;
+import org.eclipse.tractusx.semantics.aas.registry.model.Extension;
 import org.eclipse.tractusx.semantics.aas.registry.model.GetSubmodelDescriptorsResult;
 import org.eclipse.tractusx.semantics.aas.registry.model.Key;
 import org.eclipse.tractusx.semantics.aas.registry.model.KeyTypes;
@@ -39,6 +40,7 @@ import org.eclipse.tractusx.semantics.registry.dto.SubmodelCollectionDto;
 import org.eclipse.tractusx.semantics.registry.model.Submodel;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelDescription;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelEndpoint;
+import org.eclipse.tractusx.semantics.registry.model.SubmodelExtension;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.InjectionStrategy;
@@ -71,7 +73,7 @@ public interface SubmodelMapper {
          @Mapping(target="value", source = "value"),
          @Mapping(target="refersTo", source = "refersTo")
    })
-   SubmodelExtension mapSubmodelExtension (Extension submodelExtensions);
+   SubmodelExtension mapSubmodelExtension ( Extension submodelExtensions);
 
 
 

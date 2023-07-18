@@ -63,7 +63,7 @@ public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecific
 //                    "having count(*) = :keyValueCombinationsSize " +
 //            ")"
 
-          "select s.id_external from shell s where s.id in (" +
+          value = "select s.id_external from shell s where s.id in (" +
           "select si.fk_shell_id from shell_identifier si " +
           "where concat(si.namespace,si.identifier) in (:keyValueCombinations) " +
           "and (:tenantId = :owningTenantId or :tenantId in (" +
@@ -74,7 +74,7 @@ public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecific
                 + ") "
                 + "group by si.fk_shell_id " +
           "having count(*) = :keyValueCombinationsSize " +
-           ")"
+           ")",nativeQuery = true
 
     )
     List<String> findExternalShellIdsByIdentifiersByExactMatch(@Param("keyValueCombinations") List<String> keyValueCombinations,

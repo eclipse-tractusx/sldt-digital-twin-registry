@@ -346,3 +346,657 @@ databaseChangeLog:
             referencedColumnNames: ID
             referencedTableName: SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE
             validate: true
+
+        - createTable:
+            tableName: SHELL_EXTENSION_SEMANTIC_ID_REFERENCE
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SHELL_EXT_SEMANTIC_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_EXTENSION_SEMANTIC_ID_REFERENCE
+            baseColumnNames: FK_SHELL_EXT_SEMANTIC_ID
+            constraintName: REF_FK_SHELL_EXT_SEMANTIC_REF
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_EXTENSION
+            validate: true
+
+        - createTable:
+            tableName: SHELL_EXTENSION_SEMANTIC_ID_REFERENCE_PARENT
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SHELL_EXTENSION_SEMANTIC_REFERRED_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_EXTENSION_SEMANTIC_ID_REFERENCE_PARENT
+            baseColumnNames: FK_SHELL_EXTENSION_SEMANTIC_REFERRED_ID
+            constraintName: REF_FKSHELL_EXTENSION_SEMANTIC_REFERENCE_PARENT
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_EXTENSION_SEMANTIC_ID_REFERENCE
+            validate: true
+
+        - createTable:
+            tableName: SHELL_EXTENSION_SEMANTIC_ID_REFERENCE_KEY
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: REF_KEY_VALUE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SHELL_EXTENSION_SEMANTIC_REFERENCE_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+              - column:
+                  name: FK_REFERENCE_PARENT_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_EXTENSION_SEMANTIC_ID_REFERENCE_KEY
+            baseColumnNames: FK_REFERENCE_PARENT_ID
+            constraintName: REF_FK_SHELL_EXTENSION_SEMANTIC_PARENT_KEY
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_EXTENSION_SEMANTIC_ID_REFERENCE_PARENT
+            validate: true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_EXTENSION_SEMANTIC_ID_REFERENCE_KEY
+            baseColumnNames: FK_SHELL_EXTENSION_SEMANTIC_REFERENCE_ID
+            constraintName: REF_FK_SHELL_EXTENSION_SEMANTIC_ID_REFERENCE_KEY
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_EXTENSION_SEMANTIC_ID_REFERENCE
+            validate: true
+
+        - createTable:
+            tableName: SHELL_EXTENSION_SUPPLEM_SEMANTIC_ID_REFERENCE
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SHELL_EXT_SUPPLEMENTAL_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_EXTENSION_SUPPLEM_SEMANTIC_ID_REFERENCE
+            baseColumnNames: FK_SHELL_EXT_SUPPLEMENTAL_ID
+            constraintName: REF_FK_SHELL_EXT_SUPPLEMENTAL_ID_REF
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_EXTENSION
+            validate: true
+
+        - createTable:
+            tableName: SHELL_EXTENSION_SUPPLEM_SEMANTIC_ID_REFERENCE_PARENT
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SHELL_EXTENSION_SUPPLEM_SEMANTIC_REFERRED_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_EXTENSION_SUPPLEM_SEMANTIC_ID_REFERENCE_PARENT
+            baseColumnNames: FK_SHELL_EXTENSION_SUPPLEM_SEMANTIC_REFERRED_ID
+            constraintName: REF_FK_SHELL_EXTENSION_SUPPLEM_SEMANTIC_REFERENCE_PARENT
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_EXTENSION_SUPPLEM_SEMANTIC_ID_REFERENCE
+            validate: true
+
+        - createTable:
+            tableName: SHELL_EXTENSION_SUPPLEM_SEMANTIC_ID_REFERENCE_KEY
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: REF_KEY_VALUE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SHELL_EXTENSION_SUPPLEM_SEMANTIC_REFERENCE_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+              - column:
+                  name: FK_REFERENCE_PARENT_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_EXTENSION_SUPPLEM_SEMANTIC_ID_REFERENCE_KEY
+            baseColumnNames: FK_REFERENCE_PARENT_ID
+            constraintName: REF_FK_SHELL_EXTENSION_SUPPLEM_SEMANTIC_ID_PARENT_KEY
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_EXTENSION_SUPPLEM_SEMANTIC_ID_REFERENCE_PARENT
+            validate: true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_EXTENSION_SUPPLEM_SEMANTIC_ID_REFERENCE_KEY
+            baseColumnNames: FK_SHELL_EXTENSION_SUPPLEM_SEMANTIC_REFERENCE_ID
+            constraintName: REF_FK_SHELL_EXTENSION_SUPPLEM_SEMANTIC_REFERENCE_KEY
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_EXTENSION_SUPPLEM_SEMANTIC_ID_REFERENCE
+            validate: true
+
+        - createTable:
+            tableName: SHELL_EXTENSION_REFERS_TO_REFERENCE
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SHELL_EXT_REFERS_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_EXTENSION_REFERS_TO_REFERENCE
+            baseColumnNames: FK_SHELL_EXT_REFERS_ID
+            constraintName: REF_FK_SHELL_EXT_REFERS_ID_REF
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_EXTENSION
+            validate: true
+
+        - createTable:
+            tableName: SHELL_EXTENSION_REFERS_TO_REFERENCE_PARENT
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SHELL_EXTENSION_REFERS_REFERRED_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_EXTENSION_REFERS_TO_REFERENCE_PARENT
+            baseColumnNames: FK_SHELL_EXTENSION_REFERS_REFERRED_ID
+            constraintName: REF_FK_SHELL_EXTENSION_REFERS_REFERENCE_PARENT
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_EXTENSION_REFERS_TO_REFERENCE
+            validate: true
+
+        - createTable:
+            tableName: SHELL_EXTENSION_REFERS_TO_REFERENCE_KEY
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: REF_KEY_VALUE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SHELL_EXTENSION_REFERS_REFERENCE_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+              - column:
+                  name: FK_REFERENCE_PARENT_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_EXTENSION_REFERS_TO_REFERENCE_KEY
+            baseColumnNames: FK_REFERENCE_PARENT_ID
+            constraintName: REF_FK_SHELL_EXTENSION_REFERS_PARENT_KEY
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_EXTENSION_REFERS_TO_REFERENCE_PARENT
+            validate: true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_EXTENSION_REFERS_TO_REFERENCE_KEY
+            baseColumnNames: FK_SHELL_EXTENSION_REFERS_REFERENCE_ID
+            constraintName: REF_FK_SHELL_EXTENSION_REFERS_REFERENCE_KEY
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_EXTENSION_REFERS_TO_REFERENCE
+            validate: true
+
+        - createTable:
+            tableName: SUBMODEL_EXTENSION_SEMANTIC_ID_REFERENCE
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SUBMOD_EXT_SEMANTIC_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_EXTENSION_SEMANTIC_ID_REFERENCE
+            baseColumnNames: FK_SUBMOD_EXT_SEMANTIC_ID
+            constraintName: REF_FK_SUBMODEL_EXT_SEMANTIC_REF
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL_EXTENSION
+            validate: true
+
+        - createTable:
+            tableName: SUBMODEL_EXTENSION_SEMANTIC_ID_REFERENCE_PARENT
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SUBMODEL_EXTENSION_SEMANTIC_REFERRED_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_EXTENSION_SEMANTIC_ID_REFERENCE_PARENT
+            baseColumnNames: FK_SUBMODEL_EXTENSION_SEMANTIC_REFERRED_ID
+            constraintName: REF_FK_SUBMODEL_EXTENSION_SEMANTIC_REFERENCE_PARENT
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL_EXTENSION_SEMANTIC_ID_REFERENCE
+            validate: true
+
+        - createTable:
+            tableName: SUBMODEL_EXTENSION_SEMANTIC_ID_REFERENCE_KEY
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: REF_KEY_VALUE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SUBMODEL_EXTENSION_SEMANTIC_REFERENCE_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+              - column:
+                  name: FK_REFERENCE_PARENT_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_EXTENSION_SEMANTIC_ID_REFERENCE_KEY
+            baseColumnNames: FK_REFERENCE_PARENT_ID
+            constraintName: REF_FK_SUBMODEL_EXTENSION_SEMANTIC_PARENT_KEY
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL_EXTENSION_SEMANTIC_ID_REFERENCE_PARENT
+            validate: true
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_EXTENSION_SEMANTIC_ID_REFERENCE_KEY
+            baseColumnNames: FK_SUBMODEL_EXTENSION_SEMANTIC_REFERENCE_ID
+            constraintName: REF_FK_SUBMODEL_EXTENSION_SEMANTIC_ID_REFERENCE_KEY
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL_EXTENSION_SEMANTIC_ID_REFERENCE
+            validate: true
+
+        - createTable:
+            tableName: SUBMODEL_EXTENSION_SUPPLEM_SEMANTIC_ID_REFERENCE
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SUBMOD_EXT_SUPPLEMENTAL_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_EXTENSION_SUPPLEM_SEMANTIC_ID_REFERENCE
+            baseColumnNames: FK_SUBMOD_EXT_SUPPLEMENTAL_ID
+            constraintName: REF_FK_SUBMODEL_EXT_SUPPLEMENTAL_ID_REF
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL_EXTENSION
+            validate: true
+
+        - createTable:
+            tableName: SUBMODEL_EXTENSION_SUPPLEM_SEMANTIC_ID_REFERENCE_PARENT
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SUBMODEL_EXTENSION_SUPPLEM_SEMANTIC_REFERRED_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_EXTENSION_SUPPLEM_SEMANTIC_ID_REFERENCE_PARENT
+            baseColumnNames: FK_SUBMODEL_EXTENSION_SUPPLEM_SEMANTIC_REFERRED_ID
+            constraintName: REF_FK_SUBMODEL_EXTENSION_SUPPLEM_SEMANTIC_REFERENCE_PARENT
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL_EXTENSION_SUPPLEM_SEMANTIC_ID_REFERENCE
+            validate: true
+
+        - createTable:
+            tableName: SUBMODEL_EXTENSION_SUPPLEM_SEMANTIC_ID_REFERENCE_KEY
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: REF_KEY_VALUE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SUBMODEL_EXTENSION_SUPPLEM_SEMANTIC_REFERENCE_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+              - column:
+                  name: FK_REFERENCE_PARENT_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_EXTENSION_SUPPLEM_SEMANTIC_ID_REFERENCE_KEY
+            baseColumnNames: FK_REFERENCE_PARENT_ID
+            constraintName: REF_FK_SUBMODEL_EXTENSION_SUPPLEM_SEMANTIC_ID_PARENT_KEY
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL_EXTENSION_SUPPLEM_SEMANTIC_ID_REFERENCE_PARENT
+            validate: true
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_EXTENSION_SUPPLEM_SEMANTIC_ID_REFERENCE_KEY
+            baseColumnNames: FK_SUBMODEL_EXTENSION_SUPPLEM_SEMANTIC_REFERENCE_ID
+            constraintName: REF_FK_SUBMODEL_EXTENSION_SUPPLEM_SEMANTIC_REFERENCE_KEY
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL_EXTENSION_SUPPLEM_SEMANTIC_ID_REFERENCE
+            validate: true
+
+        - createTable:
+            tableName: SUBMODEL_EXTENSION_REFERS_TO_REFERENCE
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SUBMOD_EXT_REFERS_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_EXTENSION_REFERS_TO_REFERENCE
+            baseColumnNames: FK_SUBMOD_EXT_REFERS_ID
+            constraintName: REF_FK_SUBMODEL_EXT_REFERS_ID_REF
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL_EXTENSION
+            validate: true
+
+        - createTable:
+            tableName: SUBMODEL_EXTENSION_REFERS_TO_REFERENCE_PARENT
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SUBMODEL_EXTENSION_REFERS_REFERRED_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_EXTENSION_REFERS_TO_REFERENCE_PARENT
+            baseColumnNames: FK_SUBMODEL_EXTENSION_REFERS_REFERRED_ID
+            constraintName: REF_FK_SUBMODEL_EXTENSION_REFERS_REFERENCE_PARENT
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL_EXTENSION_REFERS_TO_REFERENCE
+            validate: true
+
+        - createTable:
+            tableName: SUBMODEL_EXTENSION_REFERS_TO_REFERENCE_KEY
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: REF_KEY_VALUE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SUBMODEL_EXTENSION_REFERS_REFERENCE_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+              - column:
+                  name: FK_REFERENCE_PARENT_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_EXTENSION_REFERS_TO_REFERENCE_KEY
+            baseColumnNames: FK_REFERENCE_PARENT_ID
+            constraintName: REF_FK_SUBMODEL_EXTENSION_REFERS_PARENT_KEY
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL_EXTENSION_REFERS_TO_REFERENCE_PARENT
+            validate: true
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_EXTENSION_REFERS_TO_REFERENCE_KEY
+            baseColumnNames: FK_SUBMODEL_EXTENSION_REFERS_REFERENCE_ID
+            constraintName: REF_FK_SUBMODEL_EXTENSION_REFERS_REFERENCE_KEY
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL_EXTENSION_REFERS_TO_REFERENCE
+            validate: true

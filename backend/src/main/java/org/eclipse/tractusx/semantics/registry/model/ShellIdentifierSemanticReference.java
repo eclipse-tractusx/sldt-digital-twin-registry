@@ -22,30 +22,58 @@ package org.eclipse.tractusx.semantics.registry.model;
 import java.util.Set;
 import java.util.UUID;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.MappedCollection;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.With;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@Entity
 @Getter
 @Setter
+@Table
+@NoArgsConstructor
+@AllArgsConstructor
+@With
 public class ShellIdentifierSemanticReference {
 
    @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   @Column(name="id")
    UUID id;
 
    ReferenceType type;
 
-   @MappedCollection(idColumn = "fk_sis_reference_id")
+   @JsonManagedReference
+   @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellIdentifierSemanticReference")
+   //@MappedCollection(idColumn = "fk_sis_reference_id")
    Set<ShellIdentifierSemanticReferenceKey> keys;
 
-   @Column("fk_sis_referred_semantic_id" )
+   @JsonManagedReference
+   @OneToOne(cascade = CascadeType.ALL, mappedBy = "shellIdentifierSemanticReference")
+   // @Column("fk_sis_referred_semantic_id" )
    ShellIdentifierSemanticReferenceParent referredSemanticId;
+
+   @JsonBackReference
+   @OneToOne(fetch = FetchType.LAZY, optional = false)
+   @JoinColumn(name = "fk_shell_identifier_semantic_id")
+   private ShellIdentifier shellIdentifier;
 
 }

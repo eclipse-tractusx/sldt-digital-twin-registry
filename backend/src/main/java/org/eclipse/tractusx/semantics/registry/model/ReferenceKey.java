@@ -21,26 +21,55 @@ package org.eclipse.tractusx.semantics.registry.model;
 
 import java.util.UUID;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.With;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@Entity
 @Getter
 @Setter
+@Table
+@NoArgsConstructor
+@AllArgsConstructor
+@With
+@JsonIdentityInfo(
+      generator = ObjectIdGenerators.PropertyGenerator.class,
+      property = "id")
 public class ReferenceKey {
 
+   @GeneratedValue( strategy = GenerationType.IDENTITY )
    @Id
+   @Column( name = "id" )
    UUID id;
+
+   @JsonBackReference
+   @ManyToOne(fetch = FetchType.LAZY)
+   @JoinColumn(name = "fk_reference_parent_id")
+   private ReferenceParent referenceParent;
+
+   @Column
    ReferenceKeyType type;
 
-   @Column("ref_key_value")
+   @Column(name = "ref_key_value")
    String value;
+
+
+
 }
 
 
