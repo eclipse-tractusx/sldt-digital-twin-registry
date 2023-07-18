@@ -33,6 +33,7 @@ import java.util.List;
 
 import java.util.UUID;
 
+import static org.eclipse.tractusx.semantics.registry.TestUtil.getEncodedValue;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -85,7 +86,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( SINGLE_SHELL_BASE_PATH, shellId )
+                           .get( SINGLE_SHELL_BASE_PATH, getEncodedValue( shellId ) )
                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
@@ -138,7 +139,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
          mvc.perform(
                      MockMvcRequestBuilders
-                           .put( SINGLE_SHELL_BASE_PATH, shellId )
+                           .put( SINGLE_SHELL_BASE_PATH, getEncodedValue(shellId) )
                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .contentType( MediaType.APPLICATION_JSON )
@@ -150,7 +151,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( SINGLE_SHELL_BASE_PATH, shellId )
+                           .get( SINGLE_SHELL_BASE_PATH, getEncodedValue( shellId ) )
                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
@@ -167,7 +168,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
          mvc.perform(
                      MockMvcRequestBuilders
-                           .put( SINGLE_SHELL_BASE_PATH, "shellIdthatdoesnotexists" )
+                           .put( SINGLE_SHELL_BASE_PATH, getEncodedValue("shellIdthatdoesnotexists") )
                            .accept( MediaType.APPLICATION_JSON )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( mapper.writeValueAsString( shellPayload ) )
@@ -192,7 +193,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
          mvc.perform(
                      MockMvcRequestBuilders
-                           .put( SINGLE_SHELL_BASE_PATH, shellId )
+                           .put( SINGLE_SHELL_BASE_PATH, getEncodedValue(shellId) )
                            .accept( MediaType.APPLICATION_JSON )
                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .contentType( MediaType.APPLICATION_JSON )
@@ -206,7 +207,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          shellPayload.setId( UUID.randomUUID().toString() );
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( SINGLE_SHELL_BASE_PATH, shellId )
+                           .get( SINGLE_SHELL_BASE_PATH, getEncodedValue( shellId ) )
                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
@@ -226,7 +227,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          String shellId = shellPayload.getId();
          mvc.perform(
                      MockMvcRequestBuilders
-                           .delete( SINGLE_SHELL_BASE_PATH, shellId )
+                           .delete( SINGLE_SHELL_BASE_PATH, getEncodedValue(shellId) )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -244,7 +245,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          String shellId = shellPayload.getId();
          mvc.perform(
                      MockMvcRequestBuilders
-                           .delete( SINGLE_SHELL_BASE_PATH, shellId )
+                           .delete( SINGLE_SHELL_BASE_PATH, getEncodedValue(shellId) )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -302,7 +303,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
          mvc.perform(
                      MockMvcRequestBuilders
-                           .post( SINGLE_LOOKUP_SHELL_BASE_PATH, shellId )
+                           .post( SINGLE_LOOKUP_SHELL_BASE_PATH, getEncodedValue(shellId ) )
                            .accept( MediaType.APPLICATION_JSON )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( toJson( specificAssetIds ) )
@@ -331,7 +332,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
          mvc.perform(
                      MockMvcRequestBuilders
-                           .post( SINGLE_LOOKUP_SHELL_BASE_PATH, shellId )
+                           .post( SINGLE_LOOKUP_SHELL_BASE_PATH, getEncodedValue( shellId ) )
                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .contentType( MediaType.APPLICATION_JSON )
@@ -346,7 +347,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          // ObjectNode expectedShellPayload = shellPayload.set("specificAssetIds", specificAssetIds);
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( SINGLE_SHELL_BASE_PATH, shellId )
+                           .get( SINGLE_SHELL_BASE_PATH, getEncodedValue( shellId ) )
                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
@@ -362,7 +363,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                .add( specificAssetId( "key1", "value1" ) );
          mvc.perform(
                      MockMvcRequestBuilders
-                           .post( SINGLE_LOOKUP_SHELL_BASE_PATH, "notexistingshell" )
+                           .post( SINGLE_LOOKUP_SHELL_BASE_PATH,getEncodedValue("notexistingshell" )  )
                            .accept( MediaType.APPLICATION_JSON )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( toJson( specificAssetIds ) )
@@ -384,7 +385,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( SINGLE_LOOKUP_SHELL_BASE_PATH, shellId )
+                           .get( SINGLE_LOOKUP_SHELL_BASE_PATH, getEncodedValue( shellId ) )
                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
@@ -398,7 +399,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
       public void testGetSpecificIdsExpectNotFound() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( SINGLE_LOOKUP_SHELL_BASE_PATH, "notexistingshell", "notexistingsubmodel" )
+                           .get( SINGLE_LOOKUP_SHELL_BASE_PATH, getEncodedValue("notexistingshell" ), getEncodedValue("notexistingsubmodel" ) )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -422,11 +423,11 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
          SubmodelDescriptor submodelDescriptor = TestUtil.createSubmodel();
 
-         performSubmodelCreateRequest( mapper.writeValueAsString( submodelDescriptor ), shellId );
+         performSubmodelCreateRequest( mapper.writeValueAsString( submodelDescriptor ), getEncodedValue( shellId )  );
 
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( SINGLE_SHELL_BASE_PATH, shellId )
+                           .get( SINGLE_SHELL_BASE_PATH, getEncodedValue( shellId ) )
                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
@@ -449,7 +450,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          SubmodelDescriptor existingSubmodel = shellPayload1.getSubmodelDescriptors().get( 0 );
          mvc.perform(
                      MockMvcRequestBuilders
-                           .post( SUB_MODEL_BASE_PATH, shellId )
+                           .post( SUB_MODEL_BASE_PATH, getEncodedValue(shellId) )
                            .accept( MediaType.APPLICATION_JSON )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( mapper.writeValueAsString( existingSubmodel ) )
@@ -467,7 +468,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          performShellCreateRequest( mapper.writeValueAsString( shellPayload1 ) );
 
          SubmodelDescriptor submodel = TestUtil.createSubmodel();
-         performSubmodelCreateRequest( mapper.writeValueAsString( submodel ), shellPayload1.getId() );
+         performSubmodelCreateRequest( mapper.writeValueAsString( submodel ),getEncodedValue(  shellPayload1.getId()  ));
          String submodelId = submodel.getId();
 
          SubmodelDescriptor updatedSubmodel = TestUtil.createSubmodel();
@@ -480,7 +481,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
          mvc.perform(
                      MockMvcRequestBuilders
-                           .put( SINGLE_SUB_MODEL_BASE_PATH, shellPayload1.getId(), submodelId )
+                           .put( SINGLE_SUB_MODEL_BASE_PATH, getEncodedValue(  shellPayload1.getId()  ), getEncodedValue(  submodelId  ) )
                            .accept( MediaType.APPLICATION_JSON )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( mapper.writeValueAsString( updatedSubmodel ) )
@@ -491,7 +492,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( SINGLE_SUB_MODEL_BASE_PATH, shellPayload1.getId(), submodelId )
+                           .get( SINGLE_SUB_MODEL_BASE_PATH,getEncodedValue( shellPayload1.getId() ), getEncodedValue( submodelId ))
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -505,7 +506,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          // verify shell is missing
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( SINGLE_SUB_MODEL_BASE_PATH, "notexistingshell", "notexistingsubmodel" )
+                           .get( SINGLE_SUB_MODEL_BASE_PATH, getEncodedValue( "notexistingshell") , getEncodedValue( "notexistingsubmodel")  )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -519,7 +520,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          // verify submodel is missing
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( SINGLE_SUB_MODEL_BASE_PATH, shellPayload1.getId(), "notexistingsubmodel" )
+                           .get( SINGLE_SUB_MODEL_BASE_PATH, getEncodedValue(shellPayload1.getId()), getEncodedValue("notexistingsubmodel") )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -536,14 +537,14 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          String shellId = shellPayload1.getId();
 
          SubmodelDescriptor submodel = TestUtil.createSubmodel();
-         performSubmodelCreateRequest( mapper.writeValueAsString( submodel ), shellPayload1.getId() );
+         performSubmodelCreateRequest( mapper.writeValueAsString( submodel ), getEncodedValue( shellPayload1.getId() ) );
 
          String submodelId = submodel.getId();
          submodel.setIdShort( "newIdShortInUpdateRequest" );
 
          mvc.perform(
                      MockMvcRequestBuilders
-                           .put( SINGLE_SUB_MODEL_BASE_PATH, shellId, submodelId )
+                           .put( SINGLE_SUB_MODEL_BASE_PATH, getEncodedValue( shellId ), getEncodedValue( submodelId ) )
                            .accept( MediaType.APPLICATION_JSON )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( mapper.writeValueAsString( submodel ) )
@@ -555,7 +556,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          // verify that anything expect the identification can be updated
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( SINGLE_SUB_MODEL_BASE_PATH, shellId, submodelId )
+                           .get( SINGLE_SUB_MODEL_BASE_PATH, getEncodedValue( shellId ), getEncodedValue( submodelId ))
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -573,13 +574,13 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          String shellId = shellPayload1.getId();
 
          SubmodelDescriptor submodel = TestUtil.createSubmodel();
-         performSubmodelCreateRequest( mapper.writeValueAsString( submodel ), shellPayload1.getId() );
+         performSubmodelCreateRequest( mapper.writeValueAsString( submodel ),getEncodedValue( shellPayload1.getId())  );
 
          String submodelId = submodel.getId();
 
          mvc.perform(
                      MockMvcRequestBuilders
-                           .delete( SINGLE_SUB_MODEL_BASE_PATH, shellId, submodelId )
+                           .delete( SINGLE_SUB_MODEL_BASE_PATH,getEncodedValue( shellId) , getEncodedValue( submodelId) )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -588,7 +589,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( SINGLE_SUB_MODEL_BASE_PATH, shellId, submodelId )
+                           .get( SINGLE_SUB_MODEL_BASE_PATH, getEncodedValue( shellId) , getEncodedValue( submodelId))
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -601,7 +602,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          // verify shell is missing
          mvc.perform(
                      MockMvcRequestBuilders
-                           .delete( SINGLE_SUB_MODEL_BASE_PATH, "notexistingshell", "notexistingsubmodel" )
+                           .delete( SINGLE_SUB_MODEL_BASE_PATH, getEncodedValue( "notexistingshell" ), getEncodedValue( "notexistingsubmodel" ))
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -616,7 +617,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          // verify submodel is missing
          mvc.perform(
                      MockMvcRequestBuilders
-                           .delete( SINGLE_SUB_MODEL_BASE_PATH, shellId, "notexistingsubmodel" )
+                           .delete( SINGLE_SUB_MODEL_BASE_PATH,getEncodedValue( shellId) ,getEncodedValue( "notexistingsubmodel")  )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )

@@ -194,8 +194,8 @@ paths:
           explode: false
           schema:
             type: string
+            format: byte
         - $ref: '#/components/parameters/ExternalSubjectIdHeader'
-      #          format: byte
       responses:
         "200":
           description: Requested Asset Administration Shell Descriptor
@@ -249,7 +249,7 @@ paths:
           explode: false
           schema:
             type: string
-      #          format: byte
+            format: byte
       requestBody:
         description: Asset Administration Shell Descriptor object
         content:
@@ -306,7 +306,7 @@ paths:
           explode: false
           schema:
             type: string
-      #          format: byte
+            format: byte
       responses:
         "204":
           description: Asset Administration Shell Descriptor deleted successfully
@@ -351,7 +351,7 @@ paths:
           explode: false
           schema:
             type: string
-        #          format: byte
+            format: byte
         - name: limit
           in: query
           description: The maximum number of elements in the response array
@@ -417,7 +417,7 @@ paths:
           explode: false
           schema:
             type: string
-      #          format: byte
+            format: byte
       requestBody:
         description: Submodel Descriptor object
         content:
@@ -484,7 +484,7 @@ paths:
           explode: false
           schema:
             type: string
-        #          format: byte
+            format: byte
         - name: submodelIdentifier
           in: path
           description: The Submodel’s unique id (UTF8-BASE64-URL-encoded)
@@ -493,7 +493,7 @@ paths:
           explode: false
           schema:
             type: string
-      #          format: byte
+            format: byte
       responses:
         "200":
           description: Requested Submodel Descriptor
@@ -547,7 +547,7 @@ paths:
           explode: false
           schema:
             type: string
-        #          format: byte
+            format: byte
         - name: submodelIdentifier
           in: path
           description: The Submodel’s unique id (UTF8-BASE64-URL-encoded)
@@ -556,7 +556,7 @@ paths:
           explode: false
           schema:
             type: string
-      #          format: byte
+            format: byte
       requestBody:
         description: Submodel Descriptor object
         content:
@@ -612,7 +612,7 @@ paths:
           explode: false
           schema:
             type: string
-        #          format: byte
+            format: byte
         - name: submodelIdentifier
           in: path
           description: The Submodel’s unique id (UTF8-BASE64-URL-encoded)
@@ -621,7 +621,7 @@ paths:
           explode: false
           schema:
             type: string
-      #          format: byte
+            format: byte
       responses:
         "204":
           description: Submodel Descriptor deleted successfully
@@ -754,6 +754,7 @@ paths:
           explode: false
           schema:
             type: string
+            format: byte
         - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       responses:
         "200":
@@ -784,6 +785,7 @@ paths:
           explode: false
           schema:
             type: string
+            format: byte
       requestBody:
         description: Asset identifier key-value-pairs
         content:
@@ -826,6 +828,7 @@ paths:
           explode: false
           schema:
             type: string
+            format: byte
       responses:
         "204":
           description: Asset identifier key-value-pairs deleted successfully
