@@ -19,6 +19,8 @@ data:
 
     variables:
       aas_registry_api_url: "{tavern.env_vars.AAS_REGISTRY_API_URL}"
+      decoded_shell_id: 20062250-6b6e-4eba-bf90-7720ddc855e9
+      encoded_shell_id: MjAwNjIyNTAtNmI2ZS00ZWJhLWJmOTAtNzcyMGRkYzg1NWU5
   stage_auth.yaml: |
     ---
     name: Authentication stage
@@ -101,19 +103,16 @@ data:
             Content-Type: application/json
             Authorization: "Bearer {access_token}"
           json: 
-            id: !uuid
+            id: "{decoded_shell_id:s}"
             idShort: twin of a break (Testing)
         response:
           status_code: 201
           headers:
             content-type: application/json
-          save:
-            json:
-              returned_id: id
         
       - name: Get shell descriptor by id
         request:
-          url: "{aas_registry_api_url:s}/api/v3.0/shell-descriptors/{returned_id:s}"
+          url: "{aas_registry_api_url:s}/api/v3.0/shell-descriptors/{encoded_shell_id:s}"
           method: GET
           headers:
             Content-Type: application/json
@@ -126,26 +125,26 @@ data:
             description: []
             displayName: []
             idShort: twin of a break (Testing)
-            id: "{returned_id:s}"
+            id: "{decoded_shell_id:s}"
             specificAssetIds: []
             submodelDescriptors: []
 
       - name: Update shell descriptor by id
         request:
-          url: "{aas_registry_api_url:s}/api/v3.0/shell-descriptors/{returned_id:s}"
+          url: "{aas_registry_api_url:s}/api/v3.0/shell-descriptors/{encoded_shell_id:s}"
           method: PUT
           headers:
             Content-Type: application/json
             Authorization: "Bearer {access_token}"
           json: 
-            id: "{returned_id:s}"
+            id: "{decoded_shell_id:s}"
             idShort: twin of a break (Testing Update)
         response:
           status_code: 204
 
       - name: Delete shell descriptor by id
         request:
-          url: "{aas_registry_api_url:s}/api/v3.0/shell-descriptors/{returned_id:s}"
+          url: "{aas_registry_api_url:s}/api/v3.0/shell-descriptors/{encoded_shell_id:s}"
           method: DELETE
           headers:
             Content-Type: application/json
