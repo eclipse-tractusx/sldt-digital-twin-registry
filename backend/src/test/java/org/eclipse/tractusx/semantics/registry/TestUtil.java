@@ -19,25 +19,11 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry;
 
+import org.eclipse.tractusx.semantics.aas.registry.model.*;
+
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
-
-import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
-import org.eclipse.tractusx.semantics.aas.registry.model.AssetKind;
-import org.eclipse.tractusx.semantics.aas.registry.model.DataTypeDefXsd;
-import org.eclipse.tractusx.semantics.aas.registry.model.Endpoint;
-import org.eclipse.tractusx.semantics.aas.registry.model.Extension;
-import org.eclipse.tractusx.semantics.aas.registry.model.Key;
-import org.eclipse.tractusx.semantics.aas.registry.model.KeyTypes;
-import org.eclipse.tractusx.semantics.aas.registry.model.LangStringNameType;
-import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
-import org.eclipse.tractusx.semantics.aas.registry.model.ProtocolInformation;
-import org.eclipse.tractusx.semantics.aas.registry.model.ProtocolInformationSecurityAttributes;
-import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
-import org.eclipse.tractusx.semantics.aas.registry.model.ReferenceParent;
-import org.eclipse.tractusx.semantics.aas.registry.model.ReferenceTypes;
-import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
-import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
 
 public class TestUtil {
 
@@ -412,5 +398,9 @@ public class TestUtil {
        specificAssetId1.setSupplementalSemanticIds( List.of(assetIdReference) );
 
        return specificAssetId1;
+    }
+
+    public static String getEncodedValue(String shellId){
+       return Base64.getUrlEncoder().encodeToString(shellId.getBytes());
     }
 }

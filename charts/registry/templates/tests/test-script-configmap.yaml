@@ -19,6 +19,8 @@ data:
 
     variables:
       aas_registry_api_url: "{tavern.env_vars.AAS_REGISTRY_API_URL}"
+      decoded_shell_id: 20062250-6b6e-4eba-bf90-7720ddc855e9
+      encoded_shell_id: MjAwNjIyNTAtNmI2ZS00ZWJhLWJmOTAtNzcyMGRkYzg1NWU5
   stage_auth.yaml: |
     ---
     name: Authentication stage
@@ -62,7 +64,7 @@ data:
     stages:
       - name: Test get shell descriptors without access token
         request:
-          url: "{aas_registry_api_url:s}/registry/shell-descriptors"
+          url: "{aas_registry_api_url:s}/api/v3.0/shell-descriptors"
           method: GET
         response:
           status_code: 401
@@ -72,7 +74,7 @@ data:
 
       - name: Authenticated request
         request:
-          url: "{aas_registry_api_url:s}/registry/shell-descriptors"
+          url: "{aas_registry_api_url:s}/api/v3.0/shell-descriptors"
           method: GET
           headers:
             Content-Type: application/json
@@ -95,25 +97,22 @@ data:
 
       - name: Create shell descriptor expect success
         request:
-          url: "{aas_registry_api_url:s}/registry/shell-descriptors"
+          url: "{aas_registry_api_url:s}/api/v3.0/shell-descriptors"
           method: POST
           headers:
             Content-Type: application/json
             Authorization: "Bearer {access_token}"
           json: 
-            identification: !uuid
+            id: "{decoded_shell_id:s}"
             idShort: twin of a break (Testing)
         response:
           status_code: 201
           headers:
             content-type: application/json
-          save:
-            json:
-              returned_identification: identification
         
-      - name: Get shell descriptor by identification
+      - name: Get shell descriptor by id
         request:
-          url: "{aas_registry_api_url:s}/registry/shell-descriptors/{returned_identification:s}"
+          url: "{aas_registry_api_url:s}/api/v3.0/shell-descriptors/{encoded_shell_id:s}"
           method: GET
           headers:
             Content-Type: application/json
@@ -123,28 +122,29 @@ data:
           headers:
             content-type: application/json
           json: 
-            identification: "{returned_identification:s}"
-            idShort: twin of a break (Testing)
             description: []
+            displayName: []
+            idShort: twin of a break (Testing)
+            id: "{decoded_shell_id:s}"
             specificAssetIds: []
             submodelDescriptors: []
 
-      - name: Update shell descriptor by identification
+      - name: Update shell descriptor by id
         request:
-          url: "{aas_registry_api_url:s}/registry/shell-descriptors/{returned_identification:s}"
+          url: "{aas_registry_api_url:s}/api/v3.0/shell-descriptors/{encoded_shell_id:s}"
           method: PUT
           headers:
             Content-Type: application/json
             Authorization: "Bearer {access_token}"
           json: 
-            identification: "{returned_identification:s}"
+            id: "{decoded_shell_id:s}"
             idShort: twin of a break (Testing Update)
         response:
           status_code: 204
 
-      - name: Delete shell descriptor by identification
+      - name: Delete shell descriptor by id
         request:
-          url: "{aas_registry_api_url:s}/registry/shell-descriptors/{returned_identification:s}"
+          url: "{aas_registry_api_url:s}/api/v3.0/shell-descriptors/{encoded_shell_id:s}"
           method: DELETE
           headers:
             Content-Type: application/json
