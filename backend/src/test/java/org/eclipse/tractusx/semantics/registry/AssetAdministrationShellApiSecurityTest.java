@@ -698,7 +698,8 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             shellPayload.setSpecificAssetIds(null);
             SpecificAssetId asset1 = TestUtil.createSpecificAssetId("CustomerPartId","tenantTwoAssetIdValue",jwtTokenFactory.tenantTwo().getTenantId());
             SpecificAssetId asset2 = TestUtil.createSpecificAssetId("CustomerPartId","tenantThreeAssetIdValue",jwtTokenFactory.tenantThree().getTenantId());
-            SpecificAssetId asset3 = TestUtil.createSpecificAssetId("MaterialNumber","withoutTenantAssetIdValue",null);
+            SpecificAssetId asset3 = TestUtil.createSpecificAssetId("MaterialNumber","withoutTenantAssetIdValue",jwtTokenFactory.tenantTwo().getTenantId());
+
 
             shellPayload.setSpecificAssetIds(List.of(asset1,asset2,asset3));
 

@@ -377,7 +377,15 @@ public class TestUtil {
             key.setValue(externalSubjectId);
             reference.setKeys(List.of(key));
 
-            specificAssetId1.setExternalSubjectId(reference);
+           ReferenceParent specificAssetIdRefParent = new ReferenceParent();
+           specificAssetIdRefParent.setType( ReferenceTypes.EXTERNALREFERENCE );
+           Key specificAssetIdParentKey = new Key();
+           specificAssetIdParentKey.setValue( "specificAssetId ReferenceParent key" );
+           specificAssetIdParentKey.setType( KeyTypes.ASSETADMINISTRATIONSHELL );
+           specificAssetIdRefParent.setKeys( List.of(specificAssetIdParentKey) );
+           reference.setReferredSemanticId( specificAssetIdRefParent );
+
+           specificAssetId1.setExternalSubjectId(reference);
         }
 
 

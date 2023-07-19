@@ -144,13 +144,8 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     @Override
     public ResponseEntity<Void> putSubmodelDescriptorByIdThroughSuperpath( byte[] aasIdentifier, byte[] submodelIdentifier, SubmodelDescriptor submodelDescriptor ) {
         shellService.deleteSubmodel(getDecodedId( aasIdentifier ),  getDecodedId( submodelIdentifier ),getExternalSubjectIdOrEmpty( null ));
-        submodelDescriptor.setId( submodelIdentifier );
+        submodelDescriptor.setId( getDecodedId( submodelIdentifier ));
         postSubmodelDescriptorThroughSuperpath(aasIdentifier,submodelDescriptor);
-
-        //        Submodel submodel = submodelMapper.fromApiDto( submodelDescriptor );
-//        Submodel fromDB = shellService.findSubmodelByExternalId( aasIdentifier,submodelIdentifier,getExternalSubjectIdOrEmpty( null ) );
-//        shellService.deleteSubmodel(aasIdentifier,  submodelIdentifier,getExternalSubjectIdOrEmpty( null ));
-//        shellService.update( aasIdentifier, submodel.withIdExternal( submodelIdentifier ).withId( fromDB.getId() ) ,getExternalSubjectIdOrEmpty( "" ));
         return new ResponseEntity<>( HttpStatus.NO_CONTENT );
     }
 

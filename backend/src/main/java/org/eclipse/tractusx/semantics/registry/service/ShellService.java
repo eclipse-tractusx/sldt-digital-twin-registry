@@ -109,7 +109,7 @@ public class ShellService {
                    key.setShellExtensionSemanticIdReference( shellExtension.getSemanticId() );
                 } );
           shellExtension.getSemanticId().getReferredSemanticId().setShellExtensionSemanticIdReference( shellExtension.getSemanticId());
-          shellExtension.getSemanticId().getKeys().forEach( key -> key.setShellExtensionSemanticIdReferenceParent(shellExtension.getSemanticId()
+          shellExtension.getSemanticId().getReferredSemanticId().getKeys().forEach( key -> key.setShellExtensionSemanticIdReferenceParent(shellExtension.getSemanticId()
                 .getReferredSemanticId()  ) );
           shellExtension.getSemanticId().setShellExtension( shellExtension );
              });
@@ -128,7 +128,18 @@ public class ShellService {
              supplementalID.setShellIdentifier( identifier );
           } );
 
-       } );
+          if(identifier.getExternalSubjectId()!=null) {
+             identifier.getExternalSubjectId().getKeys().stream().filter( Objects::nonNull ).forEach( key -> {
+                key.setShellIdentifierExternalSubjectReference( identifier.getExternalSubjectId() );
+             } );
+
+             identifier.getExternalSubjectId().getReferredSemanticId().setShellIdentifierExternalSubjectReference( identifier.getExternalSubjectId() );
+             identifier.getExternalSubjectId().getReferredSemanticId().getKeys().forEach( key ->
+                   key.setShellIdentifierExternalSubjectReferenceParent( identifier.getExternalSubjectId().getReferredSemanticId() ) );
+             identifier.getExternalSubjectId().setShellIdentifier( identifier );
+          }
+
+       });
     }
 
     public void mapSubmodel(Set<Submodel> submodels){

@@ -706,6 +706,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                            .get( LOOKUP_SHELL_BASE_PATH )
                            .queryParam( "assetIds", mapper.writeValueAsString( specificAssetId1 ) )
                            .queryParam( "limit", "1" )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -763,6 +764,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          mvc.perform(
                      MockMvcRequestBuilders
                            .get( LOOKUP_SHELL_BASE_PATH )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .queryParam( "assetIds", toJson( globalAssetIdForSampleQuery ) )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )

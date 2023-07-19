@@ -66,13 +66,10 @@ public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecific
           value = "select s.id_external from shell s where s.id in (" +
           "select si.fk_shell_id from shell_identifier si " +
           "where concat(si.namespace,si.identifier) in (:keyValueCombinations) " +
-          "and (:tenantId = :owningTenantId or :tenantId in (" +
-                "Select rk.ref_key_value, s.id_external from reference_key rk "+
-          "Join reference r on rk.fk_reference_id = r.id "+
-          "Join shell_identifier si on si.id = r.fk_shell_identifier_external_subject_id "+
-          "Join shell s on s.id = si.fk_shell_id )"
-                + ") "
-                + "group by si.fk_shell_id " +
+          "and (:tenantId = :owningTenantId or :tenantId = (" +
+                "Select sider.ref_key_value from SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY sider where FK_SI_EXTERNAL_SUBJECT_REFERENCE_ID="+
+          "(select sies.id from SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE sies where sies.FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID=si.id)"+
+          ")) group by si.fk_shell_id " +
           "having count(*) = :keyValueCombinationsSize " +
            ")",nativeQuery = true
 
