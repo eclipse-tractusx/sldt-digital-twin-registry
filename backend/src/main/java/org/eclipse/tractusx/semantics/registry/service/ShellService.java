@@ -151,6 +151,19 @@ public class ShellService {
           submodelExtension.getSubmodSemanticId().getReferredSemanticId().setSubmodelExtensionSemanticIdReference( submodelExtension.getSubmodSemanticId());
           submodelExtension.getSubmodSemanticId().getKeys().forEach( key -> key.setSubmodelExtensionSemanticIdReferenceParent(submodelExtension.getSubmodSemanticId().getReferredSemanticId()  ) );
           submodelExtension.getSubmodSemanticId().setSubmodelExtension( submodelExtension );} ));
+
+       submodels.forEach( submodel -> {
+          submodel.getSemanticId().getKeys().stream().filter( Objects::nonNull ).forEach( key -> {key.setSubmodelSemanticIdReference( submodel.getSemanticId() );} );
+          submodel.getSemanticId().getReferredSemanticId().setSubmodelSemanticIdReference(  submodel.getSemanticId() );
+          submodel.getSemanticId().getReferredSemanticId().getKeys().forEach( key ->
+                key.setSubmodelSemanticIdReferenceParent(submodel.getSemanticId().getReferredSemanticId() ) );
+          submodel.getSemanticId().setSubmodel( submodel );} );
+
+       submodels.forEach(submodel -> submodel.getSubmodelSupplemSemanticIds().forEach( supplemental ->{
+          supplemental.getKeys().forEach( key -> key.setSubmodelSupplemSemanticIdReference( supplemental ) );
+          supplemental.getReferredSemanticId().setSubmodelSupplemSemanticIdReference(supplemental  );
+          supplemental.getReferredSemanticId().getKeys().forEach( key -> key.setSubmodelSupplemSemanticIdReferenceParent( supplemental.getReferredSemanticId() ));
+          supplemental.setSubmodel( submodel );} ));
     }
 
     @Transactional
