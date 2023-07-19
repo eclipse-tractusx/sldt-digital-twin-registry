@@ -57,13 +57,13 @@ public class ShellExtensionRefersToReferenceParent {
 
    ReferenceType type;
 
-   @JsonBackReference
-   @OneToOne(fetch = FetchType.LAZY)
-   @JoinColumn(name = "fk_shell_extension_refers_referred_id")
-   private ShellExtensionRefersToReference shellExtensionRefersToReference;
-
    @JsonManagedReference
    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellExtensionRefersToReferenceParent")
   // @MappedCollection(idColumn = "fk_reference_parent_id")
    Set<ShellExtensionRefersToReferenceKey> keys;
+
+   @JsonBackReference
+   @OneToOne(fetch = FetchType.LAZY)
+   @JoinColumn(name = "fk_shell_extension_refers_referred_id")
+   private ShellExtensionRefersToReference shellExtensionRefersToReference;
 }

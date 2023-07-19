@@ -19,7 +19,6 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.controller;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -49,6 +48,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.context.request.NativeWebRequest;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class AssetAdministrationShellApiDelegate implements DescriptionApiDelegate, ShellDescriptorsApiDelegate, LookupApiDelegate {
@@ -128,7 +129,7 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     public ResponseEntity<AssetAdministrationShellDescriptor> postAssetAdministrationShellDescriptor( AssetAdministrationShellDescriptor assetAdministrationShellDescriptor ) {
         Shell shell = shellMapper.fromApiDto(assetAdministrationShellDescriptor);
         shellService.mapShellCollection( shell );
-        shellService.mapSubmodel( shell );
+        shellService.mapSubmodel( shell.getSubmodels() );
         Shell saved = shellService.save(shell);
         return new ResponseEntity<>(shellMapper.toApiDto(saved), HttpStatus.CREATED);
     }
@@ -137,6 +138,7 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     public ResponseEntity<SubmodelDescriptor> postSubmodelDescriptorThroughSuperpath( String aasIdentifier, SubmodelDescriptor submodelDescriptor ) {
         Submodel toBeSaved = submodelMapper.fromApiDto(submodelDescriptor);
         toBeSaved.setIdExternal( submodelDescriptor.getId() );
+        shellService.mapSubmodel( Set.of(toBeSaved) );
         Submodel savedSubModel = shellService.save(aasIdentifier, toBeSaved, getExternalSubjectIdOrEmpty(null));
         return new ResponseEntity<>(submodelMapper.toApiDto(savedSubModel), HttpStatus.CREATED);
     }
@@ -151,10 +153,15 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
 
     @Override
     public ResponseEntity<Void> putSubmodelDescriptorByIdThroughSuperpath( String aasIdentifier, String submodelIdentifier, SubmodelDescriptor submodelDescriptor ) {
-        Submodel submodel = submodelMapper.fromApiDto( submodelDescriptor );
-        Submodel fromDB = shellService.findSubmodelByExternalId( aasIdentifier,submodelIdentifier,getExternalSubjectIdOrEmpty( null ) );
         shellService.deleteSubmodel(aasIdentifier,  submodelIdentifier,getExternalSubjectIdOrEmpty( null ));
-        shellService.update( aasIdentifier, submodel.withIdExternal( submodelIdentifier ).withId( fromDB.getId() ) ,getExternalSubjectIdOrEmpty( "" ));
+        submodelDescriptor.setId( submodelIdentifier );
+        postSubmodelDescriptorThroughSuperpath(aasIdentifier,submodelDescriptor);
+
+
+//                Submodel submodel = submodelMapper.fromApiDto( submodelDescriptor );
+//        Submodel fromDB = shellService.findSubmodelByExternalId( aasIdentifier,submodelIdentifier,getExternalSubjectIdOrEmpty( null ) );
+//        shellService.deleteSubmodel(aasIdentifier,  submodelIdentifier,getExternalSubjectIdOrEmpty( null ));
+//        shellService.update( aasIdentifier, submodel.withIdExternal( submodelIdentifier ).withId( fromDB.getId() ) ,getExternalSubjectIdOrEmpty( "" ));
         return new ResponseEntity<>( HttpStatus.NO_CONTENT );
     }
 

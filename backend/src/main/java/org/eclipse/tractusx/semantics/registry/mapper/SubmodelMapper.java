@@ -59,7 +59,8 @@ public interface SubmodelMapper {
             @Mapping(target="semanticId", source = "semanticId"),
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "displayNames", source = "displayName"),
-          @Mapping(target = "submodelExtensions", source = "extensions")
+          @Mapping(target = "submodelExtensions", source = "extensions"),
+          @Mapping(target = "submodelSupplemSemanticIds", source = "supplementalSemanticId")
     })
     Submodel fromApiDto(SubmodelDescriptor apiDto);
 
@@ -73,7 +74,7 @@ public interface SubmodelMapper {
          @Mapping(target="value", source = "value"),
          @Mapping(target="refersTo", source = "refersTo")
    })
-   SubmodelExtension mapSubmodelExtension ( Extension submodelExtensions);
+   SubmodelExtension mapSubmodelExtension (Extension submodelExtensions);
 
 
 
@@ -135,39 +136,5 @@ public interface SubmodelMapper {
          @Mapping(source="refersTo", target = "refersTo")
    })
    Extension mapExtension (SubmodelExtension submodelExtension);
-
-
-   default String map(Reference reference) {
-      return Optional.ofNullable(reference).map(Reference::getKeys)
-            .map( Collection::stream)
-            .orElseGet( Stream::empty)
-            .map(Key::getValue)
-            .filter( Objects::nonNull)
-            .findFirst()
-            .orElse(null);
-   }
-
-   // todo: implement types
-    default Reference map(String semanticId){
-        if(semanticId == null ||  semanticId.isBlank()) {
-            return null;
-        }
-        Reference reference = new Reference();
-        reference.setType( ReferenceTypes.EXTERNALREFERENCE );
-        Key key = new Key();
-        key.setType( KeyTypes.SUBMODEL );
-        key.setValue( semanticId );
-        reference.setKeys( List.of(key) );
-        return reference;
-    }
-
-   @AfterMapping
-   default Submodel mapSemanticIds( SubmodelDescriptor apiDto, @MappingTarget Submodel submodel){
-      if(apiDto.getSemanticId().getKeys()!=null){
-         return submodel.withSemanticId( apiDto.getSemanticId().getKeys().get( 0 ).getValue() );
-      }else{
-         return submodel.withSemanticId( "" );
-      }
-   }
 
 }

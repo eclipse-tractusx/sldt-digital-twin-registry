@@ -19,13 +19,14 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
-import java.util.Set;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -33,7 +34,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -49,22 +49,30 @@ import lombok.With;
 @NoArgsConstructor
 @AllArgsConstructor
 @With
-public class ShellExtensionSupplemSemanticIdReferenceParent {
+@JsonIdentityInfo(
+      generator = ObjectIdGenerators.PropertyGenerator.class,
+      property = "id")
+public class SubmodelSupplemSemanticIdReferenceKey {
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
+   @Column(name="id")
    UUID id;
 
-   ReferenceType type;
+   ReferenceKeyType type;
 
-
-   @JsonManagedReference
-   @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellExtensionSupplemSemanticIdReferenceParent")
-   //@MappedCollection(idColumn = "fk_reference_parent_id")
-   Set<ShellExtensionSupplemSemanticIdReferenceKey> keys;
+   @Column(name = "ref_key_value")
+   String value;
 
    @JsonBackReference
-   @OneToOne(fetch = FetchType.LAZY)
-   @JoinColumn(name = "fk_shell_extension_supplem_semantic_referred_id")
-   private ShellExtensionSupplemSemanticIdReference shellExtensionSupplemSemanticIdReference;
+   @ManyToOne( fetch = FetchType.LAZY, optional = false,cascade = { CascadeType.MERGE}  )
+   @JoinColumn( name = "fk_submodel_supplem_semantic_id_reference_id" )
+   private SubmodelSupplemSemanticIdReference submodelSupplemSemanticIdReference;
+
+   @JsonBackReference
+   @ManyToOne( fetch = FetchType.LAZY, optional = false,cascade = { CascadeType.MERGE}  )
+   @JoinColumn( name = "fk_reference_parent_id" )
+   private SubmodelSupplemSemanticIdReferenceParent submodelSupplemSemanticIdReferenceParent;
 }
+
+

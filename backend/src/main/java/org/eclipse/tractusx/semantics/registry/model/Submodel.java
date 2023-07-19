@@ -52,8 +52,12 @@ public class Submodel {
     private String idExternal;
     @Column
     private String idShort;
-    @Column
-    private String semanticId;
+
+    @JsonManagedReference
+    @JsonIgnore
+    @OneToOne(cascade = CascadeType.ALL,orphanRemoval=true, mappedBy = "submodel")
+    //@Column("fk_submodel_id")
+    SubmodelSemanticIdReference semanticId;
 
     @JsonManagedReference
     @JsonIgnore
@@ -81,6 +85,12 @@ public class Submodel {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true,mappedBy = "submodel")
     //@MappedCollection(idColumn = "fk_submodel_id")
     Set<SubmodelExtension> submodelExtensions= new HashSet<>();
+
+    @JsonManagedReference
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true,mappedBy = "submodel")
+    //@MappedCollection(idColumn = "fk_submodel_id")
+    Set<SubmodelSupplemSemanticIdReference> submodelSupplemSemanticIds;
 
     public void setDisplayNames(Set<SubmodelDisplayName> displayNames) {
         if(displayNames==null) {displayNames = new HashSet<>();}

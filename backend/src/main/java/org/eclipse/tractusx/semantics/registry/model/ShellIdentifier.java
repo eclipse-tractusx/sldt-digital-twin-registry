@@ -53,9 +53,6 @@ public class ShellIdentifier {
     @Column(name = "identifier")
     private String value;
 
-//    @Column(name = "external_subject_id")
-//    private String externalSubjectId;
-
 
     @JsonManagedReference
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "shellIdentifier")

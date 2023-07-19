@@ -60,16 +60,16 @@ public class SubmodelEndpoint {
    @Column
    private String subProtocolBodyEncoding;
 
-   @JsonBackReference
-   @ManyToOne( fetch = FetchType.LAZY, optional = false,cascade = {CascadeType.MERGE}  )
-   @JoinColumn( name = "fk_submodel_id" )
-   private Submodel submodel;
-
 
    @JsonManagedReference
    @JsonIgnore
    @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true,mappedBy = "submodelEndpoint")
     //@MappedCollection(idColumn = "fk_submodel_endpoint_id")
     Set<SubmodelSecurityAttribute> submodelSecurityAttribute=new HashSet<>();
+
+   @JsonBackReference
+   @ManyToOne( fetch = FetchType.LAZY, optional = false,cascade = {CascadeType.MERGE}  )
+   @JoinColumn( name = "fk_submodel_id" )
+   private Submodel submodel;
 
 }

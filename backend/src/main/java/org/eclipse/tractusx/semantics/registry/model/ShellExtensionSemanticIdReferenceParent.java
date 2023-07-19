@@ -58,14 +58,14 @@ public class ShellExtensionSemanticIdReferenceParent {
 
    ReferenceType type;
 
-   @JsonBackReference
-   @OneToOne(cascade = CascadeType.ALL)
-   @JoinColumn(name = "fk_shell_extension_semantic_referred_id")
-   private ShellExtensionSemanticIdReference shellExtensionSemanticIdReference;
-
 
    @JsonManagedReference
    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellExtensionSemanticIdReferenceParent")
    //@MappedCollection(idColumn = "fk_reference_parent_id")
    Set<ShellExtensionSemanticIdReferenceKey> keys;
+
+   @JsonBackReference
+   @OneToOne(cascade = CascadeType.ALL)
+   @JoinColumn(name = "fk_shell_extension_semantic_referred_id")
+   private ShellExtensionSemanticIdReference shellExtensionSemanticIdReference;
 }

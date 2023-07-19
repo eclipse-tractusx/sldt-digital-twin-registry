@@ -23,9 +23,13 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -49,22 +53,32 @@ import lombok.With;
 @NoArgsConstructor
 @AllArgsConstructor
 @With
-public class ShellExtensionSupplemSemanticIdReferenceParent {
+@JsonIdentityInfo(
+      generator = ObjectIdGenerators.PropertyGenerator.class,
+      property = "id")
+public class SubmodelSupplemSemanticIdReference {
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
+   @Column(name="id")
    UUID id;
 
    ReferenceType type;
 
+   @JsonManagedReference
+   @JsonIgnore
+   @OneToMany(cascade = CascadeType.ALL,orphanRemoval=true, mappedBy = "submodelSupplemSemanticIdReference")
+   //@MappedCollection(idColumn = "fk_submodel_supplem_semantic_id_reference_id")
+   Set<SubmodelSupplemSemanticIdReferenceKey> keys;
 
    @JsonManagedReference
-   @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellExtensionSupplemSemanticIdReferenceParent")
-   //@MappedCollection(idColumn = "fk_reference_parent_id")
-   Set<ShellExtensionSupplemSemanticIdReferenceKey> keys;
+   @JsonIgnore
+   @OneToOne(cascade = CascadeType.ALL,orphanRemoval=true, mappedBy = "submodelSupplemSemanticIdReference")
+   //@Column("fk_submodel_supplem_semantic_id_referred_id" )
+   SubmodelSupplemSemanticIdReferenceParent referredSemanticId;
 
    @JsonBackReference
-   @OneToOne(fetch = FetchType.LAZY)
-   @JoinColumn(name = "fk_shell_extension_supplem_semantic_referred_id")
-   private ShellExtensionSupplemSemanticIdReference shellExtensionSupplemSemanticIdReference;
+   @ManyToOne(fetch = FetchType.LAZY)
+   @JoinColumn(name = "fk_submodel_id")
+   private Submodel submodel;
 }

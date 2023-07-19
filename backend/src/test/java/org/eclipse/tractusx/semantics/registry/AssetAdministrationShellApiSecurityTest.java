@@ -123,7 +123,6 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             mvc.perform(
                             MockMvcRequestBuilders
                                     .get(SHELL_BASE_PATH)
-                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                                     .accept(MediaType.APPLICATION_JSON)
                                     // test with wrong role
                                     .with(jwtTokenFactory.addTwin())
@@ -134,7 +133,6 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             mvc.perform(
                             MockMvcRequestBuilders
                                     .get(SHELL_BASE_PATH)
-                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                                     .accept(MediaType.APPLICATION_JSON)
                                     .with(jwtTokenFactory.readTwin())
                     )
@@ -148,7 +146,6 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             mvc.perform(
                             MockMvcRequestBuilders
                                     .get(SINGLE_SHELL_BASE_PATH, shellId )
-                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                                     .accept(MediaType.APPLICATION_JSON)
                                     // test with wrong role
                                     .with(jwtTokenFactory.deleteTwin())
@@ -159,7 +156,6 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             mvc.perform(
                             MockMvcRequestBuilders
                                     .get(SINGLE_SHELL_BASE_PATH, shellId )
-                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                                     .accept(MediaType.APPLICATION_JSON)
                                     .with(jwtTokenFactory.readTwin())
                     )

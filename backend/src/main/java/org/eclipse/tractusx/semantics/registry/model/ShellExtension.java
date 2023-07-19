@@ -72,11 +72,6 @@ public class ShellExtension {
 
    DataTypeXsd valueType;
 
-   @JsonBackReference
-   @ManyToOne(fetch = FetchType.LAZY)
-   @JoinColumn(name = "fk_shell_id")
-   private Shell shellId;
-
 
    @JsonManagedReference
    @OneToOne(cascade = CascadeType.ALL, mappedBy = "shellExtension")
@@ -93,5 +88,10 @@ public class ShellExtension {
    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellExtension")
    //@MappedCollection(idColumn = "fk_shell_ext_refers_id")
    Set<ShellExtensionRefersToReference> refersTo;
+
+   @JsonBackReference
+   @ManyToOne(fetch = FetchType.LAZY)
+   @JoinColumn(name = "fk_shell_id")
+   private Shell shellId;
 
 }

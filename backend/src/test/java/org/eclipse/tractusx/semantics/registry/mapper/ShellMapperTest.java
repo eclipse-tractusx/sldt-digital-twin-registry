@@ -40,13 +40,12 @@ import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
 import org.eclipse.tractusx.semantics.aas.registry.model.ProtocolInformation;
 import org.eclipse.tractusx.semantics.aas.registry.model.ProtocolInformationSecurityAttributes;
 import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
+import org.eclipse.tractusx.semantics.aas.registry.model.ReferenceParent;
 import org.eclipse.tractusx.semantics.aas.registry.model.ReferenceTypes;
 import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
 import org.eclipse.tractusx.semantics.registry.model.DataTypeXsd;
-import org.eclipse.tractusx.semantics.registry.model.ReferenceKey;
 import org.eclipse.tractusx.semantics.registry.model.ReferenceKeyType;
-import org.eclipse.tractusx.semantics.registry.model.ReferenceParent;
 import org.eclipse.tractusx.semantics.registry.model.ReferenceType;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellDescription;
@@ -77,20 +76,26 @@ import org.eclipse.tractusx.semantics.registry.model.SubmodelDescription;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelDisplayName;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelEndpoint;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelExtension;
+import org.eclipse.tractusx.semantics.registry.model.SubmodelExtensionRefersToReference;
+import org.eclipse.tractusx.semantics.registry.model.SubmodelExtensionRefersToReferenceKey;
+import org.eclipse.tractusx.semantics.registry.model.SubmodelExtensionRefersToReferenceParent;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelExtensionSemanticIdReference;
+import org.eclipse.tractusx.semantics.registry.model.SubmodelExtensionSemanticIdReferenceKey;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelExtensionSemanticIdReferenceParent;
+import org.eclipse.tractusx.semantics.registry.model.SubmodelExtensionSupplemSemanticIdReference;
+import org.eclipse.tractusx.semantics.registry.model.SubmodelExtensionSupplemSemanticIdReferenceKey;
+import org.eclipse.tractusx.semantics.registry.model.SubmodelExtensionSupplemSemanticIdReferenceParent;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelSecurityAttribute;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelSecurityType;
+import org.eclipse.tractusx.semantics.registry.model.SubmodelSemanticIdReference;
+import org.eclipse.tractusx.semantics.registry.model.SubmodelSemanticIdReferenceKey;
+import org.eclipse.tractusx.semantics.registry.model.SubmodelSemanticIdReferenceParent;
+import org.eclipse.tractusx.semantics.registry.model.SubmodelSupplemSemanticIdReference;
+import org.eclipse.tractusx.semantics.registry.model.SubmodelSupplemSemanticIdReferenceKey;
+import org.eclipse.tractusx.semantics.registry.model.SubmodelSupplemSemanticIdReferenceParent;
 import org.junit.jupiter.api.Test;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
 public class ShellMapperTest {
 
@@ -155,7 +160,16 @@ public class ShellMapperTest {
               .isEqualTo( submodelDescriptor.getExtensions().get( 0 ).getSemanticId().getType().toString() );
         assertThat( submodelExtension.getRefersTo() ).hasSize( 1 );
         assertThat( submodelExtension.getSubmodSupplementalIds() ).hasSize( 1 );
+        assertThat( submodel.getSemanticId().getReferredSemanticId().getType().toString()).isEqualTo( "ModelReference" );
+        assertThat( submodel.getSemanticId().getKeys() ).hasSize( 1 );
+        assertThat(submodel.getSemanticId().getType().toString()).isEqualTo( "ExternalReference" );
+        assertThat(submodel.getSubmodelSupplemSemanticIds()).hasSize( 1 );
+        assertThat(submodel.getSubmodelSupplemSemanticIds().stream().findFirst().get().getKeys()).hasSize( 1 );
 
+        SubmodelSupplemSemanticIdReferenceKey supplemSemanticIdReferenceKey =
+              submodel.getSubmodelSupplemSemanticIds().stream().findFirst().get().getKeys().stream().findFirst().get();
+        assertThat( supplemSemanticIdReferenceKey.getValue() )
+              .isEqualTo( submodelDescriptor.getSupplementalSemanticId().get( 0 ).getKeys().get( 0 ).getValue() );
 
 
 
@@ -164,7 +178,7 @@ public class ShellMapperTest {
         assertThat(shell.getShellType()).isEqualTo( aas.getAssetType() );
         assertThat(shell.getDisplayNames().stream().findFirst().get().getLanguage()).isEqualTo( aas.getDisplayName().stream().findFirst().get().getLanguage() );
 
-        //Extensioins
+        //Extensions
         assertThat( shell.getShellExtensions() ).hasSize( 1 );
         ShellExtension shellExtension = shell.getShellExtensions().stream().findFirst().get();
         Extension aasExtension = aas.getExtensions().stream().findFirst().get();
@@ -214,7 +228,7 @@ public class ShellMapperTest {
 
         assertThat(apiSubmodelDescriptor.getDescription())
                 .extracting("language", "text")
-                .contains(createTuplesForSubmodelDescriptionTuples(Set.of(submodelDescription)));
+                .contains(createTuplesForSubmodelDescriptionTuples(submodel.getDescriptions()));
 
         assertThat(apiSubmodelDescriptor.getEndpoints()).hasSize(1);
         Endpoint apiSubmodelEndpoint = apiSubmodelDescriptor.getEndpoints().stream().findFirst().get();
@@ -232,6 +246,14 @@ public class ShellMapperTest {
               .isEqualTo( apiSubmodelDescriptor.getDisplayName().stream().findFirst().get().getLanguage() );
         assertThat( submodel.getDisplayNames().stream().findFirst().get().getText() )
               .isEqualTo( apiSubmodelDescriptor.getDisplayName().stream().findFirst().get().getText() );
+
+        assertThat( apiSubmodelDescriptor.getSemanticId().getReferredSemanticId().getKeys() ).hasSize( 1 );
+        assertThat(apiSubmodelDescriptor.getSemanticId().getKeys().get( 0 ).getValue()).isEqualTo( "submodelSemanticIdReferenceKey value" );
+        assertThat(apiSubmodelDescriptor.getSemanticId().getType().toString()).isEqualTo( submodel.getSemanticId().getType().toString() );
+        assertThat(apiSubmodelDescriptor.getSupplementalSemanticId()).hasSize( 1 );
+        assertThat(apiSubmodelDescriptor.getSupplementalSemanticId().get( 0 ).getType().toString())
+              .isEqualTo(submodel.getSubmodelSupplemSemanticIds().stream().findFirst().get().getType().toString());
+
         // submodelDescriptorsExtensions
         Extension submodelDescriptorExtension = apiSubmodelDescriptor.getExtensions().get( 0 );
         SubmodelExtension submodelExtension = submodel.getSubmodelExtensions().stream().findFirst().get();
@@ -261,7 +283,7 @@ public class ShellMapperTest {
         assertThat( aasExtension.getName() ).isEqualTo( shell.getShellExtensions().stream().findFirst().get().getName() );
         assertThat( aasExtension.getRefersTo() ).hasSize( 1 );
         assertThat( aasExtension.getSupplementalSemanticIds() ).hasSize( 1 );
-        assertThat( aasExtension.getSupplementalSemanticIds().get( 0 ).getType() ).isEqualTo( ReferenceTypes.MODELREFERENCE );
+        assertThat( aasExtension.getSupplementalSemanticIds().get( 0 ).getType() ).isEqualTo( ReferenceTypes.EXTERNALREFERENCE );
     }
 
     private Shell createCompleteShell() {
@@ -312,7 +334,6 @@ public class ShellMapperTest {
               shellIdentifierSupplemSemanticReferenceParent,null
         );
 
-
         ShellIdentifier shellIdentifier1 = new ShellIdentifier(
               UUID.randomUUID(),
               "key1",
@@ -342,144 +363,181 @@ public class ShellMapperTest {
 
         Set<ShellIdentifier> shellIdentifiers = Set.of(shellIdentifier1, shellIdentifier2, shellIdentifier3);
 
+
         ShellDescription shellDescription1 = new ShellDescription(UUID.randomUUID(), "en", "example description1",null);
         ShellDescription shellDescription2 = new ShellDescription(UUID.randomUUID(), "de", "exampleDescription2",null);
-
-        SubmodelDescription submodelDescription = new SubmodelDescription(UUID.randomUUID(),"en","example submodel description",null);
-//        SubmodelEndpoint submodelEndpoint = new SubmodelEndpoint(UUID.randomUUID(), "interfaceExample",
-//                                      "endpointAddressExample", "endpointProtocolExample",
-//                                      "endpointProtocolVersionExample", "subProtocolExample"
-//                                      , "subProtocolBodyExample", "subProtocolEncodingExample",null);
-//
-//        ShellDescription shellDescription1 = new ShellDescription(UUID.randomUUID(), "en", "example description1");
-//        ShellDescription shellDescription2 = new ShellDescription(UUID.randomUUID(), "de", "exampleDescription2");
 
         Set<ShellDescription> shellDescriptions = Set.of(shellDescription1, shellDescription2);
 
          //SubmodelExtensionRefersTo
-//        SubmodelExtensionRefersToReferenceKey submodelExtensionRefersToReferenceKey = new SubmodelExtensionRefersToReferenceKey(
-//              UUID.randomUUID(),
-//              ReferenceKeyType.ANNOTATEDRELATIONSHIPELEMENT,
-//              "submodelExtensionRefersToReferenceKey value"
-//        );
-//
-//        SubmodelExtensionRefersToReferenceParent submodelExtensionRefersToReferenceParent = new SubmodelExtensionRefersToReferenceParent(
-//              UUID.randomUUID(),
-//              ReferenceType.EXTERNALREFERENCE,
-//              Set.of(submodelExtensionRefersToReferenceKey)
-//        );
-//
-//        SubmodelExtensionRefersToReference submodelExtensionRefersToReference = new SubmodelExtensionRefersToReference(
-//              UUID.randomUUID(),ReferenceType.EXTERNALREFERENCE,
-//              Set.of(submodelExtensionRefersToReferenceKey),
-//              submodelExtensionRefersToReferenceParent
-//        );
-//
-//        //SubmodelExtensionSupplemSemanticId
-//        SubmodelExtensionSupplemSemanticIdReferenceKey submodelExtensionSupplemSemanticIdReferenceKey = new SubmodelExtensionSupplemSemanticIdReferenceKey(
-//              UUID.randomUUID(),
-//              ReferenceKeyType.ANNOTATEDRELATIONSHIPELEMENT,
-//              "SubmodelExtensionSupplemSemanticIdReferenceKey value"
-//        );
-//
-//        SubmodelExtensionSupplemSemanticIdReferenceParent submodelExtensionSupplemSemanticIdReferenceParent = new SubmodelExtensionSupplemSemanticIdReferenceParent(
-//              UUID.randomUUID(),
-//              ReferenceType.EXTERNALREFERENCE,
-//              Set.of(submodelExtensionSupplemSemanticIdReferenceKey)
-//        );
-//
-//        SubmodelExtensionSupplemSemanticIdReference submodelExtensionSupplemSemanticIdReference = new SubmodelExtensionSupplemSemanticIdReference(
-//              UUID.randomUUID(),ReferenceType.EXTERNALREFERENCE,
-//              Set.of(submodelExtensionSupplemSemanticIdReferenceKey),
-//              submodelExtensionSupplemSemanticIdReferenceParent
-//        );
-//
-//        //SubmodelExtensionSemanticID
-//        SubmodelExtensionSemanticIdReferenceKey submodelExtensionSemanticIdReferenceKey = new SubmodelExtensionSemanticIdReferenceKey(
-//              UUID.randomUUID(),
-//              ReferenceKeyType.ANNOTATEDRELATIONSHIPELEMENT,
-//              "SubmodelExtensionSemanticIdReferenceKey value"
-//        );
-//
-//        SubmodelExtensionSemanticIdReferenceParent submodelExtensionSemanticIdReferenceParent = new SubmodelExtensionSemanticIdReferenceParent(
-//              UUID.randomUUID(),
-//              ReferenceType.EXTERNALREFERENCE,
-//              Set.of(submodelExtensionSemanticIdReferenceKey)
-//        );
+        SubmodelExtensionRefersToReferenceKey submodelExtensionRefersToReferenceKey = new SubmodelExtensionRefersToReferenceKey(
+              UUID.randomUUID(),
+              ReferenceKeyType.ANNOTATEDRELATIONSHIPELEMENT,
+              "submodelExtensionRefersToReferenceKey value",null,null
+        );
 
-//        SubmodelExtensionSemanticIdReference submodelExtensionSemanticIdReference = new SubmodelExtensionSemanticIdReference(
-//              UUID.randomUUID(),ReferenceType.EXTERNALREFERENCE,
-//              Set.of(submodelExtensionSemanticIdReferenceKey),
-//              submodelExtensionSemanticIdReferenceParent
-//        );
+        SubmodelExtensionRefersToReferenceParent submodelExtensionRefersToReferenceParent = new SubmodelExtensionRefersToReferenceParent(
+              UUID.randomUUID(),
+              ReferenceType.EXTERNALREFERENCE,
+              Set.of(submodelExtensionRefersToReferenceKey),null
+        );
+
+        SubmodelExtensionRefersToReference submodelExtensionRefersToReference = new SubmodelExtensionRefersToReference(
+              UUID.randomUUID(),ReferenceType.EXTERNALREFERENCE,
+              Set.of(submodelExtensionRefersToReferenceKey),
+              submodelExtensionRefersToReferenceParent,null
+        );
+
+        //SubmodelExtensionSupplemSemanticId
+        SubmodelExtensionSupplemSemanticIdReferenceKey submodelExtensionSupplemSemanticIdReferenceKey = new SubmodelExtensionSupplemSemanticIdReferenceKey(
+              UUID.randomUUID(),
+              ReferenceKeyType.ANNOTATEDRELATIONSHIPELEMENT,
+              "SubmodelExtensionSupplemSemanticIdReferenceKey value",null,null
+        );
+
+        SubmodelExtensionSupplemSemanticIdReferenceParent submodelExtensionSupplemSemanticIdReferenceParent = new SubmodelExtensionSupplemSemanticIdReferenceParent(
+              UUID.randomUUID(),
+              ReferenceType.EXTERNALREFERENCE,
+              Set.of(submodelExtensionSupplemSemanticIdReferenceKey),null
+        );
+
+        SubmodelExtensionSupplemSemanticIdReference submodelExtensionSupplemSemanticIdReference = new SubmodelExtensionSupplemSemanticIdReference(
+              UUID.randomUUID(),ReferenceType.EXTERNALREFERENCE,
+              Set.of(submodelExtensionSupplemSemanticIdReferenceKey),
+              submodelExtensionSupplemSemanticIdReferenceParent,null
+        );
+
+        //SubmodelExtensionSemanticID
+        SubmodelExtensionSemanticIdReferenceKey submodelExtensionSemanticIdReferenceKey = new SubmodelExtensionSemanticIdReferenceKey(
+              UUID.randomUUID(),
+              ReferenceKeyType.ANNOTATEDRELATIONSHIPELEMENT,
+              "SubmodelExtensionSemanticIdReferenceKey value",null,null
+        );
+
+        SubmodelExtensionSemanticIdReferenceParent submodelExtensionSemanticIdReferenceParent = new SubmodelExtensionSemanticIdReferenceParent(
+              UUID.randomUUID(),
+              ReferenceType.EXTERNALREFERENCE,
+              Set.of(submodelExtensionSemanticIdReferenceKey),null
+        );
+
+        SubmodelExtensionSemanticIdReference submodelExtensionSemanticIdReference = new SubmodelExtensionSemanticIdReference(
+              UUID.randomUUID(),ReferenceType.EXTERNALREFERENCE,
+              Set.of(submodelExtensionSemanticIdReferenceKey),
+              submodelExtensionSemanticIdReferenceParent,null
+        );
 
 
-//                SubmodelExtension submodelExtension = new SubmodelExtension( UUID.randomUUID(),submodelExtensionSemanticIdReference, Set.of(submodelExtensionSupplemSemanticIdReference),
-//              "SubmodelExtension", DataTypeXsd.STRING,"SubmodelExtension value", Set.of(submodelExtensionRefersToReference)  );
-//
-//        SubmodelDisplayName submodelDisplayName = new SubmodelDisplayName( UUID.randomUUID(), "de", "Submodel display name" );
-//
-//        SubmodelSecurityAttribute submodelSecurityAttribute = new SubmodelSecurityAttribute(
-//              UUID.randomUUID(),
-//              SubmodelSecurityType.W3C_DID,
-//              "submodel security attribute key",
-//              "submodel security attribute value" );
-//
+                SubmodelExtension submodelExtension = new SubmodelExtension( UUID.randomUUID(),submodelExtensionSemanticIdReference, Set.of(submodelExtensionSupplemSemanticIdReference),
+              "SubmodelExtension", DataTypeXsd.STRING,"SubmodelExtension value", Set.of(submodelExtensionRefersToReference),null  );
+
+        SubmodelDisplayName submodelDisplayName = new SubmodelDisplayName( UUID.randomUUID(), "de", "Submodel display name",null );
+
+        SubmodelSecurityAttribute submodelSecurityAttribute = new SubmodelSecurityAttribute(
+              UUID.randomUUID(),
+              SubmodelSecurityType.W3C_DID,
+              "submodel security attribute key",
+              "submodel security attribute value",null );
+
+
+        // Submodel SemanticID Reference
+        SubmodelSemanticIdReferenceKey submodelSemanticIdReferenceKey =
+              new SubmodelSemanticIdReferenceKey(UUID.randomUUID(),ReferenceKeyType.SUBMODEL,"submodelSemanticIdReferenceKey value",null,null );
+
+        SubmodelSemanticIdReferenceParent submodelSemanticIdReferenceParent =
+              new SubmodelSemanticIdReferenceParent(UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(submodelSemanticIdReferenceKey),null);
+
+        SubmodelSemanticIdReference submodelSemanticIdReference = new SubmodelSemanticIdReference(
+              UUID.randomUUID(),
+              ReferenceType.EXTERNALREFERENCE,
+              Set.of(submodelSemanticIdReferenceKey),
+              submodelSemanticIdReferenceParent,null);
+
+        // Submodel Supplemental SemanticID Reference
+        SubmodelSupplemSemanticIdReferenceKey submodelSupplemSemanticIdReferenceKey =
+              new SubmodelSupplemSemanticIdReferenceKey(UUID.randomUUID(),ReferenceKeyType.SUBMODEL,"SubmodelSupplemSemanticIdReferenceKey value",null,null );
+
+        SubmodelSupplemSemanticIdReferenceParent submodelSupplemSemanticIdReferenceParent =
+              new SubmodelSupplemSemanticIdReferenceParent(UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(submodelSupplemSemanticIdReferenceKey),null);
+
+        SubmodelSupplemSemanticIdReference submodelSupplemSemanticIdReference = new SubmodelSupplemSemanticIdReference(
+              UUID.randomUUID(),
+              ReferenceType.EXTERNALREFERENCE,
+              Set.of(submodelSupplemSemanticIdReferenceKey),
+              submodelSupplemSemanticIdReferenceParent,null);
+
+
+                Submodel submodel = new Submodel(UUID.randomUUID(),
+                "submodelIdExternal",
+                "submodelIdShort", submodelSemanticIdReference,
+                Set.of(new SubmodelDescription(UUID.randomUUID(), "en", "example submodel description",null)),
+                Set.of(new SubmodelEndpoint(UUID.randomUUID(), "interfaceExample",
+                        "endpointAddressExample", "endpointProtocolExample",
+                        "endpointProtocolVersionExample", "subProtocolExample"
+                        , "subProtocolBodyExample", "subProtocolEncodingExample",
+                      Set.of(submodelSecurityAttribute),null
+                )),
+                null,
+              Set.of(submodelDisplayName),
+              Set.of(submodelExtension),
+        Set.of(submodelSupplemSemanticIdReference)
+        );
+
 //        Submodel submodel = new Submodel(UUID.randomUUID(),
-//                "submodelIdExternal",
-//                "submodelIdShort", "submodelSemanticId",
-//                Set.of(new SubmodelDescription(UUID.randomUUID(), "en", "example submodel description",null)),
-//                Set.of(new SubmodelEndpoint(UUID.randomUUID(), "interfaceExample",
-//                        "endpointAddressExample", "endpointProtocolExample",
-//                        "endpointProtocolVersionExample", "subProtocolExample"
-//                        , "subProtocolBodyExample", "subProtocolEncodingExample",
-//                      Set.of(submodelSecurityAttribute),null
-//                )),
-//                null,
+//              "submodelIdExternal",
+//              "submodelIdShort", submodelSemanticIdReference,
+//              Set.of(new SubmodelDescription(UUID.randomUUID(), "en", "example submodel description")),
+//              Set.of(new SubmodelEndpoint(UUID.randomUUID(), "interfaceExample",
+//                    "endpointAddressExample", "endpointProtocolExample",
+//                    "endpointProtocolVersionExample", "subProtocolExample"
+//                    , "subProtocolBodyExample", "subProtocolEncodingExample",
+//                    Set.of(submodelSecurityAttribute)
+//              )),
+//              null,
 //              Set.of(submodelDisplayName),
-//              Set.of(submodelExtension)
+//              Set.of(submodelExtension),
+//              null
 //        );
 
-//        ShellDisplayName shellDisplayName = new ShellDisplayName( UUID.randomUUID(), "de", "Display name" );
-//
-//        //ShellExtensionRefersToReference
-//        ShellExtensionRefersToReferenceKey refersToReferenceKey =
-//              new ShellExtensionRefersToReferenceKey(UUID.randomUUID(), ReferenceKeyType.BLOB, "refersToReferenceKey value");
-//        ShellExtensionRefersToReferenceParent refersToReferenceParent =
-//              new ShellExtensionRefersToReferenceParent(UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(refersToReferenceKey));
-//        ShellExtensionRefersToReference refersToReference =
-//              new ShellExtensionRefersToReference(UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(refersToReferenceKey), refersToReferenceParent);
-//
-//
-//        //ShellExtensionSupplemSemanticIdReference
-//        ShellExtensionSupplemSemanticIdReferenceKey supplemSemanticIdReferenceKey =
-//              new ShellExtensionSupplemSemanticIdReferenceKey(UUID.randomUUID(), ReferenceKeyType.BLOB, "supplem SemanticIdReferenceKey value");
-//        ShellExtensionSupplemSemanticIdReferenceParent supplemSemanticIdReferenceParent =
-//              new ShellExtensionSupplemSemanticIdReferenceParent(UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(supplemSemanticIdReferenceKey));
-//        ShellExtensionSupplemSemanticIdReference supplemSemanticIdReference =
-//              new ShellExtensionSupplemSemanticIdReference(UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(supplemSemanticIdReferenceKey), supplemSemanticIdReferenceParent);
-//
-//        //ShellExtensionSemanticIdReference
-//        ShellExtensionSemanticIdReferenceKey semanticIdReferenceKey =
-//              new ShellExtensionSemanticIdReferenceKey(UUID.randomUUID(), ReferenceKeyType.BLOB, "SemanticIdReferenceKey value");
-//        ShellExtensionSemanticIdReferenceParent semanticIdReferenceParent =
-//              new ShellExtensionSemanticIdReferenceParent(UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(semanticIdReferenceKey));
-//        ShellExtensionSemanticIdReference semanticIdReference =
-//              new ShellExtensionSemanticIdReference(UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(semanticIdReferenceKey), semanticIdReferenceParent);
-//
-//        ShellExtension shellExtension = new ShellExtension(
-//              UUID.randomUUID(),
-//              semanticIdReference,
-//              Set.of(supplemSemanticIdReference),
-//              "shell extension",
-//              DataTypeXsd.BOOLEAN,
-//              "shell extension value",
-//              Set.of(refersToReference)
-//        );
 
-        return null;
-//        return new Shell(UUID.randomUUID(), "idExternalExample", "idShortExample",
-//              shellIdentifiers, shellDescriptions, Set.of(submodel), null,null, ShellKind.INSTANCE, "shellType", Set.of(shellDisplayName), Set.of(shellExtension));
+        ShellDisplayName shellDisplayName = new ShellDisplayName( UUID.randomUUID(), "de", "Display name",null );
+
+        //ShellExtensionRefersToReference
+        ShellExtensionRefersToReferenceKey refersToReferenceKey =
+              new ShellExtensionRefersToReferenceKey(UUID.randomUUID(), ReferenceKeyType.BLOB, "refersToReferenceKey value",null,null);
+        ShellExtensionRefersToReferenceParent refersToReferenceParent =
+              new ShellExtensionRefersToReferenceParent(UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(refersToReferenceKey),null);
+        ShellExtensionRefersToReference refersToReference =
+              new ShellExtensionRefersToReference(UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(refersToReferenceKey), refersToReferenceParent,null);
+
+
+        //ShellExtensionSupplemSemanticIdReference
+        ShellExtensionSupplemSemanticIdReferenceKey supplemSemanticIdReferenceKey =
+              new ShellExtensionSupplemSemanticIdReferenceKey(UUID.randomUUID(), ReferenceKeyType.BLOB, "supplem SemanticIdReferenceKey value",null,null);
+        ShellExtensionSupplemSemanticIdReferenceParent supplemSemanticIdReferenceParent =
+              new ShellExtensionSupplemSemanticIdReferenceParent(UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(supplemSemanticIdReferenceKey),null);
+        ShellExtensionSupplemSemanticIdReference supplemSemanticIdReference =
+              new ShellExtensionSupplemSemanticIdReference(UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(supplemSemanticIdReferenceKey), supplemSemanticIdReferenceParent,null);
+
+        //ShellExtensionSemanticIdReference
+        ShellExtensionSemanticIdReferenceKey semanticIdReferenceKey =
+              new ShellExtensionSemanticIdReferenceKey(UUID.randomUUID(), ReferenceKeyType.BLOB, "SemanticIdReferenceKey value",null,null);
+        ShellExtensionSemanticIdReferenceParent semanticIdReferenceParent =
+              new ShellExtensionSemanticIdReferenceParent(UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(semanticIdReferenceKey),null);
+        ShellExtensionSemanticIdReference semanticIdReference =
+              new ShellExtensionSemanticIdReference(UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(semanticIdReferenceKey), semanticIdReferenceParent,null);
+
+        ShellExtension shellExtension = new ShellExtension(
+              UUID.randomUUID(),
+              "shell extension",
+              "shell extension value",
+              DataTypeXsd.BOOLEAN,
+              semanticIdReference,
+              Set.of(supplemSemanticIdReference),
+              Set.of(refersToReference),null
+        );
+
+        return new Shell(UUID.randomUUID(), "idExternalExample", "idShortExample",
+              shellIdentifiers, shellDescriptions, Set.of(submodel),Set.of(shellDisplayName), null,null, ShellKind.INSTANCE, "shellType", Set.of(shellExtension));
 
     }
 
@@ -605,8 +663,28 @@ public class ShellMapperTest {
         submodelSemanticReference.setType( ReferenceTypes.EXTERNALREFERENCE );
         Key key = new Key();
         key.setType( KeyTypes.SUBMODEL );
-        key.setValue( "semanticIdExample" );
+        key.setValue( "semanticId Example" );
+
+        ReferenceParent semanticReferenceParent = new ReferenceParent();
+        semanticReferenceParent.setKeys( List.of(key) );
+        semanticReferenceParent.setType( ReferenceTypes.MODELREFERENCE );
+
         submodelSemanticReference.setKeys( List.of(key) );
+        submodelSemanticReference.setReferredSemanticId( semanticReferenceParent );
+
+        // Reference for SUPPLEMENTAL semantic id
+        Reference submodelSupplemSemanticIdReference = new Reference();
+        submodelSupplemSemanticIdReference.setType( ReferenceTypes.EXTERNALREFERENCE );
+        Key submodelSupplemSemanticIdkey = new Key();
+        submodelSupplemSemanticIdkey.setType( KeyTypes.SUBMODEL );
+        submodelSupplemSemanticIdkey.setValue( "supplementalsemanticIdExample value" );
+
+        ReferenceParent submodelSupplemSemanticIdReferenceParent = new ReferenceParent();
+        submodelSupplemSemanticIdReferenceParent.setKeys( List.of(submodelSupplemSemanticIdkey) );
+        submodelSupplemSemanticIdReferenceParent.setType( ReferenceTypes.MODELREFERENCE );
+
+        submodelSupplemSemanticIdReference.setKeys( List.of(submodelSupplemSemanticIdkey) );
+        submodelSupplemSemanticIdReference.setReferredSemanticId( submodelSupplemSemanticIdReferenceParent );
 
 
         //SubmodelDescriptor Extension:
@@ -646,6 +724,7 @@ public class ShellMapperTest {
         submodelDescriptor.setDescription(List.of(description1, description2));
         submodelDescriptor.setEndpoints(List.of(endpoint));
        submodelDescriptor.setExtensions( List.of(submodelExtension) );
+       submodelDescriptor.setSupplementalSemanticId( List.of(submodelSupplemSemanticIdReference) );
         aas.setSubmodelDescriptors(List.of(submodelDescriptor));
         return aas;
     }

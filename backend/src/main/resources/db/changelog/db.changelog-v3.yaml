@@ -1000,3 +1000,230 @@ databaseChangeLog:
             referencedColumnNames: ID
             referencedTableName: SUBMODEL_EXTENSION_REFERS_TO_REFERENCE
             validate: true
+  - changeSet:
+      id: 18072023-01
+      author: slindner
+      changes:
+        - dropColumn:
+            tableName: SUBMODEL
+            columns:
+              - column:
+                  name: SEMANTIC_ID
+                  type: nvarchar(200)
+        - createTable:
+            tableName: SUBMODEL_SEMANTIC_ID_REFERENCE
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SUBMODEL_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_SEMANTIC_ID_REFERENCE
+            baseColumnNames: FK_SUBMODEL_ID
+            constraintName: REF_FK_SUBMODEL_SEMANTIC_ID_REF
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL
+            validate: true
+
+        - createTable:
+            tableName: SUBMODEL_SEMANTIC_ID_REFERENCE_PARENT
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SUBMODEL_SEMANTIC_ID_REFERRED_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_SEMANTIC_ID_REFERENCE_PARENT
+            baseColumnNames: FK_SUBMODEL_SEMANTIC_ID_REFERRED_ID
+            constraintName: REF_FK_SUBMODEL_SEMANTIC_ID_REFERENCE_PARENT
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL_SEMANTIC_ID_REFERENCE
+            validate: true
+
+        - createTable:
+            tableName: SUBMODEL_SEMANTIC_ID_REFERENCE_KEY
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: REF_KEY_VALUE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SUBMODEL_SEMANTIC_ID_REFERENCE_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+              - column:
+                  name: FK_REFERENCE_PARENT_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_SEMANTIC_ID_REFERENCE_KEY
+            baseColumnNames: FK_REFERENCE_PARENT_ID
+            constraintName: REF_FK_SUBMODEL_SEMANTIC_ID_PARENT_KEY
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL_SEMANTIC_ID_REFERENCE_PARENT
+            validate: true
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_SEMANTIC_ID_REFERENCE_KEY
+            baseColumnNames: FK_SUBMODEL_SEMANTIC_ID_REFERENCE_ID
+            constraintName: REF_FK_SUBMODEL_SEMANTIC_ID_REFERENCE_KEY
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL_SEMANTIC_ID_REFERENCE
+            validate: true
+
+        - createTable:
+            tableName: SUBMODEL_SUPPLEM_SEMANTIC_ID_REFERENCE
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SUBMODEL_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_SUPPLEM_SEMANTIC_ID_REFERENCE
+            baseColumnNames: FK_SUBMODEL_ID
+            constraintName: REF_FK_SUBMODEL_SUPPLEM_SEMANTIC_ID
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL
+            validate: true
+
+        - createTable:
+            tableName: SUBMODEL_SUPPLEM_SEMANTIC_ID_REFERENCE_PARENT
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SUBMODEL_SUPPLEM_SEMANTIC_ID_REFERRED_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_SUPPLEM_SEMANTIC_ID_REFERENCE_PARENT
+            baseColumnNames: FK_SUBMODEL_SUPPLEM_SEMANTIC_ID_REFERRED_ID
+            constraintName: REF_FK_SUBMODEL_SUPPLEM_SEMANTIC_ID_REFERENCE_PARENT
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL_SUPPLEM_SEMANTIC_ID_REFERENCE
+            validate: true
+
+        - createTable:
+            tableName: SUBMODEL_SUPPLEM_SEMANTIC_ID_REFERENCE_KEY
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: REF_KEY_VALUE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SUBMODEL_SUPPLEM_SEMANTIC_ID_REFERENCE_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+              - column:
+                  name: FK_REFERENCE_PARENT_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_SUPPLEM_SEMANTIC_ID_REFERENCE_KEY
+            baseColumnNames: FK_REFERENCE_PARENT_ID
+            constraintName: REF_FK_SUBMODEL_SUPPLEM_SEMANTIC_ID_PARENT_KEY
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL_SUPPLEM_SEMANTIC_ID_REFERENCE_PARENT
+            validate: true
+        - addForeignKeyConstraint:
+            baseTableName: SUBMODEL_SUPPLEM_SEMANTIC_ID_REFERENCE_KEY
+            baseColumnNames: FK_SUBMODEL_SUPPLEM_SEMANTIC_ID_REFERENCE_ID
+            constraintName: REF_FK_SUBMODEL_SUPPLEM_SEMANTIC_ID_REFERENCE_KEY
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SUBMODEL_SUPPLEM_SEMANTIC_ID_REFERENCE
+            validate: true

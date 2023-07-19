@@ -88,21 +88,21 @@ public class ShellService {
          shell.getSubmodels().forEach( submodel -> submodel.setShellId( shell ) );
          shell.getDescriptions().forEach( description -> description.setShellId( shell ) );
          shell.getDisplayNames().forEach( description -> description.setShellId( shell ) );
-       shell.setShellExtensions(shell.getShellExtensions()  );
+         shell.setShellExtensions(shell.getShellExtensions());
 
-       shell.getShellExtensions().forEach( shellExtension -> {
-          shellExtension.getRefersTo().forEach( submodelExtensionRefersToReference -> {
-                   submodelExtensionRefersToReference.getKeys().forEach( refersParent ->  refersParent.setShellExtensionRefersToReference(submodelExtensionRefersToReference  ));
-                   submodelExtensionRefersToReference.getReferredSemanticId().setShellExtensionRefersToReference(submodelExtensionRefersToReference  );
-                   submodelExtensionRefersToReference.getReferredSemanticId().getKeys().forEach( key -> key.setShellExtensionRefersToReferenceParent( submodelExtensionRefersToReference.getReferredSemanticId() ));
-                   submodelExtensionRefersToReference.setShellExtension( shellExtension );
+         shell.getShellExtensions().stream().filter(shellExtension -> shellExtension.getRefersTo()!=null  ).forEach( shellExtension -> {
+          shellExtension.getRefersTo().forEach( refers -> {
+                   refers.getKeys().forEach( refersParent ->  refersParent.setShellExtensionRefersToReference(refers  ));
+                   refers.getReferredSemanticId().setShellExtensionRefersToReference(refers  );
+                   refers.getReferredSemanticId().getKeys().forEach( key -> key.setShellExtensionRefersToReferenceParent( refers.getReferredSemanticId() ));
+                   refers.setShellExtension( shellExtension );
                 } );
 
-          shellExtension.getSupplementalSemanticIds().forEach( suppl ->{
-             suppl.getKeys().forEach( key -> key.setShellExtensionSupplemSemanticIdReference( suppl ) );
-             suppl.getReferredSemanticId().setShellExtensionSupplemSemanticIdReference(suppl  );
-             suppl.getReferredSemanticId().getKeys().forEach( key -> key.setShellExtensionSupplemSemanticIdReferenceParent( suppl.getReferredSemanticId() ));
-             suppl.setShellExtension( shellExtension );
+          shellExtension.getSupplementalSemanticIds().stream().filter( Objects::nonNull ).forEach( supplemental ->{
+             supplemental.getKeys().forEach( key -> key.setShellExtensionSupplemSemanticIdReference( supplemental ) );
+             supplemental.getReferredSemanticId().setShellExtensionSupplemSemanticIdReference(supplemental  );
+             supplemental.getReferredSemanticId().getKeys().forEach( key -> key.setShellExtensionSupplemSemanticIdReferenceParent( supplemental.getReferredSemanticId() ));
+             supplemental.setShellExtension( shellExtension );
                 } );
 
           shellExtension.getSemanticId().getKeys().forEach( key -> {
@@ -112,43 +112,57 @@ public class ShellService {
           shellExtension.getSemanticId().getKeys().forEach( key -> key.setShellExtensionSemanticIdReferenceParent(shellExtension.getSemanticId()
                 .getReferredSemanticId()  ) );
           shellExtension.getSemanticId().setShellExtension( shellExtension );
-             }
-       );
+             });
 
+
+       shell.getIdentifiers().stream().filter( identifiers -> !identifiers.getKey().equalsIgnoreCase("globalAssetId"  ) && identifiers.getSemanticId()!=null).forEach( identifier ->{
+          identifier.getSemanticId().getKeys().forEach( key -> key.setShellIdentifierSemanticReference( identifier.getSemanticId() ) );
+          identifier.getSemanticId().getReferredSemanticId().setShellIdentifierSemanticReference(identifier.getSemanticId()  );
+          identifier.getSemanticId().getReferredSemanticId().getKeys().forEach( key -> key.setShellIdentifierSemanticReferenceParent(  identifier.getSemanticId().getReferredSemanticId()) );
+          identifier.getSemanticId().setShellIdentifier( identifier);
+
+          identifier.getSupplementalSemanticIds().stream().filter( Objects::nonNull ).forEach( supplementalID->{
+             supplementalID.getKeys().forEach( key -> key.setShellIdentifierSupplemSemanticReference( supplementalID ) );
+             supplementalID.getReferredSemanticId().setShellIdentifierSupplemSemanticReference(supplementalID  );
+             supplementalID.getReferredSemanticId().getKeys().forEach( key -> key.setShellIdentifierSupplemSemanticReferenceParent( supplementalID.getReferredSemanticId() ));
+             supplementalID.setShellIdentifier( identifier );
+          } );
+
+       } );
     }
 
-    public void mapSubmodel(Shell shell){
-       shell.getSubmodels().forEach( submodel -> submodel.getEndpoints().forEach( submodelEndpoint -> submodelEndpoint.getSubmodelSecurityAttribute().stream().forEach(submodelSecurityAttribute ->  {
+    public void mapSubmodel(Set<Submodel> submodels){
+       submodels.forEach( submodel -> submodel.getEndpoints().forEach( submodelEndpoint -> submodelEndpoint.getSubmodelSecurityAttribute().stream().forEach(submodelSecurityAttribute ->  {
           submodelSecurityAttribute.setSubmodelEndpoint(submodelEndpoint  );
        }) ) );
 
-       shell.getSubmodels().forEach(submodel -> submodel.getSubmodelExtensions().forEach( submodelExtension -> {
-                submodelExtension.getRefersTo().forEach( submodelExtensionRefersToReference -> {
-                   submodelExtensionRefersToReference.getKeys().forEach( refersParent ->  refersParent.setSubmodelExtensionRefersToReference(submodelExtensionRefersToReference  ));
-                   submodelExtensionRefersToReference.getReferredSemanticId().setSubmodelExtensionRefersToReference(submodelExtensionRefersToReference  );
-                   submodelExtensionRefersToReference.getReferredSemanticId().getKeys().forEach( key -> key.setSubmodelExtensionRefersToReferenceParent( submodelExtensionRefersToReference.getReferredSemanticId() ));
-                   submodelExtensionRefersToReference.setSubmodelExtension( submodelExtension );
-                } );
+       submodels.forEach(submodel -> submodel.getSubmodelExtensions().forEach( submodelExtension -> {
+          submodelExtension.getRefersTo().forEach( refers -> {
+             refers.getKeys().forEach( refersParent ->  refersParent.setSubmodelExtensionRefersToReference(refers  ));
+             refers.getReferredSemanticId().setSubmodelExtensionRefersToReference(refers  );
+             refers.getReferredSemanticId().getKeys().forEach( key -> key.setSubmodelExtensionRefersToReferenceParent( refers.getReferredSemanticId() ));
+             refers.setSubmodelExtension( submodelExtension );
+          } );
 
-                submodelExtension.getSubmodSupplementalIds().forEach( suppl ->{
-                   suppl.getKeys().forEach( key -> key.setSubmodelExtensionSupplemSemanticIdReference( suppl ) );
-                   suppl.getReferredSemanticId().setSubmodelExtensionSupplemSemanticIdReference(suppl  );
-                   suppl.getReferredSemanticId().getKeys().forEach( key -> key.setSubmodelExtensionSupplemSemanticIdReferenceParent( suppl.getReferredSemanticId() ));
-                   suppl.setSubmodelExtension( submodelExtension );
-                } );
+          submodelExtension.getSubmodSupplementalIds().forEach( supplemental ->{
+             supplemental.getKeys().forEach( key -> key.setSubmodelExtensionSupplemSemanticIdReference( supplemental ) );
+             supplemental.getReferredSemanticId().setSubmodelExtensionSupplemSemanticIdReference(supplemental  );
+             supplemental.getReferredSemanticId().getKeys().forEach( key -> key.setSubmodelExtensionSupplemSemanticIdReferenceParent( supplemental.getReferredSemanticId() ));
+             supplemental.setSubmodelExtension( submodelExtension );
+          } );
 
-                submodelExtension.getSubmodSemanticId().getKeys().forEach( key -> {
-                   key.setSubmodelExtensionSemanticIdReference( submodelExtension.getSubmodSemanticId() );
-                } );
+          submodelExtension.getSubmodSemanticId().getKeys().forEach( key -> {
+             key.setSubmodelExtensionSemanticIdReference( submodelExtension.getSubmodSemanticId() );
+          } );
+
           submodelExtension.getSubmodSemanticId().getReferredSemanticId().setSubmodelExtensionSemanticIdReference( submodelExtension.getSubmodSemanticId());
           submodelExtension.getSubmodSemanticId().getKeys().forEach( key -> key.setSubmodelExtensionSemanticIdReferenceParent(submodelExtension.getSubmodSemanticId()
                 .getReferredSemanticId()  ) );
-          submodelExtension.getSubmodSemanticId().setSubmodelExtension( submodelExtension );
-             }
+          submodelExtension.getSubmodSemanticId().setSubmodelExtension( submodelExtension );}
        ));
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Shell findShellByExternalId(String externalShellId,String externalSubjectId) {
         return shellRepository.findByIdExternal(externalShellId)
                 .map(shell -> shell.withIdentifiers(filterSpecificAssetIdsByTenantId(shell.getIdentifiers(), externalSubjectId)))
@@ -295,8 +309,11 @@ public class ShellService {
    public void update( Shell shell,String aasIdentifier) {
         deleteShell(  aasIdentifier);
         mapShellCollection( shell );
+        mapSubmodel( shell.getSubmodels() );
         try {save( shell );}
-        catch ( Exception e ){throw new IllegalArgumentException( e.getMessage() );}
+        catch ( Exception e ){
+           e.printStackTrace();
+           throw new IllegalArgumentException( e.getMessage() );}
    }
    @Transactional
     public void deleteShell(String externalShellId) {
@@ -343,9 +360,10 @@ public class ShellService {
    @Transactional
    public void update( String externalShellId, Submodel submodel,String externalSubjectId) {
       Shell shellFromDb = findShellByExternalId( externalShellId,externalSubjectId );
+      shellFromDb.add(submodel  );
       submodel.setShellId( shellFromDb );
-      submodel.getDescriptions().forEach( desc-> desc.setSubmodel( submodel ) );
-      submodel.getEndpoints().forEach( end -> end.setSubmodel( submodel ) );
+      mapSubmodel( shellFromDb.getSubmodels() );
+      //submodel.setShellId( shellFromDb );
       submodelRepository.save(submodel  );
    }
 
