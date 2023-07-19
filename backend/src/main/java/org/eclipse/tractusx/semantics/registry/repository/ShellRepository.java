@@ -52,18 +52,7 @@ public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecific
      * @param keyValueCombinationsSize the size of the key value combinations
      * @return external shell ids for the given key value combinations
      */
-    @Query(
-//            "select s.id_external from shell s where s.id in (" +
-//                    "select si.fk_shell_id from shell_identifier si " +
-//                    "where concat(si.namespace,si.identifier) in (:keyValueCombinations) " +
-//                    "and (:tenantId = :owningTenantId or :tenantId = "
-//                  + "select ref_key_value from reference_key where fk_reference_id = (select id from reference  where fk_shell_identifier_external_subject_id "
-//                  + " = si.id)) " +
-//                    "group by si.fk_shell_id " +
-//                    "having count(*) = :keyValueCombinationsSize " +
-//            ")"
-
-          value = "select s.id_external from shell s where s.id in (" +
+    @Query( value = "select s.id_external from shell s where s.id in (" +
           "select si.fk_shell_id from shell_identifier si " +
           "where concat(si.namespace,si.identifier) in (:keyValueCombinations) " +
           "and (:tenantId = :owningTenantId or :tenantId = (" +
@@ -71,9 +60,7 @@ public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecific
           "(select sies.id from SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE sies where sies.FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID=si.id)"+
           ")) group by si.fk_shell_id " +
           "having count(*) = :keyValueCombinationsSize " +
-           ")",nativeQuery = true
-
-    )
+           ")",nativeQuery = true )
     List<String> findExternalShellIdsByIdentifiersByExactMatch(@Param("keyValueCombinations") List<String> keyValueCombinations,
                                                    @Param("keyValueCombinationsSize") int keyValueCombinationsSize,
                                                    @Param("tenantId") String tenantId,

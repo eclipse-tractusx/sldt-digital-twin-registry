@@ -20,23 +20,9 @@
 package org.eclipse.tractusx.semantics.registry.model;
 
 import java.util.UUID;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.With;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Getter
@@ -46,21 +32,16 @@ import lombok.With;
 @AllArgsConstructor
 @With
 public class SubmodelDisplayName {
-
    @GeneratedValue( strategy = GenerationType.IDENTITY )
    @Id
    @Column( name = "id" )
    UUID id;
-
    @Column
    String language;
-
    @Column
    String text;
-
    @JsonBackReference
    @ManyToOne(fetch = FetchType.LAZY)
    @JoinColumn(name = "fk_submodel_id")
    private Submodel submodel;
-
 }

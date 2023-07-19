@@ -19,17 +19,36 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
-import java.time.Instant;
-import java.util.*;
-import org.springframework.data.annotation.CreatedDate;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import jakarta.persistence.*;
-import lombok.*;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.With;
 
 @Entity
 @Getter
@@ -56,7 +75,6 @@ public class Submodel {
     @JsonManagedReference
     @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL,orphanRemoval=true, mappedBy = "submodel")
-    //@Column("fk_submodel_id")
     SubmodelSemanticIdReference semanticId;
 
     @JsonManagedReference
@@ -77,19 +95,16 @@ public class Submodel {
     @JsonManagedReference
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true,mappedBy = "submodel")
-    //@MappedCollection(idColumn = "fk_submodel_id")
     private Set<SubmodelDisplayName> displayNames= new HashSet<>();
 
     @JsonManagedReference
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true,mappedBy = "submodel")
-    //@MappedCollection(idColumn = "fk_submodel_id")
     Set<SubmodelExtension> submodelExtensions= new HashSet<>();
 
     @JsonManagedReference
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true,mappedBy = "submodel")
-    //@MappedCollection(idColumn = "fk_submodel_id")
     Set<SubmodelSupplemSemanticIdReference> submodelSupplemSemanticIds;
 
     public void setDisplayNames(Set<SubmodelDisplayName> displayNames) {
@@ -99,7 +114,6 @@ public class Submodel {
             s.setSubmodel(this);
         }
     }
-
     public void setSubmodelExtensions(Set<SubmodelExtension> submodelExtensions) {
         if(submodelExtensions==null) {submodelExtensions = new HashSet<>();}
         this.submodelExtensions = submodelExtensions;

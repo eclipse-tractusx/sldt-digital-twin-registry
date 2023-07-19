@@ -21,19 +21,10 @@ package org.eclipse.tractusx.semantics.registry.model;
 
 import java.util.Set;
 import java.util.UUID;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 import jakarta.persistence.*;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.With;
+import lombok.*;
 
 @Entity
 @Getter
@@ -43,26 +34,20 @@ import lombok.With;
 @AllArgsConstructor
 @With
 public class ShellIdentifierSupplemSemanticReference {
-
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    UUID id;
-
    ReferenceType type;
-
    @JsonManagedReference
    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellIdentifierSupplemSemanticReference")
-   // @MappedCollection(idColumn = "fk_reference_id")
    Set<ShellIdentifierSupplemSemanticReferenceKey> keys;
 
    @JsonManagedReference
    @OneToOne(cascade = CascadeType.ALL, mappedBy = "shellIdentifierSupplemSemanticReference")
-  /// @Column("fk_referred_semantic_id" )
    ShellIdentifierSupplemSemanticReferenceParent referredSemanticId;
 
    @JsonBackReference
    @ManyToOne(fetch = FetchType.LAZY, optional = false)
    @JoinColumn(name = "fk_shell_identifier_supplem_semantic_id")
    private ShellIdentifier shellIdentifier;
-
 }

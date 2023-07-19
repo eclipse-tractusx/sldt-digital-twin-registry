@@ -20,25 +20,14 @@
 package org.eclipse.tractusx.semantics.registry.model;
 
 public enum ShellKind {
-
-   INSTANCE("Instance"),
-
-   NOTAPPLICABLE("NotApplicable"),
-
-   TYPE("Type");
-
+   INSTANCE( "Instance" ),
+   NOTAPPLICABLE( "NotApplicable" ),
+   TYPE( "Type" );
    private String value;
-
-   ShellKind(String value ) {
+   ShellKind( String value ) {
       this.value = value;
    }
-
-   public String getValue() {
-      return value;
-   }
-
+   public String getValue() {return value;}
    @Override
-   public String toString() {
-      return String.valueOf(value);
-   }
+   public String toString() {return String.valueOf(value);}
 }

@@ -21,8 +21,6 @@ package org.eclipse.tractusx.semantics.registry.model;
 
 import java.util.Set;
 import java.util.UUID;
-
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -37,11 +35,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @With
-@JsonIdentityInfo(
-      generator = ObjectIdGenerators.PropertyGenerator.class,
-      property = "id")
+@JsonIdentityInfo( generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class ShellIdentifier {
-
     public static final String GLOBAL_ASSET_ID_KEY = "globalAssetId";
 
     @Id
@@ -53,10 +48,8 @@ public class ShellIdentifier {
     @Column(name = "identifier")
     private String value;
 
-
     @JsonManagedReference
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "shellIdentifier")
-    //@Column(name = "fk_shell_identifier_external_subject_id")
     private ShellIdentifierExternalSubjectReference externalSubjectId;
 
     @JsonBackReference
@@ -66,12 +59,9 @@ public class ShellIdentifier {
 
     @JsonManagedReference
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "shellIdentifier")
-    //@Column( "fk_shell_identifier_semantic_id")
-    ShellIdentifierSemanticReference semanticId;
+    private ShellIdentifierSemanticReference semanticId;
 
     @JsonManagedReference
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellIdentifier")
-    //@MappedCollection(idColumn = "fk_shell_identifier_supplem_semantic_id")
     Set<ShellIdentifierSupplemSemanticReference> supplementalSemanticIds;
-
 }

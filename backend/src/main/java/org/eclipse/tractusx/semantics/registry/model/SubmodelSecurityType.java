@@ -20,27 +20,12 @@
 package org.eclipse.tractusx.semantics.registry.model;
 
 public enum SubmodelSecurityType {
-
    NONE("NONE"),
-
    RFC_TLSA("RFC_TLSA"),
-
    W3C_DID("W3C_DID");
-
    private String value;
-
-   SubmodelSecurityType(String value){
-      this.value = value;
-   }
-
-   public String getValue() {
-      return value;
-   }
-
+   SubmodelSecurityType(String value){this.value = value;}
+   public String getValue() {return value;}
    @Override
-   public String toString() {
-      return String.valueOf(value);
-   }
-
-
+   public String toString() {return String.valueOf(value);}
 }

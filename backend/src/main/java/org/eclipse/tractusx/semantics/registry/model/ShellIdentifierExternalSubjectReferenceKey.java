@@ -20,24 +20,9 @@
 package org.eclipse.tractusx.semantics.registry.model;
 
 import java.util.UUID;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.With;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Getter
@@ -47,12 +32,10 @@ import lombok.With;
 @AllArgsConstructor
 @With
 public class ShellIdentifierExternalSubjectReferenceKey {
-
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    UUID id;
    ReferenceKeyType type;
-
    @Column(name="ref_key_value")
    String value;
 
@@ -61,12 +44,10 @@ public class ShellIdentifierExternalSubjectReferenceKey {
    @JoinColumn(name = "fk_si_external_subject_reference_id")
    private ShellIdentifierExternalSubjectReference shellIdentifierExternalSubjectReference;
 
-
    @JsonBackReference
    @ManyToOne(fetch = FetchType.LAZY, optional = false)
    @JoinColumn(name = "fk_reference_parent_id")
    private ShellIdentifierExternalSubjectReferenceParent shellIdentifierExternalSubjectReferenceParent;
-
 }
 
 

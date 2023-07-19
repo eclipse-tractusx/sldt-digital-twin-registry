@@ -19,34 +19,18 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.mapper;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.eclipse.tractusx.semantics.aas.registry.model.Endpoint;
-import org.eclipse.tractusx.semantics.aas.registry.model.Extension;
-import org.eclipse.tractusx.semantics.aas.registry.model.GetSubmodelDescriptorsResult;
-import org.eclipse.tractusx.semantics.aas.registry.model.Key;
-import org.eclipse.tractusx.semantics.aas.registry.model.KeyTypes;
-import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
-import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
-import org.eclipse.tractusx.semantics.aas.registry.model.ReferenceTypes;
-import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
+import org.eclipse.tractusx.semantics.aas.registry.model.*;
 import org.eclipse.tractusx.semantics.registry.dto.SubmodelCollectionDto;
-import org.eclipse.tractusx.semantics.registry.model.Submodel;
-import org.eclipse.tractusx.semantics.registry.model.SubmodelDescription;
-import org.eclipse.tractusx.semantics.registry.model.SubmodelEndpoint;
-import org.eclipse.tractusx.semantics.registry.model.SubmodelExtension;
-import org.mapstruct.AfterMapping;
+import org.eclipse.tractusx.semantics.registry.model.*;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 import org.mapstruct.Mappings;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -59,8 +43,8 @@ public interface SubmodelMapper {
             @Mapping(target="semanticId", source = "semanticId"),
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "displayNames", source = "displayName"),
-          @Mapping(target = "submodelExtensions", source = "extensions"),
-          @Mapping(target = "submodelSupplemSemanticIds", source = "supplementalSemanticId")
+            @Mapping(target = "submodelExtensions", source = "extensions"),
+            @Mapping(target = "submodelSupplemSemanticIds", source = "supplementalSemanticId")
     })
     Submodel fromApiDto(SubmodelDescriptor apiDto);
 
@@ -76,8 +60,6 @@ public interface SubmodelMapper {
    })
    SubmodelExtension mapSubmodelExtension (Extension submodelExtensions);
 
-
-
    @Mappings({
             @Mapping(target="interfaceName", source = "interface"),
             @Mapping(target="endpointAddress", source = "protocolInformation.href"),
@@ -90,7 +72,7 @@ public interface SubmodelMapper {
     })
     SubmodelEndpoint fromApiDto(Endpoint apiDto);
 
-   @Named("endpointProtocolVersionMapping")
+    @Named("endpointProtocolVersionMapping")
     default String endpointProtocolVersion(List<String> endpointProtocolVersions) {
        return Optional.ofNullable(endpointProtocolVersions).map(endpointPVs -> String.join(",", endpointPVs)).orElse(null);
     }
@@ -136,5 +118,4 @@ public interface SubmodelMapper {
          @Mapping(source="refersTo", target = "refersTo")
    })
    Extension mapExtension (SubmodelExtension submodelExtension);
-
 }

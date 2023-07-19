@@ -21,25 +21,9 @@ package org.eclipse.tractusx.semantics.registry.mapper;
 
 import java.util.List;
 import java.util.Set;
-
-import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
-import org.eclipse.tractusx.semantics.aas.registry.model.Extension;
-import org.eclipse.tractusx.semantics.aas.registry.model.GetAssetAdministrationShellDescriptorsResult;
-import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
-import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
-import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
+import org.eclipse.tractusx.semantics.aas.registry.model.*;
 import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
-import org.eclipse.tractusx.semantics.registry.model.Shell;
-import org.eclipse.tractusx.semantics.registry.model.ShellDescription;
-import org.eclipse.tractusx.semantics.registry.model.ShellDisplayName;
-import org.eclipse.tractusx.semantics.registry.model.ShellExtension;
-import org.eclipse.tractusx.semantics.registry.model.ShellExtensionRefersToReference;
-import org.eclipse.tractusx.semantics.registry.model.ShellExtensionSemanticIdReference;
-import org.eclipse.tractusx.semantics.registry.model.ShellExtensionSupplemSemanticIdReference;
-import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
-import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierExternalSubjectReference;
-import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierSemanticReference;
-import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierSupplemSemanticReference;
+import org.eclipse.tractusx.semantics.registry.model.*;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.InjectionStrategy;
@@ -62,7 +46,6 @@ public interface ShellMapper {
           @Mapping(target = "id", ignore = true),
           @Mapping(target = "displayNames", source = "displayName"),
           @Mapping(target = "shellExtensions", source = "extensions"),
-
     })
     Shell fromApiDto(AssetAdministrationShellDescriptor apiDto);
 
@@ -97,7 +80,6 @@ public interface ShellMapper {
 
    ShellExtensionRefersToReference maptoShellExtensionRefersToReference ( Reference refersTo );
 
-
     Set<ShellIdentifier> fromApiDto(List<SpecificAssetId> apiDto);
 
     @Mappings({
@@ -111,8 +93,7 @@ public interface ShellMapper {
          @Mapping(source = "descriptions", target = "description"),
          @Mapping(source = "submodels", target = "submodelDescriptors"),
          @Mapping(source = "displayNames", target = "displayName"),
-          @Mapping(source = "shellExtensions", target = "extensions"),
-
+         @Mapping(source = "shellExtensions", target = "extensions"),
     })
     @InheritInverseConfiguration
     AssetAdministrationShellDescriptor toApiDto(Shell shell);

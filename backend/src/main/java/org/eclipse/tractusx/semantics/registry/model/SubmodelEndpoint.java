@@ -21,12 +21,9 @@ package org.eclipse.tractusx.semantics.registry.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -60,16 +57,13 @@ public class SubmodelEndpoint {
    @Column
    private String subProtocolBodyEncoding;
 
-
    @JsonManagedReference
    @JsonIgnore
    @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true,mappedBy = "submodelEndpoint")
-    //@MappedCollection(idColumn = "fk_submodel_endpoint_id")
-    Set<SubmodelSecurityAttribute> submodelSecurityAttribute=new HashSet<>();
+   private Set<SubmodelSecurityAttribute> submodelSecurityAttribute=new HashSet<>();
 
    @JsonBackReference
    @ManyToOne( fetch = FetchType.LAZY, optional = false,cascade = {CascadeType.MERGE}  )
    @JoinColumn( name = "fk_submodel_id" )
    private Submodel submodel;
-
 }
