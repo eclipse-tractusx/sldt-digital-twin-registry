@@ -20,6 +20,8 @@
 package org.eclipse.tractusx.semantics.registry.utils;
 
 import java.time.Instant;
+import java.util.UUID;
+
 import org.springframework.data.jpa.domain.Specification;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -35,17 +37,18 @@ public class ShellSpecification<T> implements Specification<T> {
 
    @Override
    public Predicate toPredicate( Root<T> root, CriteriaQuery<?> cq, CriteriaBuilder criteriaBuilder ) {
-      Predicate predicate = applyFilter( root, criteriaBuilder );
-      cq.orderBy( criteriaBuilder.asc(criteriaBuilder.coalesce( root.get( sortFieldName ), Instant.now() ) ));
-      return predicate;
+      return applyFilter( root,cq, criteriaBuilder );
    }
 
-   private Predicate applyFilter( Root<T> root, CriteriaBuilder criteriaBuilder ) {
+   private Predicate applyFilter( Root<T> root,CriteriaQuery<?> cq, CriteriaBuilder criteriaBuilder ) {
       if(root.toString().contains( "Shell" )){
          var searchValue = shellCursor.getShellSearchCursor();
+         cq.orderBy( criteriaBuilder.asc( criteriaBuilder.coalesce( root.get( sortFieldName ), Instant.now() ) ) );
          return criteriaBuilder.greaterThan( root.get( sortFieldName ), searchValue );
       }else{
          var searchValue = shellCursor.getSubmodelSearchCursor();
+         cq.orderBy( criteriaBuilder.asc( criteriaBuilder.coalesce( root.get( sortFieldName ),
+               UUID.fromString( "00000000-0000-0000-0000-000000000000" )) ) );
          return criteriaBuilder.greaterThan( root.get( sortFieldName ), searchValue );
       }
    }
