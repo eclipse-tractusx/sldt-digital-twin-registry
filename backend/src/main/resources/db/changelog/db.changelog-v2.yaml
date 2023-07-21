@@ -118,3 +118,252 @@ databaseChangeLog:
             referencedColumnNames: ID
             referencedTableName: SUBMODEL
             validate: true
+  - changeSet:
+      id: 17072023-01
+      author: slindner
+      changes:
+        - createTable:
+            tableName: SHELL_IDENTIFIER_SEMANTIC_REFERENCE
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SHELL_IDENTIFIER_SEMANTIC_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_IDENTIFIER_SEMANTIC_REFERENCE
+            baseColumnNames: FK_SHELL_IDENTIFIER_SEMANTIC_ID
+            constraintName: REF_FK_SHELL_IDENTIFIER_SEMANTIC_ID_REF
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_IDENTIFIER
+            validate: true
+        - createTable:
+            tableName: SHELL_IDENTIFIER_SEMANTIC_REFERENCE_PARENT
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SIS_REFERRED_SEMANTIC_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_IDENTIFIER_SEMANTIC_REFERENCE_PARENT
+            baseColumnNames: FK_SIS_REFERRED_SEMANTIC_ID
+            constraintName: REF_FK_SHELL_IDENTIFIER_SEMANTIC_REFERENCE_PARENT
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_IDENTIFIER_SEMANTIC_REFERENCE
+            validate: true
+
+        - createTable:
+            tableName: SHELL_IDENTIFIER_SEMANTIC_REFERENCE_KEY
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: REF_KEY_VALUE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SIS_REFERENCE_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+              - column:
+                  name: FK_REFERENCE_PARENT_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_IDENTIFIER_SEMANTIC_REFERENCE_KEY
+            baseColumnNames: FK_REFERENCE_PARENT_ID
+            constraintName: REF_FK_SI_SEMANTIC_REFERENCE_PARENT_ID
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_IDENTIFIER_SEMANTIC_REFERENCE_PARENT
+            validate: true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_IDENTIFIER_SEMANTIC_REFERENCE_KEY
+            baseColumnNames: FK_SIS_REFERENCE_ID
+            constraintName: REF_FK_SI_SEMANTIC_REFERENCE_ID
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_IDENTIFIER_SEMANTIC_REFERENCE
+            validate: true
+
+        - createTable:
+            tableName: SHELL_IDENTIFIER_SUPPLEM_SEMANTIC_REFERENCE
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SHELL_IDENTIFIER_SUPPLEM_SEMANTIC_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_IDENTIFIER_SUPPLEM_SEMANTIC_REFERENCE
+            baseColumnNames: FK_SHELL_IDENTIFIER_SUPPLEM_SEMANTIC_ID
+            constraintName: REF_FK_SHELL_IDENTIFIER_SUPPLEM_SEMANTIC_ID_REF
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_IDENTIFIER
+            validate: true
+
+        - createTable:
+            tableName: SHELL_IDENTIFIER_SUPPLEM_SEMANTIC_REFERENCE_PARENT
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_REFERRED_SEMANTIC_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_IDENTIFIER_SUPPLEM_SEMANTIC_REFERENCE_PARENT
+            baseColumnNames: FK_REFERRED_SEMANTIC_ID
+            constraintName: REF_FK_SHELL_IDENTIFIER_SUPPLEM_SEMANTIC_REFERENCE_PARENT
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_IDENTIFIER_SUPPLEM_SEMANTIC_REFERENCE
+            validate: true
+        - createTable:
+            tableName: SHELL_IDENTIFIER_SUPPLEM_SEMANTIC_REFERENCE_KEY
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: REF_KEY_VALUE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_REFERENCE_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+              - column:
+                  name: FK_REFERENCE_PARENT_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_IDENTIFIER_SUPPLEM_SEMANTIC_REFERENCE_KEY
+            baseColumnNames: FK_REFERENCE_PARENT_ID
+            constraintName: REF_FK_SI_SUPPLEM_SEMANTIC_REFERENCE_PARENT_ID
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_IDENTIFIER_SUPPLEM_SEMANTIC_REFERENCE_PARENT
+            validate: true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_IDENTIFIER_SUPPLEM_SEMANTIC_REFERENCE_KEY
+            baseColumnNames: FK_REFERENCE_ID
+            constraintName: REF_FK_SI_SUPPLEM_SEMANTIC_REFERENCE_ID
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_IDENTIFIER_SUPPLEM_SEMANTIC_REFERENCE
+            validate: true
+
+        - createTable:
+            tableName: SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE
+            columns:
+              - column:
+                  name: ID
+                  type: ${uuid_type}
+                  defaultValueComputed: ${uuid_function}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: TYPE
+                  type: nvarchar(2000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID
+                  type: ${uuid_type}
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE
+            baseColumnNames: FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID
+            constraintName: REF_FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID_REF
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: ID
+            referencedTableName: SHELL_IDENTIFIER
+            validate: true
