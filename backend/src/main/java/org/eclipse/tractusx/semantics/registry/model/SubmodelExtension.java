@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,14 +19,13 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Getter
@@ -35,35 +34,33 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 @NoArgsConstructor
 @AllArgsConstructor
 @With
-public class SubmodelEndpoint {
-
+public class SubmodelExtension {
    @GeneratedValue( strategy = GenerationType.IDENTITY )
    @Id
    @Column( name = "id" )
-   private UUID id;
-
-   @Column
-   private String interfaceName;
-   @Column
-   private String endpointAddress;
-   @Column
-   private String endpointProtocol;
-   @Column
-   private String endpointProtocolVersion;
-   @Column
-   private String subProtocol;
-   @Column
-   private String subProtocolBody;
-   @Column
-   private String subProtocolBodyEncoding;
+   UUID id;
 
    @JsonManagedReference
    @JsonIgnore
-   @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true,mappedBy = "submodelEndpoint")
-   private Set<SubmodelSecurityAttribute> submodelSecurityAttribute=new HashSet<>();
+   @OneToOne(cascade = CascadeType.ALL, orphanRemoval=true,mappedBy = "submodelExtension")
+   SubmodelExtensionSemanticIdReference submodSemanticId;
+
+   @JsonManagedReference
+   @JsonIgnore
+   @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true,mappedBy = "submodelExtension")
+   Set<SubmodelExtensionSupplemSemanticIdReference> submodSupplementalIds;
+   String name;
+   DataTypeXsd valueType;
+   @Column(name = "submod_ext_value")
+   String value;
+
+   @JsonManagedReference
+   @JsonIgnore
+   @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true,mappedBy = "submodelExtension")
+   Set<SubmodelExtensionRefersToReference> refersTo;
 
    @JsonBackReference
-   @ManyToOne( fetch = FetchType.LAZY, optional = false,cascade = {CascadeType.MERGE}  )
-   @JoinColumn( name = "fk_submodel_id" )
+   @ManyToOne(fetch = FetchType.LAZY)
+   @JoinColumn(name = "fk_submodel_id")
    private Submodel submodel;
 }

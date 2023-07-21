@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,14 +19,10 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Getter
@@ -35,35 +31,17 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 @NoArgsConstructor
 @AllArgsConstructor
 @With
-public class SubmodelEndpoint {
-
+public class SubmodelDisplayName {
    @GeneratedValue( strategy = GenerationType.IDENTITY )
    @Id
    @Column( name = "id" )
-   private UUID id;
-
+   UUID id;
    @Column
-   private String interfaceName;
+   String language;
    @Column
-   private String endpointAddress;
-   @Column
-   private String endpointProtocol;
-   @Column
-   private String endpointProtocolVersion;
-   @Column
-   private String subProtocol;
-   @Column
-   private String subProtocolBody;
-   @Column
-   private String subProtocolBodyEncoding;
-
-   @JsonManagedReference
-   @JsonIgnore
-   @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true,mappedBy = "submodelEndpoint")
-   private Set<SubmodelSecurityAttribute> submodelSecurityAttribute=new HashSet<>();
-
+   String text;
    @JsonBackReference
-   @ManyToOne( fetch = FetchType.LAZY, optional = false,cascade = {CascadeType.MERGE}  )
-   @JoinColumn( name = "fk_submodel_id" )
+   @ManyToOne(fetch = FetchType.LAZY)
+   @JoinColumn(name = "fk_submodel_id")
    private Submodel submodel;
 }
