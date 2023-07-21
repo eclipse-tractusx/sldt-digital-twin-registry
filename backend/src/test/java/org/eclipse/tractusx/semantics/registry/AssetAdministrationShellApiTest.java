@@ -19,9 +19,11 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import static org.eclipse.tractusx.semantics.registry.TestUtil.getEncodedValue;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import java.util.List;
+import java.util.UUID;
 import org.eclipse.tractusx.semantics.aas.registry.model.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -29,13 +31,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import java.util.List;
 
-import java.util.UUID;
-
-import static org.eclipse.tractusx.semantics.registry.TestUtil.getEncodedValue;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class AssetAdministrationShellApiTest extends AbstractAssetAdministrationShellApi {
 
@@ -48,11 +47,12 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
       public void testCreateShellExpectSuccess() throws Exception {
          AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
          shellPayload.setId( UUID.randomUUID().toString() );
+
          performShellCreateRequest( mapper.writeValueAsString( shellPayload ) );
 
          AssetAdministrationShellDescriptor onlyRequiredFieldsShell = TestUtil.createCompleteAasDescriptor();
          onlyRequiredFieldsShell.setId( UUID.randomUUID().toString() );
-         onlyRequiredFieldsShell.setIdShort( "idShortExample" );
+
          performShellCreateRequest( mapper.writeValueAsString( onlyRequiredFieldsShell ) );
 
       }
@@ -93,7 +93,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                )
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isOk() );
-         //.andExpect(content().json(toJson(shellPayload)));
+       //  .andExpect(content().json(toJson(shellPayload)));
       }
 
       @Test
@@ -695,6 +695,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                            .get( LOOKUP_SHELL_BASE_PATH )
                            .queryParam( "assetIds", mapper.writeValueAsString( specificAssetId1 ) )
                            .queryParam( "limit", "1" )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -741,7 +742,9 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
          shellPayload.setId( UUID.randomUUID().toString() );
          shellPayload.setGlobalAssetId( globalAssetId );
-         performShellCreateRequest( mapper.writeValueAsString( shellPayload ) );
+         String payload = mapper.writeValueAsString( shellPayload );
+         performShellCreateRequest(payload );
+         //performShellCreateRequest( mapper.writeValueAsString( shellPayload ) );
 
          // for lookup global asset id is handled as specificAssetIds
          ArrayNode globalAssetIdForSampleQuery = emptyArrayNode().add(
@@ -750,6 +753,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          mvc.perform(
                      MockMvcRequestBuilders
                            .get( LOOKUP_SHELL_BASE_PATH )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .queryParam( "assetIds", toJson( globalAssetIdForSampleQuery ) )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
