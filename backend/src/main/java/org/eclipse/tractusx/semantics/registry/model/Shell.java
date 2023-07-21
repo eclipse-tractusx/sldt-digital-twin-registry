@@ -21,7 +21,6 @@ package org.eclipse.tractusx.semantics.registry.model;
 
 import java.time.Instant;
 import java.util.*;
-
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -30,7 +29,6 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
-
 @Entity
 @Getter
 @Setter
@@ -80,6 +78,18 @@ public class Shell {
 
     private ShellKind shellKind;
     private String shellType;
+
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellId")
+    Set<ShellExtension> shellExtensions= new HashSet<>();
+
+    public void setShellExtensions(Set<ShellExtension> shellExtensions) {
+        if(shellExtensions==null) {shellExtensions = new HashSet<>();}
+        this.shellExtensions = shellExtensions;
+        for(ShellExtension s : shellExtensions) {
+            s.setShellId(this);
+        }
+    }
 
     public void setDisplayNames(Set<ShellDisplayName> displayNames) {
         if(displayNames==null) {displayNames = new HashSet<>();}

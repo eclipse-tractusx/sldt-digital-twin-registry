@@ -60,7 +60,6 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
 
     @Override
-    // TODO: 21.06.2023 implement correct and not just give back dummy, implement test cases for this endpoint 
     public ResponseEntity<ServiceDescription> getDescription() {
         ServiceDescription serviceDescription = new ServiceDescription();
         serviceDescription.setProfiles( List.of( ServiceDescription.ProfilesEnum.ASSETADMINISTRATIONSHELLREPOSITORYSERVICESPECIFICATION_V3_0_MINIMALPROFILE, 
@@ -120,6 +119,7 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     public ResponseEntity<AssetAdministrationShellDescriptor> postAssetAdministrationShellDescriptor( AssetAdministrationShellDescriptor assetAdministrationShellDescriptor ) {
         Shell shell = shellMapper.fromApiDto(assetAdministrationShellDescriptor);
         shellService.mapShellCollection( shell );
+        if(!shell.getSubmodels().isEmpty()) shellService.mapSubmodel( shell.getSubmodels() );
         Shell saved = shellService.save(shell);
         return new ResponseEntity<>(shellMapper.toApiDto(saved), HttpStatus.CREATED);
     }
@@ -128,6 +128,7 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     public ResponseEntity<SubmodelDescriptor> postSubmodelDescriptorThroughSuperpath( byte[] aasIdentifier, SubmodelDescriptor submodelDescriptor ) {
         Submodel toBeSaved = submodelMapper.fromApiDto(submodelDescriptor);
         toBeSaved.setIdExternal( submodelDescriptor.getId() );
+        shellService.mapSubmodel( Set.of(toBeSaved) );
         Submodel savedSubModel = shellService.save(getDecodedId( aasIdentifier ), toBeSaved, getExternalSubjectIdOrEmpty(null));
         return new ResponseEntity<>(submodelMapper.toApiDto(savedSubModel), HttpStatus.CREATED);
     }
@@ -142,10 +143,9 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
 
     @Override
     public ResponseEntity<Void> putSubmodelDescriptorByIdThroughSuperpath( byte[] aasIdentifier, byte[] submodelIdentifier, SubmodelDescriptor submodelDescriptor ) {
-        Submodel submodel = submodelMapper.fromApiDto( submodelDescriptor );
-        Submodel fromDB = shellService.findSubmodelByExternalId( getDecodedId( aasIdentifier ),getDecodedId( submodelIdentifier ),getExternalSubjectIdOrEmpty( null ) );
         shellService.deleteSubmodel(getDecodedId( aasIdentifier ),  getDecodedId( submodelIdentifier ),getExternalSubjectIdOrEmpty( null ));
-        shellService.update( getDecodedId( aasIdentifier ), submodel.withIdExternal( getDecodedId( submodelIdentifier ) ).withId( fromDB.getId() ) ,getExternalSubjectIdOrEmpty( "" ));
+        submodelDescriptor.setId( getDecodedId( submodelIdentifier ));
+        postSubmodelDescriptorThroughSuperpath(aasIdentifier,submodelDescriptor);
         return new ResponseEntity<>( HttpStatus.NO_CONTENT );
     }
 
