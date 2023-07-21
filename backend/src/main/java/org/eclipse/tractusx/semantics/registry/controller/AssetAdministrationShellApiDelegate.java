@@ -119,7 +119,7 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     public ResponseEntity<AssetAdministrationShellDescriptor> postAssetAdministrationShellDescriptor( AssetAdministrationShellDescriptor assetAdministrationShellDescriptor ) {
         Shell shell = shellMapper.fromApiDto(assetAdministrationShellDescriptor);
         shellService.mapShellCollection( shell );
-        shellService.mapSubmodel( shell.getSubmodels() );
+        if(!shell.getSubmodels().isEmpty()) shellService.mapSubmodel( shell.getSubmodels() );
         Shell saved = shellService.save(shell);
         return new ResponseEntity<>(shellMapper.toApiDto(saved), HttpStatus.CREATED);
     }

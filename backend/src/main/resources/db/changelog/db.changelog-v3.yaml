@@ -1227,3 +1227,10 @@ databaseChangeLog:
             referencedColumnNames: ID
             referencedTableName: SUBMODEL_SUPPLEM_SEMANTIC_ID_REFERENCE
             validate: true
+  - changeSet:
+      id: 20072023-01
+      author: slindner
+      changes:
+        - dropNotNullConstraint:
+            tableName: SUBMODEL
+            columnName: ID_SHORT
