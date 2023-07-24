@@ -80,6 +80,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
       public void testGetShellExpectSuccess() throws Exception {
          AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
          shellPayload.setId( UUID.randomUUID().toString() );
+         String expectedPayload = mapper.writeValueAsString( shellPayload );
          performShellCreateRequest( mapper.writeValueAsString( shellPayload ) );
 
          String shellId = shellPayload.getId();
@@ -92,8 +93,8 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                            .with( jwtTokenFactory.allRoles() )
                )
                .andDo( MockMvcResultHandlers.print() )
-               .andExpect( status().isOk() );
-       //  .andExpect(content().json(toJson(shellPayload)));
+               .andExpect( status().isOk() )
+         .andExpect(content().json(expectedPayload));
       }
 
       @Test
@@ -744,7 +745,6 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          shellPayload.setGlobalAssetId( globalAssetId );
          String payload = mapper.writeValueAsString( shellPayload );
          performShellCreateRequest(payload );
-         //performShellCreateRequest( mapper.writeValueAsString( shellPayload ) );
 
          // for lookup global asset id is handled as specificAssetIds
          ArrayNode globalAssetIdForSampleQuery = emptyArrayNode().add(
