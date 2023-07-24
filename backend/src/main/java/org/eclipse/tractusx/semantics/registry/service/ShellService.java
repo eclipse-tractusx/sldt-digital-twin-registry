@@ -23,6 +23,7 @@ import static org.springframework.data.domain.PageRequest.ofSize;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.aas.registry.model.GetAllAssetAdministrationShellIdsByAssetLink200Response;
@@ -89,79 +90,49 @@ public class ShellService {
          shell.getDescriptions().forEach( description -> description.setShellId( shell ) );
          shell.getDisplayNames().forEach( description -> description.setShellId( shell ) );
          shell.setShellExtensions(shell.getShellExtensions());
-         shell.getShellExtensions().stream().forEach( shellExtension -> {
-          if(shellExtension.getRefersTo() != null){
-          shellExtension.getRefersTo().stream().filter( Objects::nonNull ).forEach( refers -> {
-                   refers.getKeys().forEach( refersParent ->  refersParent.setShellExtensionRefersToReference(refers  ));
-                   if(refers.getReferredSemanticId() != null){
-                   refers.getReferredSemanticId().setShellExtensionRefersToReference(refers  );
-                   refers.getReferredSemanticId().getKeys().stream().filter( Objects::nonNull ).forEach( key -> key.setShellExtensionRefersToReferenceParent( refers.getReferredSemanticId() ));
-                }
-                   refers.setShellExtension( shellExtension );} );
-          }
-
-          if(shellExtension.getSupplementalSemanticIds() != null ) {
-             shellExtension.getSupplementalSemanticIds().forEach( supplemental -> {
-                supplemental.getKeys().forEach( key -> key.setShellExtensionSupplemSemanticIdReference( supplemental ) );
-                if(supplemental.getReferredSemanticId() != null){
-                supplemental.getReferredSemanticId().setShellExtensionSupplemSemanticIdReference( supplemental );
-                supplemental.getReferredSemanticId().getKeys()
-                      .forEach( key -> key.setShellExtensionSupplemSemanticIdReferenceParent( supplemental.getReferredSemanticId() ) );
-                }
-                supplemental.setShellExtension( shellExtension );
-             } );
-          }
-          if(shellExtension.getSemanticId() != null) {
-             shellExtension.getSemanticId().getKeys().forEach( key -> {
-                key.setShellExtensionSemanticIdReference( shellExtension.getSemanticId() );
-             } );
-             if(shellExtension.getSemanticId().getReferredSemanticId() != null) {
-                shellExtension.getSemanticId().getReferredSemanticId().setShellExtensionSemanticIdReference( shellExtension.getSemanticId() );
-                shellExtension.getSemanticId().getReferredSemanticId().getKeys()
-                      .forEach( key -> key.setShellExtensionSemanticIdReferenceParent( shellExtension.getSemanticId()
-                            .getReferredSemanticId() ) );
-             }
-             shellExtension.getSemanticId().setShellExtension( shellExtension );
-          }
-         });
-
-       //shell.getIdentifiers().stream().filter( identifiers -> !identifiers.getKey().equalsIgnoreCase("globalAssetId"  ) && identifiers.getSemanticId()!=null).forEach(
-       shell.getIdentifiers().stream().filter( identifiers -> !identifiers.getKey().equalsIgnoreCase("globalAssetId"  )).forEach(
-             identifier ->{
-                if(identifier.getSemanticId()!= null){
-          identifier.getSemanticId().getKeys().forEach( key -> key.setShellIdentifierSemanticReference( identifier.getSemanticId() ) );
-          if(identifier.getSemanticId().getReferredSemanticId() != null) {
-             identifier.getSemanticId().getReferredSemanticId().setShellIdentifierSemanticReference( identifier.getSemanticId() );
-             identifier.getSemanticId().getReferredSemanticId().getKeys()
-                   .forEach( key -> key.setShellIdentifierSemanticReferenceParent( identifier.getSemanticId().getReferredSemanticId() ) );
-          }
-             identifier.getSemanticId().setShellIdentifier( identifier );
-                }
-
-                if(identifier.getSupplementalSemanticIds() != null) {
-                   identifier.getSupplementalSemanticIds().stream().filter( Objects::nonNull ).forEach( supplementalID -> {
-                      supplementalID.getKeys().forEach( key -> key.setShellIdentifierSupplemSemanticReference( supplementalID ) );
-                      if(supplementalID.getReferredSemanticId() != null){
-                      supplementalID.getReferredSemanticId().setShellIdentifierSupplemSemanticReference( supplementalID );
-                      supplementalID.getReferredSemanticId().getKeys()
-                            .forEach( key -> key.setShellIdentifierSupplemSemanticReferenceParent( supplementalID.getReferredSemanticId() ) );
-                         }
-                      supplementalID.setShellIdentifier( identifier );
-                   } );
-                }
-
-          if(identifier.getExternalSubjectId()!=null) {
-             identifier.getExternalSubjectId().getKeys().stream().filter( Objects::nonNull ).forEach( key -> {key.setShellIdentifierExternalSubjectReference( identifier.getExternalSubjectId() );} );
-             if(identifier.getExternalSubjectId().getReferredSemanticId() != null){
-             identifier.getExternalSubjectId().getReferredSemanticId().setShellIdentifierExternalSubjectReference( identifier.getExternalSubjectId() );
-             identifier.getExternalSubjectId().getReferredSemanticId().getKeys().forEach( key ->
-                   key.setShellIdentifierExternalSubjectReferenceParent( identifier.getExternalSubjectId().getReferredSemanticId() ) );
-             }
-             identifier.getExternalSubjectId().setShellIdentifier( identifier );}
-       });
+       mapShellExtension( shell );
+       mapShellIdentifier( shell.getIdentifiers().stream() );
     }
 
-    public void mapSubmodel(Set<Submodel> submodels){
+   private void mapShellExtension( Shell shell ) {
+      shell.getShellExtensions().stream().forEach( shellExtension -> {
+       if(shellExtension.getRefersTo() != null){
+       shellExtension.getRefersTo().stream().filter( Objects::nonNull ).forEach( refers -> {
+                refers.getKeys().forEach( refersParent ->  refersParent.setShellExtensionRefersToReference(refers  ));
+                if(refers.getReferredSemanticId() != null){
+                refers.getReferredSemanticId().setShellExtensionRefersToReference(refers  );
+                refers.getReferredSemanticId().getKeys().stream().filter( Objects::nonNull ).forEach( key -> key.setShellExtensionRefersToReferenceParent( refers.getReferredSemanticId() ));
+             }
+                refers.setShellExtension( shellExtension );} );
+       }
+
+       if(shellExtension.getSupplementalSemanticIds() != null ) {
+          shellExtension.getSupplementalSemanticIds().forEach( supplemental -> {
+             supplemental.getKeys().forEach( key -> key.setShellExtensionSupplemSemanticIdReference( supplemental ) );
+             if(supplemental.getReferredSemanticId() != null){
+             supplemental.getReferredSemanticId().setShellExtensionSupplemSemanticIdReference( supplemental );
+             supplemental.getReferredSemanticId().getKeys()
+                   .forEach( key -> key.setShellExtensionSupplemSemanticIdReferenceParent( supplemental.getReferredSemanticId() ) );
+             }
+             supplemental.setShellExtension( shellExtension );
+          } );
+       }
+       if(shellExtension.getSemanticId() != null) {
+          shellExtension.getSemanticId().getKeys().forEach( key -> {
+             key.setShellExtensionSemanticIdReference( shellExtension.getSemanticId() );
+          } );
+          if(shellExtension.getSemanticId().getReferredSemanticId() != null) {
+             shellExtension.getSemanticId().getReferredSemanticId().setShellExtensionSemanticIdReference( shellExtension.getSemanticId() );
+             shellExtension.getSemanticId().getReferredSemanticId().getKeys()
+                   .forEach( key -> key.setShellExtensionSemanticIdReferenceParent( shellExtension.getSemanticId()
+                         .getReferredSemanticId() ) );
+          }
+          shellExtension.getSemanticId().setShellExtension( shellExtension );
+       }
+      });
+   }
+
+   public void mapSubmodel(Set<Submodel> submodels){
        submodels.forEach( submodel -> submodel.getEndpoints().forEach( submodelEndpoint -> submodelEndpoint.getSubmodelSecurityAttribute().forEach(submodelSecurityAttribute ->  {
           submodelSecurityAttribute.setSubmodelEndpoint(submodelEndpoint  );}) ) );
 
@@ -387,12 +358,53 @@ public class ShellService {
     @Transactional
     public Set<ShellIdentifier> save(String externalShellId, Set<ShellIdentifier> shellIdentifiers,String externalSubjectId) {
         Shell shellFromDb = findShellByExternalId(externalShellId,externalSubjectId);
-        shellIdentifierRepository.deleteShellIdentifiersByShellId(shellFromDb.getId(), ShellIdentifier.GLOBAL_ASSET_ID_KEY);
 
         List<ShellIdentifier> identifiersToUpdate = shellIdentifiers.stream().map(identifier -> identifier.withShellId(shellFromDb))
                 .collect(Collectors.toList());
-        return ImmutableSet.copyOf(shellIdentifierRepository.saveAll(identifiersToUpdate));
+
+       mapShellIdentifier( identifiersToUpdate.stream() );
+
+       return ImmutableSet.copyOf(shellIdentifierRepository.saveAll(identifiersToUpdate));
     }
+
+   private static void mapShellIdentifier( Stream<ShellIdentifier> identifiersToUpdate ) {
+      identifiersToUpdate.filter( identifiers -> !identifiers.getKey().equalsIgnoreCase( "globalAssetId" ) ).forEach(
+            identifier -> {
+               if ( identifier.getSemanticId() != null ) {
+                  identifier.getSemanticId().getKeys().forEach( key -> key.setShellIdentifierSemanticReference( identifier.getSemanticId() ) );
+                  if ( identifier.getSemanticId().getReferredSemanticId() != null ) {
+                     identifier.getSemanticId().getReferredSemanticId().setShellIdentifierSemanticReference( identifier.getSemanticId() );
+                     identifier.getSemanticId().getReferredSemanticId().getKeys()
+                           .forEach( key -> key.setShellIdentifierSemanticReferenceParent( identifier.getSemanticId().getReferredSemanticId() ) );
+                  }
+                  identifier.getSemanticId().setShellIdentifier( identifier );
+               }
+
+               if ( identifier.getSupplementalSemanticIds() != null ) {
+                  identifier.getSupplementalSemanticIds().stream().filter( Objects::nonNull ).forEach( supplementalID -> {
+                     supplementalID.getKeys().forEach( key -> key.setShellIdentifierSupplemSemanticReference( supplementalID ) );
+                     if ( supplementalID.getReferredSemanticId() != null ) {
+                        supplementalID.getReferredSemanticId().setShellIdentifierSupplemSemanticReference( supplementalID );
+                        supplementalID.getReferredSemanticId().getKeys()
+                              .forEach( key -> key.setShellIdentifierSupplemSemanticReferenceParent( supplementalID.getReferredSemanticId() ) );
+                     }
+                     supplementalID.setShellIdentifier( identifier );
+                  } );
+               }
+
+               if ( identifier.getExternalSubjectId() != null ) {
+                  identifier.getExternalSubjectId().getKeys().stream().filter( Objects::nonNull ).forEach( key -> {
+                     key.setShellIdentifierExternalSubjectReference( identifier.getExternalSubjectId() );
+                  } );
+                  if ( identifier.getExternalSubjectId().getReferredSemanticId() != null ) {
+                     identifier.getExternalSubjectId().getReferredSemanticId().setShellIdentifierExternalSubjectReference( identifier.getExternalSubjectId() );
+                     identifier.getExternalSubjectId().getReferredSemanticId().getKeys().forEach( key ->
+                           key.setShellIdentifierExternalSubjectReferenceParent( identifier.getExternalSubjectId().getReferredSemanticId() ) );
+                  }
+                  identifier.getExternalSubjectId().setShellIdentifier( identifier );
+               }
+            } );
+   }
 
    @Transactional
    public Submodel save( String externalShellId, Submodel submodel, String externalSubjectId ) {
