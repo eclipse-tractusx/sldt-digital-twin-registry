@@ -203,7 +203,6 @@ public class TestUtil {
         submodelDescriptor.setDescription(List.of(description1, description2));
         submodelDescriptor.setEndpoints(List.of(endpoint));
         submodelDescriptor.setExtensions( List.of(submodelExtension) );
-        assetAdministrationShellDescriptor.setEndpoints(List.of(endpoint));
         assetAdministrationShellDescriptor.setSubmodelDescriptors(List.of(submodelDescriptor));
         return assetAdministrationShellDescriptor;
     }
