@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.3.12-M1
+### Added
+
+## fixed
+- Fix CVE-2023-34035 (update springboot to version 3.1.2)
+- Fix CVE-2023-2976 (update google guava to version 32.1.1-jre)
+
 ## 0.3.11-M1
 ### Added
 
