@@ -1,0 +1,600 @@
+{
+	"info": {
+		"_postman_id": "4bd0a60b-03ad-4891-b841-251f296e5d85",
+		"name": "tractusx-dtr-aas-3.0.0",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Asset Administration Shell Registry",
+			"item": [
+				{
+					"name": "Create Shell",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"idShort\": \"idShortExample\",\n  \"id\": \"e1eba3d7-91f0-4dac-a730-eaa1d35e035c-2\",  \n  \"description\": [\n    {\n      \"language\": \"de\",\n      \"text\": \"example text\"\n    }\n  ],\n  \"displayName\": [\n    {\n      \"language\": \"de\",\n      \"text\": \"this is an example description1\"\n    }\n  ],\n  \"endpoints\": [\n    {\n      \"interface\": \"interfaceNameExample\",\n      \"protocolInformation\": {\n        \"href\": \"endpointAddressExample\",\n        \"endpointProtocol\": \"endpointProtocolExample\",\n        \"endpointProtocolVersion\": [\n          \"e\"\n        ],\n        \"subprotocol\": \"subprotocolExample\",\n        \"subprotocolBody\": \"subprotocolBodyExample\",\n        \"subprotocolBodyEncoding\": \"subprotocolBodyExample\",\n        \"securityAttributes\": [\n          {\n            \"type\": \"NONE\"\n          }\n        ]\n      }\n    }\n  ],\n  \"specificAssetIds\": [\n    {\n      \"name\": \"manufacturePartId\",\n      \"value\": \"1234\"\n    },\n    {\n      \"name\": \"oen\",\n      \"value\": \"1239485\"\n    },\n    {\n      \"name\": \"serialnr\",\n      \"value\": \"12345\",\n      \"externalSubjectId\":{\n          \"type\": \"ExternalReference\",\n          \"keys\": [\n            {\n              \"type\": \"Property\",\n              \"value\": \"CONSUMER_BPN\"\n            }\n          ]\n        }\n    }\n  ],\n  \"submodelDescriptors\": [\n    {\n      \"endpoints\": [\n        {\n          \"interface\": \"interfaceNameExample\",\n          \"protocolInformation\": {\n            \"href\": \"endpointAddressExample\",\n            \"endpointProtocol\": \"endpointProtocolExample\",\n            \"endpointProtocolVersion\": [\n              \"e\"\n            ],\n            \"subprotocol\": \"5hg\",\n            \"subprotocolBody\":\"\",\n            \"subprotocolBodyEncoding\": \"subprotocolBodyExample\",\n            \"securityAttributes\": [\n              {\n                \"type\": \"NONE\"\n              }\n            ]\n          }\n        }\n      ],\n      \"idShort\": \"idShortExample\",\n      \"id\": \"cd47615b-daf3-4036-8670-d2f89349d388-2\",\n      \"semanticId\": {\n        \"type\": \"ExternalReference\",\n        \"keys\": [\n          {\n            \"type\": \"Submodel\",\n            \"value\": \"urn:bamm:io.catenax.serial_part_typization:1.1.0#SerialPartTypization\"\n          }\n        ]\n      },\n      \"description\": [\n        {\n          \"language\": \"de\",\n          \"text\": \"hello text\"\n        },\n        {\n          \"language\": \"en\",\n          \"text\": \"hello s\"\n        }\n      ]\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/api/v3.0/shell-descriptors"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Shells",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Edc-Bpn",
+								"value": "CONSUMER_BPN",
+								"description": "BPN (This is normally send via EDC)",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v3.0/shell-descriptors",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v3.0",
+								"shell-descriptors"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "100",
+									"disabled": true
+								},
+								{
+									"key": "cursor",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Shell by Id",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Edc-Bpn",
+								"value": "",
+								"description": "BPN (This is normally send via EDC)",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v3.0/shell-descriptors/:aasIdentifier",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v3.0",
+								"shell-descriptors",
+								":aasIdentifier"
+							],
+							"variable": [
+								{
+									"key": "aasIdentifier",
+									"value": "ZTFlYmEzZDctOTFmMC00ZGFjLWE3MzAtZWFhMWQzNWUwMzVjLTI",
+									"description": "aasIdentifier as UTF8-BASE64-URL-encoded"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Shell",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"idShort\": \"idShortExample\",\n  \"id\": \"e1eba3d7-91f0-4dac-a730-eaa1d35e035c-2\",\n  \"description\": [\n    {\n      \"language\": \"de\",\n      \"text\": \"example text\"\n    }\n  ],\n  \"displayName\": [\n    {\n      \"language\": \"de\",\n      \"text\": \"this is an example description1\"\n    }\n  ],\n  \"endpoints\": [\n    {\n      \"interface\": \"interfaceNameExample\",\n      \"protocolInformation\": {\n        \"href\": \"endpointAddressExample\",\n        \"endpointProtocol\": \"endpointProtocolExample\",\n        \"endpointProtocolVersion\": [\n          \"e\"\n        ],\n        \"subprotocol\": \"subprotocolExample\",\n        \"subprotocolBody\": \"subprotocolBodyExample\",\n        \"subprotocolBodyEncoding\": \"subprotocolBodyExample\",\n        \"securityAttributes\": [\n          {\n            \"type\": \"NONE\"\n          }\n        ]\n      }\n    }\n  ],\n  \"specificAssetIds\": [\n    {\n      \"name\": \"manufacturePartId\",\n      \"value\": \"12345\",\n      \"externalSubjectId\":{\n          \"type\": \"ExternalReference\",\n          \"keys\": [\n            {\n              \"type\": \"Property\",\n              \"value\": \"CONSUMER_BPN\"\n            }\n          ]\n        }\n    },\n    {\n      \"name\": \"oen\",\n      \"value\": \"1239485\"\n    },\n    {\n      \"name\": \"serialnr\",\n      \"value\": \"1234\",\n      \"externalSubjectId\":{\n          \"type\": \"ExternalReference\",\n          \"keys\": [\n            {\n              \"type\": \"Property\",\n              \"value\": \"CONSUMER_BPN\"\n            }\n          ]\n        }\n    }\n  ],\n  \"submodelDescriptors\": [\n    {\n      \"endpoints\": [\n        {\n          \"interface\": \"interfaceNameExample\",\n          \"protocolInformation\": {\n            \"href\": \"endpointAddressExample\",\n            \"endpointProtocol\": \"endpointProtocolExample\",\n            \"endpointProtocolVersion\": [\n              \"e\"\n            ],\n            \"subprotocol\": \"5hg\",\n            \"subprotocolBody\":\"\",\n            \"subprotocolBodyEncoding\": \"subprotocolBodyExample\",\n            \"securityAttributes\": [\n              {\n                \"type\": \"NONE\"\n              }\n            ]\n          }\n        }\n      ],\n      \"idShort\": \"idShortExample\",\n      \"id\": \"cd47615b-daf3-4036-8670-d2f89349d388-2\",\n      \"semanticId\": {\n        \"type\": \"ExternalReference\",\n        \"keys\": [\n          {\n            \"type\": \"Submodel\",\n            \"value\": \"urn:bamm:io.catenax.serial_part_typization:1.1.0#SerialPartTypization\"\n          }\n        ]\n      },\n      \"description\": [\n        {\n          \"language\": \"de\",\n          \"text\": \"hello text\"\n        },\n        {\n          \"language\": \"en\",\n          \"text\": \"hello s\"\n        }\n      ]\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v3.0/shell-descriptors/:aasIdentifier",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v3.0",
+								"shell-descriptors",
+								":aasIdentifier"
+							],
+							"variable": [
+								{
+									"key": "aasIdentifier",
+									"value": "ZTFlYmEzZDctOTFmMC00ZGFjLWE3MzAtZWFhMWQzNWUwMzVjLTI",
+									"description": "aasIdentifier as UTF8-BASE64-URL-encoded"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Shell",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v3.0/shell-descriptors/:aasIdentifier",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v3.0",
+								"shell-descriptors",
+								":aasIdentifier"
+							],
+							"variable": [
+								{
+									"key": "aasIdentifier",
+									"value": "ZTFlYmEzZDctOTFmMC00ZGFjLWE3MzAtZWFhMWQzNWUwMzVjLTI",
+									"description": "aasIdentifier as UTF8-BASE64-URL-encoded"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create new Submodel",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"endpoints\": [\n    {\n      \"interface\": \"interfaceNameExample\",\n      \"protocolInformation\": {\n        \"href\": \"endpointAddressExample\",\n        \"endpointProtocol\": \"endpointProtocolExample\",\n        \"endpointProtocolVersion\": [\n          \"e\"\n        ],\n        \"subprotocol\": \"subprotocolExample\",\n        \"subprotocolBody\": \"subprotocolBodyExample\",\n        \"subprotocolBodyEncoding\": \"subprotocolBodyExample\",\n        \"securityAttributes\": [\n          {\n            \"type\": \"NONE\"\n          }\n        ]\n      }\n    }\n  ],\n  \"idShort\": \"idShortExample\",\n  \"id\": \"341f63de-728a-4b6d-9c72-c0d9ba4f8c7d\",\n  \"semanticId\": {\n    \"type\": \"ExternalReference\",\n    \"keys\": [\n      {\n        \"type\": \"Submodel\",\n        \"value\": \"semanticIdExample\"\n      }\n    ]\n  },\n  \"description\": [\n    {\n      \"language\": \"de\",\n      \"text\": \"hello text\"\n    },\n    {\n      \"language\": \"en\",\n      \"text\": \"hello s\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v3.0/shell-descriptors/:aasIdentifier/submodel-descriptors",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v3.0",
+								"shell-descriptors",
+								":aasIdentifier",
+								"submodel-descriptors"
+							],
+							"variable": [
+								{
+									"key": "aasIdentifier",
+									"value": "ZTFlYmEzZDctOTFmMC00ZGFjLWE3MzAtZWFhMWQzNWUwMzVjLTI",
+									"description": "aasIdentifier as UTF8-BASE64-URL-encoded"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Submodel by Id",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Edc-Bpn",
+								"value": "",
+								"description": "BPN (This is normally send via EDC)",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v3.0/shell-descriptors/:aasIdentifier/submodel-descriptors",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v3.0",
+								"shell-descriptors",
+								":aasIdentifier",
+								"submodel-descriptors"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "cursor",
+									"value": null,
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "aasIdentifier",
+									"value": "ZTFlYmEzZDctOTFmMC00ZGFjLWE3MzAtZWFhMWQzNWUwMzVjLTI",
+									"description": "aasIdentifier as UTF8-BASE64-URL-encoded"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get specific Submodel by Id",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v3.0/shell-descriptors/:aasIdentifier/submodel-descriptors/:submodelIdentifier",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v3.0",
+								"shell-descriptors",
+								":aasIdentifier",
+								"submodel-descriptors",
+								":submodelIdentifier"
+							],
+							"variable": [
+								{
+									"key": "aasIdentifier",
+									"value": "ZTFlYmEzZDctOTFmMC00ZGFjLWE3MzAtZWFhMWQzNWUwMzVjLTI",
+									"description": "aasIdentifier as UTF8-BASE64-URL-encoded"
+								},
+								{
+									"key": "submodelIdentifier",
+									"value": "Y2Q0NzYxNWItZGFmMy00MDM2LTg2NzAtZDJmODkzNDlkMzg4LTI=",
+									"description": "submodelIdentifier as UTF8-BASE64-URL-encoded"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update specific Submodel by Id",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"endpoints\": [\n    {\n      \"interface\": \"interfaceNameExample\",\n      \"protocolInformation\": {\n        \"href\": \"endpointAddressExample\",\n        \"endpointProtocol\": \"endpointProtocolExample\",\n        \"endpointProtocolVersion\": [\n          \"e\"\n        ],\n        \"subprotocol\": \"subprotocolExample\",\n        \"subprotocolBody\": \"subprotocolBodyExample\",\n        \"subprotocolBodyEncoding\": \"subprotocolBodyExample\",\n        \"securityAttributes\": [\n          {\n            \"type\": \"NONE\"\n          }\n        ]\n      }\n    }\n  ],\n  \"idShort\": \"idShortExample\",\n  \"id\": \"341f63de-728a-4b6d-9c72-c0d9ba4f8c7d\",\n  \"semanticId\": {\n    \"type\": \"ExternalReference\",\n    \"keys\": [\n      {\n        \"type\": \"Submodel\",\n        \"value\": \"semanticIdExample\"\n      }\n    ]\n  },\n  \"description\": [\n    {\n      \"language\": \"de\",\n      \"text\": \"hello text\"\n    },\n    {\n      \"language\": \"en\",\n      \"text\": \"hello s\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v3.0/shell-descriptors/:aasIdentifier/submodel-descriptors/:submodelIdentifier",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v3.0",
+								"shell-descriptors",
+								":aasIdentifier",
+								"submodel-descriptors",
+								":submodelIdentifier"
+							],
+							"variable": [
+								{
+									"key": "aasIdentifier",
+									"value": "ZTFlYmEzZDctOTFmMC00ZGFjLWE3MzAtZWFhMWQzNWUwMzVjLTI",
+									"description": "aasIdentifier as UTF8-BASE64-URL-encoded"
+								},
+								{
+									"key": "submodelIdentifier",
+									"value": "Y2Q0NzYxNWItZGFmMy00MDM2LTg2NzAtZDJmODkzNDlkMzg4LTI=",
+									"description": "submodelIdentifier as UTF8-BASE64-URL-encoded"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete specific Submodel by Id",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v3.0/shell-descriptors/:aasIdentifier/submodel-descriptors/:submodelIdentifier",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v3.0",
+								"shell-descriptors",
+								":aasIdentifier",
+								"submodel-descriptors",
+								":submodelIdentifier"
+							],
+							"variable": [
+								{
+									"key": "aasIdentifier",
+									"value": "ZTFlYmEzZDctOTFmMC00ZGFjLWE3MzAtZWFhMWQzNWUwMzVjLTI",
+									"description": "aasIdentifier as UTF8-BASE64-URL-encoded"
+								},
+								{
+									"key": "submodelIdentifier",
+									"value": "Y2Q0NzYxNWItZGFmMy00MDM2LTg2NzAtZDJmODkzNDlkMzg4LTI=",
+									"description": "submodelIdentifier as UTF8-BASE64-URL-encoded"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Registry and Discovery",
+			"item": [
+				{
+					"name": "Get list of ShellIds (exact match)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Edc-Bpn",
+								"value": "",
+								"description": "BPN (This is normally send via EDC)",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v3.0/lookup/shells?assetIds=[{\"name\":\"oen\",\"value\":\"1239485\"},{\"name\":\"manufacturePartId\",\"value\":\"1234\"}]",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v3.0",
+								"lookup",
+								"shells"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "cursor",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "assetIds",
+									"value": "[{\"name\":\"oen\",\"value\":\"1239485\"},{\"name\":\"manufacturePartId\",\"value\":\"1234\"}]"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get SpecificAssetIds by aasIdentifier",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Edc-Bpn",
+								"value": "",
+								"description": "BPN (This is normally send via EDC)",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v3.0/lookup/shells/:aasIdentifier",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v3.0",
+								"lookup",
+								"shells",
+								":aasIdentifier"
+							],
+							"variable": [
+								{
+									"key": "aasIdentifier",
+									"value": "ZTFlYmEzZDctOTFmMC00ZGFjLWE3MzAtZWFhMWQzNWUwMzVjLTI",
+									"description": "aasIdentifier as UTF8-BASE64-URL-encoded"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update SpecificAssetIds by aasIdentifier (overwrite existing List)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Edc-Bpn",
+								"value": "",
+								"description": "BPN (This is normally send via EDC)",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    {\n      \"name\": \"oen\",\n      \"value\": \"1239485\"\n    }\n  ]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v3.0/lookup/shells/:aasIdentifier",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v3.0",
+								"lookup",
+								"shells",
+								":aasIdentifier"
+							],
+							"variable": [
+								{
+									"key": "aasIdentifier",
+									"value": "ZTFlYmEzZDctOTFmMC00ZGFjLWE3MzAtZWFhMWQzNWUwMzVjLTI",
+									"description": "aasIdentifier as UTF8-BASE64-URL-encoded"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get list of ShellIds (any search)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Edc-Bpn",
+								"value": "",
+								"description": "BPN (This is normally send via EDC)",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": {\n    \"assetIds\": [\n      {\n        \"name\": \"oen\",\n        \"value\": \"1239485\"\n      },\n      {\n        \"name\": \"manufacturePartId\",\n        \"value\": \"123\"\n      }\n    ]\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v3.0/lookup/shells/query",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v3.0",
+								"lookup",
+								"shells",
+								"query"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "cursor",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "",
+			"type": "default"
+		}
+	]
+}
