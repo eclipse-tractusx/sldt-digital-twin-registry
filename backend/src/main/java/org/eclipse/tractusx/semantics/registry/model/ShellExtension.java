@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -21,12 +21,15 @@ package org.eclipse.tractusx.semantics.registry.model;
 
 import java.util.Set;
 import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import jakarta.persistence.*;
 import lombok.*;
+
 
 @Entity
 @Getter
@@ -35,33 +38,33 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @With
-@JsonIdentityInfo( generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class ShellIdentifier {
-    public static final String GLOBAL_ASSET_ID_KEY = "globalAssetId";
+@JsonIdentityInfo(
+      generator = ObjectIdGenerators.PropertyGenerator.class,
+      property = "id")
+public class ShellExtension {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
-    private UUID id;
-    @Column(name = "namespace")
-    private String key;
-    @Column(name = "identifier")
-    private String value;
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   UUID id;
+   String name;
+   @Column(name = "shell_ext_value")
+   String value;
+   DataTypeXsd valueType;
 
-    @JsonManagedReference
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "shellIdentifier")
-    private ShellIdentifierExternalSubjectReference externalSubjectId;
+   @JsonManagedReference
+   @OneToOne(cascade = CascadeType.ALL, mappedBy = "shellExtension")
+   ShellExtensionSemanticIdReference semanticId;
 
-    @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "fk_shell_id")
-    private Shell shellId;
+   @JsonManagedReference
+   @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellExtension")
+   Set<ShellExtensionSupplemSemanticIdReference> supplementalSemanticIds;
 
-    @JsonManagedReference
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "shellIdentifier")
-    private ShellIdentifierSemanticReference semanticId;
+   @JsonManagedReference
+   @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellExtension")
+   Set<ShellExtensionRefersToReference> refersTo;
 
-    @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellIdentifier")
-    Set<ShellIdentifierSupplemSemanticReference> supplementalSemanticIds;
+   @JsonBackReference
+   @ManyToOne(fetch = FetchType.LAZY)
+   @JoinColumn(name = "fk_shell_id")
+   private Shell shellId;
 }

@@ -52,15 +52,15 @@ public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecific
      * @param keyValueCombinationsSize the size of the key value combinations
      * @return external shell ids for the given key value combinations
      */
-    @Query(value =
-            "select s.id_external from shell s where s.id in (" +
-                    "select si.fk_shell_id from shell_identifier si " +
-                    "where concat(si.namespace,si.identifier) in (:keyValueCombinations) " +
-                    "and (si.external_subject_id is null or :tenantId = :owningTenantId or si.external_subject_id = :tenantId) " +
-                    "group by si.fk_shell_id " +
-                    "having count(*) = :keyValueCombinationsSize " +
-            "order by s.created_date asc)",nativeQuery = true
-    )
+    @Query( value = "select s.id_external from shell s where s.id in (" +
+          "select si.fk_shell_id from shell_identifier si " +
+          "where concat(si.namespace,si.identifier) in (:keyValueCombinations) " +
+          "and (:tenantId = :owningTenantId or :tenantId = (" +
+                "Select sider.ref_key_value from SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY sider where FK_SI_EXTERNAL_SUBJECT_REFERENCE_ID="+
+          "(select sies.id from SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE sies where sies.FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID=si.id)"+
+          ")) group by si.fk_shell_id " +
+          "having count(*) = :keyValueCombinationsSize " +
+           ")",nativeQuery = true )
     List<String> findExternalShellIdsByIdentifiersByExactMatch(@Param("keyValueCombinations") List<String> keyValueCombinations,
                                                    @Param("keyValueCombinationsSize") int keyValueCombinationsSize,
                                                    @Param("tenantId") String tenantId,

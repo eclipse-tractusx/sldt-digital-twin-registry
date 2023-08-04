@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,14 +19,10 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Getter
@@ -35,35 +31,24 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 @NoArgsConstructor
 @AllArgsConstructor
 @With
-public class SubmodelEndpoint {
-
+public class SubmodelExtensionRefersToReferenceKey {
    @GeneratedValue( strategy = GenerationType.IDENTITY )
    @Id
    @Column( name = "id" )
-   private UUID id;
-
-   @Column
-   private String interfaceName;
-   @Column
-   private String endpointAddress;
-   @Column
-   private String endpointProtocol;
-   @Column
-   private String endpointProtocolVersion;
-   @Column
-   private String subProtocol;
-   @Column
-   private String subProtocolBody;
-   @Column
-   private String subProtocolBodyEncoding;
-
-   @JsonManagedReference
-   @JsonIgnore
-   @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true,mappedBy = "submodelEndpoint")
-   private Set<SubmodelSecurityAttribute> submodelSecurityAttribute=new HashSet<>();
+   UUID id;
+   ReferenceKeyType type;
+   @Column(name = "ref_key_value")
+   String value;
 
    @JsonBackReference
-   @ManyToOne( fetch = FetchType.LAZY, optional = false,cascade = {CascadeType.MERGE}  )
-   @JoinColumn( name = "fk_submodel_id" )
-   private Submodel submodel;
+   @ManyToOne(fetch = FetchType.LAZY)
+   @JoinColumn(name = "fk_reference_parent_id")
+   private SubmodelExtensionRefersToReferenceParent submodelExtensionRefersToReferenceParent;
+
+   @JsonBackReference
+   @ManyToOne(fetch = FetchType.LAZY)
+   @JoinColumn(name = "fk_submodel_extension_refers_reference_id")
+   private SubmodelExtensionRefersToReference submodelExtensionRefersToReference;
 }
+
+

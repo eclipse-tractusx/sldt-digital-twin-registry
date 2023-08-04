@@ -19,15 +19,35 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
-public enum ShellKind {
-   INSTANCE( "Instance" ),
-   NOTAPPLICABLE( "NotApplicable" ),
-   TYPE( "Type" );
+import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Getter
+@Setter
+@Table
+@NoArgsConstructor
+@AllArgsConstructor
+@With
+public class ShellExtensionSemanticIdReferenceKey {
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   UUID id;
+   private ReferenceKeyType type;
+   @Column(name = "ref_key_value")
    private String value;
-   ShellKind( String value ) {
-      this.value = value;
-   }
-   public String getValue() {return value;}
-   @Override
-   public String toString() {return String.valueOf(value);}
+
+   @JsonBackReference
+   @ManyToOne(fetch = FetchType.LAZY)
+   @JoinColumn(name = "fk_shell_extension_semantic_reference_id")
+   private ShellExtensionSemanticIdReference shellExtensionSemanticIdReference;
+
+   @JsonBackReference
+   @ManyToOne(fetch = FetchType.LAZY)
+   @JoinColumn(name = "fk_reference_parent_id")
+   private ShellExtensionSemanticIdReferenceParent shellExtensionSemanticIdReferenceParent;
 }
+
+

@@ -19,20 +19,19 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.mapper;
 
-import com.google.common.base.Strings;
-import org.checkerframework.checker.units.qual.K;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
-// import org.eclipse.tractusx.semantics.aas.registry.model.IdentifierKeyValuePair;
 import org.eclipse.tractusx.semantics.aas.registry.model.Key;
 import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
 import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import com.google.common.base.Strings;
 
 /**
  * The globalAssetId of a AssetAdministrationShellDescriptor is the same as specificAssetIds from persistence point of view.
@@ -89,7 +88,7 @@ public class ShellMapperCustomization {
         if(Strings.isNullOrEmpty(globalAssetId)){
             return Optional.empty();
         }
-        return Optional.of(new ShellIdentifier(null, ShellIdentifier.GLOBAL_ASSET_ID_KEY, globalAssetId, null, null));
+        return Optional.of(new ShellIdentifier(null, ShellIdentifier.GLOBAL_ASSET_ID_KEY, globalAssetId, null, null, null, null));
     }
 
     public static void removeGlobalAssetIdIdentifier(List<SpecificAssetId> specificAssetIds){
