@@ -301,7 +301,8 @@ Depending on being a Data Provider or a Data Consumer there are different tokens
 
 #### Visibility of specificAssetIds based on tenantId/BPN
 You can control the visibility of specificAssetIds based on the tenantId/BPN.
-- You can provide the tenantId/BPN as attribute to a specificAssetId. Only users having the same tenantId/BPN in the Header are able to see the specificAssetId.
+- You can provide the tenantId/BPN as attribute to a specificAssetId. Only users having the same tenantId/BPN in the Header (property: Edc-Bpn) are able to see the specificAssetId.
+- The communication between consumer and provider is via EDC. Before the provider EDC sends the request to the DTR, the property Edc-Bpn with the BPN of the consumer will be set by the provider EDC.
 - The specificAssetIds of Digital Twins you created will always be shown to you.
 
 Detailed example:
