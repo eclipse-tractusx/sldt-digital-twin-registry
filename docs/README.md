@@ -212,7 +212,7 @@ To be able to register a DigitalTwin the following prerequisites must be met.
 
 ![](img/POST_Register_Twin_simplified.PNG)
 
-### Data consumer
+### Data Provider
 
 #### Prerequisites
 The Digital Twin Registry have to be accessed through an EDC. Following objects are needed to access the registry:
@@ -220,11 +220,11 @@ The Digital Twin Registry have to be accessed through an EDC. Following objects 
 ***1. Create Data Asset*** 
 The EDC Data Assets represents the location of the Digital Twin Registry offered by the provider.
 
-| API method     | URL: <PROVIDER_DATAMGMT_URL>/data/assets (POST) |
-|----------------|-------------------------------------------------|
-| **Parameters** | none                                            |
-| **Payload**    | see below                                       |
-| **Returns**    | 200 / OK                                        |
+| API method     | URL: <PROVIDER_DATAMGMT_URL>/management/v2/assets (POST) |
+|----------------|----------------------------------------------------|
+| **Parameters** | none                                               |
+| **Payload**    | see below                                          |
+| **Returns**    | 200 / OK                                           |
 
 ***Data Asset*** 
 
@@ -232,29 +232,28 @@ _note:_ that the "asset:prop:type" is standardized with "data.core.digitalTwinRe
 
 ```
 {
-   "asset":{
-      "properties":{
-         "asset:prop:id":"<ASSET_ID>",
-         "asset:prop:type":"data.core.digitalTwinRegistry",
-         "asset:prop:name":"Digital Twin Registry Endpoint of provider XYZ",
-         "asset:prop:contenttype":"application/json",
-         "asset:prop:policy-id":"use-eu"
-      }
-   },
-   "dataAddress":{
-      "properties":{
-         "type":"HttpData",
-         "baseUrl":"https://<YOUR_REGISTRY_URL>",
-         "proxyPath":true,
-         "proxyBody":true,
-         "proxyMethod":true,
-         "proxyQueryParams":true,
-         "oauth2:clientId":"<REGISTRY_CLIENT_ID>",
-         "oauth2:clientSecret":"<REGISTRY_CLIENT_SECRET>",
-         "oauth2:tokenUrl":"<REGISTRY_TOKEN_ENDPOINT>",
-         "oauth2:scope":"<REGISTRY_TOKEN_SCOPE>"
-      }
-   }
+    "@context": {},
+    "asset": {
+        "@type": "Asset",
+        "@id": "{{ASSET_ID}}", 
+        "properties": {
+            "description": "",
+            "type": "data.core.digitalTwinRegistry"
+        }
+    },
+    "dataAddress": {
+        "@type": "DataAddress",
+        "type": "HttpData",
+        "baseUrl": "{{BACKEND_SERVICE}}",
+        "proxyPath": "true",
+        "proxyBody": "true",
+        "proxyMethod": "true",
+        "proxyQueryParams": "true",
+        "oauth2:clientId": "{{REGISTRY_CLIENT_ID}}",
+        "oauth2:clientSecret": "{{REGISTRY_CLIENT_SECRET}}",
+        "oauth2:tokenUrl": "{{REGISTRY_TOKEN_ENDPOINT}}",
+        "oauth2:scope": "{{REGISTRY_TOKEN_SCOPE}}"
+    }
 }
 ```
 
@@ -262,7 +261,7 @@ _note:_ that the "asset:prop:type" is standardized with "data.core.digitalTwinRe
 
 The policy is the BPN policy to give the consumer access to the asset.
 
-   | API method     | URL: <PROVIDER_DATAMGMT_URL>/data/policies (POST) |
+   | API method     | URL: <PROVIDER_DATAMGMT_URL>/management/v2/policydefinitions (POST) |
    |----------------|---------------------------------------------------|
    | **Parameters** | none                                              |
    | **Payload**    | see below                                         |
@@ -272,33 +271,28 @@ The policy is the BPN policy to give the consumer access to the asset.
 
 ```
 {
-   "id":"<POLICY_ID}>",
-   "policy":{
-      "prohibitions":[],
-      "obligations":[],
-      "permissions":[
-         {
-            "edctype":"dataspaceconnector:permission",
-            "action":{
-               "type":"USE"
-            },
-            "constraints":[
-               {
-                  "edctype":"AtomicConstraint",
-                  "leftExpression":{
-                     "edctype":"dataspaceconnector:literalexpression",
-                     "value":"BusinessPartnerNumber"
-                  },
-                  "rightExpression":{
-                     "edctype":"dataspaceconnector:literalexpression",
-                     "value":"<CONSUMER_BPN>"
-                  },
-                  "operator":"EQ"
-               }
-            ]
-         }
-      ]
-   }
+    "@context": {
+        "odrl": "http://www.w3.org/ns/odrl/2/"
+    },
+    "@type": "PolicyDefinitionRequestDto",
+    "@id": "{{POLICY_ID}}",
+    "policy": {
+		"@type": "Policy",
+		"odrl:permission" : [{
+			"odrl:action" : "USE",
+			"odrl:constraint" : {
+				"@type": "LogicalConstraint",
+				"odrl:or" : [{
+					"@type" : "Constraint",
+					"odrl:leftOperand" : "BusinessPartnerNumber",
+					"odrl:operator" : {
+                        "@id": "odrl:eq"
+                    },
+					"odrl:rightOperand" : "{{CONSUMER_BPN}}"
+				}]
+			}
+		}]
+    }
 }
 ```
 
@@ -306,7 +300,7 @@ The policy is the BPN policy to give the consumer access to the asset.
 
 The contract definition links the created policy with the created asset. 
 
-   | API method     | URL: <PROVIDER_DATAMGMT_URL>/data/contractdefinitions (POST) | 
+   | API method     | URL: <PROVIDER_DATAMGMT_URL>/management/v2/contractdefinitions (POST) | 
    |----------------|--------------------------------------------------------------|
    | **Parameters** | none                                                         |
    | **Payload**    | see below                                                    |
@@ -317,22 +311,23 @@ The contract definition links the created policy with the created asset.
 
 ```
 {
-   "id":"<CONTRACT_DEFINITION_ID>",
-   "criteria":[
-      {
-         "operandLeft":"asset:prop:id",
-         "operator":"=",
-         "operandRight":"<ASSET_ID>"
-      }
-   ],
-   "accessPolicyId":"<ACCESS_POLICY_ID>",
-   "contractPolicyId":"<CONTRACT_POLICY_ID>"
+    "@context": {},
+    "@id": "{{CONTRACT_DEFINITION_ID}}",
+    "@type": "ContractDefinition",
+    "accessPolicyId": "{{ACCESS_POLICY_ID}}",
+    "contractPolicyId": "{{CONTRACT_POLICY_ID}}",
+    "assetsSelector" : {
+        "@type" : "CriterionDto",
+        "operandLeft": "{{EDC_NAMESPACE}}id",
+        "operator": "=",
+        "operandRight": "{{ASSET_ID}}"
+    }
 }
 ```
 
 ***4. Negotiation***
 
-At last both EDCs do the final negotiation and the consumer EDC receives the token to get access to the Digital Twin Registry.
+At last both EDCs do the final negotiation and the consumer EDC receives the edr token to get access to the Digital Twin Registry.
 
 
 #### Search for Twins (simplified)
