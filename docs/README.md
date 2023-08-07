@@ -188,14 +188,14 @@ For the purpose of simplification the diagram above does only show the required 
 ### Actors and interaction diagrams
 There are two actors who interact with the AAS Registry.
 
-| Actor         | 	Description                                                                                                                                                                                                                                                                                                                                                    | Examples                                                                 |
-|---------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
+| Actor         | 	Description                                                                                                                                                                                                                                                                                                                                                     | Examples                                                                 |
+|---------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
 | Data provider | The data provider runs its own Digital Twin Registry and registers AAS Descriptors and Submodel Descriptors so that consumers can query for AAS Descriptors and request data via the Submodel Descriptor Endpoints. Responsibilities: Run own Digital Twin Registry, providing EDC compatible Submodel Descriptor Endpoints, Registration of the AAS Descriptors | Any manufacturer who provides data for their assets and runs its own DTR |
-| Data consumer | The data consumers are accessing the AAS Registry to discover and consume data from the Submodel Descriptor Endpoints. Responsibilities: Query the AAS Registry for AAS Descriptors, Access the Submodel Descriptor Endpoints via EDC                                                                                                                           |                                                                          |
+| Data consumer | The data consumers are accessing the AAS Registry to discover and consume data from the Submodel Descriptor Endpoints. Responsibilities: Query the AAS Registry for AAS Descriptors, Access the Submodel Descriptor Endpoints via EDC                                                                                                                            |                                                                          |
 
 
 The interactions of both actors are shown in the diagrams below.
-For the purpose of simplifying, the interactions via EDC is not shown.
+For the purpose of simplifying, the interactions via EDC is not shown completely.
 
 EDC is involved as following:
 1. As a Data Provider to interact with the DTR there is no EDC needed.
@@ -213,6 +213,129 @@ To be able to register a DigitalTwin the following prerequisites must be met.
 ![](img/POST_Register_Twin_simplified.PNG)
 
 ### Data consumer
+
+#### Prerequisites
+The Digital Twin Registry have to be accessed through an EDC. Following objects are needed to access the registry:
+
+***1. Create Data Asset*** 
+The EDC Data Assets represents the location of the Digital Twin Registry offered by the provider.
+
+| API method     | URL: <PROVIDER_DATAMGMT_URL>/data/assets (POST) |
+|----------------|-------------------------------------------------|
+| **Parameters** | none                                            |
+| **Payload**    | see below                                       |
+| **Returns**    | 200 / OK                                        |
+
+***Data Asset*** 
+
+_note:_ that the "asset:prop:type" is standardized with "data.core.digitalTwinRegistry" for the Digital Twin Registry.
+
+```
+{
+   "asset":{
+      "properties":{
+         "asset:prop:id":"<ASSET_ID>",
+         "asset:prop:type":"data.core.digitalTwinRegistry",
+         "asset:prop:name":"Digital Twin Registry Endpoint of provider XYZ",
+         "asset:prop:contenttype":"application/json",
+         "asset:prop:policy-id":"use-eu"
+      }
+   },
+   "dataAddress":{
+      "properties":{
+         "type":"HttpData",
+         "baseUrl":"https://<YOUR_REGISTRY_URL>",
+         "proxyPath":true,
+         "proxyBody":true,
+         "proxyMethod":true,
+         "proxyQueryParams":true,
+         "oauth2:clientId":"<REGISTRY_CLIENT_ID>",
+         "oauth2:clientSecret":"<REGISTRY_CLIENT_SECRET>",
+         "oauth2:tokenUrl":"<REGISTRY_TOKEN_ENDPOINT>",
+         "oauth2:scope":"<REGISTRY_TOKEN_SCOPE>"
+      }
+   }
+}
+```
+
+***2. Create Policy***
+
+The policy is the BPN policy to give the consumer access to the asset.
+
+   | API method     | URL: <PROVIDER_DATAMGMT_URL>/data/policies (POST) |
+   |----------------|---------------------------------------------------|
+   | **Parameters** | none                                              |
+   | **Payload**    | see below                                         |
+   | **Returns**    | 200 / OK                                          |
+
+***EDC Policy***
+
+```
+{
+   "id":"<POLICY_ID}>",
+   "policy":{
+      "prohibitions":[],
+      "obligations":[],
+      "permissions":[
+         {
+            "edctype":"dataspaceconnector:permission",
+            "action":{
+               "type":"USE"
+            },
+            "constraints":[
+               {
+                  "edctype":"AtomicConstraint",
+                  "leftExpression":{
+                     "edctype":"dataspaceconnector:literalexpression",
+                     "value":"BusinessPartnerNumber"
+                  },
+                  "rightExpression":{
+                     "edctype":"dataspaceconnector:literalexpression",
+                     "value":"<CONSUMER_BPN>"
+                  },
+                  "operator":"EQ"
+               }
+            ]
+         }
+      ]
+   }
+}
+```
+
+***3. Create Contract Definition***
+
+The contract definition links the created policy with the created asset. 
+
+   | API method     | URL: <PROVIDER_DATAMGMT_URL>/data/contractdefinitions (POST) | 
+   |----------------|--------------------------------------------------------------|
+   | **Parameters** | none                                                         |
+   | **Payload**    | see below                                                    |
+   | **Returns**    | 200 / OK                                                     |
+
+
+***Contract Definition***
+
+```
+{
+   "id":"<CONTRACT_DEFINITION_ID>",
+   "criteria":[
+      {
+         "operandLeft":"asset:prop:id",
+         "operator":"=",
+         "operandRight":"<ASSET_ID>"
+      }
+   ],
+   "accessPolicyId":"<ACCESS_POLICY_ID>",
+   "contractPolicyId":"<CONTRACT_POLICY_ID>"
+}
+```
+
+***4. Negotiation***
+
+At last both EDCs do the final negotiation and the consumer EDC receives the token to get access to the Digital Twin Registry.
+
+
+#### Search for Twins (simplified)
 
 ![](img/GET_Endpoint_simplified.PNG)
 
@@ -297,7 +420,6 @@ Depending on being a Data Provider or a Data Consumer there are different tokens
 #### Data Consumer
 1. needs an EDR token which is provided between the intercommunication between the EDCs.
 
-[//]: # (The Swagger UI of the AAS Registry is integrated with IAM. You can check the Swagger UI API calls for examples.)
 
 #### Visibility of specificAssetIds based on tenantId/BPN
 You can control the visibility of specificAssetIds based on the tenantId/BPN.
@@ -391,14 +513,14 @@ The AAS Registry can be accessed on behalf of a user. The token has to be obtain
 
 ## Glossary
 
-| Term          | Description                                                                                                |
-|---------------|------------------------------------------------------------------------------------------------------------|
-| EDC           | Eclipse Data Space Connector                                                                               |
-| DTR           | Digital Twin Registry - the phone book to register and to search for endpoints for Digital Twins           |
+| Term          | Description                                                                                                    |
+|---------------|----------------------------------------------------------------------------------------------------------------|
+| EDC           | Eclipse Data Space Connector                                                                                   |
+| DTR           | Digital Twin Registry - the phone book to register and to search for endpoints for Digital Twins               |
 | dDTR          | decentralized Digital Twin Registry - the Digital Twin Registry which is deployed on each Data Provider system |
-| Data Provider | deploys a own Digital Twin Registry and provides the data for his digital twins                            |
-| Data Consumer | uses the Digital Twin Registry to search for digital twins                                                 |
-| IDM           | User identity management e.g. Keycloak                                                                     |
+| Data Provider | deploys a own Digital Twin Registry and provides the data for his digital twins                                |
+| Data Consumer | uses the Digital Twin Registry to search for digital twins                                                     |
+| IDM           | User identity management e.g. Keycloak                                                                         |
 
 ## Remarks
 The Digital Twin Registry implementation is not 100 % specification compliant.
