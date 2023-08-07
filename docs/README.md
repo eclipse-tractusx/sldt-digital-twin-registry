@@ -404,8 +404,8 @@ Authorization is supported by Role Based Access Control (RBAC). Following roles 
 |---------------------|--------------------------------------------------------------------------------------------------------------------------------|
 | view_digital_twin   | Can read all digital twins.                                                                                                    |
 | add_digital_twin    | Can add a digital twin.                                                                                                        |
-| update_digital_twin | Can update a digital twin.Users can only update digital twins they own. Ownership is ensured by the tenantId/BPN of the user.  |
-| delete_digital_twin | Can delete a digital twin. Users can only delete digital twins they own. Ownership is ensured by the tenantId/BPN of the user. |
+| update_digital_twin | Can update a digital twin.  |
+| delete_digital_twin | Can delete a digital twin. |
 
 Depending on being a Data Provider or a Data Consumer there are different tokens for authentication and authorization needed.
 #### Data Provider
