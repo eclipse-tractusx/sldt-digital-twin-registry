@@ -482,7 +482,7 @@ Detailed example:
       "value": "293913"
     },
 ]
-// Lookup API:  GET /shells/lookup and POST /shells/lookup/query with BPN12
+// Lookup API:  GET api/v3.0/shells/lookup and POST api/v3.0/shells/lookup/query with BPN12
 // REQUEST:
 [
   {
