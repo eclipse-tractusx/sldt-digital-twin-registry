@@ -40,6 +40,11 @@ For detailed install instructions please refer to our [INSTALL.md](./INSTALL.md)
 ## Notice for Docker image
 
 DockerHub: https://hub.docker.com/r/tractusx/sldt-digital-twin-registry
+The Docker images from version 0.3.3-M1 until the latest can be found on DockerHub, older versions have been published on GitHub Container Registry (GHCR): 
+https://github.com/catenax-ng/product-semantics/pkgs/container/sldt-digital-twin-registry
+
+The Helm chart can be found at the GitHub repository at: https://github.com/eclipse-tractusx/sldt-digital-twin-registry/releases
+
 This application provides container images for demonstration purposes.
 Eclipse Tractus-X product(s) installed within the image:
 

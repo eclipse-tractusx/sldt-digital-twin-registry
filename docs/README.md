@@ -24,7 +24,8 @@ The DTR acts as an address book for finding Digital Twins.
 
 ## 2 Architecture and constraints
 A consumer is searching for an endpoint for a Digital Twin. For this he uses the DTR of a Data Provider.
-Because now the DTR is deployed decentralized on each Data Provider side. There are some new services to help to find twins. The whole search and the embedding of the now decentralized Digital Twin is shown below:
+Because now the DTR is deployed decentralized on each Data Provider side. There are some new services to help to find twins. 
+The whole search and the embedding of the now decentralized Digital Twin is shown below:
 
 ### decentralized Digital Twin Registry environment
 
@@ -352,6 +353,10 @@ locally, using minikube. For further information checkout the [readme.md](https:
 ### Overall Concept
 
 The overall concept can be found under **2 Architecture and constraints**.
+
+### Asset Administration Shell specification 
+The Digital Twin Registry has implemented Asset Administration Shell specification in version 3.0.
+The corresponding openapi file can be found here: "backend/src/main/resources/static/aas-registry-openapi.yaml"
 
 ### Uniqueness
 The following table contains the identifier fields and whether they are globally unique, unique for an
