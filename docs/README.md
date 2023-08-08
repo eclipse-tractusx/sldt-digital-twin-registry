@@ -425,54 +425,62 @@ You can control the visibility of specificAssetIds based on the tenantId/BPN.
 Detailed example:
 ```
 // Given specificAssetIds:
-[
-  {
-    "key": "CustomerPartId",
-    "value": "293913",
-    "externalSubjectId": {
-      "value": [
-        "BPN12"
-      ]
+  "specificAssetIds": [
+    {
+      "externalSubjectId": {
+        "type": "ExternalReference",
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "BPN12"
+          }
+        ]
+      },
+      "name": "CustomerPartId",
+      "value": "293913"
+    },
+    {
+      "externalSubjectId": {
+        "type": "ExternalReference",
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "BPN49"
+          }
+        ]
+      },
+      "name": "CustomerPartId",
+      "value": "429212"
+    },
+    {
+      "externalSubjectId": {
+        "type": "ExternalReference",
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "BPN29"
+          }
+        ]
+      },
+      "name": "CustomerPartId",
+      "value": "523192"
     }
-  },
-  {
-    "key": "CustomerPartId",
-    "value": "429212",
-    "externalSubjectId": {
-      "value": [
-        "BPN49"
-      ]
-    }
-  },
-  {
-    "key": "CustomerPartId",
-    "value": "523192",
-    "externalSubjectId": {
-      "value": [
-        "BPN29"
-      ]
-    }
-  },
-  {
-    "key": "MaterialNumber",
-    "value": "39192"
-  }
-]
+  ]
 // A customer with (BPN12) will only get the specificAssetIds that contains his BPN/tenantId. Taking the above example, the response for the customer //(BPN12) would be:
 [
-  {
-    "key": "CustomerPartId",
-    "value": "293913",
-    "externalSubjectId": {
-      "value": [
-        "BPN12"
-      ]
-    }
-  },
-  {
-    "key": "MaterialNumber",
-    "value": "39192"
-  }
+{
+        "externalSubjectId": {
+        "type": "ExternalReference",
+        "keys": [
+          {
+            "type": "GlobalReference",
+            "value": "BPN12"
+          }
+        ]
+      },
+      "name": "CustomerPartId",
+      "value": "293913"
+    },
 ]
 // Lookup API:  GET /shells/lookup and POST /shells/lookup/query with BPN12
 // REQUEST:
