@@ -60,20 +60,27 @@ public class ShellService {
     private final ShellRepository shellRepository;
     private final ShellIdentifierRepository shellIdentifierRepository;
     private final SubmodelRepository submodelRepository;
+    private final ShellAccessHandler shellAccessHandler;
     private final String owningTenantId;
+    private final String externalSubjectIdWildcardPrefix;
+    private final List<String> externalSubjectIdWildcardAllowedTypes;
 
     private final String SORT_FIELD_NAME_SHELL = "createdDate";
-   private final String SORT_FIELD_NAME_SUBMODEL = "id";
+    private final String SORT_FIELD_NAME_SUBMODEL = "id";
     private final int MAXIMUM_RECORDS = 1000;
 
     public ShellService(ShellRepository shellRepository,
                         ShellIdentifierRepository shellIdentifierRepository,
                         SubmodelRepository submodelRepository,
-                        RegistryProperties registryProperties) {
+                        RegistryProperties registryProperties,
+                        ShellAccessHandler shellAccessHandler) {
         this.shellRepository = shellRepository;
         this.shellIdentifierRepository = shellIdentifierRepository;
         this.submodelRepository = submodelRepository;
+        this.shellAccessHandler = shellAccessHandler;
         this.owningTenantId = registryProperties.getIdm().getOwningTenantId();
+        this.externalSubjectIdWildcardPrefix = registryProperties.getExternalSubjectIdWildcardPrefix();
+        this.externalSubjectIdWildcardAllowedTypes = registryProperties.getExternalSubjectIdWildcardAllowedTypes();
     }
 
     @Transactional
@@ -113,18 +120,24 @@ public class ShellService {
     }
 
     @Transactional
-    public Shell findShellByExternalId(String externalShellId,String externalSubjectId) {
-        return shellRepository.findByIdExternal(externalShellId)
-                .map(shell -> shell.withIdentifiers(filterSpecificAssetIdsByTenantId(shell.getIdentifiers(), externalSubjectId)))
+    public Shell findShellByExternalIdAndExternalSubjectId(String externalShellId,String externalSubjectId) {
+        return shellRepository.findByIdExternalAndExternalSubjectId(externalShellId, externalSubjectId, owningTenantId, externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes )
+                .map(shell -> shellAccessHandler.filterShellProperties( shell, externalSubjectId ))
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Shell for identifier %s not found", externalShellId)));
     }
+
+   @Transactional
+   public Shell findShellByExternalId(String externalShellId,String externalSubjectId) {
+      return shellRepository.findByIdExternal(externalShellId)
+            .orElseThrow(() -> new EntityNotFoundException(String.format("Shell for identifier %s not found", externalShellId)));
+   }
 
     @Transactional(readOnly = true)
     public ShellCollectionDto findAllShells(Integer pageSize,String cursorVal,String externalSubjectId) {
 
       pageSize = getPageSize( pageSize );
       ShellCursor cursor = new ShellCursor( pageSize, cursorVal );
-      var specification = new ShellSpecification<Shell>( SORT_FIELD_NAME_SHELL, cursor );
+      var specification = new ShellSpecification<Shell>( SORT_FIELD_NAME_SHELL, cursor,externalSubjectId,owningTenantId,externalSubjectIdWildcardPrefix,externalSubjectIdWildcardAllowedTypes );
 
       Page<Shell> shellPage = filterSpecificAssetIdsByTenantId( shellRepository.findAll( specification, ofSize( cursor.getRecordSize() ) ),externalSubjectId );
       var shellsPage = shellPage.getContent();
@@ -148,7 +161,7 @@ public class ShellService {
       pageSize = getPageSize( pageSize );
 
       ShellCursor cursor = new ShellCursor( pageSize, cursorVal );
-      var specification = new ShellSpecification<Submodel>( SORT_FIELD_NAME_SUBMODEL, cursor );
+      var specification = new ShellSpecification<Submodel>( SORT_FIELD_NAME_SUBMODEL, cursor,null, null, null, null  );
       Page<Submodel> shellPage = submodelRepository.findAll( Specification.allOf( hasShellFkId( assetID ).and( specification ) ),
             ofSize( cursor.getRecordSize() ) );
 
@@ -176,23 +189,7 @@ public class ShellService {
    }
 
     private Page<Shell> filterSpecificAssetIdsByTenantId(Page<Shell> shells,String externalSubjectId){
-        return shells.map(shell ->  shell.withIdentifiers(filterSpecificAssetIdsByTenantId(shell.getIdentifiers(), externalSubjectId)));
-    }
-
-    private Set<ShellIdentifier> filterSpecificAssetIdsByTenantId(Set<ShellIdentifier> shellIdentifiers, String tenantId) {
-        // the owning tenant should always see all identifiers
-        if(tenantId.equals(owningTenantId)){return shellIdentifiers;}
-        Set<ShellIdentifier> externalSubjectIdSet = new HashSet<>();
-        for(ShellIdentifier identifier : shellIdentifiers){
-            if(identifier.getExternalSubjectId() == null ){
-                externalSubjectIdSet.add( identifier );
-            } else {
-                Optional<ShellIdentifierExternalSubjectReferenceKey> optionalReferenceKey =
-                identifier.getExternalSubjectId().getKeys().stream().filter( shellIdentifierExternalSubjectReferenceKey ->
-                      shellIdentifierExternalSubjectReferenceKey.getValue().equals( tenantId )).findFirst();
-              if( optionalReferenceKey.isPresent() ) externalSubjectIdSet.add( identifier );
-            }}
-        return externalSubjectIdSet;
+        return shells.map(shell ->  shellAccessHandler.filterShellProperties(shell, externalSubjectId));
     }
 
    @Transactional( readOnly = true )
@@ -201,7 +198,7 @@ public class ShellService {
       List<String> keyValueCombinations = shellIdentifiers.stream().map( shellIdentifier -> shellIdentifier.getKey() + shellIdentifier.getValue() ).toList();
 
       List<String> queryResult = shellRepository.findExternalShellIdsByIdentifiersByExactMatch( keyValueCombinations,
-            keyValueCombinations.size(), externalSubjectId, owningTenantId );
+            keyValueCombinations.size(), externalSubjectId, externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes, owningTenantId );
       pageSize = getPageSize( pageSize );
 
       int startIndex = getCursorDecoded( cursor, queryResult );
@@ -240,11 +237,12 @@ public class ShellService {
         return shellRepository.findExternalShellIdsByIdentifiersByAnyMatch(keyValueCombinations,externalSubjectId , owningTenantId);
     }
 
+    // Not used in AAS3
     @Transactional(readOnly = true)
     public List<Shell> findShellsByExternalShellIds(Set<String> externalShellIds,String externalSubjectId) {
         return shellRepository.findShellsByIdExternalIsIn(externalShellIds).stream()
-                .map(shell ->  shell.withIdentifiers(filterSpecificAssetIdsByTenantId(shell.getIdentifiers(), externalSubjectId)))
-                .collect(Collectors.toList());
+              .map(shell -> shellAccessHandler.filterShellProperties( shell, externalSubjectId ))
+              .collect(Collectors.toList());
     }
 
    @Transactional
@@ -263,8 +261,7 @@ public class ShellService {
 
     @Transactional(readOnly = true)
     public Set<ShellIdentifier> findShellIdentifiersByExternalShellId(String externalShellId,String externalSubjectId) {
-        Shell shellId = findShellByExternalId(externalShellId,externalSubjectId);
-        return filterSpecificAssetIdsByTenantId(shellIdentifierRepository.findByShellId(shellId), externalSubjectId);
+        return findShellByExternalIdAndExternalSubjectId(externalShellId,externalSubjectId).getIdentifiers();
     }
 
     @Transactional
@@ -342,7 +339,7 @@ public class ShellService {
 
     @Transactional(readOnly = true)
     public Submodel findSubmodelByExternalId(String externalShellId, String externalSubModelId,String externalSubjectId) {
-        Shell shellIdByExternalId = findShellByExternalId(externalShellId,externalSubjectId);
+        Shell shellIdByExternalId = findShellByExternalIdAndExternalSubjectId(externalShellId,externalSubjectId);
         return submodelRepository
                 .findByShellIdAndIdExternal(shellIdByExternalId, externalSubModelId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Submodel for identifier %s not found.", externalSubModelId)));

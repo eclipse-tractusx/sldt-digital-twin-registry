@@ -20,13 +20,19 @@
 package org.eclipse.tractusx.semantics.registry.utils;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierExternalSubjectReference;
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierExternalSubjectReferenceKey;
 import org.springframework.data.jpa.domain.Specification;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.ParameterExpression;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -34,6 +40,10 @@ public class ShellSpecification<T> implements Specification<T> {
 
    private final String sortFieldName;
    private final ShellCursor shellCursor;
+   private final String tenantId;
+   private final String owningTenantId;
+   private final String publicWildcardPrefix;
+   private final List<String> publicWildcardAllowedTypes;
 
    @Override
    public Predicate toPredicate( Root<T> root, CriteriaQuery<?> cq, CriteriaBuilder criteriaBuilder ) {
@@ -42,14 +52,58 @@ public class ShellSpecification<T> implements Specification<T> {
 
    private Predicate applyFilter( Root<T> root,CriteriaQuery<?> cq, CriteriaBuilder criteriaBuilder ) {
       if(root.toString().contains( "Shell" )){
-         var searchValue = shellCursor.getShellSearchCursor();
+         Instant searchValue = shellCursor.getShellSearchCursor();
          cq.orderBy( criteriaBuilder.asc( criteriaBuilder.coalesce( root.get( sortFieldName ), Instant.now() ) ) );
-         return criteriaBuilder.greaterThan( root.get( sortFieldName ), searchValue );
+
+         if(owningTenantId.equals( tenantId )){
+            return criteriaBuilder.greaterThan( root.get( sortFieldName ), searchValue );
+         }
+
+         return getAllShellsPredicate(root, cq, criteriaBuilder, searchValue);
       }else{
-         var searchValue = shellCursor.getSubmodelSearchCursor();
+         UUID searchValue = shellCursor.getSubmodelSearchCursor();
          cq.orderBy( criteriaBuilder.asc( criteriaBuilder.coalesce( root.get( sortFieldName ),
                UUID.fromString( "00000000-0000-0000-0000-000000000000" )) ) );
          return criteriaBuilder.greaterThan( root.get( sortFieldName ), searchValue );
       }
+   }
+
+   private Predicate getAllShellsPredicate(Root<T> root, CriteriaQuery<?> cq, CriteriaBuilder criteriaBuilder, Instant searchValue ){
+      // Query for noIdentifierSubQuery
+      Subquery<String> noIdentifierSubQuery = cq.subquery(String.class);
+      Root<ShellIdentifier> shellIdentifierRoot = noIdentifierSubQuery.from(ShellIdentifier.class);
+      noIdentifierSubQuery
+            .select(shellIdentifierRoot.get("shellId"))
+            .where(criteriaBuilder.equal(shellIdentifierRoot.get("shellId"), root));
+
+      // Query for identifierSubQuery
+      Subquery<UUID> identifierSubQuery = cq.subquery(UUID.class);
+      Subquery<UUID> identifierInnerSubQuery = cq.subquery(UUID.class);
+      Root<ShellIdentifier> shellIdentifierRoot1 = identifierSubQuery.from(ShellIdentifier.class);
+      Root<ShellIdentifierExternalSubjectReferenceKey> externalSubjectReferenceKeyRoot = identifierInnerSubQuery.from(ShellIdentifierExternalSubjectReferenceKey.class);
+      identifierInnerSubQuery
+            .select(externalSubjectReferenceKeyRoot.get("shellIdentifierExternalSubjectReference"))
+            .where( criteriaBuilder.and(
+                        criteriaBuilder.or(
+                              criteriaBuilder.equal(externalSubjectReferenceKeyRoot.get("value"),tenantId),
+                              criteriaBuilder.and(
+                                    criteriaBuilder.equal(externalSubjectReferenceKeyRoot.get("value"),publicWildcardPrefix),
+                                    criteriaBuilder.in(shellIdentifierRoot1.get("key")).value(publicWildcardAllowedTypes)
+                              )
+                        ),
+                        criteriaBuilder.equal(externalSubjectReferenceKeyRoot.get("shellIdentifierExternalSubjectReference").get( "shellIdentifier" ),shellIdentifierRoot1)
+                  )
+            );
+
+      identifierSubQuery
+            .select(shellIdentifierRoot1.get("shellId").get("id"))
+            .where(criteriaBuilder.exists(identifierInnerSubQuery));
+
+      return criteriaBuilder.and(
+            criteriaBuilder.or(
+                  criteriaBuilder.not(criteriaBuilder.exists(noIdentifierSubQuery)),
+                  criteriaBuilder.in(root.get("id")).value(identifierSubQuery)
+            ),
+            criteriaBuilder.greaterThan(root.get(sortFieldName), searchValue));
    }
 }

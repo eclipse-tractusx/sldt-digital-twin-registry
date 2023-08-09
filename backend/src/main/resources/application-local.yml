@@ -50,5 +50,7 @@ spring:
         web-allow-others: true
 
 registry:
+  external-subject-id-wildcard-prefix: PUBLIC_READABLE
+  external-subject-id-wildcard-allowed-types:
   idm:
     owningTenantId: TENANT_ONE

@@ -169,14 +169,12 @@ For the purpose of simplification the diagram above does only show the required 
 }
 ```
 
-
 ### Constraints
 - each Data Provider needs to run its own DTR in his environment. The DTR is not a central component anymore.
 - Data Provider must provide his twins in its own DTR.
 - To make requests to the DTR there are EDCs needed on Data Provider and Data Consumer side.
 
 ### Architecture Constraints
-
 -   Developed under an open-source license and all used frameworks and
     libraries suites to this license.
 
@@ -354,6 +352,63 @@ locally, using minikube. For further information checkout the [readme.md](https:
 
 The overall concept can be found under **2 Architecture and constraints**.
 
+### Visibility of specificAssetIds based on tenantId/BPN
+The visibility of `specificAssetIds` in the Digital Twin Registry based on the Business Partner Number (BPN) can be controlled with the attribute `externalSubjectId`. Hence, the `externalSubjectId` is identified with the BPN.
+
+* The BPN as attribute to a *specificAssetId* can be provided in `specificAssetIds`. This can be done with `externalSubjectId`.
+* Only users, who have the same BPN in the Eclipse Dataspace Components-BPN Header are able to see content of `specificAssetIds`.
+* The behavior is closed by default, *i.e.*, if no `externalSubjectId` is defined to a `specificAssetId`, the content of this particular `specificAssetId` (key, value) is only visible for the owner of the twin (also known as data provider).
+* To mark a `specificAssetId` as public for every reader on a *Digital Twin*, the defined character (`"PUBLIC_READABLE"`) needs to be added in the `externalSubjectId`.
+* The communication between consumer and provider is via EDC. Before the provider EDC sends the request to the DTR, the property Edc-Bpn with the BPN of the consumer will be set by the provider EDC.
+* The specificAssetIds of Digital Twins you created will always be shown to you.
+
+Detailed example:
+```
+// Given specificAssetIds:
+  "specificAssetIds":[
+      {
+         "name":"partInstanceId",
+         "value":"24975539203421"
+      },
+      {
+         "name":"customerPartId",
+         "value":"231982",
+         "externalSubjectId":{
+            "type":"ExternalReference",
+            "keys":[
+               {
+                  "type":"GlobalReference",
+                  "value":"BPN_COMPANY_001"
+               }
+            ]
+         }
+      },
+      {
+         "name":"manufacturerPartId",
+         "value":"123829238",
+         "externalSubjectId":{
+            "type":"ExternalReference",
+            "keys":[
+		       {
+                  "type":"GlobalReference",
+                  "value":"PUBLIC_READABLE"
+               }
+            ]
+         }
+      }
+   ]
+```
+This example is a *Digital Twin* with three different `specificAssetIds` as descriptors.
+* `partInstanceID` is only visible for the owner of the twin, since <u>no</u> `externalSubjectId` is defined.
+* `customerPartId` is only visible for the owner of the twin and an (external) reader via EDC, who has the bpn-value "BPN_COMPANY_001" in the header of the EDC
+* `manufacturerPartId` is visible for everyone, because the `externalSubjectId` has the wildcard value `"PUBLIC_READABLE"` included.
+
+For example, if an (external) reader via EDC requests the here shown *Digital Twin* and the edc-bpn header includes the bpn-value "BPN_COMPANY_001", the list of `specificAssetIds` contains two entries, namely:
+* `customerPartId`, because its `externalSubjectId` matches to the incoming bpn-value "BPN_COMPANY_001"
+* `manufacturerPartId`, because this `specificAssetId` has the `externalSubjectId = "PUBLIC_READABLE"` and therefore is public for everyone
+
+In this example, the `specificAssetId` `"name": "partInstanceId"` is filtered out, because it is only visible for the owner of the *Digital Twin*.
+
 ### Asset Administration Shell specification 
 The Digital Twin Registry has implemented Asset Administration Shell specification in version 3.0.
 The corresponding openapi file can be found here: "backend/src/main/resources/static/aas-registry-openapi.yaml"
@@ -419,86 +474,6 @@ Depending on being a Data Provider or a Data Consumer there are different tokens
 
 #### Data Consumer
 1. needs an EDR token which is provided between the intercommunication between the EDCs.
-
-
-#### Visibility of specificAssetIds based on tenantId/BPN
-You can control the visibility of specificAssetIds based on the tenantId/BPN.
-- You can provide the tenantId/BPN as attribute to a specificAssetId. Only users having the same tenantId/BPN in the Header (property: Edc-Bpn) are able to see the specificAssetId.
-- The communication between consumer and provider is via EDC. Before the provider EDC sends the request to the DTR, the property Edc-Bpn with the BPN of the consumer will be set by the provider EDC.
-- The specificAssetIds of Digital Twins you created will always be shown to you.
-
-Detailed example:
-```
-// Given specificAssetIds:
-  "specificAssetIds": [
-    {
-      "externalSubjectId": {
-        "type": "ExternalReference",
-        "keys": [
-          {
-            "type": "GlobalReference",
-            "value": "BPN12"
-          }
-        ]
-      },
-      "name": "CustomerPartId",
-      "value": "293913"
-    },
-    {
-      "externalSubjectId": {
-        "type": "ExternalReference",
-        "keys": [
-          {
-            "type": "GlobalReference",
-            "value": "BPN49"
-          }
-        ]
-      },
-      "name": "CustomerPartId",
-      "value": "429212"
-    },
-    {
-      "externalSubjectId": {
-        "type": "ExternalReference",
-        "keys": [
-          {
-            "type": "GlobalReference",
-            "value": "BPN29"
-          }
-        ]
-      },
-      "name": "CustomerPartId",
-      "value": "523192"
-    }
-  ]
-// A customer with (BPN12) will only get the specificAssetIds that contains his BPN/tenantId. Taking the above example, the response for the customer //(BPN12) would be:
-[
-{
-        "externalSubjectId": {
-        "type": "ExternalReference",
-        "keys": [
-          {
-            "type": "GlobalReference",
-            "value": "BPN12"
-          }
-        ]
-      },
-      "name": "CustomerPartId",
-      "value": "293913"
-    },
-]
-// Lookup API:  GET api/v3.0/shells/lookup and POST api/v3.0/shells/lookup/query with BPN12
-// REQUEST:
-[
-  {
-    "key": "CustomerPartId",
-    "value": "429212" // note: the externalSubjectId of this assetId is BPN49
-  }
-]
-// RESPONSE:
-// The response is empty, because the above assetId belongs to customer (BPN49) and not to the  customer (BPN12).
-[]
-```
 
 ### Authentication on behalf of a user
 The AAS Registry can be accessed on behalf of a user. The token has to be obtained via the OpenID Connect flow. The AAS Registry will validate these tokens.

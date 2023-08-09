@@ -21,6 +21,9 @@ package org.eclipse.tractusx.semantics.registry.repository;
 
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.projection.ShellMinimal;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -31,7 +34,26 @@ import java.util.*;
 
 @Repository
 public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecificationExecutor<Shell> {
-   Optional<Shell> findByIdExternal( String idExternal );
+   Optional<Shell> findByIdExternal( @Param( "idExternal" ) String idExternal);
+   
+   @Query( value = "select * from shell s " +
+         "where s.id_external = :idExternal and (" +
+         ":tenantId = :owningTenantId " +
+         "or not exists (select si.id from shell_identifier si where s.id = si.fk_shell_id) " +
+         "or s.id in (" +
+            "select si.fk_shell_id from shell_identifier si where exists (" +
+            "select sider.ref_key_value from SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY sider " +
+            "where (sider.ref_key_value = :tenantId " +
+            "or (sider.ref_key_value = :publicWildcardPrefix and si.namespace in (:publicWildcardAllowedTypes) )) " +
+            "and sider.FK_SI_EXTERNAL_SUBJECT_REFERENCE_ID="+
+            "(select sies.id from SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE sies where sies.FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID=si.id)"+
+            "))" +
+         ")",nativeQuery = true )
+   Optional<Shell> findByIdExternalAndExternalSubjectId( @Param( "idExternal" ) String idExternal,
+         @Param("tenantId") String tenantId,
+         @Param("owningTenantId") String owningTenantId,
+         @Param ("publicWildcardPrefix") String publicWildcardPrefix,
+         @Param ("publicWildcardAllowedTypes") List<String> publicWildcardAllowedTypes);
 
    @Query( "SELECT new org.eclipse.tractusx.semantics.registry.model.projection.ShellMinimal(s.id,s.createdDate) FROM Shell s where s.idExternal = :idExternal" )
    Optional<ShellMinimal> findMinimalRepresentationByIdExternal(@Param("idExternal") String idExternal );
@@ -55,8 +77,8 @@ public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecific
     @Query( value = "select s.id_external from shell s where s.id in (" +
           "select si.fk_shell_id from shell_identifier si " +
           "where concat(si.namespace,si.identifier) in (:keyValueCombinations) " +
-          "and (:tenantId = :owningTenantId or :tenantId = (" +
-                "Select sider.ref_key_value from SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY sider where FK_SI_EXTERNAL_SUBJECT_REFERENCE_ID="+
+          "and (:tenantId = :owningTenantId or exists (" +
+                "Select sider.ref_key_value from SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY sider where (sider.ref_key_value = :tenantId or (sider.ref_key_value = :publicWildcardPrefix and si.namespace in (:publicWildcardAllowedTypes) )) and sider.FK_SI_EXTERNAL_SUBJECT_REFERENCE_ID="+
           "(select sies.id from SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE sies where sies.FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID=si.id)"+
           ")) group by si.fk_shell_id " +
           "having count(*) = :keyValueCombinationsSize " +
@@ -64,6 +86,8 @@ public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecific
     List<String> findExternalShellIdsByIdentifiersByExactMatch(@Param("keyValueCombinations") List<String> keyValueCombinations,
                                                    @Param("keyValueCombinationsSize") int keyValueCombinationsSize,
                                                    @Param("tenantId") String tenantId,
+                                                   @Param ("publicWildcardPrefix") String publicWildcardPrefix,
+                                                   @Param ("publicWildcardAllowedTypes") List<String> publicWildcardAllowedTypes,
                                                    @Param("owningTenantId") String owningTenantId);
 
     /**

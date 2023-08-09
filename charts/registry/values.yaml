@@ -46,6 +46,8 @@ registry:
   idpIssuerUri: ""
   idpClientId: default-client
   tenantId: default-tenant
+  externalSubjectIdWildcardPrefix: PUBLIC_READABLE
+  externalSubjectIdWildcardAllowedTypes: manufacturerPartId,assetLifecyclePhase
   service:
     port: 8080
     type: ClusterIP
