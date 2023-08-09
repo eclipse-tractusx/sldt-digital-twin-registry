@@ -43,22 +43,11 @@ public interface SubmodelMapper {
             @Mapping(target="semanticId", source = "semanticId"),
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "displayNames", source = "displayName"),
-            @Mapping(target = "submodelExtensions", source = "extensions"),
             @Mapping(target = "submodelSupplemSemanticIds", source = "supplementalSemanticId")
     })
     Submodel fromApiDto(SubmodelDescriptor apiDto);
 
    SubmodelDescription mapShellDescription (LangStringTextType description);
-
-   @Mappings({
-         @Mapping(target="submodSemanticId", source = "semanticId"),
-         @Mapping(target="submodSupplementalIds", source = "supplementalSemanticIds"),
-         @Mapping(target="name", source = "name"),
-         @Mapping(target="valueType", source = "valueType"),
-         @Mapping(target="value", source = "value"),
-         @Mapping(target="refersTo", source = "refersTo")
-   })
-   SubmodelExtension mapSubmodelExtension (Extension submodelExtensions);
 
    @Mappings({
             @Mapping(target="interfaceName", source = "interface"),
@@ -103,19 +92,6 @@ public interface SubmodelMapper {
 
    LangStringTextType mapSubModelDescription (SubmodelDescription description);
 
-   @Mappings({
-         @Mapping(source = "submodelExtensions", target = "extensions"),
-   })
    @InheritInverseConfiguration
    List<SubmodelDescriptor> toApiDto( Set<Submodel> submodels );
-
-   @Mappings({
-         @Mapping(source="submodSemanticId", target = "semanticId"),
-         @Mapping(source="submodSupplementalIds", target = "supplementalSemanticIds"),
-         @Mapping(source="name", target = "name"),
-         @Mapping(source="valueType", target = "valueType"),
-         @Mapping(source="value", target = "value"),
-         @Mapping(source="refersTo", target = "refersTo")
-   })
-   Extension mapExtension (SubmodelExtension submodelExtension);
 }

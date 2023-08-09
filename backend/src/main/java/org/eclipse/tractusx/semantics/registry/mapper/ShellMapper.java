@@ -45,7 +45,6 @@ public interface ShellMapper {
           @Mapping(target = "shellKind", source = "assetKind"),
           @Mapping(target = "id", ignore = true),
           @Mapping(target = "displayNames", source = "displayName"),
-          @Mapping(target = "shellExtensions", source = "extensions"),
     })
     Shell fromApiDto(AssetAdministrationShellDescriptor apiDto);
 
@@ -67,19 +66,6 @@ public interface ShellMapper {
 
    ShellIdentifierExternalSubjectReference maptoShellIdentifierExternalSubjectReference ( Reference externalSubjectId );
 
-   @Mappings({
-         @Mapping(target = "supplementalSemanticIds", source = "supplementalSemanticIds"),
-         @Mapping(target = "semanticId", source = "semanticId"),
-         @Mapping(target = "refersTo", source = "refersTo"),
-   })
-   ShellExtension fromApiDto( Extension apiDto);
-
-   ShellExtensionSupplemSemanticIdReference maptoShellExtensionSupplemSemanticReference ( Reference supplementalSemanticId );
-
-   ShellExtensionSemanticIdReference maptoShellExtensionSemanticReference ( Reference semanticId );
-
-   ShellExtensionRefersToReference maptoShellExtensionRefersToReference ( Reference refersTo );
-
     Set<ShellIdentifier> fromApiDto(List<SpecificAssetId> apiDto);
 
     @Mappings({
@@ -93,7 +79,6 @@ public interface ShellMapper {
          @Mapping(source = "descriptions", target = "description"),
          @Mapping(source = "submodels", target = "submodelDescriptors"),
          @Mapping(source = "displayNames", target = "displayName"),
-         @Mapping(source = "shellExtensions", target = "extensions"),
     })
     @InheritInverseConfiguration
     AssetAdministrationShellDescriptor toApiDto(Shell shell);

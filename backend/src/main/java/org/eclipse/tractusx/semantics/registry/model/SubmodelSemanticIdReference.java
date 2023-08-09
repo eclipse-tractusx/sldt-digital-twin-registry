@@ -49,11 +49,6 @@ public class SubmodelSemanticIdReference {
    @OneToMany(cascade = CascadeType.ALL,orphanRemoval=true, mappedBy = "submodelSemanticIdReference")
    private Set<SubmodelSemanticIdReferenceKey> keys;
 
-   @JsonManagedReference
-   @JsonIgnore
-   @OneToOne(cascade = CascadeType.ALL,orphanRemoval=true, mappedBy = "submodelSemanticIdReference")
-   private SubmodelSemanticIdReferenceParent referredSemanticId;
-
    @JsonBackReference
    @OneToOne( fetch = FetchType.LAZY, optional = false,cascade = {CascadeType.MERGE} )
    @JoinColumn( name = "fk_submodel_id" )

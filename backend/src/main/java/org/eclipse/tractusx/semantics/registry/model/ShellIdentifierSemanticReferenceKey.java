@@ -45,10 +45,6 @@ public class ShellIdentifierSemanticReferenceKey {
    @JoinColumn(name = "fk_sis_reference_id")
    private ShellIdentifierSemanticReference shellIdentifierSemanticReference;
 
-   @JsonBackReference
-   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-   @JoinColumn(name = "fk_reference_parent_id")
-   private ShellIdentifierSemanticReferenceParent shellIdentifierSemanticReferenceParent;
 }
 
 

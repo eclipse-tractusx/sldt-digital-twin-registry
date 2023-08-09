@@ -43,10 +43,6 @@ public class ShellIdentifierExternalSubjectReference {
    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellIdentifierExternalSubjectReference")
    private Set<ShellIdentifierExternalSubjectReferenceKey> keys;
 
-   @JsonManagedReference
-   @OneToOne(cascade = CascadeType.ALL, mappedBy = "shellIdentifierExternalSubjectReference")
-   private ShellIdentifierExternalSubjectReferenceParent referredSemanticId;
-
    @JsonBackReference
    @OneToOne(fetch = FetchType.LAZY, optional = false)
    @JoinColumn(name = "fk_shell_identifier_external_subject_id")

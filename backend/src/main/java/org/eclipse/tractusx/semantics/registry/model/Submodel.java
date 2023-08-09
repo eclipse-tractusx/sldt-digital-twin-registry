@@ -100,24 +100,12 @@ public class Submodel {
     @JsonManagedReference
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true,mappedBy = "submodel")
-    Set<SubmodelExtension> submodelExtensions= new HashSet<>();
-
-    @JsonManagedReference
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval=true,mappedBy = "submodel")
     Set<SubmodelSupplemSemanticIdReference> submodelSupplemSemanticIds;
 
     public void setDisplayNames(Set<SubmodelDisplayName> displayNames) {
         if(displayNames==null) {displayNames = new HashSet<>();}
         this.displayNames = displayNames;
         for(SubmodelDisplayName s : displayNames) {
-            s.setSubmodel(this);
-        }
-    }
-    public void setSubmodelExtensions(Set<SubmodelExtension> submodelExtensions) {
-        if(submodelExtensions==null) {submodelExtensions = new HashSet<>();}
-        this.submodelExtensions = submodelExtensions;
-        for(SubmodelExtension s : submodelExtensions) {
             s.setSubmodel(this);
         }
     }

@@ -43,11 +43,6 @@ public class ShellIdentifierExternalSubjectReferenceKey {
    @ManyToOne(fetch = FetchType.LAZY, optional = false)
    @JoinColumn(name = "fk_si_external_subject_reference_id")
    private ShellIdentifierExternalSubjectReference shellIdentifierExternalSubjectReference;
-
-   @JsonBackReference
-   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-   @JoinColumn(name = "fk_reference_parent_id")
-   private ShellIdentifierExternalSubjectReferenceParent shellIdentifierExternalSubjectReferenceParent;
 }
 
 

@@ -44,10 +44,6 @@ public class ShellIdentifierSupplemSemanticReferenceKey {
    @JoinColumn(name = "fk_reference_id")
    private ShellIdentifierSupplemSemanticReference shellIdentifierSupplemSemanticReference;
 
-   @JsonBackReference
-   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-   @JoinColumn(name = "fk_reference_parent_id")
-   private ShellIdentifierSupplemSemanticReferenceParent shellIdentifierSupplemSemanticReferenceParent;
 }
 
 

@@ -79,18 +79,6 @@ public class Shell {
     private ShellKind shellKind;
     private String shellType;
 
-    @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellId")
-    Set<ShellExtension> shellExtensions= new HashSet<>();
-
-    public void setShellExtensions(Set<ShellExtension> shellExtensions) {
-        if(shellExtensions==null) {shellExtensions = new HashSet<>();}
-        this.shellExtensions = shellExtensions;
-        for(ShellExtension s : shellExtensions) {
-            s.setShellId(this);
-        }
-    }
-
     public void setDisplayNames(Set<ShellDisplayName> displayNames) {
         if(displayNames==null) {displayNames = new HashSet<>();}
         this.displayNames = displayNames;

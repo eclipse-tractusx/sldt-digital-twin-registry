@@ -42,16 +42,13 @@ public class SubmodelSupplemSemanticIdReference {
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    @Column(name="id")
    UUID id;
+
    ReferenceType type;
+
    @JsonManagedReference
    @JsonIgnore
    @OneToMany(cascade = CascadeType.ALL,orphanRemoval=true, mappedBy = "submodelSupplemSemanticIdReference")
    Set<SubmodelSupplemSemanticIdReferenceKey> keys;
-
-   @JsonManagedReference
-   @JsonIgnore
-   @OneToOne(cascade = CascadeType.ALL,orphanRemoval=true, mappedBy = "submodelSupplemSemanticIdReference")
-   SubmodelSupplemSemanticIdReferenceParent referredSemanticId;
 
    @JsonBackReference
    @ManyToOne(fetch = FetchType.LAZY)
