@@ -173,7 +173,6 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
         return new ResponseEntity<>(list, HttpStatus.CREATED);
     }
 
-    @Override
     public ResponseEntity<List<String>> postQueryAllAssetAdministrationShellIds(ShellLookup shellLookup,@RequestHeader String externalSubjectId) {
         List<SpecificAssetId> assetIds = shellLookup.getQuery().getAssetIds();
         List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByAnyMatch(shellMapper.fromApiDto(assetIds),getExternalSubjectIdOrEmpty(externalSubjectId));

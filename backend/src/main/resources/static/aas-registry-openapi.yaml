@@ -834,34 +834,6 @@ paths:
           description: Asset identifier key-value-pairs deleted successfully
       x-semanticIds:
         - https://admin-shell.io/aas/API/DeleteAllAssetLinksById/1/0/RC02
-  /lookup/shells/query:
-    post:
-      tags:
-        - Registry and Discovery Interface
-      summary: Returns a list of Asset Administration Shell ids based on Asset identifier key-value-pairs.
-      operationId: PostQueryAllAssetAdministrationShellIds
-      parameters:
-        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
-      requestBody:
-        description: Asset Administration Shell Descriptor object
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ShellLookup'
-        required: true
-      responses:
-        "200":
-          description: Requested Asset Administration Shell ids
-          content:
-            application/json:
-              schema:
-                type: array
-                maxItems: 10000
-                items:
-                  $ref: '#/components/schemas/Identifier'
-              examples:
-                complete:
-                  $ref: '#/components/examples/lookup-shells-by-aas-identifier-response'
 components:
   securitySchemes:
     bearerAuth:
