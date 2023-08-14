@@ -924,7 +924,7 @@ components:
       required:
         - id
       type: object
-      example: {"description":[{"language":"de","text":"hello text"},{"language":"en","text":"hello s"}],"displayName":[{"language":"de","text":"this is an example description1"}],"extensions":[{"supplementalSemanticIds":[{"type":"ExternalReference","keys":[{"type":"Submodel","value":"semanticIdExample"}]}],"refersTo":[{"type":"ExternalReference","keys":[{"type":"Submodel","value":"semanticIdExample"}]}]}],"endpoints":[{"interface":"interfaceNameExample","protocolInformation":{"href":"endpointAddressExample","endpointProtocol":"endpointProtocolExample","endpointProtocolVersion":["e"],"subprotocol":"subprotocolExample","subprotocolBody":"subprotocolBodyExample","subprotocolBodyEncoding":"subprotocolBodyExample","securityAttributes":[{"type":"NONE"}]}}],"idShort":"idShortExample","id":"e1eba3d7-91f0-4dac-a730-eaa1d35e035c","specificAssetIds":[{"supplementalSemanticIds":[{"type":"ExternalReference","keys":[{"type":"Submodel","value":"semanticIdExample"}]}],"name":"identifier1KeyExample","value":"identifier1ValueExample"},{"supplementalSemanticIds":[{"type":"ExternalReference","keys":[{"type":"Submodel","value":"semanticIdExample"}]}],"name":"identifier2KeyExample","value":"identifier2ValueExample"}],"submodelDescriptors":[{"endpoints":[{"interface":"interfaceNameExample","protocolInformation":{"href":"endpointAddressExample","endpointProtocol":"endpointProtocolExample","endpointProtocolVersion":["e"],"subprotocol":"subprotocolExample","subprotocolBody":"subprotocolBodyExample","subprotocolBodyEncoding":"subprotocolBodyExample","securityAttributes":[{"type":"NONE"}]}}],"idShort":"idShortExample","id":"cd47615b-daf3-4036-8670-d2f89349d388","semanticId":{"type":"ExternalReference","keys":[{"type":"Submodel","value":"semanticIdExample"}]},"description":[{"language":"de","text":"hello text"},{"language":"en","text":"hello s"}]}]}
+      example: {"description":[{"language":"de","text":"hello text"},{"language":"en","text":"hello s"}],"displayName":[{"language":"de","text":"this is an example description1"}],"endpoints":[{"interface":"interfaceNameExample","protocolInformation":{"href":"endpointAddressExample","endpointProtocol":"endpointProtocolExample","endpointProtocolVersion":["e"],"subprotocol":"subprotocolExample","subprotocolBody":"subprotocolBodyExample","subprotocolBodyEncoding":"subprotocolBodyExample","securityAttributes":[{"type":"NONE","key": "Security Attribute key","value": "Security Attribute value"}]}}],"idShort":"idShortExample","id":"e1eba3d7-91f0-4dac-a730-eaa1d35e035c","specificAssetIds":[{"supplementalSemanticIds":[{"type":"ExternalReference","keys":[{"type":"Submodel","value":"semanticIdExample"}]}],"name":"identifier1KeyExample","value":"identifier1ValueExample"},{"supplementalSemanticIds":[{"type":"ExternalReference","keys":[{"type":"Submodel","value":"semanticIdExample"}]}],"name":"identifier2KeyExample","value":"identifier2ValueExample"}],"submodelDescriptors":[{"endpoints":[{"interface":"interfaceNameExample","protocolInformation":{"href":"endpointAddressExample","endpointProtocol":"endpointProtocolExample","endpointProtocolVersion":["e"],"subprotocol":"subprotocolExample","subprotocolBody":"subprotocolBodyExample","subprotocolBodyEncoding":"subprotocolBodyExample","securityAttributes":[{"type":"NONE","key": "Security Attribute key","value": "Security Attribute value"}]}}],"idShort":"idShortExample","id":"cd47615b-daf3-4036-8670-d2f89349d388","semanticId":{"type":"ExternalReference","keys":[{"type":"Submodel","value":"semanticIdExample"}]},"description":[{"language":"de","text":"hello text"},{"language":"en","text":"hello s"}]}]}
       allOf:
         - $ref: '#/components/schemas/Descriptor'
         - properties:
@@ -979,12 +979,6 @@ components:
           maxItems: 10000
           items:
             $ref: '#/components/schemas/LangStringNameType'
-        extensions:
-          minItems: 1
-          maxItems: 10000
-          type: array
-          items:
-            $ref: '#/components/schemas/Extension'
       example: { "endpoints": [ { "protocolInformation": { "endpointAddress": "https://localhost:1234", "endpointProtocolVersion": "1.1" }, "interface": "AAS-1.0" }, { "protocolInformation": { "endpointAddress": "opc.tcp://localhost:4840" }, "interface": "AAS-1.0" }, { "protocolInformation": { "endpointAddress": "https://localhost:5678", "endpointProtocolVersion": "1.1", "subprotocol": "OPC UA Basic SOAP", "subprotocolBody": "ns=2;s=MyAAS", "subprotocolBodyEncoding": "application/soap+xml" }, "interface": "AAS-1.0" } ] }
     LangStringTextType:
       allOf:
@@ -1043,9 +1037,6 @@ components:
     Reference:
       allOf:
         - $ref: '#/components/schemas/ReferenceParent'
-        - properties:
-            referredSemanticId:
-              $ref: '#/components/schemas/ReferenceParent'
     ReferenceParent:
       properties:
         type:
@@ -1327,6 +1318,9 @@ components:
           type: boolean
     Endpoint:
       type: object
+      required:
+        - interface
+        - protocolInformation
       properties:
         interface:
           maxLength: 128
@@ -1409,7 +1403,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Reference'
-      example: {"endpoints": [{"interface": "interfaceNameExample","protocolInformation": {"href": "endpointAddressExample","endpointProtocol": "endpointProtocolExample","endpointProtocolVersion": [ "e"],"subprotocol": "subprotocolExample","subprotocolBody": "subprotocolBodyExample","subprotocolBodyEncoding": "subprotocolBodyExample","securityAttributes": [{"type": "NONE" }]}}],"idShort": "idShortExample","id": "341f63de-728a-4b6d-9c72-c0d9ba4f8c7d","semanticId": {"type": "ExternalReference","keys": [{"type": "Submodel","value": "semanticIdExample"}]},"description": [{"language": "de","text": "hello text"},{"language": "en","text": "hello s"}]}
+      example: {"endpoints": [{"interface": "interfaceNameExample","protocolInformation": {"href": "endpointAddressExample","endpointProtocol": "endpointProtocolExample","endpointProtocolVersion": [ "e"],"subprotocol": "subprotocolExample","subprotocolBody": "subprotocolBodyExample","subprotocolBodyEncoding": "subprotocolBodyExample","securityAttributes": [{"type": "NONE","key": "Security Attribute key","value": "Security Attribute value" }]}}],"idShort": "idShortExample","id": "341f63de-728a-4b6d-9c72-c0d9ba4f8c7d","semanticId": {"type": "ExternalReference","keys": [{"type": "Submodel","value": "semanticIdExample"}]},"description": [{"language": "de","text": "hello text"},{"language": "en","text": "hello s"}]}
       allOf:
         - $ref: '#/components/schemas/Descriptor'
     Result:
@@ -1621,16 +1615,7 @@ components:
                   "type": "AnnotatedRelationshipElement",
                   "value": "udbffFELY8AudbffZC3^WZ],;udbff^kud8005udbff2ud8002<Sud800Rkudbffb>ud800Dud800j"
                 }
-              ],
-              "referredSemanticId": {
-                "type": "ExternalReference",
-                "keys": [
-                  {
-                    "type": "AnnotatedRelationshipElement",
-                    "value": "=udbffJud800budbff4udbffiud800TZud800budbff6ud800sudbff<udbff>udbff`udbff;qitud800[ud800Rkrud800edud8005Qud800UtSud800F5~ud800[4Jud800cud800:udbffOI8D1udbffIudbff3udbffAudbffpudbffi udbff;ud800kudbffG$udbff[%ud800?6udbffNud800;&udbffMudbffA0eMB*5:JXudbffoudbffQud800\\"
-                  }
-                ]
-              }
+              ]
             },
             "supplementalSemanticIds": [
               {
@@ -1640,16 +1625,7 @@ components:
                     "type": "AnnotatedRelationshipElement",
                     "value": "Sud800oud800n>NTud800mud800VpV<7rEKPhAudbff`qOudbff]ud800;aud800>udbffav^nudbff;iRudbffsud8002ud800cqut^"
                   }
-                ],
-                "referredSemanticId": {
-                  "type": "ExternalReference",
-                  "keys": [
-                    {
-                      "type": "AnnotatedRelationshipElement",
-                      "value": "udbffVud800Eudbff9udbffYQ70Q!flyud800rudbffXudbffpZud8008q_Re?oA6cs'ud800u"
-                    }
-                  ]
-                }
+                ]
               }
             ],
             "name": "VCudbffB!ud800VkTudbffZdStPOud800:S:P0ud800Budbff;udbff1nootWudb",
@@ -1661,16 +1637,7 @@ components:
                   "type": "AnnotatedRelationshipElement",
                   "value": "ud800\\pZLbimgkR[Tudbffpudb",
                 }
-              ],
-              "referredSemanticId": {
-                "type": "ExternalReference",
-                "keys": [
-                  {
-                    "type": "AnnotatedRelationshipElement",
-                    "value": "5Iudbffjud800kudbff?m_$2ud800?udbff^h8udbff^HS$w@Uud8008G<Xud800p_gr9gud800Tud800RB'ud800jud8008udbffaud8008ud800<Dud800WudbffSud800SudbffuudbffT@1\\udbffM\"PG0udbffp$ud800Wudbff>udbfft0ehud800[4udbffoJZZudbffc3udbff4udbff@$ud800f3iud800Vud8005ud800G"
-                  }
-                ]
-              }
+              ]
             }
           }
         ]
