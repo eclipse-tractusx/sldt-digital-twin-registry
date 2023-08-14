@@ -43,10 +43,6 @@ public class ShellIdentifierSemanticReference {
    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellIdentifierSemanticReference")
    Set<ShellIdentifierSemanticReferenceKey> keys;
 
-   @JsonManagedReference
-   @OneToOne(cascade = CascadeType.ALL, mappedBy = "shellIdentifierSemanticReference")
-   ShellIdentifierSemanticReferenceParent referredSemanticId;
-
    @JsonBackReference
    @OneToOne(fetch = FetchType.LAZY, optional = false)
    @JoinColumn(name = "fk_shell_identifier_semantic_id")

@@ -47,11 +47,6 @@ public class SubmodelSupplemSemanticIdReferenceKey {
    @ManyToOne( fetch = FetchType.LAZY, optional = false,cascade = { CascadeType.MERGE}  )
    @JoinColumn( name = "fk_submodel_supplem_semantic_id_reference_id" )
    private SubmodelSupplemSemanticIdReference submodelSupplemSemanticIdReference;
-
-   @JsonBackReference
-   @ManyToOne( fetch = FetchType.LAZY, optional = false,cascade = { CascadeType.MERGE}  )
-   @JoinColumn( name = "fk_reference_parent_id" )
-   private SubmodelSupplemSemanticIdReferenceParent submodelSupplemSemanticIdReferenceParent;
 }
 
 

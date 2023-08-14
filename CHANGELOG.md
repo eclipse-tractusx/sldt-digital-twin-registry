@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - In this version the models have been adjusted to new version AAS 3.0.
 
 ## fixed
+- Refactored existing models to align with AAS 3.0. Removed /query from lookup api because it is not a part of AAS 3.0 version.
 
 ## 0.3.12-M1
 ### Added

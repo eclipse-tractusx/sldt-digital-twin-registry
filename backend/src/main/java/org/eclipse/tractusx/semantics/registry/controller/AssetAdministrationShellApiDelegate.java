@@ -173,7 +173,10 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
         return new ResponseEntity<>(list, HttpStatus.CREATED);
     }
 
-    @Override
+    /**
+     * Since /query is not part of AAS 3.0, so this method is not used.
+     * Keeping it for the reason that it might come up in next version.
+     */
     public ResponseEntity<List<String>> postQueryAllAssetAdministrationShellIds(ShellLookup shellLookup,@RequestHeader String externalSubjectId) {
         List<SpecificAssetId> assetIds = shellLookup.getQuery().getAssetIds();
         List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByAnyMatch(shellMapper.fromApiDto(assetIds),getExternalSubjectIdOrEmpty(externalSubjectId));
