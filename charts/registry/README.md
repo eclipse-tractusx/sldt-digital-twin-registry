@@ -1,11 +1,9 @@
 # registry
 
-![Version: 0.3.14](https://img.shields.io/badge/Version-0.3.14-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.3.12-M1](https://img.shields.io/badge/AppVersion-0.3.12--M1-informational?style=flat-square)
+![Version: 0.3.15](https://img.shields.io/badge/Version-0.3.15-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.3.12-M1](https://img.shields.io/badge/AppVersion-0.3.12--M1-informational?style=flat-square)
 
 **Tractus-X Digital Twin Registry Helm Chart**<br/>
 This Helm charts install the Digital Twin Registry and its dependencies.
-
-**Homepage:** <https://eclipse-tractusx.github.io/>
 
 ## Requirements
 
