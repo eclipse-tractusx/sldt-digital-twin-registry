@@ -1,8 +1,11 @@
 # registry
 
-![Version: 0.2.15](https://img.shields.io/badge/Version-0.2.15-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.2.0-M11-multi-tenancy](https://img.shields.io/badge/AppVersion-0.2.0--M11--multi--tenancy-informational?style=flat-square)
+![Version: 0.3.14](https://img.shields.io/badge/Version-0.3.14-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.3.12-M1](https://img.shields.io/badge/AppVersion-0.3.12--M1-informational?style=flat-square)
 
-Tractus-X Digital Twin Registry Helm Chart
+**Tractus-X Digital Twin Registry Helm Chart**<br/>
+This Helm charts install the Digital Twin Registry and its dependencies.
+
+**Homepage:** <https://eclipse-tractusx.github.io/>
 
 ## Requirements
 
@@ -10,6 +13,22 @@ Tractus-X Digital Twin Registry Helm Chart
 |------------|------|---------|
 | https://charts.bitnami.com/bitnami | keycloak | 13.3.0 |
 | https://charts.bitnami.com/bitnami | postgresql | 12.1.7 |
+
+## Prerequisites
+- Kubernetes 1.19+
+- Helm 3.2.0+
+- PV provisioner support in the underlying infrastructure
+
+## Install
+```
+helm dep up charts/registry
+
+kubectl create namespace semantics
+
+helm install registry -n semantics charts/registry
+
+```
+
 
 ## Values
 
@@ -47,8 +66,8 @@ Tractus-X Digital Twin Registry Helm Chart
 | registry.host | string | `"minikube"` |  |
 | registry.idpClientId | string | `"default-client"` |  |
 | registry.idpIssuerUri | string | `""` |  |
-| registry.image.registry | string | `"ghcr.io/catenax-ng"` |  |
-| registry.image.repository | string | `"sldt-digital-twin-registry"` |  |
+| registry.image.registry | string | `"docker.io"` |  |
+| registry.image.repository | string | `"tractusx/sldt-digital-twin-registry"` |  |
 | registry.image.version | string | `""` |  |
 | registry.imagePullPolicy | string | `"IfNotPresent"` |  |
 | registry.ingress.annotations | object | `{}` |  |
