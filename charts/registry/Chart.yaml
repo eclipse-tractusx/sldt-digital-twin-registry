@@ -21,9 +21,12 @@
 apiVersion: v2
 name: registry
 description: Tractus-X Digital Twin Registry Helm Chart
+home: https://eclipse-tractusx.github.io/
+sources:
+  - https://github.com/eclipse-tractusx/sldt-digital-twin-registry
 
 type: application
-version: 0.3.14
+version: 0.3.15
 appVersion: 0.3.12-M1
 
 dependencies:
