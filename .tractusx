@@ -1,4 +1,4 @@
-product: "sldt-digital-twin-registry"
+product: "Digital Twin Registry"
 leadingRepository: "https://github.com/eclipse-tractusx/sldt-digital-twin-registry"
 repositories:
   - name: "sldt-digital-twin-registry"
