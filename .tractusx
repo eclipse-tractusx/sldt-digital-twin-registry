@@ -1,5 +1,5 @@
 product: "sldt-digital-twin-registry"
-leadingRepository: "sldt-digital-twin-registry"
+leadingRepository: "https://github.com/eclipse-tractusx/sldt-digital-twin-registry"
 repositories:
   - name: "sldt-digital-twin-registry"
     usage: "This is the repository which contains the source code for the SLDT digital twin registry"
