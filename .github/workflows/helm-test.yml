@@ -22,6 +22,13 @@ name: Lint and Test Charts
 on:
   pull_request:
   workflow_dispatch:
+    inputs:
+      node_image:
+        description: 'kindest/node image for k8s kind cluster'
+        # k8s version from 3.1 release as default
+        default: 'kindest/node:v1.24.6'
+        required: false
+        type: string
 
 jobs:
   lint-test:
@@ -39,14 +46,6 @@ jobs:
           version: v0.19.0
           # default value for event_name != workflow_dispatch
           node_image: ${{ github.event.inputs.node_image || 'kindest/node:v1.24.6' }}
-
-      - name: Build image
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: ./backend/Dockerfile
-          push: true
-          tags: kind-registry:5000/sldt-digital-twin-registry:testing
 
       - name: Set up Helm
         uses: azure/setup-helm@v3
