@@ -51,6 +51,6 @@ spring:
 
 registry:
   external-subject-id-wildcard-prefix: PUBLIC_READABLE
-  external-subject-id-wildcard-allowed-types:
+  external-subject-id-wildcard-allowed-types: manufacturerPartId,assetLifecyclePhase
   idm:
     owningTenantId: TENANT_ONE

@@ -29,6 +29,8 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldNameConstants;
+
 @Entity
 @Getter
 @Setter
@@ -40,6 +42,7 @@ import lombok.*;
 @JsonIdentityInfo(
       generator = ObjectIdGenerators.PropertyGenerator.class,
       property = "id")
+@FieldNameConstants
 public class Shell {
 
     @Id

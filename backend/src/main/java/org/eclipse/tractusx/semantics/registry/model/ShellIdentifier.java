@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldNameConstants;
 
 @Entity
 @Getter
@@ -36,6 +37,7 @@ import lombok.*;
 @AllArgsConstructor
 @With
 @JsonIdentityInfo( generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@FieldNameConstants
 public class ShellIdentifier {
     public static final String GLOBAL_ASSET_ID_KEY = "globalAssetId";
 

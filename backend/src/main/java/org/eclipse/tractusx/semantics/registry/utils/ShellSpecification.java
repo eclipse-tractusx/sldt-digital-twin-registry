@@ -71,16 +71,17 @@ public class ShellSpecification<T> implements Specification<T> {
 
    private Predicate getAllShellsPredicate( Root<T> root, CriteriaQuery<?> cq, CriteriaBuilder criteriaBuilder, Instant searchValue ) {
       // Join Shell -> ShellIdentifier
-      Join<Shell,ShellIdentifier > shellIdentifierShellJoin = root.join( "identifiers" );
+      String t = Shell.Fields.identifiers;
+      Join<Shell,ShellIdentifier > shellIdentifierShellJoin = root.join( Shell.Fields.identifiers );
       // join ShellIdentifier -> ShellIdentifierExternalSubjectReference -> ShellIdentifierExternalSubjectReferenceKey
-      Join<ShellIdentifierExternalSubjectReference,ShellIdentifierExternalSubjectReferenceKey> referenceKeyJoin = shellIdentifierShellJoin.join( "externalSubjectId" ).join( "keys" );
+      Join<ShellIdentifierExternalSubjectReference,ShellIdentifierExternalSubjectReferenceKey> referenceKeyJoin = shellIdentifierShellJoin.join( ShellIdentifier.Fields.externalSubjectId ).join( ShellIdentifierExternalSubjectReference.Fields.keys );
 
       return criteriaBuilder.and(
             criteriaBuilder.or(
-                  criteriaBuilder.equal( referenceKeyJoin.get( "value" ), tenantId ),
+                  criteriaBuilder.equal( referenceKeyJoin.get( ShellIdentifierExternalSubjectReferenceKey.Fields.value ), tenantId ),
                   criteriaBuilder.and(
-                        criteriaBuilder.equal( referenceKeyJoin.get( "value" ), publicWildcardPrefix ),
-                        criteriaBuilder.in( shellIdentifierShellJoin.get( "key" ) ).value( publicWildcardAllowedTypes )
+                        criteriaBuilder.equal( referenceKeyJoin.get( ShellIdentifierExternalSubjectReferenceKey.Fields.value ), publicWildcardPrefix ),
+                        criteriaBuilder.in( shellIdentifierShellJoin.get( ShellIdentifier.Fields.key ) ).value( publicWildcardAllowedTypes )
                   )
             ),
             criteriaBuilder.greaterThan( root.get( sortFieldName ), searchValue )

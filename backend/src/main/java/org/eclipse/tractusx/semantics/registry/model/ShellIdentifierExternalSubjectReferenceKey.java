@@ -23,6 +23,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldNameConstants;
 
 @Entity
 @Getter
@@ -31,6 +32,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @With
+@FieldNameConstants
 public class ShellIdentifierExternalSubjectReferenceKey {
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
