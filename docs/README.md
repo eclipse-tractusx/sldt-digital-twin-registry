@@ -483,6 +483,180 @@ The AAS Registry can be accessed on behalf of a user. The token has to be obtain
 
 *Support contact*	tractusx-dev@eclipse.org
 
+### Access control to Digital Twins Based on the BPN (Business Partner Number)/ TenantId
+The visibility of `specificAssetIds` in the Digital Twin Registry based on the Business Partner Number (BPN) can be controlled with the attribute `externalSubjectId`. Hence, the `externalSubjectId` is identified with the BPN.
+
+* The BPN as attribute to a *specificAssetId* can be optionally provided in `specificAssetIds`. This can be done with `externalSubjectId`.
+* Only those users, where `externalSubjectId` matches the Eclipse Dataspace Components-Header (*i.e.* BPN) are able to discover and read exactly this content of `specificAssetIds`.
+* The behavior is **closed by default**, *i.e.*, if no `externalSubjectId` is defined to a `specificAssetId`, the content of this particular `specificAssetId` (key, value) is only visible for the owner of the *Digital Twin* (also known as data provider).
+* To mark a `specificAssetId` as public for every reader on a *Digital Twin*, the defined characters (`"PUBLIC_READABLE"`) need to be added in the `externalSubjectId`.
+   * *Cave: The publisher of `specificAssetIds` needs to consider antitrust law. This use of `"PUBLIC_READABLE"` is only allowed for the *specificAssetId* `"assetLifecyclePhase"` (only `"value":"AsBuilt"`, and `"value":"AsPlanned"` allowed; see [Eclipse Tractus-X - Traceability Kit](https://eclipse-tractusx.github.io/docs-kits/next/kits/Traceability%20Kit/Software%20Development%20View/Specification%20Traceability%20Kit)), and `"manufacturerPartId"` (which is technically enforced by the Digital Twin Registry) if its content describes material numbers of products and those products are or were in serial production for the open market. If its content describes material numbers of products in state of, *e.g.*, pre-production, being planned for production, being unsold, the use of `"PUBLIC_READABLE"` is not allowed and use of dedicated read access via  `externalSubjectId` is to be used instead. `"manufacturerPartId"` is not allowed to be used for different content than the one described here.*
+* The behavior of the Digital Twin Registry is as follows. The read-access from `specificAssetIds` is inherited by the other fields of a *Digital Twin*.
+   * An owner and a user with respect to the BPN, who has read-access to one of the `specificAssetIds` (`externalSubjectId` has `"value":"<Business Partner Number>"`) has read-access to the other fields of a *Digital Twin* as well, *i.e.* (see the full list of fields [POST Asset Administration Shell Descriptor v3.0 SSP-001](https://app.swaggerhub.com/apis/Plattform_i40/AssetAdministrationShellRegistryServiceSpecification/V3.0_SSP-001#/Asset%20Administration%20Shell%20Registry%20API/PostAssetAdministrationShellDescriptor))
+      * `description`
+      * `displayName`
+      * `administration`
+      * `assetKind`
+      * `assetType`
+      * `globalAssetId`
+      * `idShort`
+      * `id`
+      * `submodelDescriptors`
+      * `specificAssetIds`
+
+   * A user, who has <u>only</u> general read-access to `specificAssetIds` (`externalSubjectId` has `"value":"PUBLIC_READABLE"`) has <u>only</u> read-access to the following fields of a *Digital Twin*
+      * `id`
+      * `submodelDescriptors`
+      * `specificAssetIds`
+   * The list of `keys` in the externalSubjectId is filtered for the requested user. Only the keys will be returned where the BPN matched.
+
+**Hint** <br>
+The defined string for `"PUBLIC_READABLE"` and the list of allowed types to mark as public is configurable via helm values.yml:
+* `registry.externalSubjectIdWildcardPrefix` (Default is `"PUBLIC_READABLE"` )
+* `registry.externalSubjectIdWildcardAllowedTypes` (Default is `"manufacturerPartId,assetLifecyclePhase"` )
+
+Detailed information can be found [here](../INSTALL.md)
+
+_________________
+
+
+
+Example to create a *Digital Twin* with `specificAssetIds`:
+```
+POST Method:
+{{registry-baseurl}}/api/v3.0/shell-descriptors
+```
+
+```json
+POST Body (JSON):
+{
+   "idShort":"idShortExample",
+   "id":"e1eba3d7-91f0-4dac-a730-eaa1d35e035c-2",
+   "description":[
+      {
+         "language":"en",
+         "text":"Example of human readable description of digital twin."
+      }
+   ],
+   "specificAssetIds":[
+      {
+         "name":"partInstanceId",
+         "value":"24975539203421"
+      },
+      {
+         "name":"customerPartId",
+         "value":"231982",
+         "externalSubjectId":{
+            "type":"ExternalReference",
+            "keys":[
+               {
+                  "type":"GlobalReference",
+                  "value":"BPN_COMPANY_001"
+               }
+            ]
+         }
+      },
+      {
+         "name":"manufacturerId",
+         "value":"123829238",
+         "externalSubjectId":{
+            "type":"ExternalReference",
+            "keys":[
+               {
+                  "type":"GlobalReference",
+                  "value":"BPN_COMPANY_001"
+               },
+               {
+                  "type":"GlobalReference",
+                  "value":"BPN_COMPANY_002"
+               }
+            ]
+         }
+      },
+      {
+         "name":"manufacturerPartId",
+         "value":"231982",
+         "externalSubjectId":{
+            "type":"ExternalReference",
+            "keys":[
+               {
+                  "type":"GlobalReference",
+                  "value":"PUBLIC_READABLE"
+               }
+            ]
+         }
+      }
+   ],
+   "submodelDescriptors":[
+      {
+         "endpoints":[
+            {
+               "interface":"SUBMODEL-3.0",
+               "protocolInformation":{
+                  "href":"https://edc.data.plane/mypath/submodel",
+                  "endpointProtocol":"HTTP",
+                  "endpointProtocolVersion":[
+                     "1.1"
+                  ],
+                  "subprotocol":"DSP",
+                  "subprotocolBody":"body with information required by subprotocol",
+                  "subprotocolBodyEncoding":"plain",
+                  "securityAttributes":[
+                     {
+                        "type":"NONE",
+                        "key": "NONE",
+                        "value": "NONE"
+                     }
+                  ]
+               }
+            }
+         ],
+         "idShort":"idShortExample",
+         "id":"cd47615b-daf3-4036-8670-d2f89349d388-2",
+         "semanticId":{
+            "type":"ExternalReference",
+            "keys":[
+               {
+                  "type":"Submodel",
+                  "value":"urn:bamm:io.catenax.serial_part_typization:1.1.0#SerialPartTypization"
+               }
+            ]
+         },
+         "description":[
+            {
+               "language":"de",
+               "text":"Beispiel einer lesbaren Beschreibung des Submodels."
+            },
+            {
+               "language":"en",
+               "text":"Example of human readable description of submodel"
+            }
+         ]
+      }
+   ]
+}
+```
+This example is a *Digital Twin* with four different `specificAssetIds` as descriptors.
+* `partInstanceID` is discoverable and visible only for the owner of the *Digital Twin*, since <u>no</u> `externalSubjectId` is defined.
+* `customerPartId` is discoverable and visible only for the owner of the *Digital Twin* and an (external) reader via EDC, who has the bpn-value "BPN_COMPANY_001" in the header of the EDC
+* `manufacturerId` is discoverable and visible only for the owner of the *Digital Twin* and two (external) readers via EDC, who have the bpn-value "BPN_COMPANY_001" and "BPN_COMPANY_002" in the header of the EDC
+* `manufacturerPartId` is discoverable and visible for everyone, who has access to the Digital Twin Registry, because the `externalSubjectId` has the value `"PUBLIC_READABLE"` included.
+
+For example, if an (external) reader via EDC requests the here shown *Digital Twin* and the edc-bpn header includes the bpn-value "BPN_COMPANY_001", the list of `specificAssetIds` contains three entries, namely:
+* `customerPartId`
+* `manufacturerId`
+* `manufacturerPartId`
+
+In consequence, the reader "BPN_COMPANY_001", as well as the reader "BPN_COMPANY_002" and the owner of this *Digital Twin* has full read access to the other fields of this *Digital Twin*, *i.e.* `idShort`, `id`, `description`, and `submodelDescriptors`.
+
+In this example, the `specificAssetId` `"name": "partInstanceId"` is filtered out, because it is only visible for the owner of the *Digital Twin*.
+
+Any (external) readers with respect to the `"PUBLIC_READABLE"` flag at `specificAssetId` `"name": "manufacturerPartId"`, have access to the fields
+* `id`
+* `submodelDescriptors`
+
+of this *Digital Twin*.
+
 ## 7 Quality scenarios
 
 ### Quality Requirements
