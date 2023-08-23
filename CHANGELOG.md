@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## 0.3.13-M1
 ### Added
 - In this version the models have been adjusted to new version AAS 3.0.
+- Implement access control to Digital Twins Based on the BPN (Business Partner Number)/ TenantId
 
 ## fixed
 - Refactored existing models to align with AAS 3.0. Removed /query from lookup api because it is not a part of AAS 3.0 version.
