@@ -79,6 +79,7 @@ data:
           headers:
             Content-Type: application/json
             Authorization: "Bearer {access_token}"
+            Edc-Bpn: "default-tenant"
         response:
           status_code: 200
           headers:
@@ -102,6 +103,7 @@ data:
           headers:
             Content-Type: application/json
             Authorization: "Bearer {access_token}"
+            Edc-Bpn: "default-tenant"
           json: 
             id: "{decoded_shell_id:s}"
             idShort: twin of a break (Testing)
@@ -117,6 +119,7 @@ data:
           headers:
             Content-Type: application/json
             Authorization: "Bearer {access_token}"
+            Edc-Bpn: "default-tenant"
         response:
           status_code: 200
           headers:
@@ -136,6 +139,7 @@ data:
           headers:
             Content-Type: application/json
             Authorization: "Bearer {access_token}"
+            Edc-Bpn: "default-tenant"
           json: 
             id: "{decoded_shell_id:s}"
             idShort: twin of a break (Testing Update)
@@ -149,5 +153,6 @@ data:
           headers:
             Content-Type: application/json
             Authorization: "Bearer {access_token}"
+            Edc-Bpn: "default-tenant"
         response:
           status_code: 204
