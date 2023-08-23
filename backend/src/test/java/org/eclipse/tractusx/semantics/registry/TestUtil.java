@@ -20,6 +20,8 @@
 package org.eclipse.tractusx.semantics.registry;
 
 import org.eclipse.tractusx.semantics.aas.registry.model.*;
+
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
@@ -207,18 +209,22 @@ public class TestUtil {
         return specificAssetId1;
     }
 
-    public static SpecificAssetId createSpecificAssetId(String name, String value, String externalSubjectId){
+    public static SpecificAssetId createSpecificAssetId(String name, String value, List<String> externalSubjectIds){
         SpecificAssetId specificAssetId1 = new SpecificAssetId();
         specificAssetId1.setName(name);
         specificAssetId1.setValue(value);
 
-        if(externalSubjectId!=null){
+        if(externalSubjectIds!=null && !externalSubjectIds.isEmpty()) {
             Reference reference = new Reference();
             reference.setType(ReferenceTypes.EXTERNALREFERENCE);
-            Key key = new Key();
-            key.setType(KeyTypes.SUBMODEL);
-            key.setValue(externalSubjectId);
-            reference.setKeys(List.of(key));
+            List<Key> keys = new ArrayList<>();
+            externalSubjectIds.forEach( externalSubjectId-> {
+               Key key = new Key();
+               key.setType(KeyTypes.SUBMODEL);
+               key.setValue(externalSubjectId);
+               keys.add( key );
+            });
+            reference.setKeys(keys);
            specificAssetId1.setExternalSubjectId(reference);
         }
 

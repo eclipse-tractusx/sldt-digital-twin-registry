@@ -250,6 +250,7 @@ paths:
           schema:
             type: string
             format: byte
+        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       requestBody:
         description: Asset Administration Shell Descriptor object
         content:
@@ -418,6 +419,7 @@ paths:
           schema:
             type: string
             format: byte
+        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       requestBody:
         description: Submodel Descriptor object
         content:
@@ -494,6 +496,7 @@ paths:
           schema:
             type: string
             format: byte
+        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       responses:
         "200":
           description: Requested Submodel Descriptor
@@ -557,6 +560,7 @@ paths:
           schema:
             type: string
             format: byte
+        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       requestBody:
         description: Submodel Descriptor object
         content:
@@ -622,6 +626,7 @@ paths:
           schema:
             type: string
             format: byte
+        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       responses:
         "204":
           description: Submodel Descriptor deleted successfully
@@ -786,6 +791,7 @@ paths:
           schema:
             type: string
             format: byte
+        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       requestBody:
         description: Asset identifier key-value-pairs
         content:

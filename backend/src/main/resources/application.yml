@@ -59,6 +59,10 @@ spring:
   #        issuer-uri: "http://localhost:9090/auth/realms/CX-Central"
 
 registry:
+  # This wildcard prefix is used to make specificAssetIds public vor everyone.
+  # The default-value "PUBLIC_READABLE" is used by all catenaX participants.
+  external-subject-id-wildcard-prefix: PUBLIC_READABLE
+  external-subject-id-wildcard-allowed-types:
   idm:
     public-client-id: catenax-portal
 

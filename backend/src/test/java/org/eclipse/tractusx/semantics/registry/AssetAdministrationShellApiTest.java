@@ -495,6 +495,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                      MockMvcRequestBuilders
                            .get( SINGLE_SUB_MODEL_BASE_PATH,getEncodedValue( shellPayload1.getId() ), getEncodedValue( submodelId ))
                            .accept( MediaType.APPLICATION_JSON )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .with( jwtTokenFactory.allRoles() )
                )
                .andDo( MockMvcResultHandlers.print() )
@@ -509,6 +510,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                      MockMvcRequestBuilders
                            .get( SINGLE_SUB_MODEL_BASE_PATH, getEncodedValue( "notexistingshell") , getEncodedValue( "notexistingsubmodel")  )
                            .accept( MediaType.APPLICATION_JSON )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .with( jwtTokenFactory.allRoles() )
                )
                .andDo( MockMvcResultHandlers.print() )
@@ -523,6 +525,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                      MockMvcRequestBuilders
                            .get( SINGLE_SUB_MODEL_BASE_PATH, getEncodedValue(shellPayload1.getId()), getEncodedValue("notexistingsubmodel") )
                            .accept( MediaType.APPLICATION_JSON )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .with( jwtTokenFactory.allRoles() )
                )
                .andDo( MockMvcResultHandlers.print() )
@@ -559,6 +562,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                      MockMvcRequestBuilders
                            .get( SINGLE_SUB_MODEL_BASE_PATH, getEncodedValue( shellId ), getEncodedValue( submodelId ))
                            .accept( MediaType.APPLICATION_JSON )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .with( jwtTokenFactory.allRoles() )
                )
                .andDo( MockMvcResultHandlers.print() )
