@@ -20,6 +20,8 @@
 
 package org.eclipse.tractusx.semantics;
 
+import java.util.List;
+
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
@@ -34,6 +36,18 @@ import jakarta.validation.constraints.NotNull;
 public class RegistryProperties {
 
     private final Idm idm = new Idm();
+
+    /**
+     * This wildcard prefix is used to make specificAssetIds public for everyone.
+     * The default-value "PUBLIC_READABLE" is used by all catenaX participants.
+     */
+    @NotEmpty(message = "externalSubjectIdWildcardPrefix must not be empty")
+    private  String externalSubjectIdWildcardPrefix;
+
+    /**
+     * This wildcard-allowed-types is used to make only specificAssetIds public for defined types.
+     */
+    private List<String> externalSubjectIdWildcardAllowedTypes;
 
     /**
      * Properties for Identity Management system

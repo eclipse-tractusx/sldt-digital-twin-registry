@@ -39,10 +39,11 @@ For detailed install instructions please refer to our [INSTALL.md](./INSTALL.md)
 
 ## Notice for Docker image
 
+DockerHub:  [Docker.io:tractusx-digital-twin-registry](https://hub.docker.com/r/tractusx/sldt-digital-twin-registry) <br/>
+The Docker images from version 0.3.3-M1 until the latest can be found on DockerHub, older versions have been published on GitHub Container Registry (GHCR): [catena-ng:digital-twin-registry](https://github.com/catenax-ng/product-semantics/pkgs/container/sldt-digital-twin-registry)
+
+The Helm chart can be found at the GitHub repository at: [Releases](https://github.com/eclipse-tractusx/sldt-digital-twin-registry/releases) <br/>
 This application provides container images for demonstration purposes.
-
-GitHub Container Registry (GHCR): https://github.com/catenax-ng/product-semantics/pkgs/container/sldt-digital-twin-registry
-
 Eclipse Tractus-X product(s) installed within the image:
 
 - GitHub: https://github.com/eclipse-tractusx/sldt-digital-twin-registry
@@ -51,7 +52,7 @@ Eclipse Tractus-X product(s) installed within the image:
 - Project license: [Apache License, Version 2.0](https://github.com/eclipse-tractusx/sldt-digital-twin-registry/blob/main/LICENSE)
 
 **Used base image**
-- [eclipse-temurin:11-jre-alpine](https://github.com/adoptium/containers)
+- [eclipse-temurin:17-jre-alpine](https://github.com/adoptium/containers)
 - Official Eclipse Temurin DockerHub page: https://hub.docker.com/_/eclipse-temurin  
 - Eclipse Temurin Project: https://projects.eclipse.org/projects/adoptium.temurin  
 - Additional information about the Eclipse Temurin images: https://github.com/docker-library/repo-info/tree/master/repos/eclipse-temurin

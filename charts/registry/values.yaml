@@ -46,6 +46,8 @@ registry:
   idpIssuerUri: ""
   idpClientId: default-client
   tenantId: default-tenant
+  externalSubjectIdWildcardPrefix: PUBLIC_READABLE
+  externalSubjectIdWildcardAllowedTypes: manufacturerPartId,assetLifecyclePhase
   service:
     port: 8080
     type: ClusterIP
@@ -72,9 +74,11 @@ registry:
       # nginx.ingress.kubernetes.io/x-forwarded-prefix: /semantics/registry
   resources:
     limits:
-      memory: "1024Mi"
+      cpu: 750m
+      memory: 1024Mi
     requests:
-      memory: "512Mi"
+      cpu: 250m
+      memory: 1024Mi
 
 postgresql:
   primary:

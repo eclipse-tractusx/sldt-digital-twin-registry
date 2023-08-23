@@ -60,7 +60,6 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
 
     @Override
-    // TODO: 21.06.2023 implement correct and not just give back dummy, implement test cases for this endpoint 
     public ResponseEntity<ServiceDescription> getDescription() {
         ServiceDescription serviceDescription = new ServiceDescription();
         serviceDescription.setProfiles( List.of( ServiceDescription.ProfilesEnum.ASSETADMINISTRATIONSHELLREPOSITORYSERVICESPECIFICATION_V3_0_MINIMALPROFILE, 
@@ -80,8 +79,8 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     @Override
-    public ResponseEntity<Void> deleteSubmodelDescriptorByIdThroughSuperpath( byte[] aasIdentifier, byte[] submodelIdentifier ) {
-        shellService.deleteSubmodel(getDecodedId( aasIdentifier ), getDecodedId( submodelIdentifier ),getExternalSubjectIdOrEmpty( null ));
+    public ResponseEntity<Void> deleteSubmodelDescriptorByIdThroughSuperpath( byte[] aasIdentifier, byte[] submodelIdentifier, @RequestHeader String externalSubjectId ) {
+        shellService.deleteSubmodel(getDecodedId( aasIdentifier ), getDecodedId( submodelIdentifier ),getExternalSubjectIdOrEmpty( externalSubjectId ));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
     }
@@ -97,7 +96,7 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     @Override
     // new todo: correct implementation
     public ResponseEntity<GetSubmodelDescriptorsResult> getAllSubmodelDescriptorsThroughSuperpath( byte[] aasIdentifier, Integer limit, String cursor, @RequestHeader String externalSubjectId  ) {
-        Shell savedShell = shellService.findShellByExternalId(getDecodedId( aasIdentifier ),getExternalSubjectIdOrEmpty(externalSubjectId));
+        Shell savedShell = shellService.findShellByExternalIdAndExternalSubjectId(getDecodedId( aasIdentifier ),getExternalSubjectIdOrEmpty(externalSubjectId));
         SubmodelCollectionDto dto = shellService.findAllSubmodel( limit,cursor, savedShell);
         GetSubmodelDescriptorsResult result= submodelMapper.toApiDto( dto );
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -106,13 +105,13 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     @Override
     public ResponseEntity<AssetAdministrationShellDescriptor> getAssetAdministrationShellDescriptorById( byte[] aasIdentifier, @RequestHeader String externalSubjectId ) {
         String decodedAasIdentifier = getDecodedId( aasIdentifier );
-        Shell saved = shellService.findShellByExternalId(decodedAasIdentifier, getExternalSubjectIdOrEmpty(externalSubjectId));
+        Shell saved = shellService.findShellByExternalIdAndExternalSubjectId(decodedAasIdentifier, getExternalSubjectIdOrEmpty(externalSubjectId));
            return new ResponseEntity<>(shellMapper.toApiDto(saved), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<SubmodelDescriptor> getSubmodelDescriptorByIdThroughSuperpath( byte[] aasIdentifier, byte[]  submodelIdentifier ) {
-        Submodel submodel = shellService.findSubmodelByExternalId(getDecodedId( aasIdentifier ), getDecodedId( submodelIdentifier ),getExternalSubjectIdOrEmpty( null ));
+    public ResponseEntity<SubmodelDescriptor> getSubmodelDescriptorByIdThroughSuperpath( byte[] aasIdentifier, byte[]  submodelIdentifier, @RequestHeader String externalSubjectId ) {
+        Submodel submodel = shellService.findSubmodelByExternalId(getDecodedId( aasIdentifier ), getDecodedId( submodelIdentifier ),getExternalSubjectIdOrEmpty( externalSubjectId ));
         return new ResponseEntity<>(submodelMapper.toApiDto(submodel), HttpStatus.OK);
     }
 
@@ -120,32 +119,33 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     public ResponseEntity<AssetAdministrationShellDescriptor> postAssetAdministrationShellDescriptor( AssetAdministrationShellDescriptor assetAdministrationShellDescriptor ) {
         Shell shell = shellMapper.fromApiDto(assetAdministrationShellDescriptor);
         shellService.mapShellCollection( shell );
+        if(!shell.getSubmodels().isEmpty()) shellService.mapSubmodel( shell.getSubmodels() );
         Shell saved = shellService.save(shell);
         return new ResponseEntity<>(shellMapper.toApiDto(saved), HttpStatus.CREATED);
     }
 
     @Override
-    public ResponseEntity<SubmodelDescriptor> postSubmodelDescriptorThroughSuperpath( byte[] aasIdentifier, SubmodelDescriptor submodelDescriptor ) {
+    public ResponseEntity<SubmodelDescriptor> postSubmodelDescriptorThroughSuperpath( byte[] aasIdentifier, @RequestHeader String externalSubjectId, SubmodelDescriptor submodelDescriptor ) {
         Submodel toBeSaved = submodelMapper.fromApiDto(submodelDescriptor);
         toBeSaved.setIdExternal( submodelDescriptor.getId() );
-        Submodel savedSubModel = shellService.save(getDecodedId( aasIdentifier ), toBeSaved, getExternalSubjectIdOrEmpty(null));
+        shellService.mapSubmodel( Set.of(toBeSaved) );
+        Submodel savedSubModel = shellService.save(getDecodedId( aasIdentifier ), toBeSaved, getExternalSubjectIdOrEmpty(externalSubjectId));
         return new ResponseEntity<>(submodelMapper.toApiDto(savedSubModel), HttpStatus.CREATED);
     }
 
     @Override
-    public ResponseEntity<Void> putAssetAdministrationShellDescriptorById( byte[] aasIdentifier, AssetAdministrationShellDescriptor assetAdministrationShellDescriptor ) {
+    public ResponseEntity<Void> putAssetAdministrationShellDescriptorById( byte[] aasIdentifier, AssetAdministrationShellDescriptor assetAdministrationShellDescriptor, @RequestHeader String externalSubjectId ) {
         Shell shell = shellMapper.fromApiDto( assetAdministrationShellDescriptor );
-        Shell shellFromDb = shellService.findShellByExternalId( getDecodedId( aasIdentifier),getExternalSubjectIdOrEmpty(null) );
+        Shell shellFromDb = shellService.findShellByExternalId( getDecodedId( aasIdentifier),getExternalSubjectIdOrEmpty(externalSubjectId) );
         shellService.update( shell.withId( shellFromDb.getId() ).withIdExternal(getDecodedId(aasIdentifier)  ),getDecodedId(aasIdentifier));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Override
-    public ResponseEntity<Void> putSubmodelDescriptorByIdThroughSuperpath( byte[] aasIdentifier, byte[] submodelIdentifier, SubmodelDescriptor submodelDescriptor ) {
-        Submodel submodel = submodelMapper.fromApiDto( submodelDescriptor );
-        Submodel fromDB = shellService.findSubmodelByExternalId( getDecodedId( aasIdentifier ),getDecodedId( submodelIdentifier ),getExternalSubjectIdOrEmpty( null ) );
-        shellService.deleteSubmodel(getDecodedId( aasIdentifier ),  getDecodedId( submodelIdentifier ),getExternalSubjectIdOrEmpty( null ));
-        shellService.update( getDecodedId( aasIdentifier ), submodel.withIdExternal( getDecodedId( submodelIdentifier ) ).withId( fromDB.getId() ) ,getExternalSubjectIdOrEmpty( "" ));
+    public ResponseEntity<Void> putSubmodelDescriptorByIdThroughSuperpath( byte[] aasIdentifier, byte[] submodelIdentifier, @RequestHeader String externalSubjectId, SubmodelDescriptor submodelDescriptor ) {
+        shellService.deleteSubmodel(getDecodedId( aasIdentifier ),  getDecodedId( submodelIdentifier ),getExternalSubjectIdOrEmpty( externalSubjectId ));
+        submodelDescriptor.setId( getDecodedId( submodelIdentifier ));
+        postSubmodelDescriptorThroughSuperpath(aasIdentifier,externalSubjectId,submodelDescriptor);
         return new ResponseEntity<>( HttpStatus.NO_CONTENT );
     }
 
@@ -161,19 +161,22 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
 
     @Override
-        public ResponseEntity<List<SpecificAssetId>> getAllAssetLinksById(byte[] aasIdentifier,@RequestHeader String externalSubjectId) {
+    public ResponseEntity<List<SpecificAssetId>> getAllAssetLinksById(byte[] aasIdentifier,@RequestHeader String externalSubjectId) {
             Set<ShellIdentifier> identifiers = shellService.findShellIdentifiersByExternalShellId(getDecodedId( aasIdentifier ),getExternalSubjectIdOrEmpty(externalSubjectId));
             return new ResponseEntity<>(shellMapper.toApiDto(identifiers), HttpStatus.OK);
         }
 
-        @Override
-    public ResponseEntity<List<SpecificAssetId>> postAllAssetLinksById(byte[] aasIdentifier, List<SpecificAssetId> specificAssetId) {
-        Set<ShellIdentifier> shellIdentifiers = shellService.save(getDecodedId( aasIdentifier ), shellMapper.fromApiDto(specificAssetId),getExternalSubjectIdOrEmpty( null ));
+    @Override
+    public ResponseEntity<List<SpecificAssetId>> postAllAssetLinksById(byte[] aasIdentifier, List<SpecificAssetId> specificAssetId, @RequestHeader String externalSubjectId ) {
+        Set<ShellIdentifier> shellIdentifiers = shellService.save(getDecodedId( aasIdentifier ), shellMapper.fromApiDto(specificAssetId),getExternalSubjectIdOrEmpty( externalSubjectId ));
         List<SpecificAssetId> list = shellMapper.toApiDto(shellIdentifiers);
         return new ResponseEntity<>(list, HttpStatus.CREATED);
     }
 
-    @Override
+    /**
+     * Since /query is not part of AAS 3.0, so this method is not used.
+     * Keeping it for the reason that it might come up in next version.
+     */
     public ResponseEntity<List<String>> postQueryAllAssetAdministrationShellIds(ShellLookup shellLookup,@RequestHeader String externalSubjectId) {
         List<SpecificAssetId> assetIds = shellLookup.getQuery().getAssetIds();
         List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByAnyMatch(shellMapper.fromApiDto(assetIds),getExternalSubjectIdOrEmpty(externalSubjectId));

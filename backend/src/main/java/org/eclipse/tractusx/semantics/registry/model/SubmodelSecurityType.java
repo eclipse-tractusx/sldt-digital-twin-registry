@@ -19,14 +19,12 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
-public enum ShellKind {
-   INSTANCE( "Instance" ),
-   NOTAPPLICABLE( "NotApplicable" ),
-   TYPE( "Type" );
+public enum SubmodelSecurityType {
+   NONE("NONE"),
+   RFC_TLSA("RFC_TLSA"),
+   W3C_DID("W3C_DID");
    private String value;
-   ShellKind( String value ) {
-      this.value = value;
-   }
+   SubmodelSecurityType(String value){this.value = value;}
    public String getValue() {return value;}
    @Override
    public String toString() {return String.valueOf(value);}

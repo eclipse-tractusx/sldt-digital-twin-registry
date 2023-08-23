@@ -19,19 +19,19 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.mapper;
 
-import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
-import org.eclipse.tractusx.semantics.aas.registry.model.GetAssetAdministrationShellDescriptorsResult;
-import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
-import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
-import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
-import org.eclipse.tractusx.semantics.registry.model.Shell;
-import org.eclipse.tractusx.semantics.registry.model.ShellDescription;
-import org.eclipse.tractusx.semantics.registry.model.ShellDisplayName;
-import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
-import org.mapstruct.*;
-
 import java.util.List;
 import java.util.Set;
+import org.eclipse.tractusx.semantics.aas.registry.model.*;
+import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
+import org.eclipse.tractusx.semantics.registry.model.*;
+import org.mapstruct.AfterMapping;
+import org.mapstruct.InheritInverseConfiguration;
+import org.mapstruct.InjectionStrategy;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.Mappings;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 
 @Mapper(uses = {SubmodelMapper.class}, componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR ,nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE )
@@ -44,7 +44,7 @@ public interface ShellMapper {
           @Mapping(target = "shellType", source = "assetType"),
           @Mapping(target = "shellKind", source = "assetKind"),
           @Mapping(target = "id", ignore = true),
-          @Mapping(target = "displayNames", source = "displayName")
+          @Mapping(target = "displayNames", source = "displayName"),
     })
     Shell fromApiDto(AssetAdministrationShellDescriptor apiDto);
 
@@ -54,8 +54,17 @@ public interface ShellMapper {
 
     @Mappings({
           @Mapping(target = "key", source = "name"),
+          @Mapping(target = "supplementalSemanticIds", source = "supplementalSemanticIds"),
+          @Mapping(target = "semanticId", source = "semanticId"),
+          @Mapping(target = "externalSubjectId", source = "externalSubjectId"),
     })
     ShellIdentifier fromApiDto(SpecificAssetId apiDto);
+
+   ShellIdentifierSupplemSemanticReference maptoShellIdentifierSupplemSemanticReference ( Reference supplementalSemanticId );
+
+   ShellIdentifierSemanticReference maptoShellIdentifierSemanticReference ( Reference semanticId );
+
+   ShellIdentifierExternalSubjectReference maptoShellIdentifierExternalSubjectReference ( Reference externalSubjectId );
 
     Set<ShellIdentifier> fromApiDto(List<SpecificAssetId> apiDto);
 
@@ -70,7 +79,6 @@ public interface ShellMapper {
          @Mapping(source = "descriptions", target = "description"),
          @Mapping(source = "submodels", target = "submodelDescriptors"),
          @Mapping(source = "displayNames", target = "displayName"),
-
     })
     @InheritInverseConfiguration
     AssetAdministrationShellDescriptor toApiDto(Shell shell);

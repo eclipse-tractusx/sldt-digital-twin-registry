@@ -19,15 +19,32 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
-public enum ShellKind {
-   INSTANCE( "Instance" ),
-   NOTAPPLICABLE( "NotApplicable" ),
-   TYPE( "Type" );
-   private String value;
-   ShellKind( String value ) {
-      this.value = value;
-   }
-   public String getValue() {return value;}
-   @Override
-   public String toString() {return String.valueOf(value);}
+import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.FieldNameConstants;
+
+@Entity
+@Getter
+@Setter
+@Table
+@NoArgsConstructor
+@AllArgsConstructor
+@With
+@FieldNameConstants
+public class ShellIdentifierExternalSubjectReferenceKey {
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   UUID id;
+   ReferenceKeyType type;
+   @Column(name="ref_key_value")
+   String value;
+
+   @JsonBackReference
+   @ManyToOne(fetch = FetchType.LAZY, optional = false)
+   @JoinColumn(name = "fk_si_external_subject_reference_id")
+   private ShellIdentifierExternalSubjectReference shellIdentifierExternalSubjectReference;
 }
+
+

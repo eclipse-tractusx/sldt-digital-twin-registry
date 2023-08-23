@@ -19,15 +19,13 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
-public enum ShellKind {
-   INSTANCE( "Instance" ),
-   NOTAPPLICABLE( "NotApplicable" ),
-   TYPE( "Type" );
-   private String value;
-   ShellKind( String value ) {
-      this.value = value;
-   }
+public enum ReferenceType {
+      EXTERNALREFERENCE("ExternalReference"),
+      MODELREFERENCE("ModelReference");
+      String value;
+      ReferenceType(String value) {this.value = value;}
    public String getValue() {return value;}
+   public String getType() {return value;}
    @Override
    public String toString() {return String.valueOf(value);}
 }

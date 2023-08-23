@@ -21,7 +21,6 @@ package org.eclipse.tractusx.semantics.registry.model;
 
 import java.time.Instant;
 import java.util.*;
-
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -30,6 +29,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldNameConstants;
 
 @Entity
 @Getter
@@ -42,6 +42,7 @@ import lombok.*;
 @JsonIdentityInfo(
       generator = ObjectIdGenerators.PropertyGenerator.class,
       property = "id")
+@FieldNameConstants
 public class Shell {
 
     @Id

@@ -264,6 +264,15 @@
                     <exclude>**/*.yml</exclude>
                 </excludes>
             </resource>
+            <resource>
+                <directory>../</directory>
+                <includes>
+                    <include>LICENSE</include>
+                    <include>NOTICE.md</include>
+                    <include>DEPENDENCIES</include>
+                </includes>
+                <targetPath>META-INF</targetPath>
+            </resource>
         </resources>
     </build>
 

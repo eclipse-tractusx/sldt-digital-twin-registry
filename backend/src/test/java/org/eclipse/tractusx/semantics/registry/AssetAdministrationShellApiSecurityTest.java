@@ -19,10 +19,18 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.eclipse.tractusx.semantics.aas.registry.model.*;
+import static org.hamcrest.Matchers.*;
+
+import java.util.List;
+import java.util.UUID;
+
+import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
+import org.eclipse.tractusx.semantics.aas.registry.model.Key;
+import org.eclipse.tractusx.semantics.aas.registry.model.KeyTypes;
+import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
+import org.eclipse.tractusx.semantics.aas.registry.model.ReferenceTypes;
+import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
+import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -31,12 +39,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
-import java.util.List;
-import java.util.UUID;
-
 import static org.eclipse.tractusx.semantics.registry.TestUtil.*;
-import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  *  This class contains test to verify Authentication and RBAC based Authorization for all API endpoints.
@@ -639,10 +647,13 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
     class TenantBasedVisibilityTest {
 
         @Test
-        public void testGetAllShellsWithFilteredSpecificAssetIdsByTenantId() throws Exception {
-
+        public void testGetAllShellsWithDefaultClosedFilteredSpecificAssetIdsByTenantId() throws Exception {
             AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
             shellPayload.setId(UUID.randomUUID().toString());
+            List<SpecificAssetId> shellpayloadSpecificAssetIDs = shellPayload.getSpecificAssetIds();
+            shellpayloadSpecificAssetIDs.forEach( specificAssetId -> specificAssetId.setExternalSubjectId( null ) );
+            shellPayload.setSpecificAssetIds( shellpayloadSpecificAssetIDs );
+
             performShellCreateRequest(mapper.writeValueAsString(shellPayload));
 
 
@@ -670,8 +681,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     .andDo(MockMvcResultHandlers.print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.result").exists())
-                    .andExpect(jsonPath("$.result[*].specificAssetIds[*].value", hasItems("identifier1ValueExample", "identifier2ValueExample")))
-                    .andExpect(jsonPath("$.result[*].specificAssetIds[*].value", not(hasItem("tenantThreeAssetIdValue"))));
+                    .andExpect(jsonPath("$.result[*].specificAssetIds[*].value", not(hasItems("identifier1ValueExample", "identifier2ValueExample","tenantThreeAssetIdValue"))));
         }
 
         @Test
@@ -679,11 +689,15 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
 
             AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
             shellPayload.setSpecificAssetIds(null);
-            SpecificAssetId asset1 = TestUtil.createSpecificAssetId("CustomerPartId","tenantTwoAssetIdValue",jwtTokenFactory.tenantTwo().getTenantId());
-            SpecificAssetId asset2 = TestUtil.createSpecificAssetId("CustomerPartId","tenantThreeAssetIdValue",jwtTokenFactory.tenantThree().getTenantId());
-            SpecificAssetId asset3 = TestUtil.createSpecificAssetId("MaterialNumber","withoutTenantAssetIdValue",null);
+            SpecificAssetId asset1 = TestUtil.createSpecificAssetId("CustomerPartId","tenantTwoAssetIdValue",List.of(jwtTokenFactory.tenantTwo().getTenantId()));
+            SpecificAssetId asset2 = TestUtil.createSpecificAssetId("CustomerPartId","tenantThreeAssetIdValue",List.of(jwtTokenFactory.tenantThree().getTenantId()));
+            SpecificAssetId asset3 = TestUtil.createSpecificAssetId("MaterialNumber","withoutTenantAssetIdValue",List.of(jwtTokenFactory.tenantTwo().getTenantId()));
+            // Define specificAsset with wildcard which not allowed. (Only manufacturerPartId is defined in application.yml)
+            SpecificAssetId asset4 = TestUtil.createSpecificAssetId("BPID","ignoreWildcard",List.of(getExternalSubjectIdWildcardPrefix()));
+           // Define specificAsset with wildcard which is allowed. (Only manufacturerPartId is defined in application.yml)
+           SpecificAssetId asset5 = TestUtil.createSpecificAssetId("manufacturerPartId","wildcardAllowed",List.of(getExternalSubjectIdWildcardPrefix()));
 
-            shellPayload.setSpecificAssetIds(List.of(asset1,asset2,asset3));
+            shellPayload.setSpecificAssetIds(List.of(asset1,asset2,asset3,asset4,asset5));
 
 
             shellPayload.setId(UUID.randomUUID().toString());
@@ -691,6 +705,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
 
             String shellId = shellPayload.getId();
            String encodedShellId = getEncodedValue(shellId  );
+           // Owner of tenant has access to all specificAssetIds
             mvc.perform(
                             MockMvcRequestBuilders
                                     .get(SINGLE_SHELL_BASE_PATH, encodedShellId)
@@ -701,7 +716,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     .andDo(MockMvcResultHandlers.print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.id", equalTo(shellId)))
-                    .andExpect(jsonPath("$.specificAssetIds[*].value", containsInAnyOrder("tenantTwoAssetIdValue","tenantThreeAssetIdValue", "withoutTenantAssetIdValue")));
+                    .andExpect(jsonPath("$.specificAssetIds[*].value", containsInAnyOrder("tenantTwoAssetIdValue","tenantThreeAssetIdValue", "withoutTenantAssetIdValue","ignoreWildcard","wildcardAllowed")));
 
             // test with tenant two
             mvc.perform(
@@ -714,8 +729,8 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     .andDo(MockMvcResultHandlers.print())
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.id", equalTo(shellId)))
-                    .andExpect(jsonPath("$.specificAssetIds[*].value", hasItems("tenantTwoAssetIdValue", "withoutTenantAssetIdValue")))
-                    .andExpect(jsonPath("$.specificAssetIds[*].value", not(hasItem("tenantThreeAssetIdValue"))));
+                    .andExpect(jsonPath("$.specificAssetIds[*].value", hasItems("tenantTwoAssetIdValue", "withoutTenantAssetIdValue","wildcardAllowed")))
+                    .andExpect(jsonPath("$.specificAssetIds[*].value", not(hasItems("tenantThreeAssetIdValue","ignoreWildcard"))));
         }
 
          //TODO: Test will be ignored, because the new api does not provided batch, fetch and query. This will be come later in version 0.3.1
@@ -765,22 +780,21 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
 
         @Test
         public void testGetSpecificAssetIdsFilteredByTenantId() throws Exception {
-
             AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
             shellPayload.setId(UUID.randomUUID().toString());
             performShellCreateRequest(mapper.writeValueAsString(shellPayload));
 
+            // Update specificIds only with one specificAssetId for tenantOne
             SpecificAssetId specificAssetId = new SpecificAssetId();
             Reference externalSubjectId = new Reference();
-            externalSubjectId.setType(ReferenceTypes.EXTERNALREFERENCE);
             Key key = new Key();
             key.setType(KeyTypes.SUBMODEL);
-            key.setValue("semanticIdExample");
+            key.setValue(jwtTokenFactory.tenantOne().getTenantId());
             externalSubjectId.setKeys(List.of(key));
-
-            specificAssetId.setName("assetName");
-            specificAssetId.setValue("assetValue");
-
+            externalSubjectId.setType(ReferenceTypes.EXTERNALREFERENCE);
+            specificAssetId.setName("findExternal_1_tenantOne");
+            specificAssetId.setValue("value_1:tenantOne");
+            specificAssetId.setExternalSubjectId(externalSubjectId);
 
             String shellId = shellPayload.getId();
             mvc.perform(
@@ -798,23 +812,28 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
 
             mvc.perform(
                             MockMvcRequestBuilders
-                                    .get(SINGLE_LOOKUP_SHELL_BASE_PATH, getEncodedValue( shellId ))
+                                    .get(LOOKUP_SHELL_BASE_PATH)
                                     .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
+                                    .queryParam("assetIds", mapper.writeValueAsString(List.of(specificAssetId)))
                                     .accept(MediaType.APPLICATION_JSON)
                                     .with(jwtTokenFactory.allRoles())
                     )
                     .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isOk());
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.result", hasSize(1)))
+                    .andExpect(jsonPath("$.result", contains(shellPayload.getId())));
 
             mvc.perform(
                             MockMvcRequestBuilders
-                                    .get(SINGLE_LOOKUP_SHELL_BASE_PATH, getEncodedValue( shellId ))
+                                    .get(LOOKUP_SHELL_BASE_PATH)
                                     .accept(MediaType.APPLICATION_JSON)
                                     .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
+                                    .queryParam("assetIds", mapper.writeValueAsString(List.of(specificAssetId)))
                                     .with(jwtTokenFactory.tenantTwo().allRoles())
                     )
                     .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isOk());
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.result", hasSize(0)));
         }
 
         @Test
@@ -822,20 +841,19 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             // the keyPrefix ensures that this test can run against a persistent database multiple times
             String keyPrefix = UUID.randomUUID().toString();
             // first shell
-
             AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
             shellPayload.setSpecificAssetIds(null);
             shellPayload.setId(UUID.randomUUID().toString());
             SpecificAssetId asset1 = TestUtil.createSpecificAssetId(keyPrefix + "findExternal_2","value_2",null);
-            SpecificAssetId asset2 = TestUtil.createSpecificAssetId(keyPrefix + "findExternal_2_1","value_2_1",jwtTokenFactory.tenantTwo().getTenantId());
-            SpecificAssetId asset3 = TestUtil.createSpecificAssetId(keyPrefix + "findExternal_2_2","value_2_2",jwtTokenFactory.tenantThree().getTenantId());
+            SpecificAssetId asset2 = TestUtil.createSpecificAssetId(keyPrefix + "findExternal_2_1","value_2_1",List.of(jwtTokenFactory.tenantTwo().getTenantId()));
+            SpecificAssetId asset3 = TestUtil.createSpecificAssetId(keyPrefix + "findExternal_2_2","value_2_2",List.of(jwtTokenFactory.tenantThree().getTenantId()));
 
             shellPayload.setSpecificAssetIds(List.of(asset1,asset2,asset3));
 
             performShellCreateRequest(mapper.writeValueAsString(shellPayload));
 
-            SpecificAssetId sa1 = TestUtil.createSpecificAssetId(keyPrefix + "findExternal_2","value_2",null);
-            SpecificAssetId sa2 = TestUtil.createSpecificAssetId(keyPrefix + "findExternal_2_1","value_2_1",null);
+            SpecificAssetId sa1 = TestUtil.createSpecificAssetId(keyPrefix + "findExternal_2_1","value_2_1",List.of(jwtTokenFactory.tenantTwo().getTenantId()));
+            SpecificAssetId sa2 = TestUtil.createSpecificAssetId(keyPrefix + "findExternal_2_2","value_2_2",List.of(jwtTokenFactory.tenantThree().getTenantId()));
 
             mvc.perform(
                             MockMvcRequestBuilders
@@ -884,6 +902,343 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     .andExpect(jsonPath("$.result", contains(shellPayload.getId())));
         }
 
+       @Test
+       public void testFindExternalShellIdsBySpecificAssetIdsWithTenantBasedVisibilityAndWildcardExpectSuccess() throws Exception {
+          // the keyPrefix ensures that this test can run against a persistent database multiple times
+          String keyPrefix = UUID.randomUUID().toString();
+          AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+          shellPayload.setSpecificAssetIds(null);
+          shellPayload.setId(UUID.randomUUID().toString());
+
+          // asset1 is only visible for the owner because the externalSubjectId = null
+          SpecificAssetId asset1 = TestUtil.createSpecificAssetId(keyPrefix + "defaultClosed","value_1",null);
+          // asset2 is visible for everyone, because externalSubjectId = PUBLIC_READABLE and specificAssetKey is manufacturerPartId (which is in the list of allowedTypes via application.yml)
+          SpecificAssetId asset2 = TestUtil.createSpecificAssetId("manufacturerPartId","value_2",List.of(getExternalSubjectIdWildcardPrefix()));
+          // asset3 is visible only for the owner, because externalSubjectId = PUBLIC_READABLE but specificAssetKey is bpId (which is not in the list of allowedTypes via application.yml)
+          SpecificAssetId asset3 = TestUtil.createSpecificAssetId("bpId","value_3",List.of(getExternalSubjectIdWildcardPrefix()));
+          // asset3 is visible for tenantTwo and tenantThree
+          SpecificAssetId asset4 = TestUtil.createSpecificAssetId(keyPrefix + "tenantTwo_tenantThree","value_3",List.of(jwtTokenFactory.tenantTwo().getTenantId(),jwtTokenFactory.tenantThree().getTenantId()));
+          // asset4 is visible for tenantTwo, because externalSubjectId = tenantTwo
+          SpecificAssetId asset5 = TestUtil.createSpecificAssetId(keyPrefix + "tenantTwo","value_2",List.of(jwtTokenFactory.tenantTwo().getTenantId()));
+
+          shellPayload.setSpecificAssetIds(List.of(asset1,asset2,asset3,asset4,asset5));
+
+          performShellCreateRequest(mapper.writeValueAsString(shellPayload));
+
+          SpecificAssetId sa1 = TestUtil.createSpecificAssetId( keyPrefix+ "defaultClosed","value_1",null);
+          SpecificAssetId sa2 = TestUtil.createSpecificAssetId( "manufacturerPartId","value_2",null);
+          SpecificAssetId sa3 = TestUtil.createSpecificAssetId( "bpId","value_3",null);
+          SpecificAssetId sa4 = TestUtil.createSpecificAssetId(keyPrefix + "tenantTwo_tenantThree","value_3",null);
+          SpecificAssetId sa5 = TestUtil.createSpecificAssetId(keyPrefix + "tenantTwo","value_2",null);
+
+          // Make request with bpn of the owner
+          mvc.perform(
+                      MockMvcRequestBuilders
+                            .get(LOOKUP_SHELL_BASE_PATH)
+                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
+                            .queryParam("assetIds", mapper.writeValueAsString(List.of(sa1,sa2,sa3,sa4,sa5)))
+                            .accept(MediaType.APPLICATION_JSON)
+                            .with(jwtTokenFactory.allRoles())
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result", hasSize(1)))
+                .andExpect(jsonPath("$.result", contains(shellPayload.getId())));
+
+          // test with tenantTwo: returns shellId because the specificAssetIds matched
+          // sa2 = manufacturerPartId (public for everyone)
+          // sa5 = match bpn of tenantTwo
+          mvc.perform(
+                      MockMvcRequestBuilders
+                            .get(LOOKUP_SHELL_BASE_PATH)
+                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
+                            .queryParam("assetIds", mapper.writeValueAsString(List.of(sa2,sa5)))
+                            .accept(MediaType.APPLICATION_JSON)
+                            .with(jwtTokenFactory.tenantTwo().allRoles())
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result", hasSize(1)))
+                .andExpect(jsonPath("$.result", contains(shellPayload.getId())));
+
+          // test with tenantTwo: returns no shellId because the specificAssetId sa3 is set to public but the key is not in the list of public allowed types.
+          // sa2 = manufacturerPartId (public for everyone)
+          // sa3 = visible only for owner because key is not in the list of public allowed types.
+          // sa5 = match bpn of tenantTwo
+          mvc.perform(
+                      MockMvcRequestBuilders
+                            .get(LOOKUP_SHELL_BASE_PATH)
+                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
+                            .queryParam("assetIds", mapper.writeValueAsString(List.of(sa2,sa3,sa5)))
+                            .accept(MediaType.APPLICATION_JSON)
+                            .with(jwtTokenFactory.tenantTwo().allRoles())
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result", hasSize(0)));
+
+          // test with tenantThree: returns no shellId because the specificAssetId sa5 is only visible for tenantTwo
+          mvc.perform(
+                      MockMvcRequestBuilders
+                            .get(LOOKUP_SHELL_BASE_PATH)
+                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantThree().getTenantId() )
+                            .queryParam("assetIds", mapper.writeValueAsString(List.of(sa2,sa5)))
+                            .accept(MediaType.APPLICATION_JSON)
+                            .with(jwtTokenFactory.tenantTwo().allRoles())
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result", hasSize(0)));
+       }
+
+       @Test
+       public void testFindExternalShellIdsBySpecificAssetIdsWithDefaultClosedTenantBasedVisibilityExpectSuccess() throws Exception {
+          // the keyPrefix ensures that this test can run against a persistent database multiple times
+          String keyPrefix = UUID.randomUUID().toString();
+          AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+          shellPayload.setSpecificAssetIds(null);
+          shellPayload.setId(UUID.randomUUID().toString());
+
+          // asset1 is only visible for the owner because the externalSubjectId = null (owner is TENANT_ONE)
+          SpecificAssetId asset1 = TestUtil.createSpecificAssetId(keyPrefix + "defaultClosed","value_1",null);
+          // asset2 is visible for everyone, because externalSubjectId = PUBLIC_READABLE
+          SpecificAssetId asset2 = TestUtil.createSpecificAssetId(keyPrefix + "public_visible","value_2",List.of(getExternalSubjectIdWildcardPrefix()));
+          shellPayload.setSpecificAssetIds(List.of(asset1,asset2));
+
+          performShellCreateRequest(mapper.writeValueAsString(shellPayload));
+
+          SpecificAssetId sa1 = TestUtil.createSpecificAssetId(keyPrefix + "defaultClosed","value_1",null);
+          SpecificAssetId sa2 = TestUtil.createSpecificAssetId(keyPrefix + "public_visible","value_2",null);
+
+          mvc.perform(
+                      MockMvcRequestBuilders
+                            .get(LOOKUP_SHELL_BASE_PATH)
+                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
+                            .queryParam("assetIds", mapper.writeValueAsString(List.of(sa1,sa2)))
+                            .accept(MediaType.APPLICATION_JSON)
+                            .with(jwtTokenFactory.allRoles())
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result", hasSize(1)))
+                .andExpect(jsonPath("$.result", contains(shellPayload.getId())));
+
+          // test with tenantTwo: returns no shellId because specificAssetId sa1 is only visible for Owner.
+          mvc.perform(
+                      MockMvcRequestBuilders
+                            .get(LOOKUP_SHELL_BASE_PATH)
+                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
+                            .queryParam("assetIds", mapper.writeValueAsString(List.of(sa1,sa2)))
+                            .accept(MediaType.APPLICATION_JSON)
+                            .with(jwtTokenFactory.tenantTwo().allRoles())
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result", hasSize(0)));
+       }
     }
 
+    /**
+    * The specificAssetId#externalSubjectId indicates which tenant is allowed to see the shell with all properties or not.
+    */
+   @Nested
+   @DisplayName("Tenant based Shell visibility test")
+   class TenantBasedShellVisibilityTest {
+
+      @BeforeEach
+       public void before() {
+          shellRepository.deleteAll();
+       }
+
+       @Test
+       public void testGetAllShellsByOwningTenantId() throws Exception {
+          AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+          shellPayload.setId(UUID.randomUUID().toString());
+          List<SpecificAssetId> shellpayloadSpecificAssetIDs = shellPayload.getSpecificAssetIds();
+          // Make all specificAssetIds to closed with externalSubjectId==null.
+          shellpayloadSpecificAssetIDs.forEach( specificAssetId -> specificAssetId.setExternalSubjectId( null ) );
+          shellPayload.setSpecificAssetIds( shellpayloadSpecificAssetIDs );
+
+          performShellCreateRequest(mapper.writeValueAsString(shellPayload));
+
+         // Request with owner TenantId (TENANT_ONE) returns one shell
+          mvc.perform(
+                      MockMvcRequestBuilders
+                            .get(SHELL_BASE_PATH)
+                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
+                            .queryParam("pageSize", "100")
+                            .accept(MediaType.APPLICATION_JSON)
+                            .with(jwtTokenFactory.allRoles())
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").exists())
+                .andExpect(jsonPath("$.result", hasSize(1)))
+                .andExpect(jsonPath("$.result[0].description[*]").isNotEmpty())
+                .andExpect(jsonPath("$.result[0].idShort",is(shellPayload.getIdShort())));
+
+          // Request with TenantId (TENANT_TWO) returns no shells, because the shell not includes the externalSubjectId of Tenant_two as specificId
+          mvc.perform(
+                      MockMvcRequestBuilders
+                            .get(SHELL_BASE_PATH)
+                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
+                            .queryParam("pageSize", "100")
+                            .accept(MediaType.APPLICATION_JSON)
+                            .with(jwtTokenFactory.allRoles())
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").exists())
+                .andExpect(jsonPath("$.result", hasSize(0)));
+       }
+
+       @Test
+       public void testGetAllShellsWithPublicAccessByTenantId() throws Exception {
+          // the keyPrefix ensures that this test can run against a persistent database multiple times
+          String keyPrefix = UUID.randomUUID().toString();
+          AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+          shellPayload.setSpecificAssetIds(null);
+          shellPayload.setId(UUID.randomUUID().toString());
+
+          // asset1 is only visible for the owner because the externalSubjectId = null
+          SpecificAssetId asset1 = TestUtil.createSpecificAssetId(keyPrefix + "defaultClosed","value_1",null);
+          // asset2 is visible for everyone, because externalSubjectId = PUBLIC_READABLE and specificAssetKey is manufacturerPartId (which is in the list of allowedTypes via application.yml)
+          SpecificAssetId asset2 = TestUtil.createSpecificAssetId("manufacturerPartId","value_2",List.of(getExternalSubjectIdWildcardPrefix()));
+          // asset3 is visible for tenantTwo, because externalSubjectId = tenantTwo
+          SpecificAssetId asset3 = TestUtil.createSpecificAssetId(keyPrefix + "tenantTwo","value_2",List.of(jwtTokenFactory.tenantTwo().getTenantId()));
+
+          shellPayload.setSpecificAssetIds(List.of(asset1,asset2,asset3));
+          performShellCreateRequest(mapper.writeValueAsString(shellPayload));
+
+          // Request with TenantId (TENANT_TWO) returns one shell with extend visibility of shell-properties, because tenantId is included in the specificAssetIds
+          mvc.perform(
+                      MockMvcRequestBuilders
+                            .get(SHELL_BASE_PATH)
+                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
+                            .queryParam("pageSize", "100")
+                            .accept(MediaType.APPLICATION_JSON)
+                            .with(jwtTokenFactory.allRoles())
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").exists())
+                .andExpect(jsonPath("$.result", hasSize(1)))
+                .andExpect(jsonPath("$.result[0].description[*]").isNotEmpty())
+                .andExpect(jsonPath("$.result[0].idShort",is(shellPayload.getIdShort())))
+                .andExpect(jsonPath("$.result[0].id",is( shellPayload.getId() )))
+                .andExpect(jsonPath("$.result[0].submodelDescriptors[*]").exists())
+                .andExpect(jsonPath("$.result[0].specificAssetIds[*]").exists());
+
+          // Request with TenantId (TENANT_THREE) returns one shell with only public visible shell-properties
+          mvc.perform(
+                      MockMvcRequestBuilders
+                            .get(SHELL_BASE_PATH)
+                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantThree().getTenantId() )
+                            .queryParam("pageSize", "100")
+                            .accept(MediaType.APPLICATION_JSON)
+                            .with(jwtTokenFactory.allRoles())
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").exists())
+                .andExpect(jsonPath("$.result", hasSize(1)))
+                .andExpect(jsonPath("$.result[0].description[*]").doesNotExist())
+                .andExpect(jsonPath("$.result[0].idShort").doesNotExist())
+                .andExpect(jsonPath("$.result[0].id",is( shellPayload.getId() )))
+                .andExpect(jsonPath("$.result[0].submodelDescriptors[*]").exists())
+                .andExpect(jsonPath("$.result[0].specificAssetIds[*]").exists());
+       }
+
+       @Test
+       public void testGetShellByExternalIdByOwningTenantId() throws Exception {
+          AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+          shellPayload.setId(UUID.randomUUID().toString());
+          List<SpecificAssetId> shellpayloadSpecificAssetIDs = shellPayload.getSpecificAssetIds();
+          // Make all specificAssetIds to closed with externalSubjectId==null.
+          shellpayloadSpecificAssetIDs.forEach( specificAssetId -> specificAssetId.setExternalSubjectId( null ) );
+          shellPayload.setSpecificAssetIds( shellpayloadSpecificAssetIDs );
+
+          performShellCreateRequest(mapper.writeValueAsString(shellPayload));
+
+
+          // Request with owner TenantId (TENANT_ONE) returns one shell
+          mvc.perform(
+                      MockMvcRequestBuilders
+                            .get(SINGLE_SHELL_BASE_PATH, getEncodedValue( shellPayload.getId() ))
+                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
+                            .queryParam("pageSize", "100")
+                            .accept(MediaType.APPLICATION_JSON)
+                            .with(jwtTokenFactory.allRoles())
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description[*]").isNotEmpty())
+                .andExpect(jsonPath("$.idShort",is(shellPayload.getIdShort())));
+
+          // Request with TenantId (TENANT_TWO) returns no shell, because the shell not includes the externalSubjectId of Tenant_two as specificId
+          mvc.perform(
+                      MockMvcRequestBuilders
+                            .get(SINGLE_SHELL_BASE_PATH, getEncodedValue( shellPayload.getId() ))
+                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
+                            .queryParam("pageSize", "100")
+                            .accept(MediaType.APPLICATION_JSON)
+                            .with(jwtTokenFactory.allRoles())
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isNotFound());
+       }
+
+       @Test
+       public void testGetAllShellByExternalIdWithPublicAccessByTenantId() throws Exception {
+          // the keyPrefix ensures that this test can run against a persistent database multiple times
+          String keyPrefix = UUID.randomUUID().toString();
+          AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+          shellPayload.setSpecificAssetIds(null);
+          shellPayload.setId(UUID.randomUUID().toString());
+
+          // asset1 is only visible for the owner because the externalSubjectId = null
+          SpecificAssetId asset1 = TestUtil.createSpecificAssetId(keyPrefix + "defaultClosed","value_1",null);
+          // asset2 is visible for everyone, because externalSubjectId = PUBLIC_READABLE and specificAssetKey is manufacturerPartId (which is in the list of allowedTypes via application.yml)
+          SpecificAssetId asset2 = TestUtil.createSpecificAssetId("manufacturerPartId","value_2",List.of(getExternalSubjectIdWildcardPrefix()));
+          // asset3 is visible for tenantTwo, because externalSubjectId = tenantTwo
+          SpecificAssetId asset3 = TestUtil.createSpecificAssetId(keyPrefix + "tenantTwo","value_2",List.of(jwtTokenFactory.tenantTwo().getTenantId()));
+
+          shellPayload.setSpecificAssetIds(List.of(asset1,asset2,asset3));
+          performShellCreateRequest(mapper.writeValueAsString(shellPayload));
+
+          // Request with TenantId (TENANT_TWO) returns one shell with extend visibility of shell-properties, because tenantId is included in the specificAssetIds
+          mvc.perform(
+                      MockMvcRequestBuilders
+                            .get(SINGLE_SHELL_BASE_PATH, getEncodedValue( shellPayload.getId() ))
+                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
+                            .queryParam("pageSize", "100")
+                            .accept(MediaType.APPLICATION_JSON)
+                            .with(jwtTokenFactory.allRoles())
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description[*]").isNotEmpty())
+                .andExpect(jsonPath("$.idShort",is(shellPayload.getIdShort())))
+                .andExpect(jsonPath("$.id",is( shellPayload.getId() )))
+                .andExpect(jsonPath("$.submodelDescriptors[*]").exists())
+                .andExpect(jsonPath("$.specificAssetIds[*]").exists());
+
+          // Request with TenantId (TENANT_THREE) returns one shell with only public visible shell-properties
+          mvc.perform(
+                      MockMvcRequestBuilders
+                            .get(SINGLE_SHELL_BASE_PATH, getEncodedValue( shellPayload.getId() ))
+                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantThree().getTenantId() )
+                            .queryParam("pageSize", "100")
+                            .accept(MediaType.APPLICATION_JSON)
+                            .with(jwtTokenFactory.allRoles())
+                )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description[*]").doesNotExist())
+                .andExpect(jsonPath("$.idShort").doesNotExist())
+                .andExpect(jsonPath("$.id",is( shellPayload.getId() )))
+                .andExpect(jsonPath("$.submodelDescriptors[*]").exists())
+                .andExpect(jsonPath("$.specificAssetIds[*]").exists());
+       }
+   }
 }

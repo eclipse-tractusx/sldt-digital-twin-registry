@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,15 +19,12 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
-import java.util.Set;
 import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.FieldNameConstants;
 
 @Entity
 @Getter
@@ -37,33 +34,19 @@ import lombok.experimental.FieldNameConstants;
 @AllArgsConstructor
 @With
 @JsonIdentityInfo( generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-@FieldNameConstants
-public class ShellIdentifier {
-    public static final String GLOBAL_ASSET_ID_KEY = "globalAssetId";
+public class SubmodelSupplemSemanticIdReferenceKey {
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   @Column(name="id")
+   UUID id;
+   ReferenceKeyType type;
+   @Column(name = "ref_key_value")
+   String value;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
-    private UUID id;
-    @Column(name = "namespace")
-    private String key;
-    @Column(name = "identifier")
-    private String value;
-
-    @JsonManagedReference
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "shellIdentifier")
-    private ShellIdentifierExternalSubjectReference externalSubjectId;
-
-    @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "fk_shell_id")
-    private Shell shellId;
-
-    @JsonManagedReference
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "shellIdentifier")
-    private ShellIdentifierSemanticReference semanticId;
-
-    @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shellIdentifier")
-    Set<ShellIdentifierSupplemSemanticReference> supplementalSemanticIds;
+   @JsonBackReference
+   @ManyToOne( fetch = FetchType.LAZY, optional = false,cascade = { CascadeType.MERGE}  )
+   @JoinColumn( name = "fk_submodel_supplem_semantic_id_reference_id" )
+   private SubmodelSupplemSemanticIdReference submodelSupplemSemanticIdReference;
 }
+
+

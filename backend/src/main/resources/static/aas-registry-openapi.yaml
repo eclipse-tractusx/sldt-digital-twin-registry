@@ -250,6 +250,7 @@ paths:
           schema:
             type: string
             format: byte
+        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       requestBody:
         description: Asset Administration Shell Descriptor object
         content:
@@ -418,6 +419,7 @@ paths:
           schema:
             type: string
             format: byte
+        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       requestBody:
         description: Submodel Descriptor object
         content:
@@ -494,6 +496,7 @@ paths:
           schema:
             type: string
             format: byte
+        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       responses:
         "200":
           description: Requested Submodel Descriptor
@@ -557,6 +560,7 @@ paths:
           schema:
             type: string
             format: byte
+        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       requestBody:
         description: Submodel Descriptor object
         content:
@@ -622,6 +626,7 @@ paths:
           schema:
             type: string
             format: byte
+        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       responses:
         "204":
           description: Submodel Descriptor deleted successfully
@@ -786,6 +791,7 @@ paths:
           schema:
             type: string
             format: byte
+        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       requestBody:
         description: Asset identifier key-value-pairs
         content:
@@ -834,34 +840,6 @@ paths:
           description: Asset identifier key-value-pairs deleted successfully
       x-semanticIds:
         - https://admin-shell.io/aas/API/DeleteAllAssetLinksById/1/0/RC02
-  /lookup/shells/query:
-    post:
-      tags:
-        - Registry and Discovery Interface
-      summary: Returns a list of Asset Administration Shell ids based on Asset identifier key-value-pairs.
-      operationId: PostQueryAllAssetAdministrationShellIds
-      parameters:
-        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
-      requestBody:
-        description: Asset Administration Shell Descriptor object
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ShellLookup'
-        required: true
-      responses:
-        "200":
-          description: Requested Asset Administration Shell ids
-          content:
-            application/json:
-              schema:
-                type: array
-                maxItems: 10000
-                items:
-                  $ref: '#/components/schemas/Identifier'
-              examples:
-                complete:
-                  $ref: '#/components/examples/lookup-shells-by-aas-identifier-response'
 components:
   securitySchemes:
     bearerAuth:
@@ -887,6 +865,7 @@ components:
       minLength: 1
       maxLength: 200
     ModelReference:
+      type: object
       required:
         - keys
       properties:
@@ -934,6 +913,7 @@ components:
         - NotApplicable
         - Type
     GetAssetAdministrationShellDescriptorsResult:
+      type: object
       allOf:
         - $ref: '#/components/schemas/PagedResult'
         - type: object
@@ -952,7 +932,7 @@ components:
       required:
         - id
       type: object
-      example: {"description":[{"language":"de","text":"hello text"},{"language":"en","text":"hello s"}],"displayName":[{"language":"de","text":"this is an example description1"}],"extensions":[{"supplementalSemanticIds":[{"type":"ExternalReference","keys":[{"type":"Submodel","value":"semanticIdExample"}]}],"refersTo":[{"type":"ExternalReference","keys":[{"type":"Submodel","value":"semanticIdExample"}]}]}],"endpoints":[{"interface":"interfaceNameExample","protocolInformation":{"href":"endpointAddressExample","endpointProtocol":"endpointProtocolExample","endpointProtocolVersion":["e"],"subprotocol":"subprotocolExample","subprotocolBody":"subprotocolBodyExample","subprotocolBodyEncoding":"subprotocolBodyExample","securityAttributes":[{"type":"NONE"}]}}],"idShort":"idShortExample","id":"e1eba3d7-91f0-4dac-a730-eaa1d35e035c","specificAssetIds":[{"supplementalSemanticIds":[{"type":"ExternalReference","keys":[{"type":"Submodel","value":"semanticIdExample"}]}],"name":"identifier1KeyExample","value":"identifier1ValueExample"},{"supplementalSemanticIds":[{"type":"ExternalReference","keys":[{"type":"Submodel","value":"semanticIdExample"}]}],"name":"identifier2KeyExample","value":"identifier2ValueExample"}],"submodelDescriptors":[{"endpoints":[{"interface":"interfaceNameExample","protocolInformation":{"href":"endpointAddressExample","endpointProtocol":"endpointProtocolExample","endpointProtocolVersion":["e"],"subprotocol":"subprotocolExample","subprotocolBody":"subprotocolBodyExample","subprotocolBodyEncoding":"subprotocolBodyExample","securityAttributes":[{"type":"NONE"}]}}],"idShort":"idShortExample","id":"cd47615b-daf3-4036-8670-d2f89349d388","semanticId":{"type":"ExternalReference","keys":[{"type":"Submodel","value":"semanticIdExample"}]},"description":[{"language":"de","text":"hello text"},{"language":"en","text":"hello s"}]}]}
+      example: {"description":[{"language":"de","text":"hello text"},{"language":"en","text":"hello s"}],"displayName":[{"language":"de","text":"this is an example description1"}],"endpoints":[{"interface":"interfaceNameExample","protocolInformation":{"href":"endpointAddressExample","endpointProtocol":"endpointProtocolExample","endpointProtocolVersion":["e"],"subprotocol":"subprotocolExample","subprotocolBody":"subprotocolBodyExample","subprotocolBodyEncoding":"subprotocolBodyExample","securityAttributes":[{"type":"NONE","key": "Security Attribute key","value": "Security Attribute value"}]}}],"idShort":"idShortExample","id":"e1eba3d7-91f0-4dac-a730-eaa1d35e035c","specificAssetIds":[{"supplementalSemanticIds":[{"type":"ExternalReference","keys":[{"type":"Submodel","value":"semanticIdExample"}]}],"name":"identifier1KeyExample","value":"identifier1ValueExample"},{"supplementalSemanticIds":[{"type":"ExternalReference","keys":[{"type":"Submodel","value":"semanticIdExample"}]}],"name":"identifier2KeyExample","value":"identifier2ValueExample"}],"submodelDescriptors":[{"endpoints":[{"interface":"interfaceNameExample","protocolInformation":{"href":"endpointAddressExample","endpointProtocol":"endpointProtocolExample","endpointProtocolVersion":["e"],"subprotocol":"subprotocolExample","subprotocolBody":"subprotocolBodyExample","subprotocolBodyEncoding":"subprotocolBodyExample","securityAttributes":[{"type":"NONE","key": "Security Attribute key","value": "Security Attribute value"}]}}],"idShort":"idShortExample","id":"cd47615b-daf3-4036-8670-d2f89349d388","semanticId":{"type":"ExternalReference","keys":[{"type":"Submodel","value":"semanticIdExample"}]},"description":[{"language":"de","text":"hello text"},{"language":"en","text":"hello s"}]}]}
       allOf:
         - $ref: '#/components/schemas/Descriptor'
         - properties:
@@ -1007,14 +987,9 @@ components:
           maxItems: 10000
           items:
             $ref: '#/components/schemas/LangStringNameType'
-        extensions:
-          minItems: 1
-          maxItems: 10000
-          type: array
-          items:
-            $ref: '#/components/schemas/Extension'
       example: { "endpoints": [ { "protocolInformation": { "endpointAddress": "https://localhost:1234", "endpointProtocolVersion": "1.1" }, "interface": "AAS-1.0" }, { "protocolInformation": { "endpointAddress": "opc.tcp://localhost:4840" }, "interface": "AAS-1.0" }, { "protocolInformation": { "endpointAddress": "https://localhost:5678", "endpointProtocolVersion": "1.1", "subprotocol": "OPC UA Basic SOAP", "subprotocolBody": "ns=2;s=MyAAS", "subprotocolBodyEncoding": "application/soap+xml" }, "interface": "AAS-1.0" } ] }
     LangStringTextType:
+      type: object
       allOf:
         - $ref: '#/components/schemas/AbstractLangString'
         - properties:
@@ -1032,6 +1007,7 @@ components:
           #     pattern: "^([\\t\\n\\r -퟿-�]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
           type: string
     LangStringNameType:
+      type: object
       allOf:
         - $ref: '#/components/schemas/AbstractLangString'
         - properties:
@@ -1039,6 +1015,7 @@ components:
               type: string
               maxLength: 128
     Extension:
+      type: object
       allOf:
         - $ref: '#/components/schemas/HasSemantics'
         - properties:
@@ -1069,12 +1046,11 @@ components:
           items:
             $ref: '#/components/schemas/Reference'
     Reference:
+      type: object
       allOf:
         - $ref: '#/components/schemas/ReferenceParent'
-        - properties:
-            referredSemanticId:
-              $ref: '#/components/schemas/ReferenceParent'
     ReferenceParent:
+      type: object
       properties:
         type:
           $ref: '#/components/schemas/ReferenceTypes'
@@ -1160,6 +1136,7 @@ components:
         - xs:unsignedLong
         - xs:unsignedShort
     AdministrativeInformation:
+      type: object
       allOf:
         - $ref: '#/components/schemas/HasDataSpecification'
         - properties:
@@ -1201,9 +1178,11 @@ components:
         dataSpecificationContent:
           $ref: '#/components/schemas/DataSpecificationContent_choice'
     DataSpecificationContent_choice:
+      type: object
       oneOf:
         - $ref: '#/components/schemas/DataSpecificationIec61360'
     DataSpecificationIec61360:
+      type: object
       allOf:
         - $ref: '#/components/schemas/DataSpecificationContent'
         - properties:
@@ -1284,12 +1263,14 @@ components:
         - SubmodelElementCollection
         - SubmodelElementList
     LangStringPreferredNameTypeIec61360:
+      type: object
       allOf:
         - $ref: '#/components/schemas/AbstractLangString'
         - properties:
             text:
               maxLength: 255
     LangStringShortNameTypeIec61360:
+      type: object
       allOf:
         - $ref: '#/components/schemas/AbstractLangString'
         - properties:
@@ -1318,6 +1299,7 @@ components:
         - TIME
         - TIMESTAMP
     LangStringDefinitionTypeIec61360:
+      type: object
       allOf:
         - $ref: '#/components/schemas/AbstractLangString'
         - properties:
@@ -1355,6 +1337,9 @@ components:
           type: boolean
     Endpoint:
       type: object
+      required:
+        - interface
+        - protocolInformation
       properties:
         interface:
           maxLength: 128
@@ -1392,6 +1377,7 @@ components:
           items:
             $ref: '#/components/schemas/ProtocolInformation_securityAttributes'
     SpecificAssetId:
+      type: object
       allOf:
         - $ref: '#/components/schemas/HasSemantics'
         - properties:
@@ -1437,7 +1423,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Reference'
-      example: {"endpoints": [{"interface": "interfaceNameExample","protocolInformation": {"href": "endpointAddressExample","endpointProtocol": "endpointProtocolExample","endpointProtocolVersion": [ "e"],"subprotocol": "subprotocolExample","subprotocolBody": "subprotocolBodyExample","subprotocolBodyEncoding": "subprotocolBodyExample","securityAttributes": [{"type": "NONE" }]}}],"idShort": "idShortExample","id": "341f63de-728a-4b6d-9c72-c0d9ba4f8c7d","semanticId": {"type": "ExternalReference","keys": [{"type": "Submodel","value": "semanticIdExample"}]},"description": [{"language": "de","text": "hello text"},{"language": "en","text": "hello s"}]}
+      example: {"endpoints": [{"interface": "interfaceNameExample","protocolInformation": {"href": "endpointAddressExample","endpointProtocol": "endpointProtocolExample","endpointProtocolVersion": [ "e"],"subprotocol": "subprotocolExample","subprotocolBody": "subprotocolBodyExample","subprotocolBodyEncoding": "subprotocolBodyExample","securityAttributes": [{"type": "NONE","key": "Security Attribute key","value": "Security Attribute value" }]}}],"idShort": "idShortExample","id": "341f63de-728a-4b6d-9c72-c0d9ba4f8c7d","semanticId": {"type": "ExternalReference","keys": [{"type": "Submodel","value": "semanticIdExample"}]},"description": [{"language": "de","text": "hello text"},{"language": "en","text": "hello s"}]}
       allOf:
         - $ref: '#/components/schemas/Descriptor'
     Result:
@@ -1473,6 +1459,7 @@ components:
           #    pattern: "^-?(([1-9][0-9][0-9][0-9]+)|(0[0-9][0-9][0-9]))-((0[1-9])|(1[0-2]))-((0[1-9])|([12][0-9])|(3[01]))T(((([01][0-9])|(2[0-3])):[0-5][0-9]:([0-5][0-9])(\\.[0-9]+)?)|24:00:00(\\.0+)?)(Z|\\+00:00|-00:00)$"
           type: string
     GetSubmodelDescriptorsResult:
+      type: object
       allOf:
         - $ref: '#/components/schemas/PagedResult'
         - type: object
@@ -1649,16 +1636,7 @@ components:
                   "type": "AnnotatedRelationshipElement",
                   "value": "udbffFELY8AudbffZC3^WZ],;udbff^kud8005udbff2ud8002<Sud800Rkudbffb>ud800Dud800j"
                 }
-              ],
-              "referredSemanticId": {
-                "type": "ExternalReference",
-                "keys": [
-                  {
-                    "type": "AnnotatedRelationshipElement",
-                    "value": "=udbffJud800budbff4udbffiud800TZud800budbff6ud800sudbff<udbff>udbff`udbff;qitud800[ud800Rkrud800edud8005Qud800UtSud800F5~ud800[4Jud800cud800:udbffOI8D1udbffIudbff3udbffAudbffpudbffi udbff;ud800kudbffG$udbff[%ud800?6udbffNud800;&udbffMudbffA0eMB*5:JXudbffoudbffQud800\\"
-                  }
-                ]
-              }
+              ]
             },
             "supplementalSemanticIds": [
               {
@@ -1668,16 +1646,7 @@ components:
                     "type": "AnnotatedRelationshipElement",
                     "value": "Sud800oud800n>NTud800mud800VpV<7rEKPhAudbff`qOudbff]ud800;aud800>udbffav^nudbff;iRudbffsud8002ud800cqut^"
                   }
-                ],
-                "referredSemanticId": {
-                  "type": "ExternalReference",
-                  "keys": [
-                    {
-                      "type": "AnnotatedRelationshipElement",
-                      "value": "udbffVud800Eudbff9udbffYQ70Q!flyud800rudbffXudbffpZud8008q_Re?oA6cs'ud800u"
-                    }
-                  ]
-                }
+                ]
               }
             ],
             "name": "VCudbffB!ud800VkTudbffZdStPOud800:S:P0ud800Budbff;udbff1nootWudb",
@@ -1689,16 +1658,7 @@ components:
                   "type": "AnnotatedRelationshipElement",
                   "value": "ud800\\pZLbimgkR[Tudbffpudb",
                 }
-              ],
-              "referredSemanticId": {
-                "type": "ExternalReference",
-                "keys": [
-                  {
-                    "type": "AnnotatedRelationshipElement",
-                    "value": "5Iudbffjud800kudbff?m_$2ud800?udbff^h8udbff^HS$w@Uud8008G<Xud800p_gr9gud800Tud800RB'ud800jud8008udbffaud8008ud800<Dud800WudbffSud800SudbffuudbffT@1\\udbffM\"PG0udbffp$ud800Wudbff>udbfft0ehud800[4udbffoJZZudbffc3udbff4udbff@$ud800f3iud800Vud8005ud800G"
-                  }
-                ]
-              }
+              ]
             }
           }
         ]

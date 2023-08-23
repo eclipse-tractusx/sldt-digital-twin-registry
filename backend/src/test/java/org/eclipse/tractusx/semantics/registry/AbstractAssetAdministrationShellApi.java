@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.eclipse.tractusx.semantics.RegistryProperties;
+import org.eclipse.tractusx.semantics.registry.repository.ShellRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -54,8 +55,6 @@ public abstract class AbstractAssetAdministrationShellApi {
 
     protected static final String EXTERNAL_SUBJECT_ID_HEADER = "Edc-Bpn";
 
-
-
     @Autowired
     protected MockMvc mvc;
 
@@ -65,8 +64,18 @@ public abstract class AbstractAssetAdministrationShellApi {
     @Autowired
     protected JwtTokenFactory jwtTokenFactory;
 
+    @Autowired
+    private RegistryProperties registryProperties;
+
+    @Autowired
+    protected ShellRepository shellRepository;
+
     protected String getId(ObjectNode payload) {
         return payload.get("identification").textValue();
+    }
+
+    protected String getExternalSubjectIdWildcardPrefix(){
+        return registryProperties.getExternalSubjectIdWildcardPrefix();
     }
 
     protected void performSubmodelCreateRequest(String payload, String shellIdentifier) throws Exception {
