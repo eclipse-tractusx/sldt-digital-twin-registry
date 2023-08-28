@@ -78,13 +78,10 @@ jobs:
       - name: Build JAR
         run: mvn clean package
         
-      - name: Build Image
-        run: docker build -t registry -f ./backend/Dockerfile .
-        
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: registry
+          image-ref: "tractusx/sldt-digital-twin-registry:latest"
           # ignore-unfixed: true
           exit-code: "1"
           hide-progress: false
