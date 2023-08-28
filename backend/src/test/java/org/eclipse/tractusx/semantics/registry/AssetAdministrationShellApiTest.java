@@ -838,42 +838,102 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                .andExpect( jsonPath( "$", hasSize( 5 ) ) );
       }
 
-      //@Test
+      @Test
       public void testFindExternalShellIdsBySpecificAssetIdsWithAnyMatchExpectSuccess() throws Exception {
          // the keyPrefix ensures that this test can run against a persistent database multiple times
          String keyPrefix = UUID.randomUUID().toString();
-         ObjectNode commonAssetId = specificAssetId( keyPrefix + "commonAssetIdKey", "commonAssetIdValue" );
-         // first shell
-         ObjectNode firstShellPayload = createBaseIdPayload( "sampleForQuery", "idShortSampleForQuery" );
-         firstShellPayload.set( "specificAssetIds", emptyArrayNode()
-               .add( specificAssetId( keyPrefix + "findExternalShellIdQueryKey_1", "value_1" ) ) );
-         performShellCreateRequest( toJson( firstShellPayload ) );
+         AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+         shellPayload.setSpecificAssetIds(null);
+         shellPayload.setId(UUID.randomUUID().toString());
+         SpecificAssetId asset1 = TestUtil.createSpecificAssetId(keyPrefix + "findExternal_2","value_2",null);
+         SpecificAssetId asset2 = TestUtil.createSpecificAssetId(keyPrefix + "findExternal_2_1","value_2_1",List.of(jwtTokenFactory.tenantTwo().getTenantId()));
+         SpecificAssetId asset3 = TestUtil.createSpecificAssetId(keyPrefix + "findExternal_2_2","value_2_2",List.of(jwtTokenFactory.tenantThree().getTenantId()));
 
-         // second shell
-         ObjectNode secondShellPayload = createBaseIdPayload( "sampleForQuery", "idShortSampleForQuery" );
-         secondShellPayload.set( "specificAssetIds", emptyArrayNode()
-               .add( specificAssetId( keyPrefix + "findExternalShellIdQueryKey_2", "value_2" ) ) );
-         performShellCreateRequest( toJson( secondShellPayload ) );
+         shellPayload.setSpecificAssetIds(List.of(asset1,asset2,asset3));
 
-         // query to retrieve any match
-         JsonNode anyMatchAueryByAssetIds = mapper.createObjectNode().set( "query", mapper.createObjectNode()
+         performShellCreateRequest(mapper.writeValueAsString(shellPayload));
+
+         // query to retrieve any match (asset1 is only visible for OWNER TENANT_ONE)
+         JsonNode anyMatchQueryByOwnerAssetIds = mapper.createObjectNode().set( "query", mapper.createObjectNode()
                .set( "assetIds", emptyArrayNode()
-                     .add( specificAssetId( keyPrefix + "findExternalShellIdQueryKey_1", "value_1" ) )
-                     .add( specificAssetId( keyPrefix + "findExternalShellIdQueryKey_2", "value_2" ) )
-                     .add( commonAssetId ) )
+                     .add( specificAssetId( asset1.getName(), asset1.getValue() ) )
+                     .add( specificAssetId( "not_available_key_in_shell","not_available_value_in_shell" ) ))
          );
 
+         // Test with non Owner(TENANT_TWO)
          mvc.perform(
                      MockMvcRequestBuilders
                            .post( LOOKUP_SHELL_BASE_PATH + "/query" )
-                           .content( toJson( anyMatchAueryByAssetIds ) )
+                           .content( toJson( anyMatchQueryByOwnerAssetIds ) )
                            .contentType( MediaType.APPLICATION_JSON )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
                            .with( jwtTokenFactory.allRoles() )
                )
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isOk() )
-               .andExpect( jsonPath( "$", hasSize( 2 ) ) )
-               .andExpect( jsonPath( "$", containsInAnyOrder( getId( firstShellPayload ), getId( secondShellPayload ) ) ) );
+               .andExpect( jsonPath( "$", hasSize( 0 ) ) );
+
+         // Test with owner DTR (TENANT_ONE)
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .post( LOOKUP_SHELL_BASE_PATH + "/query" )
+                           .content( toJson( anyMatchQueryByOwnerAssetIds ) )
+                           .contentType( MediaType.APPLICATION_JSON )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
+                           .with( jwtTokenFactory.allRoles() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isOk() )
+               .andExpect( jsonPath( "$", hasSize( 1 ) ) )
+               .andExpect( jsonPath( "$[0]" ,is(shellPayload.getId()) ));
+
+         // query to retrieve any match (asset2 is only visible for OWNER TENANT_ONE and TENANT_TWO)
+         JsonNode anyMatchQueryByTenantTwoAssetIds = mapper.createObjectNode().set( "query", mapper.createObjectNode()
+               .set( "assetIds", emptyArrayNode()
+                     .add( specificAssetId( asset2.getName(), asset2.getValue() ) )
+                     .add( specificAssetId( "not_available_key_in_shell","not_available_value_in_shell" ) ))
+         );
+
+         // Test with non Owner(TENANT_TWO)
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .post( LOOKUP_SHELL_BASE_PATH + "/query" )
+                           .content( toJson( anyMatchQueryByTenantTwoAssetIds ) )
+                           .contentType( MediaType.APPLICATION_JSON )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
+                           .with( jwtTokenFactory.allRoles() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( jsonPath( "$", hasSize( 1 ) ) )
+               .andExpect( jsonPath( "$[0]" ,is(shellPayload.getId()) ));
+
+         // Test with non Owner(TENANT_THREE)
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .post( LOOKUP_SHELL_BASE_PATH + "/query" )
+                           .content( toJson( anyMatchQueryByOwnerAssetIds ) )
+                           .contentType( MediaType.APPLICATION_JSON )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantThree().getTenantId() )
+                           .with( jwtTokenFactory.allRoles() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isOk() )
+               .andExpect( jsonPath( "$", hasSize( 0 ) ) );
+
+         // Test with owner DTR (TENANT_ONE)
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .post( LOOKUP_SHELL_BASE_PATH + "/query" )
+                           .content( toJson( anyMatchQueryByTenantTwoAssetIds ) )
+                           .contentType( MediaType.APPLICATION_JSON )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
+                           .with( jwtTokenFactory.allRoles() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isOk() )
+               .andExpect( jsonPath( "$", hasSize( 1 ) ) )
+               .andExpect( jsonPath( "$[0]" ,is(shellPayload.getId()) ));
+
       }
 
       //@Test
