@@ -26,8 +26,8 @@ sources:
   - https://github.com/eclipse-tractusx/sldt-digital-twin-registry
 
 type: application
-version: 0.3.21
-appVersion: 0.3.13-M1
+version: 0.3.22
+appVersion: 0.3.14-M1
 
 dependencies:
   - repository: https://charts.bitnami.com/bitnami
