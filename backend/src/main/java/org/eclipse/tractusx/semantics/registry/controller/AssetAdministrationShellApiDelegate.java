@@ -94,7 +94,6 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
 
     @Override
-    // new todo: correct implementation
     public ResponseEntity<GetSubmodelDescriptorsResult> getAllSubmodelDescriptorsThroughSuperpath( byte[] aasIdentifier, Integer limit, String cursor, @RequestHeader String externalSubjectId  ) {
         Shell savedShell = shellService.findShellByExternalIdAndExternalSubjectId(getDecodedId( aasIdentifier ),getExternalSubjectIdOrEmpty(externalSubjectId));
         SubmodelCollectionDto dto = shellService.findAllSubmodel( limit,cursor, savedShell);

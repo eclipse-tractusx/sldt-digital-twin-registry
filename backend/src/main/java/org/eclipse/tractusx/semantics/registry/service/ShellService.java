@@ -198,7 +198,7 @@ public class ShellService {
       List<String> keyValueCombinations = shellIdentifiers.stream().map( shellIdentifier -> shellIdentifier.getKey() + shellIdentifier.getValue() ).toList();
 
       List<String> queryResult = shellRepository.findExternalShellIdsByIdentifiersByExactMatch( keyValueCombinations,
-            keyValueCombinations.size(), externalSubjectId, externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes, owningTenantId );
+            keyValueCombinations.size(), externalSubjectId, externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes, owningTenantId, ShellIdentifier.GLOBAL_ASSET_ID_KEY );
       pageSize = getPageSize( pageSize );
 
       int startIndex = getCursorDecoded( cursor, queryResult );

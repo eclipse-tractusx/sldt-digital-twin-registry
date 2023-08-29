@@ -76,7 +76,7 @@ public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecific
     @Query( value = "select s.id_external from shell s where s.id in (" +
           "select si.fk_shell_id from shell_identifier si " +
           "where concat(si.namespace,si.identifier) in (:keyValueCombinations) " +
-          "and (:tenantId = :owningTenantId or exists (" +
+          "and (:tenantId = :owningTenantId or si.namespace= :globalAssetId or exists (" +
                 "Select sider.ref_key_value from SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY sider where (sider.ref_key_value = :tenantId or (sider.ref_key_value = :publicWildcardPrefix and si.namespace in (:publicWildcardAllowedTypes) )) and sider.FK_SI_EXTERNAL_SUBJECT_REFERENCE_ID="+
           "(select sies.id from SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE sies where sies.FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID=si.id)"+
           ")) group by si.fk_shell_id " +
@@ -87,7 +87,8 @@ public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecific
                                                    @Param("tenantId") String tenantId,
                                                    @Param ("publicWildcardPrefix") String publicWildcardPrefix,
                                                    @Param ("publicWildcardAllowedTypes") List<String> publicWildcardAllowedTypes,
-                                                   @Param("owningTenantId") String owningTenantId);
+                                                   @Param("owningTenantId") String owningTenantId,
+                                                   @Param("globalAssetId") String globalAssetId);
 
     /**
      * Returns external shell ids for the given keyValueCombinations.

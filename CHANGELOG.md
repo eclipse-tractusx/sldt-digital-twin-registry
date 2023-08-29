@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.3.14-M1
+### Added
+
+## fixed
+- Bugfix: GlobalAssetId was not shown in the shell response. This bug is fixed. GlobalAssetId is shown, if the consumer has full access to the shell.
+
 ## 0.3.13-M1
 ### Added
 - In this version the models have been adjusted to new version AAS 3.0.
