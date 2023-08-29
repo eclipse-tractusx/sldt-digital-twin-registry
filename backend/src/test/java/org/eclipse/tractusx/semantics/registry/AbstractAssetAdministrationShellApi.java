@@ -40,7 +40,6 @@ import java.util.UUID;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-// TODO: Include also checking the expected content which is currently commented
 @SpringBootTest
 @AutoConfigureMockMvc
 @EnableConfigurationProperties( RegistryProperties.class)
@@ -88,8 +87,8 @@ public abstract class AbstractAssetAdministrationShellApi {
                                 .with(jwtTokenFactory.allRoles())
                 )
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(status().isCreated());
-               // .andExpect(content().json(payload));
+                .andExpect(status().isCreated())
+                .andExpect(content().json(payload));
     }
 
     /**
@@ -117,8 +116,8 @@ public abstract class AbstractAssetAdministrationShellApi {
                                 .with(jwtTokenFactory.allRoles())
                 )
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(status().isCreated());
-               // .andExpect(content().json(expectation));
+                .andExpect(status().isCreated())
+                .andExpect(content().json(expectation));
     }
 
 
