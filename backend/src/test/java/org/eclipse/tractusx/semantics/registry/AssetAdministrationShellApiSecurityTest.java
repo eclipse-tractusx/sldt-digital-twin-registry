@@ -1173,7 +1173,8 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description[*]").isNotEmpty())
-                .andExpect(jsonPath("$.idShort",is(shellPayload.getIdShort())));
+                .andExpect(jsonPath("$.idShort",is(shellPayload.getIdShort())))
+                .andExpect(jsonPath("$.globalAssetId",is(shellPayload.getGlobalAssetId())));
 
           // Request with TenantId (TENANT_TWO) returns no shell, because the shell not includes the externalSubjectId of Tenant_two as specificId
           mvc.perform(
@@ -1218,6 +1219,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description[*]").isNotEmpty())
+                .andExpect(jsonPath("$.globalAssetId",is(shellPayload.getGlobalAssetId())))
                 .andExpect(jsonPath("$.idShort",is(shellPayload.getIdShort())))
                 .andExpect(jsonPath("$.id",is( shellPayload.getId() )))
                 .andExpect(jsonPath("$.submodelDescriptors[*]").exists())
@@ -1236,6 +1238,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description[*]").doesNotExist())
                 .andExpect(jsonPath("$.idShort").doesNotExist())
+                .andExpect(jsonPath("$.globalAssetId").doesNotExist())
                 .andExpect(jsonPath("$.id",is( shellPayload.getId() )))
                 .andExpect(jsonPath("$.submodelDescriptors[*]").exists())
                 .andExpect(jsonPath("$.specificAssetIds[*]").exists());

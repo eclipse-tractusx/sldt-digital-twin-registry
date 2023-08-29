@@ -71,8 +71,13 @@ public class ShellAccessHandler {
       );
 
       if ( hasOnlyPublicAccess ) {
+         // Filter out globalAssetId from specificAssetId. TODO: implement to save globalAssetId in separate database column
+         // GlobalAssetId is set via mapper. In case of only read access, no globalAssetId should be shown.
+         Set<ShellIdentifier> filteredIdentifiersWithNoGlobalAssetId = filteredIdentifiers.stream().filter(
+               shellIdentifier -> !shellIdentifier.getKey().equals( ShellIdentifier.GLOBAL_ASSET_ID_KEY ) )
+               .collect( Collectors.toSet() );
          return new Shell()
-               .withIdentifiers( filteredIdentifiers )
+               .withIdentifiers(filteredIdentifiersWithNoGlobalAssetId)
                .withSubmodels( shell.getSubmodels() )
                .withIdExternal( shell.getIdExternal() )
                .withId( shell.getId() )
@@ -89,6 +94,10 @@ public class ShellAccessHandler {
 
       Set<ShellIdentifier> externalSubjectIdSet = new HashSet<>();
       for ( ShellIdentifier identifier : shellIdentifiers ) {
+         // Check if specificAssetId is globalAssetId -> TODO: implement to save globalAssetId in separate database column
+         if(identifier.getKey().equals( ShellIdentifier.GLOBAL_ASSET_ID_KEY )){
+            externalSubjectIdSet.add( identifier );
+         }
          if ( identifier.getExternalSubjectId() != null ) {
             Set<ShellIdentifierExternalSubjectReferenceKey> optionalReferenceKey =
                   identifier.getExternalSubjectId().getKeys().stream().filter( shellIdentifierExternalSubjectReferenceKey ->
