@@ -352,63 +352,6 @@ locally, using minikube. For further information checkout the [readme.md](https:
 
 The overall concept can be found under **2 Architecture and constraints**.
 
-### Visibility of specificAssetIds based on tenantId/BPN
-The visibility of `specificAssetIds` in the Digital Twin Registry based on the Business Partner Number (BPN) can be controlled with the attribute `externalSubjectId`. Hence, the `externalSubjectId` is identified with the BPN.
-
-* The BPN as attribute to a *specificAssetId* can be provided in `specificAssetIds`. This can be done with `externalSubjectId`.
-* Only users, who have the same BPN in the Eclipse Dataspace Components-BPN Header are able to see content of `specificAssetIds`.
-* The behavior is closed by default, *i.e.*, if no `externalSubjectId` is defined to a `specificAssetId`, the content of this particular `specificAssetId` (key, value) is only visible for the owner of the twin (also known as data provider).
-* To mark a `specificAssetId` as public for every reader on a *Digital Twin*, the defined character (`"PUBLIC_READABLE"`) needs to be added in the `externalSubjectId`.
-* The communication between consumer and provider is via EDC. Before the provider EDC sends the request to the DTR, the property Edc-Bpn with the BPN of the consumer will be set by the provider EDC.
-* The specificAssetIds of Digital Twins you created will always be shown to you.
-
-Detailed example:
-```
-// Given specificAssetIds:
-  "specificAssetIds":[
-      {
-         "name":"partInstanceId",
-         "value":"24975539203421"
-      },
-      {
-         "name":"customerPartId",
-         "value":"231982",
-         "externalSubjectId":{
-            "type":"ExternalReference",
-            "keys":[
-               {
-                  "type":"GlobalReference",
-                  "value":"BPN_COMPANY_001"
-               }
-            ]
-         }
-      },
-      {
-         "name":"manufacturerPartId",
-         "value":"123829238",
-         "externalSubjectId":{
-            "type":"ExternalReference",
-            "keys":[
-		       {
-                  "type":"GlobalReference",
-                  "value":"PUBLIC_READABLE"
-               }
-            ]
-         }
-      }
-   ]
-```
-This example is a *Digital Twin* with three different `specificAssetIds` as descriptors.
-* `partInstanceID` is only visible for the owner of the twin, since <u>no</u> `externalSubjectId` is defined.
-* `customerPartId` is only visible for the owner of the twin and an (external) reader via EDC, who has the bpn-value "BPN_COMPANY_001" in the header of the EDC
-* `manufacturerPartId` is visible for everyone, because the `externalSubjectId` has the wildcard value `"PUBLIC_READABLE"` included.
-
-For example, if an (external) reader via EDC requests the here shown *Digital Twin* and the edc-bpn header includes the bpn-value "BPN_COMPANY_001", the list of `specificAssetIds` contains two entries, namely:
-* `customerPartId`, because its `externalSubjectId` matches to the incoming bpn-value "BPN_COMPANY_001"
-* `manufacturerPartId`, because this `specificAssetId` has the `externalSubjectId = "PUBLIC_READABLE"` and therefore is public for everyone
-
-In this example, the `specificAssetId` `"name": "partInstanceId"` is filtered out, because it is only visible for the owner of the *Digital Twin*.
-
 ### Asset Administration Shell specification 
 The Digital Twin Registry has implemented Asset Administration Shell specification in version 3.0.
 The corresponding openapi file can be found here: "backend/src/main/resources/static/aas-registry-openapi.yaml"
@@ -484,10 +427,12 @@ The AAS Registry can be accessed on behalf of a user. The token has to be obtain
 *Support contact*	tractusx-dev@eclipse.org
 
 ### Access control to Digital Twins Based on the BPN (Business Partner Number)/ TenantId
-The visibility of `specificAssetIds` in the Digital Twin Registry based on the Business Partner Number (BPN) can be controlled with the attribute `externalSubjectId`. Hence, the `externalSubjectId` is identified with the BPN.
+The visibility of `specificAssetIds` in the Digital Twin Registry based on the Business Partner Number (BPN) (Which is send via header Edc-Bpn) can be controlled with the attribute `externalSubjectId`. Hence, the `externalSubjectId` is identified with the BPN. 
+The communication between consumer and provider is via EDC. Before the provider EDC sends the request to the DTR, the property Edc-Bpn with the BPN of the consumer will be set by the provider EDC.
+
 
 * The BPN as attribute to a *specificAssetId* can be optionally provided in `specificAssetIds`. This can be done with `externalSubjectId`.
-* Only those users, where `externalSubjectId` matches the Eclipse Dataspace Components-Header (*i.e.* BPN) are able to discover and read exactly this content of `specificAssetIds`.
+* Only those users, where `externalSubjectId` matches the Eclipse Dataspace Components-Header (Edc-Bpn -> *i.e.* BPN) are able to discover and read exactly this content of `specificAssetIds`.
 * The behavior is **closed by default**, *i.e.*, if no `externalSubjectId` is defined to a `specificAssetId`, the content of this particular `specificAssetId` (key, value) is only visible for the owner of the *Digital Twin* (also known as data provider).
 * To mark a `specificAssetId` as public for every reader on a *Digital Twin*, the defined characters (`"PUBLIC_READABLE"`) need to be added in the `externalSubjectId`.
    * *Cave: The publisher of `specificAssetIds` needs to consider antitrust law. This use of `"PUBLIC_READABLE"` is only allowed for the *specificAssetId* `"assetLifecyclePhase"` (only `"value":"AsBuilt"`, and `"value":"AsPlanned"` allowed; see [Eclipse Tractus-X - Traceability Kit](https://eclipse-tractusx.github.io/docs-kits/next/kits/Traceability%20Kit/Software%20Development%20View/Specification%20Traceability%20Kit)), and `"manufacturerPartId"` (which is technically enforced by the Digital Twin Registry) if its content describes material numbers of products and those products are or were in serial production for the open market. If its content describes material numbers of products in state of, *e.g.*, pre-production, being planned for production, being unsold, the use of `"PUBLIC_READABLE"` is not allowed and use of dedicated read access via  `externalSubjectId` is to be used instead. `"manufacturerPartId"` is not allowed to be used for different content than the one described here.*

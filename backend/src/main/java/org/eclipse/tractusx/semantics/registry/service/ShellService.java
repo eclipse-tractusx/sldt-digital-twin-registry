@@ -234,7 +234,13 @@ public class ShellService {
     public List<String> findExternalShellIdsByIdentifiersByAnyMatch(Set<ShellIdentifier> shellIdentifiers,String externalSubjectId) {
         List<String> keyValueCombinations=shellIdentifiers.stream().map( shellIdentifier -> shellIdentifier.getKey()+shellIdentifier.getValue()).toList();
 
-        return shellRepository.findExternalShellIdsByIdentifiersByAnyMatch(keyValueCombinations,externalSubjectId , owningTenantId);
+        return shellRepository.findExternalShellIdsByIdentifiersByAnyMatch(
+              keyValueCombinations,
+              externalSubjectId,
+              externalSubjectIdWildcardPrefix,
+              externalSubjectIdWildcardAllowedTypes,
+              owningTenantId,
+              ShellIdentifier.GLOBAL_ASSET_ID_KEY);
     }
 
     // Not used in AAS3

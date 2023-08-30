@@ -573,8 +573,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     .andExpect(status().isCreated());
         }
 
-       //TODO: Test will be ignored, because the new api does not provided batch, fetch and query. This will be come later in version 0.3.1
-       //@Test
+       @Test
         public void testRbacForFindShellsWithAnyMatch() throws Exception {
             JsonNode anyMatchLookupPayload = mapper.createObjectNode().set("query", mapper.createObjectNode()
                     .set("assetIds", emptyArrayNode().add(specificAssetId("abc", "123")))
