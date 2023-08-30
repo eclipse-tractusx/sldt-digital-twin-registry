@@ -176,13 +176,14 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
      * Since /query is not part of AAS 3.0, so this method is not used.
      * Keeping it for the reason that it might come up in next version.
      */
+    @Deprecated
     public ResponseEntity<List<String>> postQueryAllAssetAdministrationShellIds(ShellLookup shellLookup,@RequestHeader String externalSubjectId) {
         List<SpecificAssetId> assetIds = shellLookup.getQuery().getAssetIds();
         List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByAnyMatch(shellMapper.fromApiDto(assetIds),getExternalSubjectIdOrEmpty(externalSubjectId));
         return new ResponseEntity<>(externalIds, HttpStatus.OK);
     }
 
-        private String getExternalSubjectIdOrEmpty(String externalSubjectId) {
+    private String getExternalSubjectIdOrEmpty(String externalSubjectId) {
             return (null ==externalSubjectId) ? "" : externalSubjectId;
         }
 
@@ -194,6 +195,5 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
             throw new IllegalArgumentException("Incorrect Base64 encoded value provided as parameter");
         }
     }
-
     }
 
