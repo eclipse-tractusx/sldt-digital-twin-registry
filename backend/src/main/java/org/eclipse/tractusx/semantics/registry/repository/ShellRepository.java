@@ -53,13 +53,11 @@ public interface ShellRepository extends PagingAndSortingRepository<Shell, UUID>
      * @return external shell ids for the given key value combinations
      */
     @Query(
-            "select s.id_external from shell s where s.id in (" +
-                    "select si.fk_shell_id from shell_identifier si " +
+            "select s.id_external from shell s join shell_identifier si on s.id = si.fk_shell_id " +
                     "where concat(si.namespace,si.identifier) in (:keyValueCombinations) " +
-                    "AND ((si.external_subject_id is not null and si.external_subject_id = :tenantId) or :tenantId = s.tenant_id) " +
-                    "group by si.fk_shell_id " +
-                    "having count(*) = :keyValueCombinationsSize " +
-            ")"
+                    "AND ((si.external_subject_id is not null and si.external_subject_id = :tenantId) " +
+                    "or :tenantId = s.tenant_id) " +
+                    "group by s.id_external having count(*) = :keyValueCombinationsSize"
     )
     List<String> findExternalShellIdsByIdentifiersByExactMatch(@Param("keyValueCombinations") List<String>  keyValueCombinations,
                                                    @Param("keyValueCombinationsSize") int keyValueCombinationsSize,
