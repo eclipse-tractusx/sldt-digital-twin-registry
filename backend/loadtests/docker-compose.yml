@@ -33,7 +33,7 @@ services:
       - ./postgres-data:/var/lib/postgresql/data
 
   aas_registry:
-    image: catenaxacr.azurecr.io/semantics/registryint:latest
+    image: tractusx/sldt-digital-twin-registry:latest
     # build image locally with `docker build -f ./registry -t registry:latest .`
     # and comment below in to test against local instance.
     #image: registry:latest
@@ -54,10 +54,10 @@ services:
     image: locustio/locust:2.8.2
     container_name: locust_master
     ports:
-      - "8089:8089"
+      - "8090:8089"
     volumes:
       - ./locust:/mnt/locust/
-    command: -f /mnt/locust/locustfile.py --master -H http://host.docker.internal:4242
+    command: -f /mnt/locust/locustfile.py --master -H http://host.docker.internal:4243
 
   locust_worker:
     image: locustio/locust:2.8.2
