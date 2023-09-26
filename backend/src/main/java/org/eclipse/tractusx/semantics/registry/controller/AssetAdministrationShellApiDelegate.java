@@ -21,6 +21,7 @@ package org.eclipse.tractusx.semantics.registry.controller;
 
 import java.util.*;
 
+import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.aas.registry.api.DescriptionApiDelegate;
 import org.eclipse.tractusx.semantics.aas.registry.api.LookupApiDelegate;
 import org.eclipse.tractusx.semantics.aas.registry.api.ShellDescriptorsApiDelegate;
@@ -48,7 +49,7 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
 
     public AssetAdministrationShellApiDelegate(final ShellService shellService,
                                                final ShellMapper shellMapper,
-                                               final SubmodelMapper submodelMapper) {
+                                               final SubmodelMapper submodelMapper ) {
         this.shellService = shellService;
         this.shellMapper = shellMapper;
         this.submodelMapper = submodelMapper;
@@ -61,9 +62,9 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
 
     @Override
     public ResponseEntity<ServiceDescription> getDescription() {
+
         ServiceDescription serviceDescription = new ServiceDescription();
-        serviceDescription.setProfiles( List.of( ServiceDescription.ProfilesEnum.ASSETADMINISTRATIONSHELLREPOSITORYSERVICESPECIFICATION_V3_0_MINIMALPROFILE, 
-              ServiceDescription.ProfilesEnum.REGISTRYSERVICESPECIFICATION_V3_0) );
+        serviceDescription.setProfiles( List.of( ServiceDescription.ProfilesEnum.ASSETADMINISTRATIONSHELLREGISTRYSERVICESPECIFICATION_SSP_001, ServiceDescription.ProfilesEnum.DISCOVERYSERVICESPECIFICATION_SSP_001) );
         return  new ResponseEntity<>( serviceDescription, HttpStatus.OK );
     }
 
