@@ -1243,4 +1243,55 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                 .andExpect(jsonPath("$.specificAssetIds[*]").exists());
        }
    }
+   @Nested
+   @DisplayName( "Description Authentication Tests" )
+   class DescriptionApiTest {
+
+      @Test
+      public void testGetDescriptionOnlyDeleteRoleExpectForbidden() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( "/api/v3.0/description" )
+                           .accept( MediaType.APPLICATION_JSON )
+                           .with( jwtTokenFactory.deleteTwin() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect(status().isForbidden());
+      }
+
+      @Test
+      public void testGetDescriptionNoRoleExpectForbidden() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( "/api/v3.0/description" )
+                           .accept( MediaType.APPLICATION_JSON )
+                           .with( jwtTokenFactory.withoutRoles() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect(status().isForbidden());
+      }
+
+      @Test
+      public void testGetDescriptionReadRoleExpectSuccess() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( "/api/v3.0/description" )
+                           .accept( MediaType.APPLICATION_JSON )
+                           .with( jwtTokenFactory.readTwin() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect(status().isOk());
+      }
+
+      @Test
+      public void testGetDescriptionReadRoleExpectUnauthorized() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( "/api/v3.0/description" )
+                           .accept( MediaType.APPLICATION_JSON )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect(status().isUnauthorized());
+      }
+   }
 }

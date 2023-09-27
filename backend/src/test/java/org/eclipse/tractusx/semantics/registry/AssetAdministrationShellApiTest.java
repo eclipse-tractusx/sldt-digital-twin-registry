@@ -992,4 +992,20 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
       }
    }
 
+   @Nested
+   @DisplayName( "Description Tests" )
+   class DescriptionApiTest {
+      @Test
+      public void testGetDescriptionExpectSuccess() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( "/api/v3.0/description" )
+                           .accept( MediaType.APPLICATION_JSON )
+                           .with( jwtTokenFactory.allRoles() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isOk() )
+               .andExpect( jsonPath( "$.profiles[0]", is( "https://admin-shell.io/aas/API/3/0/AssetAdministrationShellRegistryServiceSpecification/SSP-001" ) ) );
+      }
+   }
 }

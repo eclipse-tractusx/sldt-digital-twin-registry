@@ -64,6 +64,9 @@ public class OAuthSecurityConfig {
                     .requestMatchers( HttpMethod.POST, "/**/lookup/**" ).access( "@authorizationEvaluator.hasRoleAddDigitalTwin()" )
                     .requestMatchers( HttpMethod.PUT, "/**/lookup/**" ).access( "@authorizationEvaluator.hasRoleUpdateDigitalTwin()" )
                     .requestMatchers( HttpMethod.DELETE, "/**/lookup/**" ).access( "@authorizationEvaluator.hasRoleDeleteDigitalTwin()" )
+
+                    //getDescription allowed for reader
+                    .requestMatchers( HttpMethod.GET, "/**/description" ).access( "@authorizationEvaluator.hasRoleViewDigitalTwin()" )
               )
               .csrf().disable()
               .sessionManagement().sessionCreationPolicy( SessionCreationPolicy.STATELESS )
