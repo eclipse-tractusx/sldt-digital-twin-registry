@@ -49,7 +49,7 @@ The `docker-compose.yml` all relevant services to execute the load test.
    3. In the opened form enter the following:
          - Number of users = 100 (=> 10 req/s)
          - Spawn rate      = 5
-         - Host            = http://host.docker.internal:4242
+         - Host            = http://host.docker.internal:4243
    4. Press Start. Locust will now execute the load test as long as you wish.
    5. You can stop the test at anytime through the UI and grab the statistics.
 
@@ -60,4 +60,4 @@ The steps for local development of the load tests are:
    1. Ensure python3 is installed
    2. Run `pip3 install -r requirements.txt`
    3. Modify the script
-   4. Run `locust -f ./locust/locustfile.py --headless --users 1 --spawn-rate 1 -H http://host.docker.internal:4242`
+   4. Run `locust -f ./locust/locustfile.py --headless --users 1 --spawn-rate 1 -H http://host.docker.internal:4243`
