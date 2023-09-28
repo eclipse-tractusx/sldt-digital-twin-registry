@@ -73,15 +73,13 @@ public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecific
      * @param keyValueCombinationsSize the size of the key value combinations
      * @return external shell ids for the given key value combinations
      */
-    @Query( value = "select s.id_external from shell s where s.id in (" +
-          "select si.fk_shell_id from shell_identifier si " +
-          "where concat(si.namespace,si.identifier) in (:keyValueCombinations) " +
-          "and (:tenantId = :owningTenantId or si.namespace= :globalAssetId or exists (" +
-                "Select sider.ref_key_value from SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY sider where (sider.ref_key_value = :tenantId or (sider.ref_key_value = :publicWildcardPrefix and si.namespace in (:publicWildcardAllowedTypes) )) and sider.FK_SI_EXTERNAL_SUBJECT_REFERENCE_ID="+
-          "(select sies.id from SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE sies where sies.FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID=si.id)"+
-          ")) group by si.fk_shell_id " +
-          "having count(*) = :keyValueCombinationsSize " +
-           ")",nativeQuery = true )
+    @Query( value = "SELECT s.id_external FROM shell s JOIN shell_identifier si ON s.id = si.fk_shell_id  " +
+          " WHERE CONCAT(si.namespace, si.identifier) IN (:keyValueCombinations) AND (:tenantId = :owningTenantId OR si.namespace = :globalAssetId   " +
+          " OR EXISTS ( SELECT 1 FROM SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY sider JOIN SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE sies ON sider.FK_SI_EXTERNAL_SUBJECT_REFERENCE_ID = sies.id " +
+          " WHERE ( sider.ref_key_value = :tenantId OR (sider.ref_key_value = :publicWildcardPrefix AND si.namespace IN (:publicWildcardAllowedTypes))) " +
+          "AND sies.FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID = si.id  ) ) "+
+          "GROUP BY s.id_external HAVING COUNT(*) = :keyValueCombinationsSize"
+          ,nativeQuery = true )
     List<String> findExternalShellIdsByIdentifiersByExactMatch(@Param("keyValueCombinations") List<String> keyValueCombinations,
                                                    @Param("keyValueCombinationsSize") int keyValueCombinationsSize,
                                                    @Param("tenantId") String tenantId,
