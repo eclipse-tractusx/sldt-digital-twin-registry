@@ -63,6 +63,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class ShellService {
 
+    private final String AN_ASSET_ADMINISTRATION_SUBMODEL_FOR_THE_GIVEN_IDENTIFICATION_DOES_ALREADY_EXISTS = "An AssetAdministrationSubmodel for the given identification does already exists.";
+
     private final ShellRepository shellRepository;
     private final ShellIdentifierRepository shellIdentifierRepository;
     private final SubmodelRepository submodelRepository;
@@ -122,7 +124,7 @@ public class ShellService {
             .toList();
 
       Optional.of( idShortList ).filter( idShorts -> idShortList.stream().distinct().count() == idShorts.size() ) // checking for duplicate idShort
-            .orElseThrow( () -> new DuplicateKeyException( "An AssetAdministrationSubmodel for the given identification does already exists." ) );
+            .orElseThrow( () -> new DuplicateKeyException( AN_ASSET_ADMINISTRATION_SUBMODEL_FOR_THE_GIVEN_IDENTIFICATION_DOES_ALREADY_EXISTS ) );
    }
 
    public void mapShellCollection(Shell shell){
@@ -359,7 +361,7 @@ public class ShellService {
 
       Optional.of( isIdShortPresent ).filter( BooleanUtils::isFalse )
             .orElseThrow( () -> new DuplicateKeyException(
-                  "An AssetAdministrationSubmodel for the given identification does already exists." ) );// Throw exception if sub-model.idShort exists in DB
+                  AN_ASSET_ADMINISTRATION_SUBMODEL_FOR_THE_GIVEN_IDENTIFICATION_DOES_ALREADY_EXISTS ) );// Throw exception if sub-model.idShort exists in DB
 
 
       return saveSubmodel( submodel );
@@ -367,7 +369,7 @@ public class ShellService {
 
    public Submodel saveSubmodel(Submodel submodel){
       if(submodelRepository.findByShellIdAndIdExternal(submodel.getShellId(),submodel.getIdExternal()).isPresent()){
-         throw new DuplicateKeyException("An AssetAdministrationSubmodel for the given identification does already exists."  );
+         throw new DuplicateKeyException( AN_ASSET_ADMINISTRATION_SUBMODEL_FOR_THE_GIVEN_IDENTIFICATION_DOES_ALREADY_EXISTS );
       }
       return submodelRepository.save( submodel );
    }
