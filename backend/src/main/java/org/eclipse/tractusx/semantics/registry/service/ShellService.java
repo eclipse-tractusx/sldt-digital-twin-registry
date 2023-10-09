@@ -63,7 +63,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class ShellService {
 
-    private final String AN_ASSET_ADMINISTRATION_SUBMODEL_FOR_THE_GIVEN_IDENTIFICATION_DOES_ALREADY_EXISTS = "An AssetAdministrationSubmodel for the given identification does already exists.";
+    public static final String DUPLICATE_SUBMODEL_EXCEPTION = "An AssetAdministrationSubmodel for the given identification does already exists.";
 
     private final ShellRepository shellRepository;
     private final ShellIdentifierRepository shellIdentifierRepository;
@@ -124,7 +124,7 @@ public class ShellService {
             .toList();
 
       Optional.of( idShortList ).filter( idShorts -> idShortList.stream().distinct().count() == idShorts.size() ) // checking for duplicate idShort
-            .orElseThrow( () -> new DuplicateKeyException( AN_ASSET_ADMINISTRATION_SUBMODEL_FOR_THE_GIVEN_IDENTIFICATION_DOES_ALREADY_EXISTS ) );
+            .orElseThrow( () -> new DuplicateKeyException( DUPLICATE_SUBMODEL_EXCEPTION ) );
    }
 
    public void mapShellCollection(Shell shell){
@@ -361,7 +361,7 @@ public class ShellService {
 
       Optional.of( isIdShortPresent ).filter( BooleanUtils::isFalse )
             .orElseThrow( () -> new DuplicateKeyException(
-                  AN_ASSET_ADMINISTRATION_SUBMODEL_FOR_THE_GIVEN_IDENTIFICATION_DOES_ALREADY_EXISTS ) );// Throw exception if sub-model.idShort exists in DB
+                  DUPLICATE_SUBMODEL_EXCEPTION ) );// Throw exception if sub-model.idShort exists in DB
 
 
       return saveSubmodel( submodel );
@@ -369,7 +369,7 @@ public class ShellService {
 
    public Submodel saveSubmodel(Submodel submodel){
       if(submodelRepository.findByShellIdAndIdExternal(submodel.getShellId(),submodel.getIdExternal()).isPresent()){
-         throw new DuplicateKeyException( AN_ASSET_ADMINISTRATION_SUBMODEL_FOR_THE_GIVEN_IDENTIFICATION_DOES_ALREADY_EXISTS );
+         throw new DuplicateKeyException( DUPLICATE_SUBMODEL_EXCEPTION );
       }
       return submodelRepository.save( submodel );
    }
