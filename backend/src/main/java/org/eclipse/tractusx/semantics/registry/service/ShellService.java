@@ -123,8 +123,13 @@ public class ShellService {
             .map( String::toLowerCase )
             .toList();
 
-      Optional.of( idShortList ).filter( idShorts -> idShortList.stream().distinct().count() == idShorts.size() ) // checking for duplicate idShort
-            .orElseThrow( () -> new DuplicateKeyException( DUPLICATE_SUBMODEL_EXCEPTION ) );
+      boolean isDuplicateIdShortPresent = Optional.of( idShortList ).filter( idShorts -> idShortList.stream().distinct().count() != idShorts.size() )
+            .isPresent();
+
+      if ( isDuplicateIdShortPresent ) {
+         throw new DuplicateKeyException( DUPLICATE_SUBMODEL_EXCEPTION );
+      }
+
    }
 
    public void mapShellCollection(Shell shell){
@@ -359,11 +364,9 @@ public class ShellService {
             .anyMatch(
                   idShort -> idShort.toLowerCase().equals( submodel.getIdShort().toLowerCase() ) ); // check whether the input sub-model.idShort exists in DB
 
-      Optional.of( isIdShortPresent ).filter( BooleanUtils::isFalse )
-            .orElseThrow( () -> new DuplicateKeyException(
-                  DUPLICATE_SUBMODEL_EXCEPTION ) );// Throw exception if sub-model.idShort exists in DB
-
-
+      if(isIdShortPresent){// Throw exception if sub-model.idShort exists in DB
+         throw new DuplicateKeyException(DUPLICATE_SUBMODEL_EXCEPTION);
+      }
       return saveSubmodel( submodel );
    }
 
