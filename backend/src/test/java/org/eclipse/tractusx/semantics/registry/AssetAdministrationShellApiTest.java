@@ -58,6 +58,27 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
       }
 
       @Test
+      public void testCreateShellExpectRegexError() throws Exception {
+         AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+         shellPayload.setId( UUID.randomUUID().toString() );
+
+         //set assetType wrong value according to regex pattern
+         shellPayload.setAssetType( "AssetType \u0000" );
+
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .post(SHELL_BASE_PATH)
+                           .accept(MediaType.APPLICATION_JSON)
+                           .contentType(MediaType.APPLICATION_JSON)
+                           .content(mapper.writeValueAsString( shellPayload ))
+                           .with(jwtTokenFactory.allRoles())
+               )
+               .andDo(MockMvcResultHandlers.print())
+               .andExpect(status().isBadRequest())
+               .andExpect( jsonPath( "$.messages[0].text", is( "must match \"^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\x{00010000}-\\x{0010FFFF}]*$\"" ) ) );
+      }
+
+      @Test
       public void testCreateShellWithExistingIdExpectBadRequest() throws Exception {
          AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
          shellPayload.setId( UUID.randomUUID().toString() );
