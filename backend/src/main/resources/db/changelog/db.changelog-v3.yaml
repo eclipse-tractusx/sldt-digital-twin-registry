@@ -91,6 +91,10 @@ databaseChangeLog:
             tableName: SUBMODEL_ENDPOINT
             columnName: SUB_PROTOCOL_BODY_ENCODING
             newDataType: NVARCHAR(128)
+  - changeSet:
+      id: 28092023-01
+      author: shijin
+      changes:
         - createIndex:
             indexName: SHELL_ID_EXTERNAL_IX01
             tableName: SHELL
