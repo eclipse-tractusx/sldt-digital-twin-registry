@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## fixed
 - Performance improvements in the look-up API - GET /lookup/shells.
-
+- Implemented the regex patterns for various fields. 
 
 ## 0.3.16-M1
 ### Added
