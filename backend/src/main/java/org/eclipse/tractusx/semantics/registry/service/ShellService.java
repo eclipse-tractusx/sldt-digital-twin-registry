@@ -65,6 +65,8 @@ public class ShellService {
 
     public static final String DUPLICATE_SUBMODEL_EXCEPTION = "An AssetAdministrationSubmodel for the given identification does already exists.";
 
+   public static final String DUPLICATE_SUBMODEL_ID_SHORT_EXCEPTION = "An AssetAdministration Submodel for the given IdShort does already exists.";
+
     private final ShellRepository shellRepository;
     private final ShellIdentifierRepository shellIdentifierRepository;
     private final SubmodelRepository submodelRepository;
@@ -127,7 +129,7 @@ public class ShellService {
             .isPresent();
 
       if ( isDuplicateIdShortPresent ) {
-         throw new DuplicateKeyException( DUPLICATE_SUBMODEL_EXCEPTION );
+         throw new DuplicateKeyException( DUPLICATE_SUBMODEL_ID_SHORT_EXCEPTION );
       }
 
    }
@@ -365,7 +367,7 @@ public class ShellService {
                   idShort -> idShort.toLowerCase().equals( submodel.getIdShort().toLowerCase() ) ); // check whether the input sub-model.idShort exists in DB
 
       if(isIdShortPresent){// Throw exception if sub-model.idShort exists in DB
-         throw new DuplicateKeyException(DUPLICATE_SUBMODEL_EXCEPTION);
+         throw new DuplicateKeyException(DUPLICATE_SUBMODEL_ID_SHORT_EXCEPTION);
       }
       return saveSubmodel( submodel );
    }

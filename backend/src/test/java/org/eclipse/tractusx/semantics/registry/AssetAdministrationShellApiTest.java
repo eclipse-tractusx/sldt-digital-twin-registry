@@ -31,6 +31,7 @@ import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShel
 import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
 import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
+import org.eclipse.tractusx.semantics.registry.service.ShellService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -490,7 +491,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                )
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isBadRequest() )
-               .andExpect( jsonPath( "$.messages[0].text", is( "A SubmodelDescriptor with the given identification does already exists." ) ) );
+               .andExpect( jsonPath( "$.messages[0].text", is( ShellService.DUPLICATE_SUBMODEL_ID_SHORT_EXCEPTION ) ) );
       }
 
       @Test
@@ -1095,7 +1096,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
             )
             .andDo( MockMvcResultHandlers.print() )
             .andExpect( status().isBadRequest() )
-            .andExpect( jsonPath( "$.messages[0].text", is( "A SubmodelDescriptor with the given identification does already exists." ) ) );
+            .andExpect( jsonPath( "$.messages[0].text", is( ShellService.DUPLICATE_SUBMODEL_ID_SHORT_EXCEPTION ) ) );
    }
 
    @Test
@@ -1144,7 +1145,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
             )
             .andDo( MockMvcResultHandlers.print() )
             .andExpect( status().isBadRequest() )
-            .andExpect( jsonPath( "$.messages[0].text", is( "A SubmodelDescriptor with the given identification does already exists." ) ) );
+            .andExpect( jsonPath( "$.messages[0].text", is( ShellService.DUPLICATE_SUBMODEL_ID_SHORT_EXCEPTION ) ) );
    }
 
 }
