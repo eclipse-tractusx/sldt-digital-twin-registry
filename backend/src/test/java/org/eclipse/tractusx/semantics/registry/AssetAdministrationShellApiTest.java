@@ -1067,7 +1067,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
             )
             .andDo( MockMvcResultHandlers.print() )
             .andExpect( status().isBadRequest() )
-            .andExpect( jsonPath( "$.messages[0].text", is( "An AssetAdministrationShell for the given identification does already exists." ) ) );
+            .andExpect( jsonPath( "$.messages[0].text", is( "An AssetAdministrationShell for the given IdShort already exists." ) ) );
    }
 
    @Test

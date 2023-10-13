@@ -19,10 +19,9 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model.support;
 
-import org.springframework.dao.DuplicateKeyException;
-
-import java.util.Locale;
 import java.util.regex.Pattern;
+
+import org.springframework.dao.DuplicateKeyException;
 
 public class DatabaseExceptionTranslation {
 
@@ -38,6 +37,10 @@ public class DatabaseExceptionTranslation {
         }
 
         String upperCaseMessage=message.toUpperCase();
+
+        if(message.contains( "IdShort")){
+            return message;
+        }
 
         if(SUBMODEL.matcher(upperCaseMessage).find()) {
             return "A SubmodelDescriptor with the given identification does already exists.";
