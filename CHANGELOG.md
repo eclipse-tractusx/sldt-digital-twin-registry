@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## fixed
 - Performance improvements in the look-up API - GET /lookup/shells.
 - Implemented the regex patterns for various fields. 
+- IdShort is unique on shell level. Idshort can be exists only one time in the database (tenant).IdShort of submodelDescriptor is unique inside a shell. Uniqueness on shellId and idShort and Idshort of submodelDescriptors are unique.
 
 ## 0.3.16-M1
 ### Added

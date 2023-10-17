@@ -35,7 +35,9 @@ import java.util.*;
 @Repository
 public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecificationExecutor<Shell> {
    Optional<Shell> findByIdExternal( @Param( "idExternal" ) String idExternal);
-   
+
+   boolean existsByIdShort(@Param( "idShort" ) String idShort);
+
    @Query( value = "select * from shell s " +
          "where s.id_external = :idExternal and (" +
          ":tenantId = :owningTenantId " +
