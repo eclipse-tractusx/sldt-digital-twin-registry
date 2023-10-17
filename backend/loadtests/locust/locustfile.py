@@ -1,6 +1,6 @@
 ###############################################################
-# Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
-# Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+# Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
+# Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -21,6 +21,7 @@
 import json
 import uuid
 import urllib.parse
+import base64
 
 
 from locust import HttpUser, task, constant_throughput
@@ -35,22 +36,23 @@ class AasRegistryTask(HttpUser):
     @task
     def createAndQueryAasDescriptor(self):
         shell = generate_shell()
-        headers = { 'Content-Type' : 'application/json'}
-        with self.client.post("/registry/shell-descriptors", data=json.dumps(shell), headers= headers, catch_response=True) as response:
+        headers = { 'Content-Type' : 'application/json', 'Edc-Bpn' : 'BPN_COMPANY_1'}
+        with self.client.post("/api/v3.0/shell-descriptors", data=json.dumps(shell), headers= headers, catch_response=True) as response:
             if response.status_code != 201:
                 response.failure(f"Expected 201 but status code was {response.status_code}")
                 raise RescheduleTask()
-        
-        shell_id = shell['identification']
 
-        with self.client.get(f"/registry/shell-descriptors/{shell_id}", name = "/registry/shell-descriptors/{id}", catch_response=True) as response:
+        shell_id = shell['id']
+        shell_id_encoded = str(base64.urlsafe_b64encode(shell_id.encode("utf-8")), "utf-8")
+
+        with self.client.get(f"/api/v3.0/shell-descriptors/{shell_id_encoded}", name = "/api/v3.0/shell-descriptors/{id}", headers= headers, catch_response=True) as response:
             if response.status_code != 200:
                 response.failure(f"Expected 200 but status code was {response.status_code}")
                 raise RescheduleTask()
 
         specificAssetIds = shell['specificAssetIds']
         decodedAssetIds = urllib.parse.quote_plus(json.dumps(specificAssetIds))
-        with self.client.get(f"/lookup/shells?assetIds={decodedAssetIds}", name = "/lookup/shells?assetIds={assetIds}", catch_response=True) as response:
+        with self.client.get(f"/api/v3.0/lookup/shells?assetIds={decodedAssetIds}", name = "/api/v3.0/lookup/shells?assetIds={assetIds}", headers= headers, catch_response=True) as response:
             if response.status_code != 200:
                 response.failure(f"Expected 200 but status code was {response.status_code}")
                 raise RescheduleTask()
@@ -60,80 +62,164 @@ def generate_shell():
     globalAssetId = uuid.uuid4()
     specificAssetId1 = uuid.uuid4()
     specificAssetId2 = uuid.uuid4()
+    specificAssetId3 = uuid.uuid4()
+    specificAssetId4 = uuid.uuid4()
+    submodelId1 = uuid.uuid4()
+    submodelId2 = uuid.uuid4()
     return {
-              "description": [
-                {
-                  "language": "en",
-                  "text": "The shell for a vehicle"
-                }
+             "idShort": "idShortExample",
+             "id": str(aasId),
+             "description": [
+               {
+                 "language": "de",
+                 "text": "example text"
+               }
+             ],
+             "displayName": [
+               {
+                 "language": "de",
+                 "text": "this is an example description1"
+               }
+             ],
+             "specificAssetIds":[
+                 {
+                    "name":"assetLifecyclePhase",
+                    "value":str(specificAssetId1),
+                    "externalSubjectId":{
+                       "type":"ExternalReference",
+                       "keys":[
+                          {
+                             "type":"Submodel",
+                             "value":"PUBLIC_READABLE"
+                          }
+                       ]
+                    }
+                 },
+                 {
+                    "name":"CustomerPartId",
+                    "value":str(specificAssetId3),
+                    "externalSubjectId":{
+                       "type":"ExternalReference",
+                       "keys":[
+                          {
+                             "type":"Submodel",
+                             "value":"BPN_COMPANY_1"
+                          }
+                       ]
+                    }
+                 },
+                 {
+                    "name":"Serialnr",
+                    "value":str(specificAssetId4),
+                    "externalSubjectId":{
+                       "type":"ExternalReference",
+                       "keys":[
+                          {
+                             "type":"Submodel",
+                             "value":"BPN_COMPANY_1"
+                          },
+                          {
+                             "type":"Submodel",
+                             "value":"BPN_COMPANY_2"
+                          },
+                          {
+                             "type":"Submodel",
+                             "value":"BPN_COMPANY_3"
+                          }
+                       ]
+                    }
+                 }
               ],
-              "globalAssetId": {
-                "value": [
-                    str(globalAssetId)
-                ]
-              },
-              "idShort": "future concept x",
-              "identification": str(aasId),
-              "specificAssetIds": [
-                {
-                  "key": "MaterialId",
-                  "value": str(specificAssetId1)
-                },
-                {
-                  "key": "PartId",
-                  "value": str(specificAssetId2)
-                }
-              ],
-              "submodelDescriptors": [
-                {
-                  "description": [
-                    {
-                      "language": "en",
-                      "text": "Provides base vehicle information"
-                    }
-                  ],
-                  "idShort": "vehicle base details",
-                  "identification": "4a738a24-b7d8-4989-9cd6-387772f40565",
-                  "semanticId": {
-                    "value": [
-                        "urn:bamm:com.catenax.vehicle:0.1.1"
-                    ]
-                  },
-                  "endpoints": [
-                    {
-                      "interface": "HTTP",
-                      "protocolInformation": {
-                        "endpointAddress": "https://catena-x.net/vehicle/basedetails/",
-                        "endpointProtocol": "HTTPS",
-                        "endpointProtocolVersion": "1.0"
-                      }
-                    }
-                  ]
-                },
-                {
-                  "description": [
-                    {
-                      "language": "en",
-                      "text": "Provides base vehicle information"
-                    }
-                  ],
-                  "idShort": "vehicle part details",
-                  "identification": "dae4d249-6d66-4818-b576-bf52f3b9ae90",
-                  "semanticId": {
-                    "value": [
-                        "urn:bamm:com.catenax.vehicle:0.1.1#PartDetails"
-                    ]
-                  },
-                  "endpoints": [
-                    {
-                      "interface": "HTTP",
-                      "protocolInformation": {
-                        "endpointAddress": "https://catena-x.net/vehicle/partdetails/",
-                        "endpointProtocol": "HTTPS",
-                        "endpointProtocolVersion": "1.0"
-                      }
-                    }
-                  ]
-                }
-              ]
-        }
+             "submodelDescriptors": [
+               {
+                 "id": str(submodelId1),
+                 "endpoints": [
+                   {
+                     "interface": "interfaceNameExample",
+                     "protocolInformation": {
+                       "href": "endpointAddressExample",
+                       "endpointProtocol": "endpointProtocolExample",
+                       "endpointProtocolVersion": [
+                         "e"
+                       ],
+                       "subprotocol": "5hg",
+                       "subprotocolBody":"",
+                       "subprotocolBodyEncoding": "subprotocolBodyExample",
+                       "securityAttributes": [
+                         {
+                           "type": "NONE",
+                           "key": "sec",
+                           "value": "1"
+                         }
+                       ]
+                     }
+                   }
+                 ],
+                 "idShort": "idShortExample",
+                 "semanticId": {
+                   "type": "ExternalReference",
+                   "keys": [
+                     {
+                       "type": "Submodel",
+                       "value": "urn:bamm:io.catenax.serial_part_typization:1.1.0#SerialPartTypization"
+                     }
+                   ]
+                 },
+                 "description": [
+                   {
+                     "language": "de",
+                     "text": "hello text"
+                   },
+                   {
+                     "language": "en",
+                     "text": "hello s"
+                   }
+                 ]
+               },
+               {
+                 "id": str(submodelId2),
+                 "endpoints": [
+                   {
+                     "interface": "interfaceNameExample",
+                     "protocolInformation": {
+                       "href": "endpointAddressExample",
+                       "endpointProtocol": "endpointProtocolExample",
+                       "endpointProtocolVersion": [
+                         "e"
+                       ],
+                       "subprotocol": "5hg",
+                       "subprotocolBody":"",
+                       "subprotocolBodyEncoding": "subprotocolBodyExample",
+                       "securityAttributes": [
+                         {
+                           "type": "NONE",
+                           "key": "sec",
+                           "value": "1"
+                         }
+                       ]
+                     }
+                   }
+                 ],
+                 "idShort": "idShortExample",
+                 "semanticId": {
+                   "type": "ExternalReference",
+                   "keys": [
+                     {
+                       "type": "Submodel",
+                       "value": "urn:bamm:io.catenax.serial_part_typization:1.1.0#SerialPartTypization"
+                     }
+                   ]
+                 },
+                 "description": [
+                   {
+                     "language": "de",
+                     "text": "hello text"
+                   },
+                   {
+                     "language": "en",
+                     "text": "hello s"
+                   }
+                 ]
+               }
+             ]
+           }
