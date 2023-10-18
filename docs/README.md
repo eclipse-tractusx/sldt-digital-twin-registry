@@ -614,7 +614,7 @@ of this *Digital Twin*.
 
 ## Security Assessment
 
-Data Flow Diagram:
+Data flow diagram:
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear"} }}%%
@@ -638,7 +638,7 @@ graph TB
     end
 
     CD <-->|X-API auth key \n return twin| CE
-    CE <-->|EDC flow \n certificate base auth \n provide role| PE
+    CE <-->|EDC flow \n certificate based auth \n provide role| PE
 
     PE -->|Get token| IDM
     DP -->|Get token| IDM
