@@ -76,6 +76,19 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
+            <exclusions>
+                <!--Fixed CVE-2023-36478 | CWE-190 and CVE-2023-40167| CWE-130 Third-Party Components vulnerability-->
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-http</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--Fixed CVE-2023-36478 | CWE-190 and CVE-2023-40167| CWE-130 Third-Party Components vulnerability-->
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-http</artifactId>
+            <version>12.0.1</version>
         </dependency>
         <dependency>
             <groupId>jakarta.validation</groupId>
