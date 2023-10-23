@@ -19,7 +19,9 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.controller;
 
+import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.eclipse.tractusx.semantics.aas.registry.api.DescriptionApiDelegate;
 import org.eclipse.tractusx.semantics.aas.registry.api.LookupApiDelegate;
@@ -38,6 +40,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.context.request.NativeWebRequest;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class AssetAdministrationShellApiDelegate implements DescriptionApiDelegate, ShellDescriptorsApiDelegate, LookupApiDelegate {
@@ -149,13 +154,27 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
 
     @Override
-    public ResponseEntity<GetAllAssetAdministrationShellIdsByAssetLink200Response> getAllAssetAdministrationShellIdsByAssetLink(List<SpecificAssetId> assetIds,
+    public ResponseEntity<GetAllAssetAdministrationShellIdsByAssetLink200Response> getAllAssetAdministrationShellIdsByAssetLink(List<byte[]> assetIds,
     Integer limit, String cursor, @RequestHeader String externalSubjectId) {
         if (assetIds == null || assetIds.isEmpty()) {
             return new ResponseEntity<>(new GetAllAssetAdministrationShellIdsByAssetLink200Response(), HttpStatus.OK);
         }
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion( JsonInclude.Include.NON_NULL);
+        List<SpecificAssetId> listSpecificAssetId =  assetIds.stream().map( value ->
+        {
+            byte[] decodedBytes = Base64.getUrlDecoder().decode( value );
+            try {
+                SpecificAssetId specificAssetId = mapper.readValue(decodedBytes, SpecificAssetId.class );
+                return specificAssetId;
+            } catch ( IOException e ) {
+                throw new IllegalArgumentException("Incorrect Base64 encoded value provided as parameter");
+            }
+        }
+        ).collect( Collectors.toList());
+
         GetAllAssetAdministrationShellIdsByAssetLink200Response result  =
-              shellService.findExternalShellIdsByIdentifiersByExactMatch(shellMapper.fromApiDto(assetIds), limit, cursor,getExternalSubjectIdOrEmpty(externalSubjectId));
+              shellService.findExternalShellIdsByIdentifiersByExactMatch(shellMapper.fromApiDto(listSpecificAssetId), limit, cursor,getExternalSubjectIdOrEmpty(externalSubjectId));
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
