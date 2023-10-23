@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update PostgreSQL version to 15.4.
 
 ## fixed
-- Fixed Open api specification by adding the context root 
+- Fixed Open api specification by adding the context root.
 
 ## 0.3.17
 ### Added
