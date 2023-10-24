@@ -76,6 +76,8 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
+            <exclusions>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>jakarta.validation</groupId>
