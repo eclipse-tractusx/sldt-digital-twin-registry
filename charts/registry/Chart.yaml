@@ -27,7 +27,7 @@ sources:
 
 type: application
 version: 0.3.26
-appVersion: 0.3.17
+appVersion: 0.3.19
 
 dependencies:
   - repository: https://charts.bitnami.com/bitnami
