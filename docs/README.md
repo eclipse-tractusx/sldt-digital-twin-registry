@@ -612,6 +612,42 @@ of this *Digital Twin*.
 | Trivy      | "Trivy is a simple and comprehensive vulnerability/misconfiguration/secret scanner for containers and other artifacts. Trivy detects vulnerabilities of OS packages and language-specific packages." [Link](https://aquasecurity.github.io/trivy/v0.34/) |
 | SonarCloud | "SonarCloud's static analysis detects Bugs and Code Smells in your repositories and provides the feedback you need to write better code." [Link](https://www.sonarsource.com/products/sonarcloud/)                                                       |
 
+## Security Assessment
+
+Data flow diagram:
+
+```mermaid
+%%{init: {"flowchart": {"curve": "linear"} }}%%
+graph TB
+    CD[Consumer Data]
+    CE[Consumer EDC]
+    PE[Provider EDC]
+    DP[Data Provider]
+    IDM[IDM]
+    DTR-B[DTR Backend]
+    DTR-P[DTR Postgres]
+
+    subgraph Provider Env
+    PE
+    DP
+    IDM
+    subgraph Digital Twin Registry
+        DTR-B
+        DTR-P
+    end
+    end
+
+    CD <-->|X-API auth key \n return twin| CE
+    CE <-->|EDC flow \n certificate based auth \n provide role| PE
+
+    PE -->|Get token| IDM
+    DP -->|Get token| IDM
+    DTR-B -->|Get public key \n token validation| IDM
+
+    PE <-->|Get twin & submodel| DTR-B
+    DP <-->|Register twin & submodel| DTR-B
+    DTR-B <-->|Create twin & submodel| DTR-P
+```
 
 ## Glossary
 
