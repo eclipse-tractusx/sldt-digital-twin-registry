@@ -34,7 +34,7 @@ info:
 security:
   - bearerAuth: []
 servers:
-  - url: "{protocol}://{host_name}:{port}/{context_root}/api/{version_prefix}/"
+  - url: "{protocol}://{host_name}:{port}{context_root}/api/{version_prefix}/"
     variables:
       protocol:
         description: Allows access through http and https (recommended)
@@ -58,9 +58,9 @@ servers:
           - v3.0
       context_root:
         description: Context root for the API
-        default: "dec-registry"
+        default: ""
         enum:
-          - "dec-registry"
+          - "/dec-registry"
 paths:
   /shell-descriptors:
     get:
