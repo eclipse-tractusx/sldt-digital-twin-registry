@@ -59,8 +59,6 @@ servers:
       context_root:
         description: Context root for the API
         default: ""
-        enum:
-          - "/dec-registry"
 paths:
   /shell-descriptors:
     get:
