@@ -41,7 +41,7 @@ stages:
       headers:
         Content-Type: application/json
         Authorization: "Bearer {access_token}"
-        Edc-Bpn: "default-tenant"
+        Edc-Bpn: "{edc_bpn:s}"
     response:
       status_code: 200
       headers:
@@ -65,7 +65,7 @@ stages:
       headers:
         Content-Type: application/json
         Authorization: "Bearer {access_token}"
-        Edc-Bpn: "default-tenant"
+        Edc-Bpn: "{edc_bpn:s}"
       json:
         id: "{decoded_shell_id:s}"
         idShort: twin of a break (Testing)
@@ -73,7 +73,7 @@ stages:
       status_code: 201
       headers:
         content-type: application/json
-    
+
   - name: Get shell descriptor by id
     request:
       url: "{aas_registry_api_url:s}/api/v3.0/shell-descriptors/{encoded_shell_id:s}"
@@ -81,18 +81,18 @@ stages:
       headers:
         Content-Type: application/json
         Authorization: "Bearer {access_token}"
-        Edc-Bpn: "default-tenant"
-      response:
-        status_code: 200
-        headers:
-          content-type: application/json
-        json:
-          description: [ ]
-          displayName: [ ]
-          idShort: twin of a break (Testing)
-          id: "{decoded_shell_id:s}"
-          specificAssetIds: []
-          submodelDescriptors: []
+        Edc-Bpn: "{edc_bpn:s}"
+    response:
+      status_code: 200
+      headers:
+        content-type: application/json
+      json:
+        description: []
+        displayName: []
+        idShort: twin of a break (Testing)
+        id: "{decoded_shell_id:s}"
+        specificAssetIds: []
+        submodelDescriptors: []
 
   - name: Update shell descriptor by id
     request:
@@ -101,12 +101,12 @@ stages:
       headers:
         Content-Type: application/json
         Authorization: "Bearer {access_token}"
-        Edc-Bpn: "default-tenant"
+        Edc-Bpn: "{edc_bpn:s}"
       json:
         id: "{decoded_shell_id:s}"
         idShort: twin of a break (Testing Update)
-      response:
-        status_code: 204
+    response:
+      status_code: 204
 
   - name: Delete shell descriptor by id
     request:
@@ -115,6 +115,6 @@ stages:
       headers:
         Content-Type: application/json
         Authorization: "Bearer {access_token}"
-        Edc-Bpn: "default-tenant"
-      response:
-        status_code: 204
+        Edc-Bpn: "{edc_bpn:s}"
+    response:
+      status_code: 204
