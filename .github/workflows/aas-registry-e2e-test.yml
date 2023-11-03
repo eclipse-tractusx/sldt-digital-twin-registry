@@ -34,6 +34,9 @@ on:
       aasRegistryUrl:
         description: 'AAS-Registry-Url'
         required: true
+      edcBpn:
+        description: 'EDC-BPN'
+        required: true
 
 jobs:
   end_to_end_tests:
@@ -41,12 +44,22 @@ jobs:
     name: Execute End-to-End tests
 
     steps:
+      - name: Mask Input Credentials
+        run: |
+          mask_client_secret=$(jq -r '.inputs.clientSecret' $GITHUB_EVENT_PATH)
+          echo ::add-mask::$mask_client_secret
+          echo mask_client_secret=$mask_client_secret >> $GITHUB_ENV
+          
+          mask_edc_bpn=$(jq -r '.inputs.edcBpn' $GITHUB_EVENT_PATH)
+          echo ::add-mask::$mask_edc_bpn
+          echo mask_edc_bpn=$mask_edc_bpn >> $GITHUB_ENV  
+
       - name: Checkout
         uses: actions/checkout@v3
 
       - uses: actions/setup-python@v4
         with:
-          python-version: "3.9"
+          python-version: "3.8"
           check-latest: true
 
       - name: Install python dependencies
@@ -60,9 +73,10 @@ jobs:
           py.test . -vv --html=./output/report.html --self-contained-html
         env:
           CLIENT_ID: ${{ inputs.clientId }}
-          CLIENT_SECRET: ${{ inputs.clientSecret }}
+          CLIENT_SECRET: ${{ env.mask_client_secret }}
           AUTH_SERVER_TOKEN_URL: ${{ inputs.tokenUrl }}
           AAS_REGISTRY_API_URL: ${{ inputs.aasRegistryUrl }}
+          EDC_BPN: ${{ env.mask_edc_bpn }}
 
       - name: Upload test report
         uses: actions/upload-artifact@v3
