@@ -1,18 +1,3 @@
-package org.eclipse.tractusx.semantics.registry.service;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.eclipse.tractusx.semantics.RegistryProperties;
-import org.eclipse.tractusx.semantics.registry.model.Shell;
-import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
-import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierExternalSubjectReferenceKey;
-import org.springframework.stereotype.Service;
-
-import lombok.extern.slf4j.Slf4j;
-
 /********************************************************************************
  * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
  * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
@@ -32,6 +17,22 @@ import lombok.extern.slf4j.Slf4j;
  *
  * SPDX-License-Identifier: Apache-2.0
  ********************************************************************************/
+
+package org.eclipse.tractusx.semantics.registry.service;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.eclipse.tractusx.semantics.RegistryProperties;
+import org.eclipse.tractusx.semantics.registry.model.Shell;
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierExternalSubjectReferenceKey;
+import org.springframework.stereotype.Service;
+
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 @Service
 public class ShellAccessHandler {
