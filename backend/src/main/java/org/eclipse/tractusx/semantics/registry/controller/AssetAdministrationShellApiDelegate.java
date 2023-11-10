@@ -161,21 +161,24 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
         }
         ObjectMapper mapper = new ObjectMapper();
         mapper.setSerializationInclusion( JsonInclude.Include.NON_NULL);
-        List<SpecificAssetId> listSpecificAssetId =  assetIds.stream().map( value ->
+        List<SpecificAssetId> listSpecificAssetId = getDecodedSpecAssetIds( assetIds, mapper );
+
+        GetAllAssetAdministrationShellIdsByAssetLink200Response result  =
+              shellService.findExternalShellIdsByIdentifiersByExactMatch(shellMapper.fromApiDto(listSpecificAssetId), limit, cursor,getExternalSubjectIdOrEmpty(externalSubjectId));
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    private static List<SpecificAssetId> getDecodedSpecAssetIds( List<byte[]> assetIds, ObjectMapper mapper ) {
+        return assetIds.stream().map( value ->
         {
             byte[] decodedBytes = Base64.getUrlDecoder().decode( value );
             try {
-                SpecificAssetId specificAssetId = mapper.readValue(decodedBytes, SpecificAssetId.class );
-                return specificAssetId;
+                return mapper.readValue(decodedBytes, SpecificAssetId.class );
             } catch ( IOException e ) {
                 throw new IllegalArgumentException("Incorrect Base64 encoded value provided as parameter");
             }
         }
         ).collect( Collectors.toList());
-
-        GetAllAssetAdministrationShellIdsByAssetLink200Response result  =
-              shellService.findExternalShellIdsByIdentifiersByExactMatch(shellMapper.fromApiDto(listSpecificAssetId), limit, cursor,getExternalSubjectIdOrEmpty(externalSubjectId));
-        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @Override
