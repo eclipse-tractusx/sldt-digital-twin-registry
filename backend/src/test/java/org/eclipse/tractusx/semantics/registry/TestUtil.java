@@ -22,11 +22,16 @@ package org.eclipse.tractusx.semantics.registry;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.eclipse.tractusx.semantics.aas.registry.model.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class TestUtil {
 
@@ -246,4 +251,13 @@ public class TestUtil {
     public static String getEncodedValue(String shellId){
        return Base64.getUrlEncoder().encodeToString(shellId.getBytes());
     }
+
+   public static byte[] serialize(Object obj) throws IOException {
+      ByteArrayOutputStream os = new ByteArrayOutputStream();
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.enable( SerializationFeature.INDENT_OUTPUT);
+      mapper.setSerializationInclusion( JsonInclude.Include.NON_NULL);
+      mapper.writeValue(os, obj);
+      return os.toByteArray();
+   }
 }
