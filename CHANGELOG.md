@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.3.19
+### Added
+
+## fixed
+- Fixed CVE-2023-36478 | CWE-190 and CVE-2023-40167| CWE-130 Third-Party Components vulnerability.
+
+## 0.3.18
+### Added
+- Update PostgreSQL version to 15.4.
+
+## fixed
+
+## 0.3.17
+### Added
+
+## fixed
+- Performance improvements in the look-up API - GET /lookup/shells.
+- Implemented the regex patterns for various fields. 
+- IdShort is unique on shell level. Idshort can be exists only one time in the database (tenant).IdShort of submodelDescriptor is unique inside a shell. Uniqueness on shellId and idShort and Idshort of submodelDescriptors are unique.
+
 ## 0.3.16-M1
 ### Added
 

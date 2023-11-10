@@ -1,6 +1,6 @@
 ###############################################################
-# Copyright (c) 2021, 2023 Robert Bosch Manufacturing Solutions GmbH
-# Copyright (c) 2021, 2023 Contributors to the Eclipse Foundation
+# Copyright (c) 2023 Robert Bosch Manufacturing Solutions GmbH
+# Copyright (c) 2023 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -17,24 +17,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 ###############################################################
+name: Common variable definitions
+description:
+  Contains common variable definitions.
 
-apiVersion: v2
-name: registry
-description: Tractus-X Digital Twin Registry Helm Chart
-home: https://eclipse-tractusx.github.io/
-sources:
-  - https://github.com/eclipse-tractusx/sldt-digital-twin-registry
-
-type: application
-version: 0.3.27
-appVersion: 0.3.19
-
-dependencies:
-  - repository: https://charts.bitnami.com/bitnami
-    name: postgresql
-    version: 12.12.10
-    condition: enablePostgres
-  - repository: https://charts.bitnami.com/bitnami
-    name: keycloak
-    version: 16.1.7
-    condition: enableKeycloak
+variables:
+  aas_registry_api_url: "{tavern.env_vars.AAS_REGISTRY_API_URL}"
+  edc_bpn: "{tavern.env_vars.EDC_BPN}"
+  decoded_shell_id: 20062250-6b6e-4eba-bf90-7720ddc855e9
+  encoded_shell_id: "MjAwNjIyNTAtNmI2ZS00ZWJhLWJmOTAtNzcyMGRkYzg1NWU5"

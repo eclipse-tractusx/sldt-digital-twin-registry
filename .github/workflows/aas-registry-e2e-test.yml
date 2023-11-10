@@ -1,0 +1,86 @@
+###############################################################
+# Copyright (c) 2023 Robert Bosch Manufacturing Solutions GmbH
+# Copyright (c) 2023 Contributors to the Eclipse Foundation
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache License, Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0.
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+###############################################################
+name: AAS Registry End-to-End tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      clientId:
+        description: 'clientId'
+        required: true
+      clientSecret:
+        description: 'clientSecret'
+        required: true
+      tokenUrl:
+        description: 'tokenUrl'
+        required: true
+      aasRegistryUrl:
+        description: 'AAS-Registry-Url'
+        required: true
+      edcBpn:
+        description: 'EDC-BPN'
+        required: true
+
+jobs:
+  end_to_end_tests:
+    runs-on: ubuntu-latest
+    name: Execute End-to-End tests
+
+    steps:
+      - name: Mask Input Credentials
+        run: |
+          mask_client_secret=$(jq -r '.inputs.clientSecret' $GITHUB_EVENT_PATH)
+          echo ::add-mask::$mask_client_secret
+          echo mask_client_secret=$mask_client_secret >> $GITHUB_ENV
+          
+          mask_edc_bpn=$(jq -r '.inputs.edcBpn' $GITHUB_EVENT_PATH)
+          echo ::add-mask::$mask_edc_bpn
+          echo mask_edc_bpn=$mask_edc_bpn >> $GITHUB_ENV  
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.8"
+          check-latest: true
+
+      - name: Install python dependencies
+        working-directory: ./e2e-tests
+        run: |
+          pip install -r requirements.txt
+
+      - name: Install python dependencies
+        working-directory: ./e2e-tests/aas-registry
+        run: |
+          py.test . -vv --html=./output/report.html --self-contained-html
+        env:
+          CLIENT_ID: ${{ inputs.clientId }}
+          CLIENT_SECRET: ${{ env.mask_client_secret }}
+          AUTH_SERVER_TOKEN_URL: ${{ inputs.tokenUrl }}
+          AAS_REGISTRY_API_URL: ${{ inputs.aasRegistryUrl }}
+          EDC_BPN: ${{ env.mask_edc_bpn }}
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: aas-registry-e2e-test-report
+          path: ./e2e-tests/aas-registry/output/report.html

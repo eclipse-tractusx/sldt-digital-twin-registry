@@ -91,3 +91,54 @@ databaseChangeLog:
             tableName: SUBMODEL_ENDPOINT
             columnName: SUB_PROTOCOL_BODY_ENCODING
             newDataType: NVARCHAR(128)
+  - changeSet:
+      id: 28092023-01
+      author: shijin
+      changes:
+        - createIndex:
+            indexName: SHELL_ID_EXTERNAL_IX01
+            tableName: SHELL
+            columns:
+              - column:
+                  name: ID_EXTERNAL
+        - createIndex:
+            indexName: SHELL_IDENTIFIER_FK_SHELL_ID_IX01
+            tableName: SHELL_IDENTIFIER
+            columns:
+              - column:
+                  name: FK_SHELL_ID
+        - createIndex:
+            indexName: SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY_FK_SI_EXTERNAL_SUBJECT_REFERENCE_ID_IX01
+            tableName: SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY
+            columns:
+              - column:
+                  name: FK_SI_EXTERNAL_SUBJECT_REFERENCE_ID
+        - createIndex:
+            indexName: SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY_REF_KEY_VALUE_IX01
+            tableName: SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY
+            columns:
+              - column:
+                  name: REF_KEY_VALUE
+        - createIndex:
+            indexName: SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID_IX01
+            tableName: SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE
+            columns:
+              - column:
+                  name: FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID
+        - createIndex:
+            indexName: SHELL_IDENTIFIER_COMPOSITE_NAMESPACE_IDENTIFIER_IX01
+            tableName: SHELL_IDENTIFIER
+            columns:
+              - column:
+                    name: NAMESPACE
+              - column:
+                  name: IDENTIFIER
+            function: concat_ws
+            separator: ''
+
+        - createIndex:
+            indexName: SHELL_IDENTIFIER_NAMESPACE_IX01
+            tableName: SHELL_IDENTIFIER
+            columns:
+              - column:
+                  name: NAMESPACE

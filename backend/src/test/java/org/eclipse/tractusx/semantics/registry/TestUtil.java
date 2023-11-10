@@ -19,9 +19,11 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.eclipse.tractusx.semantics.aas.registry.model.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
@@ -38,8 +40,7 @@ public class TestUtil {
         assetAdministrationShellDescriptor.setAssetType( "AssetType" );
         assetAdministrationShellDescriptor.setAssetKind( AssetKind.INSTANCE );
         assetAdministrationShellDescriptor.setId("fb7ebcc2-5731-4948-aeaa-c9e9692decf5");
-        assetAdministrationShellDescriptor.setIdShort("idShortExample");
-
+        assetAdministrationShellDescriptor.setIdShort(RandomStringUtils.random(10, true, true));
 
        Reference specificAssetIdReference = new Reference();
        specificAssetIdReference.setType( ReferenceTypes.MODELREFERENCE );
@@ -125,12 +126,14 @@ public class TestUtil {
         SubmodelDescriptor submodelDescriptor = new SubmodelDescriptor();
         submodelDescriptor.setId(UUID.randomUUID().toString());
         submodelDescriptor.setDisplayName( List.of(displayName) );
-        submodelDescriptor.setIdShort("idShortExample");
+        submodelDescriptor.setIdShort(RandomStringUtils.random(10, true, true));
         submodelDescriptor.setSemanticId(submodelSemanticReference);
         submodelDescriptor.setSupplementalSemanticId( List.of(submodelSupplemSemanticIdReference) );
         submodelDescriptor.setDescription(List.of(description1, description2));
         submodelDescriptor.setEndpoints(List.of(endpoint));
-        assetAdministrationShellDescriptor.setSubmodelDescriptors(List.of(submodelDescriptor));
+        List<SubmodelDescriptor> submodelDescriptors = new ArrayList<>();
+        submodelDescriptors.add( submodelDescriptor );
+        assetAdministrationShellDescriptor.setSubmodelDescriptors(submodelDescriptors);
         return assetAdministrationShellDescriptor;
     }
 

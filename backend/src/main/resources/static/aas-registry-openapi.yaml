@@ -90,7 +90,7 @@ paths:
           schema:
             maxLength: 2000
             minLength: 1
-            #     pattern: "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+            pattern: "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\x{00010000}-\\x{0010FFFF}]*$"
             type: string
         - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       responses:
@@ -971,7 +971,7 @@ components:
             assetType:
               maxLength: 2000
               minLength: 1
-              #        pattern: "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+              pattern: "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\x{00010000}-\\x{0010FFFF}]*$"
               type: string
             endpoints:
               minItems: 1
@@ -982,7 +982,7 @@ components:
             globalAssetId:
               maxLength: 2000
               minLength: 1
-              #     pattern: "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+              pattern: "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\x{00010000}-\\x{0010FFFF}]*$"
               type: string
             idShort:
               maxLength: 128
@@ -990,7 +990,7 @@ components:
             id:
               maxLength: 2000
               minLength: 1
-              #      pattern: "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+              pattern: "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\x{00010000}-\\x{0010FFFF}]*$"
               type: string
             specificAssetIds:
               type: array
@@ -1028,11 +1028,11 @@ components:
       type: object
       properties:
         language:
-          #     pattern: "^(([a-zA-Z]{2,3}(-[a-zA-Z]{3}(-[a-zA-Z]{3}){2})?|[a-zA-Z]{4}|[a-zA-Z]{5,8})(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-(([a-zA-Z0-9]){5,8}|[0-9]([a-zA-Z0-9]){3}))*(-[0-9A-WY-Za-wy-z](-([a-zA-Z0-9]){2,8})+)*(-[xX](-([a-zA-Z0-9]){1,8})+)?|[xX](-([a-zA-Z0-9]){1,8})+|((en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)|(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang)))$"
+          pattern: "^(([a-zA-Z]{2,3}(-[a-zA-Z]{3}(-[a-zA-Z]{3}){2})?|[a-zA-Z]{4}|[a-zA-Z]{5,8})(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-(([a-zA-Z0-9]){5,8}|[0-9]([a-zA-Z0-9]){3}))*(-[0-9A-WY-Za-wy-z](-([a-zA-Z0-9]){2,8})+)*(-[xX](-([a-zA-Z0-9]){1,8})+)?|[xX](-([a-zA-Z0-9]){1,8})+|((en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)|(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang)))$"
           type: string
         text:
           minLength: 0
-          #     pattern: "^([\\t\\n\\r -퟿-�]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
+          pattern: "^([\\t\\n\\r \\_\\.\\/\\:\\#\\-a-zA-Z0-9]|[\\ud800\\udc00-\\ud800\\udfff]|[\\ud801\\udc00-\\udbfe\\udfff]|[\\udbff\\udc00-\\udbff\\udfff])*+$"
           type: string
     LangStringNameType:
       type: object
@@ -1101,7 +1101,7 @@ components:
         value:
           maxLength: 2000
           minLength: 1
-          #   pattern: "^([\\t\\n\\r -퟿-�]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
+          pattern: "^([\\t\\n\\r \\_\\.\\/\\:\\#\\-a-zA-Z0-9]|[\\ud800\\udc00-\\ud800\\udfff]|[\\ud801\\udc00-\\udbfe\\udfff]|[\\udbff\\udc00-\\udbff\\udfff])*+$"
           type: string
     KeyTypes:
       type: string
@@ -1412,12 +1412,12 @@ components:
             name:
               maxLength: 64
               minLength: 1
-              #  pattern: "^([\\t\\n\\r -퟿-�]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
+              pattern: "^([\\t\\n\\r \\_\\.\\/\\:\\#\\-a-zA-Z0-9]|[\\ud800\\udc00-\\ud800\\udfff]|[\\ud801\\udc00-\\udbfe\\udfff]|[\\udbff\\udc00-\\udbff\\udfff])*+$"
               type: string
             value:
               maxLength: 2000
               minLength: 1
-              #  pattern: "^([\\t\\n\\r -퟿-�]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
+              pattern: "^([\\t\\n\\r \\_\\.\\/\\:\\#\\-a-zA-Z0-9]|[\\ud800\\udc00-\\ud800\\udfff]|[\\ud801\\udc00-\\udbfe\\udfff]|[\\udbff\\udc00-\\udbff\\udfff])*+$"
               type: string
             externalSubjectId:
               $ref: '#/components/schemas/Reference'
@@ -1441,7 +1441,7 @@ components:
         id:
           maxLength: 2000
           minLength: 1
-          #   pattern: "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+          pattern: "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\x{00010000}-\\x{0010FFFF}]*$"
           type: string
         semanticId:
           $ref: '#/components/schemas/Reference'
@@ -1484,7 +1484,7 @@ components:
         text:
           type: string
         timestamp:
-          #    pattern: "^-?(([1-9][0-9][0-9][0-9]+)|(0[0-9][0-9][0-9]))-((0[1-9])|(1[0-2]))-((0[1-9])|([12][0-9])|(3[01]))T(((([01][0-9])|(2[0-3])):[0-5][0-9]:([0-5][0-9])(\\.[0-9]+)?)|24:00:00(\\.0+)?)(Z|\\+00:00|-00:00)$"
+          pattern: "^-?(([1-9][0-9][0-9][0-9]+)|(0[0-9][0-9][0-9]))-((0[1-9])|(1[0-2]))-((0[1-9])|([12][0-9])|(3[01]))T(((([01][0-9])|(2[0-3])):[0-5][0-9]:([0-5][0-9])(\\.[0-9]+)?)|24:00:00(\\.0+)?)(Z|\\+00:00|-00:00)$"
           type: string
     GetSubmodelDescriptorsResult:
       type: object
@@ -1613,7 +1613,7 @@ components:
       schema:
         maxLength: 2000
         minLength: 1
-        #        pattern: "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+        pattern: "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\x{00010000}-\\x{0010FFFF}]*$"
         type: string
     AssetAdministrationShellIdentifier:
       name: aasIdentifier

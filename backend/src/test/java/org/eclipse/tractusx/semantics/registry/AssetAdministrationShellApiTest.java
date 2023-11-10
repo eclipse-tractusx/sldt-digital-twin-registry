@@ -22,9 +22,16 @@ package org.eclipse.tractusx.semantics.registry;
 import static org.eclipse.tractusx.semantics.registry.TestUtil.getEncodedValue;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import java.util.List;
 import java.util.UUID;
-import org.eclipse.tractusx.semantics.aas.registry.model.*;
+
+import org.apache.commons.lang3.RandomStringUtils;
+import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
+import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
+import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
+import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
+import org.eclipse.tractusx.semantics.registry.service.ShellService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -55,6 +62,27 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
          performShellCreateRequest( mapper.writeValueAsString( onlyRequiredFieldsShell ) );
 
+      }
+
+      @Test
+      public void testCreateShellExpectRegexError() throws Exception {
+         AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+         shellPayload.setId( UUID.randomUUID().toString() );
+
+         //set assetType wrong value according to regex pattern
+         shellPayload.setAssetType( "AssetType \u0000" );
+
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .post(SHELL_BASE_PATH)
+                           .accept(MediaType.APPLICATION_JSON)
+                           .contentType(MediaType.APPLICATION_JSON)
+                           .content(mapper.writeValueAsString( shellPayload ))
+                           .with(jwtTokenFactory.allRoles())
+               )
+               .andDo(MockMvcResultHandlers.print())
+               .andExpect(status().isBadRequest())
+               .andExpect( jsonPath( "$.messages[0].text", is( "must match \"^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\x{00010000}-\\x{0010FFFF}]*$\"" ) ) );
       }
 
       @Test
@@ -137,6 +165,8 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          shellPayload.getDescription().get( 0 ).setLanguage( "fr" );
 
          String shellId = shellPayload.getId();
+         shellPayload.setIdShort( RandomStringUtils.random(10, true, true) );
+         shellPayload.getSubmodelDescriptors().get( 0 ).setIdShort( RandomStringUtils.random(10, true, true) );
 
          mvc.perform(
                      MockMvcRequestBuilders
@@ -191,6 +221,8 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          String changedID = UUID.randomUUID().toString();
          shellPayload.setId( changedID );
          shellPayload.setIdShort( "newIdShortInUpdateRequest" );
+
+         shellPayload.getSubmodelDescriptors().get( 0 ).setIdShort( RandomStringUtils.random(10, true, true) );
 
          mvc.perform(
                      MockMvcRequestBuilders
@@ -459,7 +491,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                )
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isBadRequest() )
-               .andExpect( jsonPath( "$.messages[0].text", is( "A SubmodelDescriptor with the given identification does already exists." ) ) );
+               .andExpect( jsonPath( "$.messages[0].text", is( ShellService.DUPLICATE_SUBMODEL_ID_SHORT_EXCEPTION ) ) );
       }
 
       @Test
@@ -992,6 +1024,131 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
       }
    }
 
+   @Test
+   @DisplayName( "Test creating a new Asset Administration Shell Descriptor with unique IdShort in shell and submodelDescriptor level" )
+   public void test_Creating_a_new_Asset_Administration_Shell_Descriptor_with_unique_IdShort_in_shell_and_submodelDescriptor_level() throws Exception {
+      //Given
+      AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+      //When & Then
+      mvc.perform(
+                  MockMvcRequestBuilders
+                        .post( SHELL_BASE_PATH )
+                        .accept( MediaType.APPLICATION_JSON )
+                        .contentType( MediaType.APPLICATION_JSON )
+                        .content( mapper.writeValueAsString( shellPayload ) )
+                        .with( jwtTokenFactory.allRoles() )
+            )
+            .andDo( MockMvcResultHandlers.print() )
+            .andExpect( status().isCreated());
+   }
+
+   @Test
+   @DisplayName( "Test creating a new Asset Administration Shell Descriptor with dupilcate IdShort in shell level" )
+   public void test_Creating_a_new_Asset_Administration_Shell_Descriptor_with_Dupilcate_IdShort_in_shell_level() throws Exception {
+      //Given
+      //Creates a shell using test data
+      AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+      shellPayload.setId( UUID.randomUUID().toString() );
+      performShellCreateRequest( mapper.writeValueAsString( shellPayload ) );
+      String idShort = shellPayload.getIdShort();
+
+      //Creating a new shell with unique Shell.IdShort and Shell.SubmodelDescriptor.IdShort
+      shellPayload = TestUtil.createCompleteAasDescriptor();
+      //setting duplicate idShort is shell level
+      shellPayload.setIdShort( idShort );
+
+      //When & Then
+      mvc.perform(
+                  MockMvcRequestBuilders
+                        .post( SHELL_BASE_PATH )
+                        .accept( MediaType.APPLICATION_JSON )
+                        .contentType( MediaType.APPLICATION_JSON )
+                        .content( mapper.writeValueAsString( shellPayload ) )
+                        .with( jwtTokenFactory.allRoles() )
+            )
+            .andDo( MockMvcResultHandlers.print() )
+            .andExpect( status().isBadRequest() )
+            .andExpect( jsonPath( "$.messages[0].text", is( "An AssetAdministrationShell for the given IdShort already exists." ) ) );
+   }
+
+   @Test
+   @DisplayName( "Test Creating a new Asset Administration Shell Descriptor with unique  IdShort in shell level and duplicate IdShort in submodelDescriptor level" )
+   public void test_Creating_a_new_Asset_Administration_Shell_Descriptor_with_unique_IdShort_in_shell_level_and_duplicate_submodelDescriptor_level() throws Exception {
+      //Given
+      AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+
+      SubmodelDescriptor submodelDescriptor = new SubmodelDescriptor();
+      //Setting duplicate id short
+      submodelDescriptor.setIdShort(shellPayload.getSubmodelDescriptors().get( 0 ).getIdShort());
+
+      //Adding duplicate submodel which contains duplicate idshort
+      shellPayload.getSubmodelDescriptors().add( submodelDescriptor);
+
+
+      //When & Then
+      mvc.perform(
+                  MockMvcRequestBuilders
+                        .post( SHELL_BASE_PATH )
+                        .accept( MediaType.APPLICATION_JSON )
+                        .contentType( MediaType.APPLICATION_JSON )
+                        .content( mapper.writeValueAsString( shellPayload ) )
+                        .with( jwtTokenFactory.allRoles() )
+            )
+            .andDo( MockMvcResultHandlers.print() )
+            .andExpect( status().isBadRequest() )
+            .andExpect( jsonPath( "$.messages[0].text", is( ShellService.DUPLICATE_SUBMODEL_ID_SHORT_EXCEPTION ) ) );
+   }
+
+   @Test
+   @DisplayName( "Test Creating a new Submodel Descriptor with unique IdShort in submodelDescriptor level" )
+   public void test_Creates_a_new_Submodel_Descriptor_with_unique_IdShort_in_submodelDescriptor_level() throws Exception {
+      //Given
+      AssetAdministrationShellDescriptor shellPayload1 = TestUtil.createCompleteAasDescriptor();
+      shellPayload1.setId( UUID.randomUUID().toString() );
+      performShellCreateRequest( mapper.writeValueAsString( shellPayload1 ) );
+
+      String shellId = shellPayload1.getId();
+      //Get new SubmodelDescriptor which contains unique IdShort
+      SubmodelDescriptor submodel = TestUtil.createCompleteAasDescriptor().getSubmodelDescriptors().get( 0 );
+      mvc.perform(
+                  MockMvcRequestBuilders
+                        .post( SUB_MODEL_BASE_PATH, getEncodedValue(shellId) )
+                        .accept( MediaType.APPLICATION_JSON )
+                        .contentType( MediaType.APPLICATION_JSON )
+                        .content( mapper.writeValueAsString( submodel ) )
+                        .with( jwtTokenFactory.allRoles() )
+            )
+            .andDo( MockMvcResultHandlers.print() )
+            .andExpect( status().isCreated());
+   }
+
+   @Test
+   @DisplayName( "Test Creating a new Submodel Descriptor with duplicate IdShort in submodelDescriptor level - DB" )
+   public void test_Creates_a_new_Submodel_Descriptor_with_duplicate_IdShort_in_submodelDescriptor_level_in_DB() throws Exception {
+      //Given
+      AssetAdministrationShellDescriptor shellPayload1 = TestUtil.createCompleteAasDescriptor();
+      shellPayload1.setId( UUID.randomUUID().toString() );
+      performShellCreateRequest( mapper.writeValueAsString( shellPayload1 ) );
+
+      String shellId = shellPayload1.getId();
+      SubmodelDescriptor submodel = shellPayload1.getSubmodelDescriptors().get( 0 );
+      submodel.setId( UUID.randomUUID().toString() );
+
+      //When & Then
+      mvc.perform(
+                  MockMvcRequestBuilders
+                        .post( SUB_MODEL_BASE_PATH, getEncodedValue(shellId) )
+                        .accept( MediaType.APPLICATION_JSON )
+                        .contentType( MediaType.APPLICATION_JSON )
+                        .content( mapper.writeValueAsString( submodel ) )
+                        .with( jwtTokenFactory.allRoles() )
+            )
+            .andDo( MockMvcResultHandlers.print() )
+            .andExpect( status().isBadRequest() )
+            .andExpect( jsonPath( "$.messages[0].text", is( ShellService.DUPLICATE_SUBMODEL_ID_SHORT_EXCEPTION ) ) );
+   }
+
+
    @Nested
    @DisplayName( "Description Tests" )
    class DescriptionApiTest {
@@ -1008,4 +1165,5 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                .andExpect( jsonPath( "$.profiles[0]", is( "https://admin-shell.io/aas/API/3/0/AssetAdministrationShellRegistryServiceSpecification/SSP-001" ) ) );
       }
    }
+
 }

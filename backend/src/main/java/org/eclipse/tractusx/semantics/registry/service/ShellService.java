@@ -21,10 +21,17 @@ package org.eclipse.tractusx.semantics.registry.service;
 
 import static org.springframework.data.domain.PageRequest.ofSize;
 
-import java.util.*;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.aas.registry.model.GetAllAssetAdministrationShellIdsByAssetLink200Response;
 import org.eclipse.tractusx.semantics.aas.registry.model.PagedResultPagingMetadata;
@@ -33,7 +40,6 @@ import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
 import org.eclipse.tractusx.semantics.registry.dto.SubmodelCollectionDto;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
-import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierExternalSubjectReferenceKey;
 import org.eclipse.tractusx.semantics.registry.model.Submodel;
 import org.eclipse.tractusx.semantics.registry.model.projection.ShellMinimal;
 import org.eclipse.tractusx.semantics.registry.model.support.DatabaseExceptionTranslation;
@@ -56,6 +62,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class ShellService {
+
+    public static final String DUPLICATE_SUBMODEL_EXCEPTION = "An AssetAdministrationSubmodel for the given identification does already exists.";
+
+   public static final String DUPLICATE_SUBMODEL_ID_SHORT_EXCEPTION = "An AssetAdministration Submodel for the given IdShort does already exists.";
 
     private final ShellRepository shellRepository;
     private final ShellIdentifierRepository shellIdentifierRepository;
@@ -88,10 +98,43 @@ public class ShellService {
        if(shellRepository.findByIdExternal(shell.getIdExternal()  ).isPresent()){
           throw new DuplicateKeyException("An AssetAdministrationShell for the given identification does already exists."  );
         }
+
+       validateIdShort( shell );
+
        return shellRepository.save(shell);
     }
 
-    public void mapShellCollection(Shell shell){
+   /**
+    * Checks IdShort in shell level against DB & validate duplicate IdShort values in Submodels
+    * @param shell
+    */
+   private void validateIdShort( Shell shell ) {
+      //Check uniqueness of IdShort in shell level
+      Optional.of( shell.getIdShort() ).map( shellRepository::existsByIdShort ).filter( BooleanUtils::isFalse )
+            .orElseThrow( () -> new DuplicateKeyException( "An AssetAdministrationShell for the given IdShort already exists." ) );
+
+      checkForDuplicateIdShortWithInSubModels( shell );
+   }
+
+   private void checkForDuplicateIdShortWithInSubModels( Shell shell ) {
+      //Check uniqueness of IdShort in Sub-model level
+      List<String> idShortList = Optional.of( shell ).map( Shell::getSubmodels )
+            .map( Collection::stream )
+            .orElseGet( Stream::empty )
+            .map( Submodel::getIdShort )
+            .map( String::toLowerCase )
+            .toList();
+
+      boolean isDuplicateIdShortPresent = Optional.of( idShortList ).filter( idShorts -> idShortList.stream().distinct().count() != idShorts.size() )
+            .isPresent();
+
+      if ( isDuplicateIdShortPresent ) {
+         throw new DuplicateKeyException( DUPLICATE_SUBMODEL_ID_SHORT_EXCEPTION );
+      }
+
+   }
+
+   public void mapShellCollection(Shell shell){
          shell.getIdentifiers().forEach( shellIdentifier -> shellIdentifier.setShellId( shell ) );
          shell.getSubmodels().forEach( submodel -> submodel.setShellId( shell ) );
          shell.getDescriptions().forEach( description -> description.setShellId( shell ) );
@@ -316,12 +359,22 @@ public class ShellService {
    public Submodel save( String externalShellId, Submodel submodel, String externalSubjectId ) {
       Shell shellFromDb = findShellByExternalId( externalShellId ,externalSubjectId);
       submodel.setShellId( shellFromDb );
+
+      //uniqueness on shellId and idShort
+      boolean isIdShortPresent = Optional.of( shellFromDb ).map( Shell::getSubmodels ).map( Collection::stream ).orElseGet( Stream::empty )
+            .map( Submodel::getIdShort )
+            .anyMatch(
+                  idShort -> idShort.toLowerCase().equals( submodel.getIdShort().toLowerCase() ) ); // check whether the input sub-model.idShort exists in DB
+
+      if(isIdShortPresent){// Throw exception if sub-model.idShort exists in DB
+         throw new DuplicateKeyException(DUPLICATE_SUBMODEL_ID_SHORT_EXCEPTION);
+      }
       return saveSubmodel( submodel );
    }
 
    public Submodel saveSubmodel(Submodel submodel){
       if(submodelRepository.findByShellIdAndIdExternal(submodel.getShellId(),submodel.getIdExternal()).isPresent()){
-         throw new DuplicateKeyException("An AssetAdministrationSubmodel for the given identification does already exists."  );
+         throw new DuplicateKeyException( DUPLICATE_SUBMODEL_EXCEPTION );
       }
       return submodelRepository.save( submodel );
    }
