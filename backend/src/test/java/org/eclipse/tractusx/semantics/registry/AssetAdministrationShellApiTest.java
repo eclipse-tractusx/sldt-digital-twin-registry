@@ -680,7 +680,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                )
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isBadRequest() )
-               .andExpect( jsonPath( "$.messages[0].text", is( "Illegal base64 character 7b" ) ) );
+               .andExpect( jsonPath( "$.messages[0].text", is( "Incorrect Base64 encoded value provided as parameter" ) ) );
       }
 
       @Test
