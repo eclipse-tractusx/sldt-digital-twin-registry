@@ -156,28 +156,25 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     public ResponseEntity<GetAllAssetAdministrationShellIdsByAssetLink200Response> getAllAssetAdministrationShellIdsByAssetLink(List<byte[]> assetIds,
     Integer limit, String cursor, @RequestHeader String externalSubjectId) {
         if (assetIds == null || assetIds.isEmpty()) {
-            return new ResponseEntity<>(new GetAllAssetAdministrationShellIdsByAssetLink200Response(), HttpStatus.OK);
+            return new ResponseEntity<>(new GetAllAssetAdministrationShellIdsByAssetLink200Response(), HttpStatus.BAD_REQUEST);
         }
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setSerializationInclusion( JsonInclude.Include.NON_NULL);
-        List<SpecificAssetId> listSpecificAssetId = getDecodedSpecAssetIds( assetIds, mapper );
 
+        List<SpecificAssetId> listSpecificAssetId = Optional.of(assetIds).orElse(Collections.emptyList()).
+              stream().map( this::decodeSAID).collect( Collectors.toList());
         GetAllAssetAdministrationShellIdsByAssetLink200Response result  =
               shellService.findExternalShellIdsByIdentifiersByExactMatch(shellMapper.fromApiDto(listSpecificAssetId), limit, cursor,getExternalSubjectIdOrEmpty(externalSubjectId));
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    private static List<SpecificAssetId> getDecodedSpecAssetIds( List<byte[]> assetIds, ObjectMapper mapper ) {
-        return assetIds.stream().map( value ->
-        {
-            byte[] decodedBytes = Base64.getUrlDecoder().decode( value );
-            try {
-                return mapper.readValue(decodedBytes, SpecificAssetId.class );
-            } catch ( IOException e ) {
-                throw new IllegalArgumentException("Incorrect Base64 encoded value provided as parameter");
-            }
+    private SpecificAssetId decodeSAID(byte[] encodedId){
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion( JsonInclude.Include.NON_NULL);
+        try {
+            byte[] decodedBytes = Base64.getUrlDecoder().decode( encodedId );
+            return mapper.readValue(decodedBytes, SpecificAssetId.class );
+        } catch (Exception e ) {
+            throw new IllegalArgumentException("Incorrect Base64 encoded value provided as parameter");
         }
-        ).collect( Collectors.toList());
     }
 
     @Override
