@@ -77,7 +77,7 @@ registry:
       cpu: 750m
       memory: 1024Mi
     requests:
-      cpu: 250m
+      cpu: 251m
       memory: 1024Mi
 
 postgresql:
