@@ -26,7 +26,7 @@ on:
       node_image:
         description: 'kindest/node image for k8s kind cluster'
         # k8s version from 3.1 release as default
-        default: 'kindest/node:v1.24.6'
+        default: 'kindest/node:v1.27.3'
         required: false
         type: string
       upgrade_from:
@@ -48,9 +48,9 @@ jobs:
         uses: container-tools/kind-action@v1
         with:
           # upgrade version, default (v0.17.0) uses node image v1.21.1 and doesn't work with more recent node image versions
-          version: v0.19.0
+          version: v0.20.0
           # default value for event_name != workflow_dispatch
-          node_image: ${{ github.event.inputs.node_image || 'kindest/node:v1.24.6' }}
+          node_image: ${{ github.event.inputs.node_image || 'kindest/node:v1.27.3' }}
 
       - name: Set up Helm
         uses: azure/setup-helm@v3
@@ -77,7 +77,7 @@ jobs:
 
       - name: Run chart-testing (install)
         run: ct install --charts charts/registry --config charts/chart-testing-config.yaml
-        if: steps.list-changed.outputs.changed == 'true'
+        if: github.event_name != 'pull_request' || steps.list-changed.outputs.changed == 'true'
 
       - name: Upload test report
         uses: actions/upload-artifact@v3
@@ -93,4 +93,4 @@ jobs:
           helm install registry tractusx-dev/registry --version ${{ github.event.inputs.upgrade_from || '0.3.19' }}
           helm dependency update charts/registry
           helm upgrade registry charts/registry
-        if: steps.list-changed.outputs.changed == 'true'          
+        if: github.event_name != 'pull_request' || steps.list-changed.outputs.changed == 'true'
