@@ -1,0 +1,26 @@
+{{ template "chart.header" . }}
+{{ template "chart.badgesSection" . }}
+
+**{{ template "chart.description" . }}**<br/>
+This Helm charts install the Digital Twin Registry and its dependencies.
+
+{{ template "chart.requirementsSection" . }}
+
+## Prerequisites
+- Kubernetes 1.19+
+- Helm 3.2.0+
+- PV provisioner support in the underlying infrastructure
+
+## Install
+```
+helm dep up charts/registry
+
+kubectl create namespace semantics
+
+helm install registry -n semantics charts/registry
+
+```
+
+
+{{ template "chart.valuesSection" . }}
+{{ template "helm-docs.versionFooter" . }}
