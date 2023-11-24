@@ -43,16 +43,13 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Run Trivy vulnerability scanner in repo mode
-#        uses: aquasecurity/trivy-action@master
         uses: aquasecurity/trivy-action@0.14.0
         with:
           scan-type: "config"
           # ignore-unfixed: true
-#          exit-code: "1"
           hide-progress: false
           format: "sarif"
           output: "trivy-results1.sarif"
-#          severity: "CRITICAL,HIGH"
           vuln-type: "os,library"
 
       - name: Upload Trivy scan results to GitHub Security tab
@@ -81,16 +78,13 @@ jobs:
         run: mvn clean package
         
       - name: Run Trivy vulnerability scanner
-#        uses: aquasecurity/trivy-action@master
         uses: aquasecurity/trivy-action@0.14.0
         with:
           image-ref: "tractusx/sldt-digital-twin-registry:latest"
           # ignore-unfixed: true
-#          exit-code: "1"
           hide-progress: false
           format: "sarif"
           output: "trivy-results-registry.sarif"
-#          severity: "CRITICAL,HIGH"
           vuln-type: "os,library"
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
