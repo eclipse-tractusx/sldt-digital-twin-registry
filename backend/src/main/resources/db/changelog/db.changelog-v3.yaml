@@ -142,3 +142,11 @@ databaseChangeLog:
             columns:
               - column:
                   name: NAMESPACE
+  - changeSet:
+      id: 28112023-01
+      author: slindner
+      changes:
+        - modifyDataType:
+            tableName: SUBMODEL_ENDPOINT
+            columnName: SUB_PROTOCOL_BODY
+            newDataType: NVARCHAR(2048)
