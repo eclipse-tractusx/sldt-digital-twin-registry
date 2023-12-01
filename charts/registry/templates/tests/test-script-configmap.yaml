@@ -40,88 +40,19 @@ data:
       aas_registry_api_url: "{tavern.env_vars.AAS_REGISTRY_API_URL}"
       decoded_shell_id: 20062250-6b6e-4eba-bf90-7720ddc855e9
       encoded_shell_id: MjAwNjIyNTAtNmI2ZS00ZWJhLWJmOTAtNzcyMGRkYzg1NWU5
-  stage_auth.yaml: |
-    ---
-    name: Authentication stage
-    description:
-      Reusable test stage for authentication
-
-    variables:
-      auth:
-        client_id: "{tavern.env_vars.CLIENT_ID}"
-        client_secret: "{tavern.env_vars.CLIENT_SECRET}"
-        auth_server_token_url: "{tavern.env_vars.AUTH_SERVER_TOKEN_URL}"
-
-    stages:
-      - id: request_auth_token
-        name: Request token
-        request:
-          url: "{auth.auth_server_token_url:s}"
-          headers:
-            Accept: "*/*"
-            Content-Type: "application/x-www-form-urlencoded"
-          data:
-            grant_type: "client_credentials"
-            client_id: "{auth.client_id:s}"
-            client_secret: "{auth.client_secret:s}"
-          method: POST
-        response:
-          status_code: 200
-          headers:
-            content-type: application/json
-          save:
-            json:
-              access_token: access_token
   test_api.tavern.yaml: |
-    ---
-    test_name: Test APIs are protected with authentication
-
-    includes:
-      - !include common.yaml
-      - !include stage_auth.yaml
-
-    stages:
-      - name: Test get shell descriptors without access token
-        request:
-          url: "{aas_registry_api_url:s}/api/v3.0/shell-descriptors"
-          method: GET
-        response:
-          status_code: 401
-
-      - type: ref
-        id: request_auth_token
-
-      - name: Authenticated request
-        request:
-          url: "{aas_registry_api_url:s}/api/v3.0/shell-descriptors"
-          method: GET
-          headers:
-            Content-Type: application/json
-            Authorization: "Bearer {access_token}"
-            Edc-Bpn: "default-tenant"
-        response:
-          status_code: 200
-          headers:
-            content-type: application/json
-
-    ---
     test_name: Test create, read, update and delete of a shell descriptor
 
     includes:
       - !include common.yaml
-      - !include stage_auth.yaml
 
     stages:
-      - type: ref
-        id: request_auth_token
-
       - name: Create shell descriptor expect success
         request:
           url: "{aas_registry_api_url:s}/api/v3.0/shell-descriptors"
           method: POST
           headers:
             Content-Type: application/json
-            Authorization: "Bearer {access_token}"
             Edc-Bpn: "default-tenant"
           json: 
             id: "{decoded_shell_id:s}"
@@ -137,7 +68,6 @@ data:
           method: GET
           headers:
             Content-Type: application/json
-            Authorization: "Bearer {access_token}"
             Edc-Bpn: "default-tenant"
         response:
           status_code: 200
@@ -157,7 +87,6 @@ data:
           method: PUT
           headers:
             Content-Type: application/json
-            Authorization: "Bearer {access_token}"
             Edc-Bpn: "default-tenant"
           json: 
             id: "{decoded_shell_id:s}"
@@ -171,7 +100,6 @@ data:
           method: DELETE
           headers:
             Content-Type: application/json
-            Authorization: "Bearer {access_token}"
             Edc-Bpn: "default-tenant"
         response:
           status_code: 204

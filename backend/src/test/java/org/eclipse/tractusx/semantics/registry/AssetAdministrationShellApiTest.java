@@ -163,7 +163,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          shellPayload.setId( UUID.randomUUID().toString() );
          performShellCreateRequest( mapper.writeValueAsString( shellPayload ) );
 
-         shellPayload.getDescription().get( 0 ).setLanguage( "fr" );
+         shellPayload.getDisplayName().get( 0 ).setLanguage( "fr" );
 
          String shellId = shellPayload.getId();
          shellPayload.setIdShort( RandomStringUtils.random(10, true, true) );
@@ -189,8 +189,8 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                            .with( jwtTokenFactory.allRoles() )
                )
                .andDo( MockMvcResultHandlers.print() )
-               .andExpect( status().isOk() );
-         //.andExpect(content().json(toJson(updateDescription)));
+               .andExpect( status().isOk() )
+               .andExpect( jsonPath( "$.displayName[0].language", is("fr") ) );
       }
 
       @Test
@@ -238,7 +238,6 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                .andExpect( status().isNoContent() );
 
          // verify that anything expect the identification can be updated
-         shellPayload.setId( UUID.randomUUID().toString() );
          mvc.perform(
                      MockMvcRequestBuilders
                            .get( SINGLE_SHELL_BASE_PATH, getEncodedValue( shellId ) )
@@ -247,8 +246,8 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                            .with( jwtTokenFactory.allRoles() )
                )
                .andDo( MockMvcResultHandlers.print() )
-               .andExpect( status().isOk() );
-         //.andExpect(content().json(toJson(expectedShellAfterUpdate)));
+               .andExpect( status().isOk() )
+               .andExpect( jsonPath( "$.id", is( shellId ) ) );
       }
 
       @Test
@@ -315,8 +314,8 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                            .with( jwtTokenFactory.allRoles() )
                )
                .andDo( MockMvcResultHandlers.print() )
-               .andExpect( status().isCreated() );
-         //.andExpect(content().json(mapper.writeValueAsString(shellPayload)));
+               .andExpect( status().isCreated() )
+        .andExpect(content().json(mapper.writeValueAsString(shellPayload)));
       }
    }
 
@@ -350,10 +349,10 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
 
       /**
        * The API method for creation of specificAssetIds accepts an array of objects.
-       * Invoking the API removes all existing specificAssetIds and adds the new ones.
+       * Invoking the API adds the new specificAssetIds to existing ones.
        */
       @Test
-      public void testCreateSpecificAssetIdsReplacesAllExistingSpecificAssetIdsExpectSuccess() throws Exception {
+      public void testCreateSpecificAssetIdsAddToExistingSpecificAssetIdsExpectSuccess() throws Exception {
          AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
          shellPayload.setId( UUID.randomUUID().toString() );
          performShellCreateRequest( mapper.writeValueAsString( shellPayload ) );
@@ -374,11 +373,10 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                            .with( jwtTokenFactory.allRoles() )
                )
                .andDo( MockMvcResultHandlers.print() )
-               .andExpect( status().isCreated() );
-         // .andExpect(content().json(toJson(specificAssetIds)));
+               .andExpect( status().isCreated() )
+          .andExpect(content().json(toJson(specificAssetIds)));
 
          // verify that the shell payload does no longer contain the initial specificAssetIds that were provided at creation time
-         // ObjectNode expectedShellPayload = shellPayload.set("specificAssetIds", specificAssetIds);
          mvc.perform(
                      MockMvcRequestBuilders
                            .get( SINGLE_SHELL_BASE_PATH, getEncodedValue( shellId ) )
@@ -387,8 +385,8 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                            .with( jwtTokenFactory.allRoles() )
                )
                .andDo( MockMvcResultHandlers.print() )
-               .andExpect( status().isOk() );
-         // .andExpect(content().json(toJson(expectedShellPayload)));
+               .andExpect( status().isOk() )
+          .andExpect(jsonPath("$.specificAssetIds", hasSize(4)));
       }
 
       @Test
@@ -425,8 +423,8 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                            .with( jwtTokenFactory.allRoles() )
                )
                .andDo( MockMvcResultHandlers.print() )
-               .andExpect( status().isOk() );
-         //.andExpect(content().json(toJson(shellPayload.get("specificAssetIds")));
+               .andExpect( status().isOk() )
+         .andExpect(content().json(mapper.writeValueAsString(shellPayload.getSpecificAssetIds())));
       }
 
       @Test
@@ -468,8 +466,8 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                )
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isOk() )
-               .andExpect( jsonPath( "$.submodelDescriptors", hasSize( 2 ) ) );
-         //                    .andExpect(jsonPath("$.submodelDescriptors[*].identification", hasItem(getId(submodel))));
+               .andExpect( jsonPath( "$.submodelDescriptors", hasSize( 2 ) ) )
+               .andExpect(jsonPath("$.submodelDescriptors[*].id", hasItem(submodelDescriptor.getId())));
       }
 
       @Test
@@ -506,6 +504,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          String submodelId = submodel.getId();
 
          SubmodelDescriptor updatedSubmodel = TestUtil.createSubmodel();
+         updatedSubmodel.setId( submodelId );
          updatedSubmodel.setIdShort( "updatedSubmodelId" );
          LangStringTextType updateDescription = new LangStringTextType();
          updateDescription.setLanguage( "cn" );
@@ -532,8 +531,8 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                            .with( jwtTokenFactory.allRoles() )
                )
                .andDo( MockMvcResultHandlers.print() )
-               .andExpect( status().isOk() );
-         //.andExpect(content().json(toJson(updatedSubmodel)));
+               .andExpect( status().isOk() )
+         .andExpect(content().json(mapper.writeValueAsString( updatedSubmodel )));
       }
 
       @Test
@@ -599,8 +598,8 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                            .with( jwtTokenFactory.allRoles() )
                )
                .andDo( MockMvcResultHandlers.print() )
-               .andExpect( status().isOk() );
-         //.andExpect(content().json(mapper.writeValueAsString(submodel)));
+               .andExpect( status().isOk() )
+         .andExpect(content().json(mapper.writeValueAsString(submodel)));
       }
 
       @Test

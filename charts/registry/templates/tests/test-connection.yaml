@@ -37,26 +37,11 @@ spec:
         - name: test-output
           mountPath: /tests/output
       env:
-        - name: CLIENT_ID
-          valueFrom:
-            secretKeyRef:
-              name: test-credentials
-              key: clientId
-        - name: CLIENT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: test-credentials
-              key: clientSecret
         - name: AAS_REGISTRY_API_URL
           valueFrom:
             secretKeyRef:
               name: test-credentials
               key: aasRegistryUrl
-        - name: AUTH_SERVER_TOKEN_URL
-          valueFrom:
-            secretKeyRef:
-              name: test-credentials
-              key: authServerTokenUrl
   volumes:
     - name: test-script
       configMap:

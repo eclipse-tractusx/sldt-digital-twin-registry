@@ -34,7 +34,7 @@ info:
 security:
   - bearerAuth: []
 servers:
-  - url: "{protocol}://{host_name}:{port}/api/{version_prefix}"
+  - url: "{protocol}://{host_name}:{port}{context_root}/api/{version_prefix}/"
     variables:
       protocol:
         description: Allows access through http and https (recommended)
@@ -56,6 +56,9 @@ servers:
         default: v3.0
         enum:
           - v3.0
+      context_root:
+        description: Context root for the API
+        default: ""
 paths:
   /shell-descriptors:
     get:
@@ -1389,7 +1392,7 @@ components:
           maxLength: 128
           type: string
         subprotocolBody:
-          maxLength: 2000
+          maxLength: 2048
           type: string
         subprotocolBodyEncoding:
           maxLength: 128
