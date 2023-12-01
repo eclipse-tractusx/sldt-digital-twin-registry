@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -64,12 +65,14 @@ public class OAuthSecurityConfig {
                     .requestMatchers( HttpMethod.POST, "/**/lookup/**" ).access( "@authorizationEvaluator.hasRoleAddDigitalTwin()" )
                     .requestMatchers( HttpMethod.PUT, "/**/lookup/**" ).access( "@authorizationEvaluator.hasRoleUpdateDigitalTwin()" )
                     .requestMatchers( HttpMethod.DELETE, "/**/lookup/**" ).access( "@authorizationEvaluator.hasRoleDeleteDigitalTwin()" )
+
+                    //getDescription allowed for reader
+                    .requestMatchers( HttpMethod.GET, "/**/description" ).access( "@authorizationEvaluator.hasRoleViewDigitalTwin()" )
               )
-              .csrf().disable()
-              .sessionManagement().sessionCreationPolicy( SessionCreationPolicy.STATELESS )
-              .and()
-              .oauth2ResourceServer()
-              .jwt();
+              .csrf(CsrfConfigurer::disable)
+              .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+              .oauth2ResourceServer(oauth2ResourceServerConfigurer -> oauth2ResourceServerConfigurer.jwt());
+
         return http.build();
     }
 

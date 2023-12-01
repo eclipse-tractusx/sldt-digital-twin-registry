@@ -19,7 +19,9 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.controller;
 
+import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.eclipse.tractusx.semantics.aas.registry.api.DescriptionApiDelegate;
 import org.eclipse.tractusx.semantics.aas.registry.api.LookupApiDelegate;
@@ -38,6 +40,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.context.request.NativeWebRequest;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class AssetAdministrationShellApiDelegate implements DescriptionApiDelegate, ShellDescriptorsApiDelegate, LookupApiDelegate {
@@ -62,8 +67,7 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     @Override
     public ResponseEntity<ServiceDescription> getDescription() {
         ServiceDescription serviceDescription = new ServiceDescription();
-        serviceDescription.setProfiles( List.of( ServiceDescription.ProfilesEnum.ASSETADMINISTRATIONSHELLREPOSITORYSERVICESPECIFICATION_V3_0_MINIMALPROFILE, 
-              ServiceDescription.ProfilesEnum.REGISTRYSERVICESPECIFICATION_V3_0) );
+        serviceDescription.setProfiles( List.of( ServiceDescription.ProfilesEnum.ASSETADMINISTRATIONSHELLREGISTRYSERVICESPECIFICATION_SSP_001, ServiceDescription.ProfilesEnum.DISCOVERYSERVICESPECIFICATION_SSP_001) );
         return  new ResponseEntity<>( serviceDescription, HttpStatus.OK );
     }
 
@@ -149,14 +153,27 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
 
     @Override
-    public ResponseEntity<GetAllAssetAdministrationShellIdsByAssetLink200Response> getAllAssetAdministrationShellIdsByAssetLink(List<SpecificAssetId> assetIds,
+    public ResponseEntity<GetAllAssetAdministrationShellIdsByAssetLink200Response> getAllAssetAdministrationShellIdsByAssetLink(List<byte[]> assetIds,
     Integer limit, String cursor, @RequestHeader String externalSubjectId) {
         if (assetIds == null || assetIds.isEmpty()) {
             return new ResponseEntity<>(new GetAllAssetAdministrationShellIdsByAssetLink200Response(), HttpStatus.OK);
         }
+
+        List<SpecificAssetId> listSpecificAssetId =assetIds.stream().map( this::decodeSAID).collect( Collectors.toList());
         GetAllAssetAdministrationShellIdsByAssetLink200Response result  =
-              shellService.findExternalShellIdsByIdentifiersByExactMatch(shellMapper.fromApiDto(assetIds), limit, cursor,getExternalSubjectIdOrEmpty(externalSubjectId));
+              shellService.findExternalShellIdsByIdentifiersByExactMatch(shellMapper.fromApiDto(listSpecificAssetId), limit, cursor,getExternalSubjectIdOrEmpty(externalSubjectId));
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    private SpecificAssetId decodeSAID(byte[] encodedId){
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion( JsonInclude.Include.NON_NULL);
+        try {
+            byte[] decodedBytes = Base64.getUrlDecoder().decode( encodedId );
+            return mapper.readValue(decodedBytes, SpecificAssetId.class );
+        } catch (Exception e ) {
+            throw new IllegalArgumentException("Incorrect Base64 encoded value provided as parameter");
+        }
     }
 
     @Override

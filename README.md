@@ -35,7 +35,7 @@ Run `docker build -t registry .`
 In case you want to publish your image into a remote container registry, apply the tag accordingly and `docker push` the image.
 
 ## Install Instructions
-For detailed install instructions please refer to our [INSTALL.md](./INSTALL.md)
+For detailed install instructions please refer to our [INSTALL.md](https://github.com/eclipse-tractusx/sldt-digital-twin-registry/blob/main/INSTALL.md)
 
 ## Notice for Docker image
 
