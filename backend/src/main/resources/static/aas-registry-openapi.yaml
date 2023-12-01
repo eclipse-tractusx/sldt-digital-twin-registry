@@ -1396,7 +1396,7 @@ components:
           maxLength: 128
           type: string
         subprotocolBody:
-          maxLength: 2000
+          maxLength: 2048
           type: string
         subprotocolBodyEncoding:
           maxLength: 128
