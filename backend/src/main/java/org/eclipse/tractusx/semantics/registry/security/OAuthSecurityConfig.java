@@ -69,9 +69,11 @@ public class OAuthSecurityConfig {
                     //getDescription allowed for reader
                     .requestMatchers( HttpMethod.GET, "/**/description" ).access( "@authorizationEvaluator.hasRoleViewDigitalTwin()" )
               )
-              .csrf(CsrfConfigurer::disable)
-              .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-              .oauth2ResourceServer(oauth2ResourceServerConfigurer -> oauth2ResourceServerConfigurer.jwt());
+              .csrf().disable()
+              .sessionManagement().sessionCreationPolicy( SessionCreationPolicy.STATELESS )
+              .and()
+              .oauth2ResourceServer()
+              .jwt();
 
         return http.build();
     }
