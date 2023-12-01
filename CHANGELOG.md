@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Length for Column "SUB_PROTOCOL_BODY" has been extended to 2048.
 ## fixed
-
+- Fix done for encoding input parameter to get shell look up api.
+- Fixed response for GetDescription api.
 
 ## 0.3.20
 ### Added

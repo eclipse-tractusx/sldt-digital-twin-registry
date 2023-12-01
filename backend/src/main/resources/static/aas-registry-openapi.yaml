@@ -703,16 +703,12 @@ paths:
           # the "content" is the correct way to accept json encoded query parameters
           # style: form
           # explode: true
-          content:
-            application/json:
-              schema:
-                type: array
-                maxItems: 10000
-                items:
-                  $ref: '#/components/schemas/SpecificAssetId'
-              examples:
-                complete:
-                  $ref: '#/components/examples/lookup-shells-by-aas-identifier-query'
+          schema:
+            type: array
+            items:
+              type: string
+              format: byte
+            example: '?assetIds=eyAibmFtZSI6ICJzb21lLWFzc2V0LWlkIiwgInZhbHVlIjogImh0dHA6Ly9leGFtcGxlLWNvbXBhbnkuY29tL215QXNzZXQiLCAiZXh0ZXJuYWxTdWJqZWN0SWQiOiB7ICJrZXlzIjogWyB7ICJ0eXBlIjogIkdsb2JhbFJlZmVyZW5jZSIsICJ2YWx1ZSI6ICJodHRwOi8vZXhhbXBsZS1jb21wYW55LmNvbS9leGFtcGxlLWNvbXBhbnlzLWFzc2V0LWtleXMiIH0gXSwgInR5cGUiOiAiR2xvYmFsUmVmZXJlbmNlIiB9IH0&assetIds=eyAibmFtZSI6ICJzb21lLW90aGVyLWFzc2V0LWlkIiwgInZhbHVlIjogIjEyMzQ1QUJDIiwgImV4dGVybmFsU3ViamVjdElkIjogeyAia2V5cyI6IFsgeyAidHlwZSI6ICJHbG9iYWxSZWZlcmVuY2UiLCAidmFsdWUiOiAiaHR0cDovL215LW93bi1jb21wYW55LmNvbS9rZXlzIiB9IF0sICJ0eXBlIjogIkdsb2JhbFJlZmVyZW5jZSIgfSB9'
         - name: limit
           in: query
           description: The maximum number of elements in the response array
@@ -1505,29 +1501,30 @@ components:
       properties:
         profiles:
           minItems: 1
-          maxItems: 10000
           type: array
           items:
             type: string
             enum:
-              - AssetAdministrationShellServiceSpecification/V3.0
-              - AssetAdministrationShellServiceSpecification/V3.0-MinimalProfile
-              - SubmodelServiceSpecification/V3.0
-              - SubmodelServiceSpecification/V3.0-ValueProfile
-              - SubmodelServiceSpecification/V3.0-MinimalProfile
-              - AasxFileServerServiceSpecification/V3.0
-              - RegistryServiceSpecification/V3.0
-              - RegistryServiceSpecification/V3.0- AssetAdministrationShellRegistry
-              - RegistryServiceSpecification/V3.0-SubmodelRegistry
-              - RepositoryServiceSpecification/V3.0
-              - RepositoryServiceSpecification/V3.0-MinimalProfile
-              - AssetAdministrationShellRepositoryServiceSpecification/V3.0
-              - AssetAdministrationShellRepositoryServiceSpecification/V3.0-MinimalProfile
-              - SubmodelRepositoryServiceSpecification/V3.0
-              - SubmodelRepositoryServiceSpecification/V3.0-MinimalProfile
-              - RegistryAndDiscoveryServiceSpecification/V3.0
+              - https://admin-shell.io/aas/API/3/0/AssetAdministrationShellServiceSpecification/SSP-001
+              - https://admin-shell.io/aas/API/3/0/AssetAdministrationShellServiceSpecification/SSP-002
+              - https://admin-shell.io/aas/API/3/0/SubmodelServiceSpecification/SSP-001
+              - https://admin-shell.io/aas/API/3/0/SubmodelServiceSpecification/SSP-002
+              - https://admin-shell.io/aas/API/3/0/SubmodelServiceSpecification/SSP-003
+              - https://admin-shell.io/aas/API/3/0/AasxFileServerServiceSpecification/SSP-001
+              - https://admin-shell.io/aas/API/3/0/AssetAdministrationShellRegistryServiceSpecification/SSP-001
+              - https://admin-shell.io/aas/API/3/0/AssetAdministrationShellRegistryServiceSpecification/SSP-002
+              - https://admin-shell.io/aas/API/3/0/SubmodelRegistryServiceSpecification/SSP-001
+              - https://admin-shell.io/aas/API/3/0/SubmodelRegistryServiceSpecification/SSP-002
+              - https://admin-shell.io/aas/API/3/0/DiscoveryServiceSpecification/SSP-001
+              - https://admin-shell.io/aas/API/3/0/AssetAdministrationShellRepositoryServiceSpecification/SSP-001
+              - https://admin-shell.io/aas/API/3/0/AssetAdministrationShellRepositoryServiceSpecification/SSP-002
+              - https://admin-shell.io/aas/API/3/0/SubmodelRepositoryServiceSpecification/SSP-001
+              - https://admin-shell.io/aas/API/3/0/SubmodelRepositoryServiceSpecification/SSP-002
+              - https://admin-shell.io/aas/API/3/0/SubmodelRepositoryServiceSpecification/SSP-003
+              - https://admin-shell.io/aas/API/3/0/SubmodelRepositoryServiceSpecification/SSP-004
+              - https://admin-shell.io/aas/API/3/0/ConceptDescriptionServiceSpecification/SSP-001
       description: "The Description object enables servers to present their capabilities to the clients, in particular which profiles they implement. At least one defined profile is required. Additional, proprietary attributes might be included. Nevertheless, the server must not expect that a regular client understands them."
-      example: { "profiles": [ "RepositoryServiceSpecification/V3.0-MinimalProfile", "RegistryServiceSpecification/V3.0" ] }
+      example: { "profiles": ["https://admin-shell.io/aas/API/3/0/AssetAdministrationShellRegistryServiceSpecification/SSP-002", "https://admin-shell.io/aas/API/3/0/SubmodelRegistryServiceSpecification/SSP-002"] }
     PagedResult_paging_metadata:
       type: object
       properties:

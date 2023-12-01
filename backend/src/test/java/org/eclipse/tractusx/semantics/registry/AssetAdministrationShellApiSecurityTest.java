@@ -21,6 +21,7 @@ package org.eclipse.tractusx.semantics.registry;
 
 import static org.hamcrest.Matchers.*;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -515,11 +516,12 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
         public void testRbacForLookupByAssetIds() throws Exception {
 
             SpecificAssetId specificAssetId = TestUtil.createSpecificAssetId();
+           String encodedObject = Base64.getUrlEncoder().encodeToString(serialize( specificAssetId));
 
             mvc.perform(
                             MockMvcRequestBuilders
                                     .get(LOOKUP_SHELL_BASE_PATH)
-                                    .queryParam("assetIds", mapper.writeValueAsString(specificAssetId))
+                                    .queryParam("assetIds", encodedObject)
                                     .accept(MediaType.APPLICATION_JSON)
                                     .with(jwtTokenFactory.addTwin())
                     )
@@ -528,7 +530,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
     mvc.perform(
                     MockMvcRequestBuilders
                             .get(LOOKUP_SHELL_BASE_PATH)
-                            .param("assetIds",mapper.writeValueAsString(specificAssetId))
+                            .param("assetIds",encodedObject)
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .queryParam("limit",  "10")
                             .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -809,11 +811,13 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     .andExpect(status().isCreated())
                     .andExpect(content().json(mapper.writeValueAsString(List.of(specificAssetId))));
 
-            mvc.perform(
+           String encodedObject = Base64.getUrlEncoder().encodeToString(serialize( specificAssetId));
+
+           mvc.perform(
                             MockMvcRequestBuilders
                                     .get(LOOKUP_SHELL_BASE_PATH)
                                     .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
-                                    .queryParam("assetIds", mapper.writeValueAsString(List.of(specificAssetId)))
+                                    .queryParam("assetIds", encodedObject)
                                     .accept(MediaType.APPLICATION_JSON)
                                     .with(jwtTokenFactory.allRoles())
                     )
@@ -827,7 +831,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                                     .get(LOOKUP_SHELL_BASE_PATH)
                                     .accept(MediaType.APPLICATION_JSON)
                                     .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
-                                    .queryParam("assetIds", mapper.writeValueAsString(List.of(specificAssetId)))
+                                    .queryParam("assetIds", encodedObject)
                                     .with(jwtTokenFactory.tenantTwo().allRoles())
                     )
                     .andDo(MockMvcResultHandlers.print())
@@ -854,11 +858,14 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             SpecificAssetId sa1 = TestUtil.createSpecificAssetId(keyPrefix + "findExternal_2_1","value_2_1",List.of(jwtTokenFactory.tenantTwo().getTenantId()));
             SpecificAssetId sa2 = TestUtil.createSpecificAssetId(keyPrefix + "findExternal_2_2","value_2_2",List.of(jwtTokenFactory.tenantThree().getTenantId()));
 
+           String encodedSa1 = Base64.getUrlEncoder().encodeToString(serialize( sa1));
+           String encodedSa2 = Base64.getUrlEncoder().encodeToString(serialize( sa2));
             mvc.perform(
                             MockMvcRequestBuilders
                                     .get(LOOKUP_SHELL_BASE_PATH)
                                     .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
-                                    .queryParam("assetIds", mapper.writeValueAsString(List.of(sa1,sa2)))
+                                    .queryParam("assetIds", encodedSa1)
+                                  .queryParam("assetIds", encodedSa2)
                                     .accept(MediaType.APPLICATION_JSON)
                                     .with(jwtTokenFactory.allRoles())
                     )
@@ -871,12 +878,12 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             // test with tenantTwo assetId included
 
             SpecificAssetId specificAssetIdsWithTenantTwoIncluded = TestUtil.createSpecificAssetId(keyPrefix + "findExternal_2_2","value_2_2",null);
-
+           String encodedSaWithTenantTwoIncluded = Base64.getUrlEncoder().encodeToString(serialize( specificAssetIdsWithTenantTwoIncluded));
             mvc.perform(
                             MockMvcRequestBuilders
                                     .get(LOOKUP_SHELL_BASE_PATH)
                                     .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
-                                    .queryParam("assetIds", mapper.writeValueAsString(specificAssetIdsWithTenantTwoIncluded))
+                                    .queryParam("assetIds", encodedSaWithTenantTwoIncluded)
                                     .accept(MediaType.APPLICATION_JSON)
                                     .with(jwtTokenFactory.tenantTwo().allRoles())
                     )
@@ -890,7 +897,8 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                             MockMvcRequestBuilders
                                     .get(LOOKUP_SHELL_BASE_PATH)
                                     .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
-                                    .queryParam("assetIds", mapper.writeValueAsString(List.of(sa1,sa2)))
+                                  .queryParam("assetIds", encodedSa1)
+                                  .queryParam("assetIds", encodedSa2)
                                     .accept(MediaType.APPLICATION_JSON)
                                     .with(jwtTokenFactory.tenantTwo().allRoles())
                     )
@@ -930,12 +938,22 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
           SpecificAssetId sa4 = TestUtil.createSpecificAssetId(keyPrefix + "tenantTwo_tenantThree","value_3",null);
           SpecificAssetId sa5 = TestUtil.createSpecificAssetId(keyPrefix + "tenantTwo","value_2",null);
 
+          String encodedSa1 = Base64.getUrlEncoder().encodeToString(serialize( sa1));
+          String encodedSa2 = Base64.getUrlEncoder().encodeToString(serialize( sa2));
+          String encodedSa3 = Base64.getUrlEncoder().encodeToString(serialize( sa3));
+          String encodedSa4 = Base64.getUrlEncoder().encodeToString(serialize( sa4));
+          String encodedSa5 = Base64.getUrlEncoder().encodeToString(serialize( sa5));
+
           // Make request with bpn of the owner
           mvc.perform(
                       MockMvcRequestBuilders
                             .get(LOOKUP_SHELL_BASE_PATH)
                             .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
-                            .queryParam("assetIds", mapper.writeValueAsString(List.of(sa1,sa2,sa3,sa4,sa5)))
+                            .queryParam("assetIds", encodedSa1)
+                            .queryParam("assetIds", encodedSa2)
+                            .queryParam("assetIds", encodedSa3)
+                            .queryParam("assetIds", encodedSa4)
+                            .queryParam("assetIds", encodedSa5)
                             .accept(MediaType.APPLICATION_JSON)
                             .with(jwtTokenFactory.allRoles())
                 )
@@ -951,7 +969,8 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                       MockMvcRequestBuilders
                             .get(LOOKUP_SHELL_BASE_PATH)
                             .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
-                            .queryParam("assetIds", mapper.writeValueAsString(List.of(sa2,sa5)))
+                            .queryParam("assetIds", encodedSa2)
+                            .queryParam("assetIds", encodedSa5)
                             .accept(MediaType.APPLICATION_JSON)
                             .with(jwtTokenFactory.tenantTwo().allRoles())
                 )
@@ -968,7 +987,9 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                       MockMvcRequestBuilders
                             .get(LOOKUP_SHELL_BASE_PATH)
                             .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
-                            .queryParam("assetIds", mapper.writeValueAsString(List.of(sa2,sa3,sa5)))
+                            .queryParam("assetIds", encodedSa2)
+                            .queryParam("assetIds", encodedSa3)
+                            .queryParam("assetIds", encodedSa5)
                             .accept(MediaType.APPLICATION_JSON)
                             .with(jwtTokenFactory.tenantTwo().allRoles())
                 )
@@ -981,7 +1002,8 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                       MockMvcRequestBuilders
                             .get(LOOKUP_SHELL_BASE_PATH)
                             .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantThree().getTenantId() )
-                            .queryParam("assetIds", mapper.writeValueAsString(List.of(sa2,sa5)))
+                            .queryParam("assetIds", encodedSa2)
+                            .queryParam("assetIds", encodedSa5)
                             .accept(MediaType.APPLICATION_JSON)
                             .with(jwtTokenFactory.tenantTwo().allRoles())
                 )
@@ -1009,11 +1031,15 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
           SpecificAssetId sa1 = TestUtil.createSpecificAssetId(keyPrefix + "defaultClosed","value_1",null);
           SpecificAssetId sa2 = TestUtil.createSpecificAssetId(keyPrefix + "public_visible","value_2",null);
 
+          String encodedSa1 = Base64.getUrlEncoder().encodeToString(serialize( sa1));
+          String encodedSa2 = Base64.getUrlEncoder().encodeToString(serialize( sa2));
+
           mvc.perform(
                       MockMvcRequestBuilders
                             .get(LOOKUP_SHELL_BASE_PATH)
                             .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
-                            .queryParam("assetIds", mapper.writeValueAsString(List.of(sa1,sa2)))
+                            .queryParam("assetIds", encodedSa1)
+                            .queryParam("assetIds", encodedSa2)
                             .accept(MediaType.APPLICATION_JSON)
                             .with(jwtTokenFactory.allRoles())
                 )
@@ -1027,7 +1053,8 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                       MockMvcRequestBuilders
                             .get(LOOKUP_SHELL_BASE_PATH)
                             .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
-                            .queryParam("assetIds", mapper.writeValueAsString(List.of(sa1,sa2)))
+                            .queryParam("assetIds", encodedSa1)
+                            .queryParam("assetIds", encodedSa2)
                             .accept(MediaType.APPLICATION_JSON)
                             .with(jwtTokenFactory.tenantTwo().allRoles())
                 )
@@ -1242,5 +1269,56 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                 .andExpect(jsonPath("$.submodelDescriptors[*]").exists())
                 .andExpect(jsonPath("$.specificAssetIds[*]").exists());
        }
+   }
+   @Nested
+   @DisplayName( "Description Authentication Tests" )
+   class DescriptionApiTest {
+
+      @Test
+      public void testGetDescriptionOnlyDeleteRoleExpectForbidden() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( "/api/v3.0/description" )
+                           .accept( MediaType.APPLICATION_JSON )
+                           .with( jwtTokenFactory.deleteTwin() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect(status().isForbidden());
+      }
+
+      @Test
+      public void testGetDescriptionNoRoleExpectForbidden() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( "/api/v3.0/description" )
+                           .accept( MediaType.APPLICATION_JSON )
+                           .with( jwtTokenFactory.withoutRoles() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect(status().isForbidden());
+      }
+
+      @Test
+      public void testGetDescriptionReadRoleExpectSuccess() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( "/api/v3.0/description" )
+                           .accept( MediaType.APPLICATION_JSON )
+                           .with( jwtTokenFactory.readTwin() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect(status().isOk());
+      }
+
+      @Test
+      public void testGetDescriptionReadRoleExpectUnauthorized() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( "/api/v3.0/description" )
+                           .accept( MediaType.APPLICATION_JSON )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect(status().isUnauthorized());
+      }
    }
 }

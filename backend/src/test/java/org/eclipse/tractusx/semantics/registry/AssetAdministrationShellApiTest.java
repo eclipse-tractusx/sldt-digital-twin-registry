@@ -19,10 +19,11 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry;
 
-import static org.eclipse.tractusx.semantics.registry.TestUtil.getEncodedValue;
+import static org.eclipse.tractusx.semantics.registry.TestUtil.*;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -678,7 +679,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                )
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isBadRequest() )
-               .andExpect( jsonPath( "$.messages[0].text", is( "The provided parameters are invalid. assetIds={ invalid }" ) ) );
+               .andExpect( jsonPath( "$.messages[0].text", is( "Incorrect Base64 encoded value provided as parameter" ) ) );
       }
 
       @Test
@@ -725,11 +726,12 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          performShellCreateRequest( mapper.writeValueAsString( shellPayload2 ) );
 
          SpecificAssetId specificAssetId1 = TestUtil.createSpecificAssetId();
+         String encodedSa1 = Base64.getUrlEncoder().encodeToString(serialize( specificAssetId1));
 
          mvc.perform(
                      MockMvcRequestBuilders
                            .get( LOOKUP_SHELL_BASE_PATH )
-                           .queryParam( "assetIds", mapper.writeValueAsString( specificAssetId1 ) )
+                           .queryParam( "assetIds", encodedSa1 )
                            .queryParam( "limit", "1" )
                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .accept( MediaType.APPLICATION_JSON )
@@ -742,10 +744,11 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          // Test first shell match with single assetId
 
          SpecificAssetId specificAssetId2 = TestUtil.createSpecificAssetId( "identifier99KeyExample", "identifier99ValueExample", null );
+         String encodedSa2 = Base64.getUrlEncoder().encodeToString(serialize( specificAssetId2));
          mvc.perform(
                      MockMvcRequestBuilders
                            .get( LOOKUP_SHELL_BASE_PATH )
-                           .queryParam( "assetIds", mapper.writeValueAsString( specificAssetId2 ) )
+                           .queryParam( "assetIds", encodedSa2)
                            .queryParam( "limit", "10" )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
@@ -757,11 +760,11 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          //            // Test first and second shell match with common asssetId
 
          SpecificAssetId specificAssetId3 = TestUtil.createSpecificAssetId( "commonAssetIdKey", "commonAssetIdValue", null );
-
+         String encodedSa3 = Base64.getUrlEncoder().encodeToString(serialize( specificAssetId3));
          mvc.perform(
                      MockMvcRequestBuilders
                            .get( LOOKUP_SHELL_BASE_PATH )
-                           .queryParam( "assetIds", mapper.writeValueAsString( specificAssetId3 ) )
+                           .queryParam( "assetIds", encodedSa3 )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -782,14 +785,15 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
          performShellCreateRequest(payload );
 
          // for lookup global asset id is handled as specificAssetIds
-         ArrayNode globalAssetIdForSampleQuery = emptyArrayNode().add(
-               specificAssetId( "globalAssetId", globalAssetId )
-         );
+         SpecificAssetId SAGlobal = TestUtil.createSpecificAssetId("globalAssetId",globalAssetId,null);
+         String encodedSa1 = Base64.getUrlEncoder().encodeToString(serialize( SAGlobal));
+
+
          mvc.perform(
                      MockMvcRequestBuilders
                            .get( LOOKUP_SHELL_BASE_PATH )
                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
-                           .queryParam( "assetIds", toJson( globalAssetIdForSampleQuery ) )
+                           .queryParam( "assetIds", encodedSa1)
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
@@ -1145,6 +1149,24 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
             .andDo( MockMvcResultHandlers.print() )
             .andExpect( status().isBadRequest() )
             .andExpect( jsonPath( "$.messages[0].text", is( ShellService.DUPLICATE_SUBMODEL_ID_SHORT_EXCEPTION ) ) );
+   }
+
+
+   @Nested
+   @DisplayName( "Description Tests" )
+   class DescriptionApiTest {
+      @Test
+      public void testGetDescriptionExpectSuccess() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( "/api/v3.0/description" )
+                           .accept( MediaType.APPLICATION_JSON )
+                           .with( jwtTokenFactory.allRoles() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isOk() )
+               .andExpect( jsonPath( "$.profiles[0]", is( "https://admin-shell.io/aas/API/3/0/AssetAdministrationShellRegistryServiceSpecification/SSP-001" ) ) );
+      }
    }
 
 }
