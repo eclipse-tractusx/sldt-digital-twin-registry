@@ -41,8 +41,8 @@ public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecific
    @Query( value = "select * from shell s " +
          "where s.id_external = :idExternal and (" +
          ":tenantId = :owningTenantId " +
-         "or s.id in (" +
-            "select si.fk_shell_id from shell_identifier si where exists (" +
+         "or exists (" +
+            "select si.fk_shell_id from shell_identifier si where si.fk_shell_id = s.id and exists (" +
             "select sider.ref_key_value from SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY sider " +
             "where (sider.ref_key_value = :tenantId " +
             "or (sider.ref_key_value = :publicWildcardPrefix and si.namespace in (:publicWildcardAllowedTypes) )) " +
