@@ -978,8 +978,8 @@ components:
               type: string
             endpoints:
               minItems: 1
-              maxItems: 10000
               type: array
+              maxItems: 10000
               items:
                 $ref: '#/components/schemas/Endpoint'
             globalAssetId:
@@ -1061,8 +1061,8 @@ components:
               type: string
             refersTo:
               minItems: 1
-              maxItems: 10000
               type: array
+              maxItems: 10000
               items:
                 $ref: '#/components/schemas/Reference'
     HasSemantics:
@@ -1072,8 +1072,8 @@ components:
           $ref: '#/components/schemas/Reference'
         supplementalSemanticIds:
           minItems: 1
-          maxItems: 10000
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/Reference'
     Reference:
@@ -1087,8 +1087,8 @@ components:
           $ref: '#/components/schemas/ReferenceTypes'
         keys:
           minItems: 1
-          maxItems: 10000
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/Key'
     ReferenceTypes:
@@ -1197,8 +1197,8 @@ components:
       properties:
         embeddedDataSpecifications:
           minItems: 1
-          maxItems: 10000
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/EmbeddedDataSpecification'
     EmbeddedDataSpecification:
@@ -1225,8 +1225,8 @@ components:
                 $ref: '#/components/schemas/LangStringPreferredNameTypeIec61360'
             shortName:
               minItems: 1
-              maxItems: 10000
               type: array
+              maxItems: 10000
               items:
                 $ref: '#/components/schemas/LangStringShortNameTypeIec61360'
             unit:
@@ -1247,8 +1247,8 @@ components:
               $ref: '#/components/schemas/DataTypeIec61360'
             definition:
               minItems: 1
-              maxItems: 10000
               type: array
+              maxItems: 10000
               items:
                 $ref: '#/components/schemas/LangStringDefinitionTypeIec61360'
             valueFormat:
@@ -1341,8 +1341,8 @@ components:
       properties:
         valueReferencePairs:
           minItems: 1
-          maxItems: 10000
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/ValueReferencePair'
     ValueReferencePair:
@@ -1403,8 +1403,8 @@ components:
           type: string
         securityAttributes:
           minItems: 1
-          maxItems: 10000
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/ProtocolInformation_securityAttributes'
     SpecificAssetId:
@@ -1434,8 +1434,8 @@ components:
           $ref: '#/components/schemas/AdministrativeInformation'
         endpoints:
           minItems: 1
-          maxItems: 10000
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/Endpoint'
         idShort:
@@ -1450,8 +1450,8 @@ components:
           $ref: '#/components/schemas/Reference'
         supplementalSemanticId:
           minItems: 1
-          maxItems: 10000
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/Reference'
       example: {"endpoints": [{"interface": "interfaceNameExample","protocolInformation": {"href": "endpointAddressExample","endpointProtocol": "endpointProtocolExample","endpointProtocolVersion": [ "e"],"subprotocol": "subprotocolExample","subprotocolBody": "subprotocolBodyExample","subprotocolBodyEncoding": "subprotocolBodyExample","securityAttributes": [{"type": "NONE","key": "Security Attribute key","value": "Security Attribute value" }]}}],"idShort": "idShortExample","id": "341f63de-728a-4b6d-9c72-c0d9ba4f8c7d","semanticId": {"type": "ExternalReference","keys": [{"type": "Submodel","value": "semanticIdExample"}]},"description": [{"language": "de","text": "hello text"},{"language": "en","text": "hello s"}]}
@@ -1505,8 +1505,8 @@ components:
       properties:
         profiles:
           minItems: 1
-          maxItems: 10000
           type: array
+          maxItems: 10000
           items:
             type: string
             enum:
