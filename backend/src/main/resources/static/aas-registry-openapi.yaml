@@ -705,6 +705,7 @@ paths:
           # explode: true
           schema:
             type: array
+            maxItems: 10000
             items:
               type: string
               format: byte
