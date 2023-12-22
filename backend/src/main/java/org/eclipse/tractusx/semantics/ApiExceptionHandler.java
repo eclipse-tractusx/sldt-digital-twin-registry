@@ -22,13 +22,11 @@ package org.eclipse.tractusx.semantics;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.eclipse.tractusx.semantics.aas.registry.model.Message;
 import org.eclipse.tractusx.semantics.aas.registry.model.Result;
-import org.eclipse.tractusx.semantics.registry.model.support.DatabaseExceptionTranslation;
 import org.eclipse.tractusx.semantics.registry.service.EntityNotFoundException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
@@ -97,9 +95,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
    @ExceptionHandler( { DuplicateKeyException.class } )
    @ResponseStatus( HttpStatus.BAD_REQUEST )
-   public ResponseEntity<Object> handleDuplicateKeyException( DuplicateKeyException e ) {
+   public ResponseEntity<Object> handleDuplicateKeyException( DuplicateKeyException duplicateKeyException ) {
       return new ResponseEntity<>(
-            new Result().messages( List.of( new Message().messageType( Message.MessageTypeEnum.ERROR ).text( DatabaseExceptionTranslation.translate( e ) ) ) ),
+            new Result().messages( List.of( new Message().messageType( Message.MessageTypeEnum.ERROR ).text(duplicateKeyException.getMessage() ) ) ),
             HttpStatus.BAD_REQUEST );
    }
 
