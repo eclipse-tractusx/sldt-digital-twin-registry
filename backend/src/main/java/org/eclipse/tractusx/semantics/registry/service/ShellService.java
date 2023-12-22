@@ -42,7 +42,6 @@ import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
 import org.eclipse.tractusx.semantics.registry.model.Submodel;
 import org.eclipse.tractusx.semantics.registry.model.projection.ShellMinimal;
-import org.eclipse.tractusx.semantics.registry.model.support.DatabaseExceptionTranslation;
 import org.eclipse.tractusx.semantics.registry.repository.ShellIdentifierRepository;
 import org.eclipse.tractusx.semantics.registry.repository.ShellRepository;
 import org.eclipse.tractusx.semantics.registry.repository.SubmodelRepository;
@@ -429,9 +428,8 @@ public class ShellService {
                 return new BatchResultDto("AssetAdministrationShell successfully created.",
                         shell.getIdExternal(), HttpStatus.OK.value());
             } catch (Exception e) {
-                if (e.getCause() instanceof DuplicateKeyException) {
-                    DuplicateKeyException duplicateKeyException = (DuplicateKeyException) e.getCause();
-                    return new BatchResultDto(DatabaseExceptionTranslation.translate(duplicateKeyException),
+                if ( e.getCause() instanceof DuplicateKeyException duplicateKeyException ) {
+                   return new BatchResultDto(duplicateKeyException.getMessage(),
                             shell.getIdExternal(),
                             HttpStatus.BAD_REQUEST.value());
                 }
