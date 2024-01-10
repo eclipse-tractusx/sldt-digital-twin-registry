@@ -25,7 +25,7 @@ By default, the Registry includes an `Ingress` that exposes the API on https://m
 For that to work, you need to append `/etc/hosts` by running `echo "$(minikube ip) minikube" | sudo tee -a /etc/hosts`.
 
 For automated certificate generation, use and configure [cert-manager](https://cert-manager.io/).
-By default, authentication is deactivated, please adjust `registry.authentication` if needed
+By default, authentication is activated, please adjust `registry.authentication` if needed
 
 ## Parameters
 The Helm Chart can be configured using the following parameters (incomplete list). For a full overview, please see the [values.yaml](./backend/deployment/registry/values.yaml).
@@ -35,7 +35,7 @@ The Helm Chart can be configured using the following parameters (incomplete list
 | ---             |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------|
 | `registry.image`     | The image of the Registry                                                                                                                                                                                                                | `registry:latest`                           |
 | `registry.host`     | This value is used by the `Ingress` object (if enabled) to route traffic.                                                                                                                                                                | `minikube`                                  |
-| `registry.authentication`    | Enables OAuth2 based authentication/authorization.                                                                                                                                                                                       | `false`                                     |
+| `registry.authentication`    | Enables OAuth2 based authentication/authorization.                                                                                                                                                                                       | `true`                                      |
 | `registry.idpIssuerUri`    | The issuer URI of the OAuth2 identity provider.                                                                                                                                                                                          | `http://localhost:8080/auth/realms/catenax` |
 | `registry.dataSource.driverClassName`    | The driver class name for the database connection.                                                                                                                                                                                       | `org.postgresql.Driver`                     |
 | `registry.dataSource.url`    | The url of the relational database (ignored if `enablePostgres` is set to `true`)                                                                                                                                                        | `jdbc:postgresql://database:5432`           |
@@ -49,7 +49,7 @@ The Helm Chart can be configured using the following parameters (incomplete list
 | `registry.ingress.annotations`    | Annotations to further configure the `Ingress` resource, e.g. for using with `cert-manager`.                                                                                                                                             |                                             |
 | `registry.tenantId`     | TenantId which is the owner of the DTR.                                                                                                                                                                                                  |                                             |
 | `registry.externalSubjectIdWildcardPrefix`    | WildcardPrefix to make a specificAssetId visible for everyone.                                                                                                                                                                           | `PUBLIC_READABLE`                           |
-| `registry.externalSubjectIdWildcardAllowedTypes`    | List of allowed types that can be made visible to everyone.                                                                                                                                                                              | `manufacturerPartId,assetLifecyclePhase`                                          |
+| `registry.externalSubjectIdWildcardAllowedTypes`    | List of allowed types that can be made visible to everyone.                                                                                                                                                                              | `manufacturerPartId,assetLifecyclePhase`    |
 
 ### PostgreSQL
 | Parameter       | Description | Default value       |

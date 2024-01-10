@@ -705,6 +705,7 @@ paths:
           # explode: true
           schema:
             type: array
+            maxItems: 10000
             items:
               type: string
               format: byte
@@ -839,34 +840,6 @@ paths:
           description: Asset identifier key-value-pairs deleted successfully
       x-semanticIds:
         - https://admin-shell.io/aas/API/DeleteAllAssetLinksById/1/0/RC02
-  /lookup/shells/query:
-    post:
-      tags:
-        - Registry and Discovery Interface
-      summary: Returns a list of Asset Administration Shell ids based on Asset identifier key-value-pairs.
-      operationId: PostQueryAllAssetAdministrationShellIds
-      parameters:
-        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
-      requestBody:
-        description: Asset Administration Shell Descriptor object
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ShellLookup'
-        required: true
-      responses:
-        "200":
-          description: Requested Asset Administration Shell ids
-          content:
-            application/json:
-              schema:
-                type: array
-                maxItems: 10000
-                items:
-                  $ref: '#/components/schemas/Identifier'
-              examples:
-                complete:
-                  $ref: '#/components/examples/lookup-shells-by-aas-identifier-response'
 components:
   securitySchemes:
     bearerAuth:
@@ -874,23 +847,6 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
-    ShellLookup:
-      type: object
-      required:
-        - query
-      properties:
-        query:
-          type: object
-          properties:
-            assetIds:
-              type: array
-              maxItems: 10000
-              items:
-                $ref: '#/components/schemas/SpecificAssetId'
-    Identifier:
-      type: string
-      minLength: 1
-      maxLength: 200
     ModelReference:
       type: object
       required:
@@ -958,6 +914,7 @@ components:
     AssetAdministrationShellDescriptor:
       required:
         - id
+        - idShort
       type: object
       example: {"description":[{"language":"de","text":"hello text"},{"language":"en","text":"hello s"}],"displayName":[{"language":"de","text":"this is an example description1"}],"endpoints":[{"interface":"interfaceNameExample","protocolInformation":{"href":"endpointAddressExample","endpointProtocol":"endpointProtocolExample","endpointProtocolVersion":["e"],"subprotocol":"subprotocolExample","subprotocolBody":"subprotocolBodyExample","subprotocolBodyEncoding":"subprotocolBodyExample","securityAttributes":[{"type":"NONE","key": "Security Attribute key","value": "Security Attribute value"}]}}],"idShort":"idShortExample","id":"e1eba3d7-91f0-4dac-a730-eaa1d35e035c","specificAssetIds":[{"supplementalSemanticIds":[{"type":"ExternalReference","keys":[{"type":"Submodel","value":"semanticIdExample"}]}],"name":"identifier1KeyExample","value":"identifier1ValueExample"},{"supplementalSemanticIds":[{"type":"ExternalReference","keys":[{"type":"Submodel","value":"semanticIdExample"}]}],"name":"identifier2KeyExample","value":"identifier2ValueExample"}],"submodelDescriptors":[{"endpoints":[{"interface":"interfaceNameExample","protocolInformation":{"href":"endpointAddressExample","endpointProtocol":"endpointProtocolExample","endpointProtocolVersion":["e"],"subprotocol":"subprotocolExample","subprotocolBody":"subprotocolBodyExample","subprotocolBodyEncoding":"subprotocolBodyExample","securityAttributes":[{"type":"NONE","key": "Security Attribute key","value": "Security Attribute value"}]}}],"idShort":"idShortExample","id":"cd47615b-daf3-4036-8670-d2f89349d388","semanticId":{"type":"ExternalReference","keys":[{"type":"Submodel","value":"semanticIdExample"}]},"description":[{"language":"de","text":"hello text"},{"language":"en","text":"hello s"}]}]}
       allOf:
@@ -974,8 +931,8 @@ components:
               type: string
             endpoints:
               minItems: 1
-              maxItems: 10000
               type: array
+              maxItems: 10000
               items:
                 $ref: '#/components/schemas/Endpoint'
             globalAssetId:
@@ -1057,8 +1014,8 @@ components:
               type: string
             refersTo:
               minItems: 1
-              maxItems: 10000
               type: array
+              maxItems: 10000
               items:
                 $ref: '#/components/schemas/Reference'
     HasSemantics:
@@ -1068,8 +1025,8 @@ components:
           $ref: '#/components/schemas/Reference'
         supplementalSemanticIds:
           minItems: 1
-          maxItems: 10000
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/Reference'
     Reference:
@@ -1083,8 +1040,8 @@ components:
           $ref: '#/components/schemas/ReferenceTypes'
         keys:
           minItems: 1
-          maxItems: 10000
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/Key'
     ReferenceTypes:
@@ -1193,8 +1150,8 @@ components:
       properties:
         embeddedDataSpecifications:
           minItems: 1
-          maxItems: 10000
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/EmbeddedDataSpecification'
     EmbeddedDataSpecification:
@@ -1221,8 +1178,8 @@ components:
                 $ref: '#/components/schemas/LangStringPreferredNameTypeIec61360'
             shortName:
               minItems: 1
-              maxItems: 10000
               type: array
+              maxItems: 10000
               items:
                 $ref: '#/components/schemas/LangStringShortNameTypeIec61360'
             unit:
@@ -1243,8 +1200,8 @@ components:
               $ref: '#/components/schemas/DataTypeIec61360'
             definition:
               minItems: 1
-              maxItems: 10000
               type: array
+              maxItems: 10000
               items:
                 $ref: '#/components/schemas/LangStringDefinitionTypeIec61360'
             valueFormat:
@@ -1337,8 +1294,8 @@ components:
       properties:
         valueReferencePairs:
           minItems: 1
-          maxItems: 10000
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/ValueReferencePair'
     ValueReferencePair:
@@ -1399,8 +1356,8 @@ components:
           type: string
         securityAttributes:
           minItems: 1
-          maxItems: 10000
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/ProtocolInformation_securityAttributes'
     SpecificAssetId:
@@ -1430,8 +1387,8 @@ components:
           $ref: '#/components/schemas/AdministrativeInformation'
         endpoints:
           minItems: 1
-          maxItems: 10000
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/Endpoint'
         idShort:
@@ -1446,8 +1403,8 @@ components:
           $ref: '#/components/schemas/Reference'
         supplementalSemanticId:
           minItems: 1
-          maxItems: 10000
           type: array
+          maxItems: 10000
           items:
             $ref: '#/components/schemas/Reference'
       example: {"endpoints": [{"interface": "interfaceNameExample","protocolInformation": {"href": "endpointAddressExample","endpointProtocol": "endpointProtocolExample","endpointProtocolVersion": [ "e"],"subprotocol": "subprotocolExample","subprotocolBody": "subprotocolBodyExample","subprotocolBodyEncoding": "subprotocolBodyExample","securityAttributes": [{"type": "NONE","key": "Security Attribute key","value": "Security Attribute value" }]}}],"idShort": "idShortExample","id": "341f63de-728a-4b6d-9c72-c0d9ba4f8c7d","semanticId": {"type": "ExternalReference","keys": [{"type": "Submodel","value": "semanticIdExample"}]},"description": [{"language": "de","text": "hello text"},{"language": "en","text": "hello s"}]}
@@ -1502,6 +1459,7 @@ components:
         profiles:
           minItems: 1
           type: array
+          maxItems: 10000
           items:
             type: string
             enum:

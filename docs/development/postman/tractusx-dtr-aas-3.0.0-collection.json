@@ -517,55 +517,6 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "Get list of ShellIds (any search)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Edc-Bpn",
-								"value": "",
-								"description": "BPN (This is normally send via EDC)",
-								"type": "default"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"query\": {\n    \"assetIds\": [\n      {\n        \"name\": \"oen\",\n        \"value\": \"1239485\"\n      },\n      {\n        \"name\": \"manufacturePartId\",\n        \"value\": \"123\"\n      }\n    ]\n  }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/v3.0/lookup/shells/query",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v3.0",
-								"lookup",
-								"shells",
-								"query"
-							],
-							"query": [
-								{
-									"key": "limit",
-									"value": null,
-									"disabled": true
-								},
-								{
-									"key": "cursor",
-									"value": null,
-									"disabled": true
-								}
-							]
-						}
-					},
-					"response": []
 				}
 			]
 		}
