@@ -17,10 +17,13 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 ###############################################################
+
+{{- $fullName := include "chart.fullname" . }}
+{{- $testconfig_name := printf "%s-test-config" $fullName }}
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: test-script
+  name: {{ $testconfig_name  }}
 data:
   test-script.sh: |
     #!/bin/sh

@@ -17,10 +17,13 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 ###############################################################
+
+{{- $fullName := include "chart.fullname" . }}
+{{- $testc_name := printf "%s-test" $fullName }}
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "test-script-pod"
+  name: {{ $testc_name  }}
   annotations:
     "helm.sh/hook": test
 spec:

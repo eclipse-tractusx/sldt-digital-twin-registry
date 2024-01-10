@@ -18,18 +18,18 @@
 # SPDX-License-Identifier: Apache-2.0
 ###############################################################
 
-{{- $deployment_name := printf "cx-%s-registry" .Release.Name }}
-{{- $svc_name := printf "%s-svc" $deployment_name }}
+{{- $fullName := include "chart.fullname" . }}
+{{- $svc_name := printf "%s-svc" $fullName }}
 apiVersion: v1
 kind: Service
 metadata:
   name: {{ $svc_name }}
   labels:
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    {{- include "chart.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.registry.service.type }}
   ports:
     - port: {{ .Values.registry.service.port }}
       targetPort: {{ .Values.registry.containerPort }}
   selector:
-    app: {{ $deployment_name }}
+    {{- include "chart.selectorLabels" . | nindent 6 }}

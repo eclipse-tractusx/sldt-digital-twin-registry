@@ -21,7 +21,8 @@
 
 {{- $deployment_name := printf "cx-%s-registry" .Release.Name }}
 {{- $svc_name := printf "%s-svc" $deployment_name }}
-{{- $ingr_name := printf "%s-ingr" $deployment_name }}
+{{- $fullName := include "chart.fullname" . }}
+{{- $ingr_name := printf "%s-ingr" $fullName }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -29,7 +30,7 @@ metadata:
   annotations:
 {{ .Values.registry.ingress.annotations | toYaml | indent 4 }}
   labels:
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    {{- include "chart.labels" . | nindent 4 }}
 spec:
   ingressClassName: {{ .Values.registry.ingress.className }}
   {{- if .Values.registry.ingress.tls }}
