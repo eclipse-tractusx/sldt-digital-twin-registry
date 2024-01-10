@@ -19,14 +19,23 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.controller;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.eclipse.tractusx.semantics.aas.registry.api.DescriptionApiDelegate;
 import org.eclipse.tractusx.semantics.aas.registry.api.LookupApiDelegate;
 import org.eclipse.tractusx.semantics.aas.registry.api.ShellDescriptorsApiDelegate;
-import org.eclipse.tractusx.semantics.aas.registry.model.*;
+import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
+import org.eclipse.tractusx.semantics.aas.registry.model.AssetKind;
+import org.eclipse.tractusx.semantics.aas.registry.model.GetAllAssetAdministrationShellIdsByAssetLink200Response;
+import org.eclipse.tractusx.semantics.aas.registry.model.GetAssetAdministrationShellDescriptorsResult;
+import org.eclipse.tractusx.semantics.aas.registry.model.GetSubmodelDescriptorsResult;
+import org.eclipse.tractusx.semantics.aas.registry.model.ServiceDescription;
+import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
+import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
 import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
 import org.eclipse.tractusx.semantics.registry.dto.SubmodelCollectionDto;
 import org.eclipse.tractusx.semantics.registry.mapper.ShellMapper;
@@ -187,17 +196,6 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
         Set<ShellIdentifier> shellIdentifiers = shellService.save(getDecodedId( aasIdentifier ), shellMapper.fromApiDto(specificAssetId),getExternalSubjectIdOrEmpty( externalSubjectId ));
         List<SpecificAssetId> list = shellMapper.toApiDto(shellIdentifiers);
         return new ResponseEntity<>(list, HttpStatus.CREATED);
-    }
-
-    /**
-     * Since /query is not part of AAS 3.0, so this method is not used.
-     * Keeping it for the reason that it might come up in next version.
-     */
-    @Deprecated
-    public ResponseEntity<List<String>> postQueryAllAssetAdministrationShellIds(ShellLookup shellLookup,@RequestHeader String externalSubjectId) {
-        List<SpecificAssetId> assetIds = shellLookup.getQuery().getAssetIds();
-        List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByAnyMatch(shellMapper.fromApiDto(assetIds),getExternalSubjectIdOrEmpty(externalSubjectId));
-        return new ResponseEntity<>(externalIds, HttpStatus.OK);
     }
 
     private String getExternalSubjectIdOrEmpty(String externalSubjectId) {

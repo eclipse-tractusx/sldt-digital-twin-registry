@@ -575,32 +575,6 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                     .andExpect(status().isCreated());
         }
 
-       @Test
-        public void testRbacForFindShellsWithAnyMatch() throws Exception {
-            JsonNode anyMatchLookupPayload = mapper.createObjectNode().set("query", mapper.createObjectNode()
-                    .set("assetIds", emptyArrayNode().add(specificAssetId("abc", "123")))
-            );
-            mvc.perform(
-                            MockMvcRequestBuilders
-                                    .post(LOOKUP_SHELL_BASE_PATH + "/query")
-                                    .content(toJson(anyMatchLookupPayload))
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .with(jwtTokenFactory.deleteTwin())
-                    )
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isForbidden());
-
-            mvc.perform(
-                            MockMvcRequestBuilders
-                                    .post(LOOKUP_SHELL_BASE_PATH + "/query")
-                                    .content(toJson(anyMatchLookupPayload))
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .with(jwtTokenFactory.readTwin())
-                    )
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isOk());
-        }
-
 //        @Test - don't have /fetch
         public void testRbacForFetchShellsByIds() throws Exception {
             mvc.perform(
