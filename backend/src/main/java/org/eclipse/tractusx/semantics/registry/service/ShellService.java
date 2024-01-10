@@ -109,7 +109,7 @@ public class ShellService {
     */
    private void validateIdShort( Shell shell ) {
       //Check uniqueness of IdShort in shell level
-      Optional.of( shell.getIdShort() ).map( shellRepository::existsByIdShort ).filter( BooleanUtils::isFalse )
+      Optional.ofNullable( shell.getIdShort() ).map( shellRepository::existsByIdShort ).filter( BooleanUtils::isFalse )
             .orElseThrow( () -> new DuplicateKeyException( "An AssetAdministrationShell for the given IdShort already exists." ) );
 
       checkForDuplicateIdShortWithInSubModels( shell );
