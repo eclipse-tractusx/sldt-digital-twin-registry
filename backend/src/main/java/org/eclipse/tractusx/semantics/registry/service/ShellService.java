@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.aas.registry.model.GetAllAssetAdministrationShellIdsByAssetLink200Response;
 import org.eclipse.tractusx.semantics.aas.registry.model.PagedResultPagingMetadata;
@@ -109,8 +110,10 @@ public class ShellService {
     */
    private void validateIdShort( Shell shell ) {
       //Check uniqueness of IdShort in shell level
-      Optional.of( shell.getIdShort() ).map( shellRepository::existsByIdShort ).filter( BooleanUtils::isFalse )
-            .orElseThrow( () -> new DuplicateKeyException( "An AssetAdministrationShell for the given IdShort already exists." ) );
+      Optional.ofNullable( shell.getIdShort() ).map( shellRepository::existsByIdShort ).filter( BooleanUtils::isTrue )
+            .ifPresent( aBoolean -> {
+               throw new DuplicateKeyException( "An AssetAdministrationShell for the given IdShort already exists." );
+            } );
 
       checkForDuplicateIdShortWithInSubModels( shell );
    }
@@ -121,6 +124,7 @@ public class ShellService {
             .map( Collection::stream )
             .orElseGet( Stream::empty )
             .map( Submodel::getIdShort )
+            .filter( StringUtils::isNotBlank )
             .map( String::toLowerCase )
             .toList();
 
