@@ -933,7 +933,68 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
    @DisplayName( "Test creating a new Asset Administration Shell Descriptor with unique IdShort in shell and submodelDescriptor level" )
    public void test_Creating_a_new_Asset_Administration_Shell_Descriptor_with_unique_IdShort_in_shell_and_submodelDescriptor_level() throws Exception {
       //Given
+      removedAllShells();
       AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+      //When & Then
+      mvc.perform(
+                  MockMvcRequestBuilders
+                        .post( SHELL_BASE_PATH )
+                        .accept( MediaType.APPLICATION_JSON )
+                        .contentType( MediaType.APPLICATION_JSON )
+                        .content( mapper.writeValueAsString( shellPayload ) )
+                        .with( jwtTokenFactory.allRoles() )
+            )
+            .andDo( MockMvcResultHandlers.print() )
+            .andExpect( status().isCreated());
+   }
+
+   @Test
+   @DisplayName( "Test creating a new Asset Administration Shell Descriptor with empty IdShort in shell and submodelDescriptor level" )
+   public void test_Creating_a_new_Asset_Administration_Shell_Descriptor_with_empty_IdShort_in_shell_and_submodelDescriptor_level() throws Exception {
+      //Given
+      removedAllShells();
+      AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+      shellPayload.setIdShort( null );
+      shellPayload.getSubmodelDescriptors().get( 0 ).setIdShort( null );
+      //When & Then
+      mvc.perform(
+                  MockMvcRequestBuilders
+                        .post( SHELL_BASE_PATH )
+                        .accept( MediaType.APPLICATION_JSON )
+                        .contentType( MediaType.APPLICATION_JSON )
+                        .content( mapper.writeValueAsString( shellPayload ) )
+                        .with( jwtTokenFactory.allRoles() )
+            )
+            .andDo( MockMvcResultHandlers.print() )
+            .andExpect( status().isCreated());
+   }
+
+   @Test
+   @DisplayName( "Test creating a new Asset Administration Shell Descriptor with empty IdShort in shell and valid IdShort in submodelDescriptor level" )
+   public void test_Creating_a_new_Asset_Administration_Shell_Descriptor_with_empty_IdShort_in_shell_and_valid_IdShort_in_submodelDescriptor_level() throws Exception {
+      //Given
+      removedAllShells();
+      AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+      shellPayload.setIdShort( null );
+      //When & Then
+      mvc.perform(
+                  MockMvcRequestBuilders
+                        .post( SHELL_BASE_PATH )
+                        .accept( MediaType.APPLICATION_JSON )
+                        .contentType( MediaType.APPLICATION_JSON )
+                        .content( mapper.writeValueAsString( shellPayload ) )
+                        .with( jwtTokenFactory.allRoles() )
+            )
+            .andDo( MockMvcResultHandlers.print() )
+            .andExpect( status().isCreated());
+   }
+
+   @Test
+   @DisplayName( "Test creating a new Asset Administration Shell Descriptor with valid IdShort in shell and empty IdShort in submodelDescriptor level" )
+   public void test_Creating_a_new_Asset_Administration_Shell_Descriptor_with_valid_IdShort_in_shell_and_empty_IdShort_in_submodelDescriptor_level() throws Exception {
+      //Given
+      AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+      shellPayload.getSubmodelDescriptors().get( 0 ).setIdShort( null );
       //When & Then
       mvc.perform(
                   MockMvcRequestBuilders
@@ -951,6 +1012,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
    @DisplayName( "Test creating a new Asset Administration Shell Descriptor with dupilcate IdShort in shell level" )
    public void test_Creating_a_new_Asset_Administration_Shell_Descriptor_with_Dupilcate_IdShort_in_shell_level() throws Exception {
       //Given
+      removedAllShells();
       //Creates a shell using test data
       AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
       shellPayload.setId( UUID.randomUUID().toString() );
@@ -976,10 +1038,15 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
             .andExpect( jsonPath( "$.messages[0].text", is( "An AssetAdministrationShell for the given IdShort already exists." ) ) );
    }
 
+   private void removedAllShells() {
+      shellRepository.deleteAll();
+   }
+
    @Test
    @DisplayName( "Test Creating a new Asset Administration Shell Descriptor with unique  IdShort in shell level and duplicate IdShort in submodelDescriptor level" )
    public void test_Creating_a_new_Asset_Administration_Shell_Descriptor_with_unique_IdShort_in_shell_level_and_duplicate_submodelDescriptor_level() throws Exception {
       //Given
+      removedAllShells();
       AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
 
       SubmodelDescriptor submodelDescriptor = new SubmodelDescriptor();
