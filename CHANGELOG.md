@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - default value for registry authentication has been corrected to 'true' in the documentation
 - Refactored DuplicateKey Exception handling
 - Removed deprecated /query-Endpoint
-- Mark idShort in openApi mandatory
+- Fixed idShort null pointer exception
 
 ## 0.3.21
 ### Added
