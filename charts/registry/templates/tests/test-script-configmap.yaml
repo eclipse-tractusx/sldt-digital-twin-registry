@@ -19,7 +19,7 @@
 ###############################################################
 
 {{- $fullName := include "chart.fullname" . }}
-{{- $testconfig_name := printf "%s-test-config" $fullName }}
+{{- $testconfig_name := printf "%s-test-script" $fullName }}
 kind: ConfigMap
 apiVersion: v1
 metadata:
