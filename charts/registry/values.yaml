@@ -27,7 +27,6 @@ enablePostgres: true
 enableKeycloak: false
 
 registry:
-  name: registry
   image:
     registry: docker.io
     repository: tractusx/sldt-digital-twin-registry

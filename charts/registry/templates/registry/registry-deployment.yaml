@@ -18,9 +18,6 @@
 # SPDX-License-Identifier: Apache-2.0
 ###############################################################
 
-{{- $fullName := include "chart.fullname" . }}
-{{- $svc_name := printf "%s-svc" $fullName }}
-{{- $sec_name := printf "%s-sec" $fullName }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -72,7 +69,7 @@ spec:
             failureThreshold: 3
           envFrom:
             - secretRef:
-                name: {{ $sec_name }}
+                name: {{ include "chart.fullname" . }}-sec
           resources:
 {{ .Values.registry.resources | toYaml | indent 12 }}
       imagePullSecrets:

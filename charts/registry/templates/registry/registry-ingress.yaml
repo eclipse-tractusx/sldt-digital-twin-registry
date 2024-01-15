@@ -19,14 +19,10 @@
 # SPDX-License-Identifier: Apache-2.0
 ###############################################################
 
-{{- $deployment_name := printf "cx-%s-registry" .Release.Name }}
-{{- $svc_name := printf "%s-svc" $deployment_name }}
-{{- $fullName := include "chart.fullname" . }}
-{{- $ingr_name := printf "%s-ingr" $fullName }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ $ingr_name }}
+  name: {{ include "chart.fullname" . }}-ingr
   annotations:
 {{ .Values.registry.ingress.annotations | toYaml | indent 4 }}
   labels:
@@ -47,7 +43,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ $svc_name }}
+                name: {{ include "chart.fullname" . }}-svc
                 port:
                   number: {{ .Values.registry.service.port }}
 {{- end}}

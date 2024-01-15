@@ -17,12 +17,10 @@
 # SPDX-License-Identifier: Apache-2.0
 ---
 
-{{- $fullName := include "chart.fullname" . }}
-{{- $keycloak_config_name := printf "%s-keycloak-configmap" $fullName }}
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: {{ $keycloak_config_name }}
+  name: {{ include "chart.fullname" . }}-keycloak-configmap
 data:
   default-realm-import.json: |-
 {{ .Files.Get "config/default-realm-import.json" | indent 4 }}
