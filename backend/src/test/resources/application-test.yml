@@ -41,6 +41,7 @@ registry:
   external-subject-id-wildcard-prefix: "PUBLIC_READABLE"
   external-subject-id-wildcard-allowed-types: manufacturerPartId,assetLifecyclePhase
   idm:
+    identity-provider: keycloak
     owning-tenant-id: TENANT_ONE
 
 logging:

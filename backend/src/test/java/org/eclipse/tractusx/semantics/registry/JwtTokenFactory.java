@@ -1,9 +1,9 @@
 /********************************************************************************
- * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH Copyright
+ * (c) 2021-2023 Contributors to the Eclipse Foundation
  *
- * See the NOTICE file(s) distributed with this work for additional
- * information regarding copyright ownership.
+ * See the NOTICE file(s) distributed with this work for additional information
+ * regarding copyright ownership.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Apache License, Version 2.0 which is available at
@@ -12,149 +12,166 @@
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations
- * under the License.
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  * SPDX-License-Identifier: Apache-2.0
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry;
-
-import lombok.Value;
-import net.minidev.json.JSONArray;
-
-import org.eclipse.tractusx.semantics.registry.security.AuthorizationEvaluator;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import org.eclipse.tractusx.semantics.registry.security.AuthorizationEvaluator;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
-public class JwtTokenFactory {
+import lombok.Value;
+import net.minidev.json.JSONArray;
 
-    private static final String TENANT_ONE = "TENANT_ONE";
-    private static final String TENANT_TWO = "TENANT_TWO";
-    private static final String TENANT_THREE = "TENANT_THREE";
+public class JwtTokenFactory
+{
 
-    private final Tenant tenantOne;
-    private final Tenant tenantTwo;
-    private final Tenant tenantThree;
+	private static final String TENANT_ONE = "TENANT_ONE";
+	private static final String TENANT_TWO = "TENANT_TWO";
+	private static final String TENANT_THREE = "TENANT_THREE";
 
-    public JwtTokenFactory(String publicClientId){
-        this.tenantOne = new Tenant(publicClientId, TENANT_ONE);
-        this.tenantTwo = new Tenant(publicClientId, TENANT_TWO);
-        this.tenantThree = new Tenant(publicClientId, TENANT_THREE);
-    }
-    public RequestPostProcessor allRoles(){
-        return tenantOne.allRoles();
-    }
+	private final Tenant tenantOne;
+	private final Tenant tenantTwo;
+	private final Tenant tenantThree;
 
-    public RequestPostProcessor readTwin(){
-        return tenantOne.readTwin();
-    }
+	public JwtTokenFactory(final String publicClientId)
+	{
+		this.tenantOne = new Tenant(publicClientId, JwtTokenFactory.TENANT_ONE);
+		this.tenantTwo = new Tenant(publicClientId, JwtTokenFactory.TENANT_TWO);
+		this.tenantThree = new Tenant(publicClientId, JwtTokenFactory.TENANT_THREE);
+	}
 
-    public RequestPostProcessor addTwin(){
-        return tenantOne.addTwin();
-    }
+	public RequestPostProcessor allRoles()
+	{
+		return this.tenantOne.allRoles();
+	}
 
-    public RequestPostProcessor updateTwin(){
-        return tenantOne.updateTwin();
-    }
+	public RequestPostProcessor readTwin()
+	{
+		return this.tenantOne.readTwin();
+	}
 
-    public RequestPostProcessor deleteTwin(){
-        return tenantOne.deleteTwin();
-    }
+	public RequestPostProcessor addTwin()
+	{
+		return this.tenantOne.addTwin();
+	}
 
-    public RequestPostProcessor withoutResourceAccess(){
-        return tenantOne.withoutResourceAccess();
-    }
+	public RequestPostProcessor updateTwin()
+	{
+		return this.tenantOne.updateTwin();
+	}
 
-    public RequestPostProcessor withoutRoles(){
-        return tenantOne.withoutRoles();
-    }
+	public RequestPostProcessor deleteTwin()
+	{
+		return this.tenantOne.deleteTwin();
+	}
 
-    public Tenant tenantOne() {
-        return tenantOne;
-    }
-    public Tenant tenantTwo() {
-        return tenantTwo;
-    }
-    public Tenant tenantThree() {
-        return tenantThree;
-    }
+	public RequestPostProcessor withoutResourceAccess()
+	{
+		return this.tenantOne.withoutResourceAccess();
+	}
 
-    @Value
-    public static class Tenant{
-        String publicClientId;
-        String tenantId;
+	public RequestPostProcessor withoutRoles()
+	{
+		return this.tenantOne.withoutRoles();
+	}
 
-        public RequestPostProcessor allRoles(){
-            return authenticationWithRoles(tenantId,
-                    List.of(AuthorizationEvaluator.Roles.ROLE_VIEW_DIGITAL_TWIN,
-                            AuthorizationEvaluator.Roles.ROLE_ADD_DIGITAL_TWIN,
-                            AuthorizationEvaluator.Roles.ROLE_UPDATE_DIGITAL_TWIN,
-                            AuthorizationEvaluator.Roles.ROLE_DELETE_DIGITAL_TWIN)
-            );
-        }
+	public Tenant tenantOne()
+	{
+		return this.tenantOne;
+	}
 
-        public RequestPostProcessor readTwin(){
-            return authenticationWithRoles(tenantId, List.of(AuthorizationEvaluator.Roles.ROLE_VIEW_DIGITAL_TWIN));
-        }
+	public Tenant tenantTwo()
+	{
+		return this.tenantTwo;
+	}
 
-        public RequestPostProcessor addTwin(){
-            return authenticationWithRoles(tenantId, List.of(AuthorizationEvaluator.Roles.ROLE_ADD_DIGITAL_TWIN));
-        }
+	public Tenant tenantThree()
+	{
+		return this.tenantThree;
+	}
 
-        public RequestPostProcessor updateTwin(){
-            return authenticationWithRoles(tenantId,List.of(AuthorizationEvaluator.Roles.ROLE_UPDATE_DIGITAL_TWIN));
-        }
+	@Value
+	public static class Tenant
+	{
+		String publicClientId;
+		String tenantId;
 
-        public RequestPostProcessor deleteTwin(){
-            return authenticationWithRoles(tenantId, List.of(AuthorizationEvaluator.Roles.ROLE_DELETE_DIGITAL_TWIN));
-        }
+		public RequestPostProcessor allRoles()
+		{
+			return this.authenticationWithRoles(this.tenantId, List.of(AuthorizationEvaluator.Roles.ROLE_VIEW_DIGITAL_TWIN, AuthorizationEvaluator.Roles.ROLE_ADD_DIGITAL_TWIN,
+					AuthorizationEvaluator.Roles.ROLE_UPDATE_DIGITAL_TWIN, AuthorizationEvaluator.Roles.ROLE_DELETE_DIGITAL_TWIN));
+		}
 
-        public RequestPostProcessor withoutResourceAccess(){
-            Jwt jwt = Jwt.withTokenValue("token")
-                    .header("alg", "none")
-                    .claim("sub", "user")
-                    .build();
-            Collection<GrantedAuthority> authorities = Collections.emptyList();
-            return authentication(new JwtAuthenticationToken(jwt, authorities));
-        }
+		public RequestPostProcessor readTwin()
+		{
+			return this.authenticationWithRoles(this.tenantId, List.of(AuthorizationEvaluator.Roles.ROLE_VIEW_DIGITAL_TWIN));
+		}
 
-        public RequestPostProcessor withoutRoles(){
-            Jwt jwt = Jwt.withTokenValue("token")
-                    .header("alg", "none")
-                    .claim("sub", "user")
-                    .claim("resource_access", Map.of(publicClientId, new HashMap<String, String>()))
-                    .build();
-            Collection<GrantedAuthority> authorities = Collections.emptyList();
-            return authentication(new JwtAuthenticationToken(jwt, authorities));
-        }
+		public RequestPostProcessor addTwin()
+		{
+			return this.authenticationWithRoles(this.tenantId, List.of(AuthorizationEvaluator.Roles.ROLE_ADD_DIGITAL_TWIN));
+		}
 
-        private RequestPostProcessor authenticationWithRoles(String tenantId, List<String> roles){
-            Jwt jwt = Jwt.withTokenValue("token")
-                    .header("alg", "none")
-                    .claim("sub", "user")
-                    .claim("resource_access", Map.of(publicClientId, Map.of("roles", toJsonArray(roles) )))
-                    .build();
-            Collection<GrantedAuthority> authorities = Collections.emptyList();
-            return authentication(new JwtAuthenticationToken(jwt, authorities));
-        }
+		public RequestPostProcessor updateTwin()
+		{
+			return this.authenticationWithRoles(this.tenantId, List.of(AuthorizationEvaluator.Roles.ROLE_UPDATE_DIGITAL_TWIN));
+		}
 
-        private static JSONArray toJsonArray(List<String> elements){
-            JSONArray jsonArray = new JSONArray();
-            for (String element : elements){
-                jsonArray.appendElement(element);
-            }
-            return jsonArray;
-        }
-    }
+		public RequestPostProcessor deleteTwin()
+		{
+			return this.authenticationWithRoles(this.tenantId, List.of(AuthorizationEvaluator.Roles.ROLE_DELETE_DIGITAL_TWIN));
+		}
+
+		public RequestPostProcessor withoutResourceAccess()
+		{
+			final Jwt jwt = Jwt.withTokenValue("token").header("alg", "none").claim("sub", "user").build();
+			final Collection<GrantedAuthority> authorities = Collections.emptyList();
+			return SecurityMockMvcRequestPostProcessors.authentication(new JwtAuthenticationToken(jwt, authorities));
+		}
+
+		public RequestPostProcessor withoutRoles()
+		{
+			final Jwt jwt = Jwt.withTokenValue("token").header("alg", "none").claim("sub", "user")
+					.claim("resource_access", Map.of(this.publicClientId, new HashMap<String, String>())).build();
+			final Collection<GrantedAuthority> authorities = Collections.emptyList();
+			return SecurityMockMvcRequestPostProcessors.authentication(new JwtAuthenticationToken(jwt, authorities));
+		}
+
+		private RequestPostProcessor authenticationWithRoles(final String tenantId, final List<String> roles)
+		{
+			final String scopes = String.join(" ", roles.stream().map(p -> "dtwinreg/" + p).collect(Collectors.toList()));
+
+			final Jwt jwt = Jwt.withTokenValue("token").header("alg", "none").claim("sub", "user")
+					.claim("resource_access", Map.of(this.publicClientId, Map.of("roles", Tenant.toJsonArray(roles)))).claim("scope", scopes).claim("client_id", "catenax-portal")
+					.build();
+
+			final Collection<GrantedAuthority> authorities = Collections.emptyList();
+			return SecurityMockMvcRequestPostProcessors.authentication(new JwtAuthenticationToken(jwt, authorities));
+		}
+
+		private static JSONArray toJsonArray(final List<String> elements)
+		{
+			final JSONArray jsonArray = new JSONArray();
+			for(final String element : elements)
+			{
+				jsonArray.appendElement(element);
+			}
+			return jsonArray;
+		}
+	}
 
 }
