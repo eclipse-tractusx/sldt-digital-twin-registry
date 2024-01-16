@@ -4,7 +4,6 @@
 
 package org.eclipse.tractusx.semantics.registry.security;
 
-import java.util.Collection;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -87,12 +86,6 @@ public class CognitoAuthorizationEvaluator extends AuthorizationEvaluator
 					}
 				}
 			}
-		}
-
-		final Object roles = claims.get("cognito:groups");
-		if(roles instanceof final Collection<?> rolesList)
-		{
-			return rolesList.contains(role);
 		}
 		return false;
 	}
