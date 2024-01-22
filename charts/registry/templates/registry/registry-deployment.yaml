@@ -69,7 +69,7 @@ spec:
             failureThreshold: 3
           envFrom:
             - secretRef:
-                name: {{ include "chart.fullname" . }}-sec
+                name: {{ include "chart.fullname" . }}
           resources:
 {{ .Values.registry.resources | toYaml | indent 12 }}
       imagePullSecrets:
