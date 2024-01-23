@@ -21,7 +21,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "chart.fullname" . }}
+  name: {{ .Values.registry.name }}
   labels:
     {{- include "chart.labels" . | nindent 4 }}
 spec:
@@ -37,7 +37,7 @@ spec:
       securityContext:
         runAsUser: 100
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ .Values.registry.name }}
           image: {{ .Values.registry.image.registry }}/{{ .Values.registry.image.repository }}:{{ .Values.registry.image.version | default .Chart.AppVersion }}
           imagePullPolicy: {{ .Values.registry.imagePullPolicy }}
           securityContext:
@@ -69,7 +69,7 @@ spec:
             failureThreshold: 3
           envFrom:
             - secretRef:
-                name: {{ include "chart.fullname" . }}
+                name: {{ .Values.registry.name }}
           resources:
 {{ .Values.registry.resources | toYaml | indent 12 }}
       imagePullSecrets:

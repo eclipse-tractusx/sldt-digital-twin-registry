@@ -22,7 +22,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "chart.fullname" . }}
+  name: {{ .Values.registry.name }}
   annotations:
 {{ .Values.registry.ingress.annotations | toYaml | indent 4 }}
   labels:
