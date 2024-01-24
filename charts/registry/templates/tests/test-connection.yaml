@@ -18,9 +18,10 @@
 # SPDX-License-Identifier: Apache-2.0
 ###############################################################
 
-{{- $testconnection_name := printf "%s-test-script-pod" .Values.registry.name }}
-{{- $testsec_name := printf "%s-test-credentials" .Values.registry.name }}
-{{- $testconfig_name := printf "%s-test-script" .Values.registry.name }}
+{{- $fullName := include "dtr.fullname" . }}
+{{- $testconnection_name := printf "%s-test-script-pod" $fullName }}
+{{- $testsec_name := printf "%s-test-credentials" $fullName }}
+{{- $testconfig_name := printf "%s-test-script" $fullName }}
 apiVersion: v1
 kind: Pod
 metadata:

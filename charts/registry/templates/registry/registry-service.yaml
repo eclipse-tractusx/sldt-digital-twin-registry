@@ -21,13 +21,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.registry.name }}
+  name: {{ include "dtr.fullname" .  }}
   labels:
-    {{- include "chart.labels" . | nindent 4 }}
+    {{- include "dtr.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.registry.service.type }}
   ports:
     - port: {{ .Values.registry.service.port }}
       targetPort: {{ .Values.registry.containerPort }}
   selector:
-    {{- include "chart.selectorLabels" . | nindent 4 }}
+    {{- include "dtr.selectorLabels" . | nindent 4 }}

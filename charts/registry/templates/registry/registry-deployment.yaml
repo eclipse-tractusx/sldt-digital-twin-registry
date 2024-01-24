@@ -21,23 +21,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.registry.name }}
+  name: {{ include "dtr.fullname" . }}
   labels:
-    {{- include "chart.labels" . | nindent 4 }}
+    {{- include "dtr.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.registry.replicaCount }}
   selector:
     matchLabels:
-      {{- include "chart.selectorLabels" . | nindent 6 }}
+      {{- include "dtr.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "chart.selectorLabels" . | nindent 8 }}
+        {{- include "dtr.selectorLabels" . | nindent 8 }}
     spec:
       securityContext:
         runAsUser: 100
       containers:
-        - name: {{ .Values.registry.name }}
+        - name: {{ include "dtr.fullname" . }}
           image: {{ .Values.registry.image.registry }}/{{ .Values.registry.image.repository }}:{{ .Values.registry.image.version | default .Chart.AppVersion }}
           imagePullPolicy: {{ .Values.registry.imagePullPolicy }}
           securityContext:
@@ -69,7 +69,7 @@ spec:
             failureThreshold: 3
           envFrom:
             - secretRef:
-                name: {{ .Values.registry.name }}
+                name: {{ include "dtr.fullname" .}}
           resources:
 {{ .Values.registry.resources | toYaml | indent 12 }}
       imagePullSecrets:
