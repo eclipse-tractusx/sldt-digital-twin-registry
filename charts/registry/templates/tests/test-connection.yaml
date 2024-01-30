@@ -17,10 +17,15 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 ###############################################################
+
+{{- $fullName := include "dtr.fullname" . }}
+{{- $testconnection_name := printf "%s-test-script-pod" $fullName }}
+{{- $testsec_name := printf "%s-test-credentials" $fullName }}
+{{- $testconfig_name := printf "%s-test-script" $fullName }}
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "test-script-pod"
+  name: {{ $testconnection_name }}
   annotations:
     "helm.sh/hook": test
 spec:
@@ -40,12 +45,12 @@ spec:
         - name: AAS_REGISTRY_API_URL
           valueFrom:
             secretKeyRef:
-              name: test-credentials
+              name: {{ $testsec_name }}
               key: aasRegistryUrl
   volumes:
     - name: test-script
       configMap:
-        name: test-script
+        name: {{ $testconfig_name }}
         defaultMode: 0777
     - name: test-output
       hostPath:

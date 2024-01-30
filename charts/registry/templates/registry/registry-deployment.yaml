@@ -18,27 +18,26 @@
 # SPDX-License-Identifier: Apache-2.0
 ###############################################################
 
-{{- $deployment_name := printf "cx-%s-registry" .Release.Name }}
-{{- $sec_name := printf "%s-sec" $deployment_name }}
-{{- $svc_name := printf "%s-svc" $deployment_name }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ $deployment_name }}
+  name: {{ include "dtr.fullname" . }}
+  labels:
+    {{- include "dtr.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.registry.replicaCount }}
   selector:
     matchLabels:
-      app: {{ $deployment_name }}
+      {{- include "dtr.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app: {{ $deployment_name }}
+        {{- include "dtr.selectorLabels" . | nindent 8 }}
     spec:
       securityContext:
         runAsUser: 100
       containers:
-        - name: {{ $deployment_name }}
+        - name: {{ .Chart.Name }}
           image: {{ .Values.registry.image.registry }}/{{ .Values.registry.image.repository }}:{{ .Values.registry.image.version | default .Chart.AppVersion }}
           imagePullPolicy: {{ .Values.registry.imagePullPolicy }}
           securityContext:
@@ -58,19 +57,19 @@ spec:
             httpGet:
               path: /actuator/health/liveness
               port: {{ .Values.registry.containerPort }}
-            initialDelaySeconds: 100
-            periodSeconds: 3
-            failureThreshold: 3
+            initialDelaySeconds: {{ .Values.registry.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.registry.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.registry.livenessProbe.failureThreshold }}
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
               port: {{ .Values.registry.containerPort }}
-            initialDelaySeconds: 60
-            periodSeconds: 3
-            failureThreshold: 3
+            initialDelaySeconds: {{ .Values.registry.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.registry.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.registry.readinessProbe.failureThreshold }}
           envFrom:
             - secretRef:
-                name: {{ $sec_name }}
+                name: {{ include "dtr.fullname" . }}
           resources:
 {{ .Values.registry.resources | toYaml | indent 12 }}
       imagePullSecrets:
