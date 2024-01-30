@@ -1,0 +1,87 @@
+[
+  {
+    "id": 1, "tid": "BPNL00000000000B", "targetTenant": "BPNL00000000000A",
+    "policyType": "AAS", "policy": {
+      "accessRules": [
+        { "attribute": "bpn", "operator": "eq", "value": "BPNL00000000000A" },
+        {
+          "attribute": "mandatorySpecificAssetIds", "operator": "includes",
+          "values": [
+            { "attribute": "manufacturerPartId", "operator": "eq", "value": "99991" },
+            { "attribute": "customerPartId", "operator": "eq", "value": "ACME001" },
+            { "attribute": "revisionNumber", "operator": "eq", "value": "01" }
+          ]
+        },
+        {
+          "attribute": "visibleSpecificAssetIdNames", "operator": "includes",
+          "values": [
+            { "attribute": "name", "operator": "eq", "value": "manufacturerPartId" },
+            { "attribute": "name", "operator": "eq", "value": "customerPartId" },
+            { "attribute": "name", "operator": "eq", "value": "revisionNumber" },
+            { "attribute": "specificAssetIds", "operator": "eq", "value": "partInstanceId" }
+          ]
+        },
+        {
+          "attribute": "visibleSemanticIds", "operator": "includes",
+          "values": [ { "attribute": "modelUrn", "operator": "eq", "value": "ProductCarbonFootprintv1.1.0" } ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 2, "tid": "BPNL00000000000B", "targetTenant": "BPNL00000000000C",
+    "policyType": "AAS", "policy": {
+      "accessRules": [
+        { "attribute": "bpn", "operator": "eq", "value": "BPNL00000000000C" },
+        {
+          "attribute": "mandatorySpecificAssetIds", "operator": "includes",
+          "values": [
+            { "attribute": "manufacturerPartId", "operator": "eq", "value": "99991" },
+            { "attribute": "customerPartId", "operator": "eq", "value": "CONTOSO001" },
+            { "attribute": "revisionNumber", "operator": "eq", "value": "01" }
+          ]
+        },
+        { "attribute": "visibleSpecificAssetIdNames", "operator": "includes",
+          "values": [
+            { "attribute": "name", "operator": "eq", "value": "manufacturerPartId" },
+            { "attribute": "name", "operator": "eq", "value": "customerPartId" },
+            { "attribute": "name", "operator": "eq", "value": "revisionNumber" },
+            { "attribute": "specificAssetIds", "operator": "eq", "value": "partInstanceId" }
+          ]
+        },
+        { "attribute": "visibleSemanticIds", "operator": "includes",
+          "values": [ { "attribute": "modelUrn", "operator": "eq", "value": "ProductCarbonFootprintv1.1.0" } ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3, "tid": "BPNL00000000000B", "targetTenant": "BPNL00000000000A",
+    "policyType": "AAS", "policy": {
+      "accessRules": [
+        { "attribute": "bpn", "operator": "eq", "value": "BPNL00000000000A" },
+        {
+          "attribute": "mandatorySpecificAssetIds", "operator": "includes",
+          "values": [
+            { "attribute": "manufacturerPartId", "operator": "eq", "value": "99991" },
+            { "attribute": "customerPartId", "operator": "eq", "value": "ACME001" },
+            { "attribute": "partInstanceId", "operator": "eq", "value": "00001" }
+          ]
+        },
+        {
+          "attribute": "visibleSpecificAssetIdNames", "operator": "includes",
+          "values": [
+            { "attribute": "name", "operator": "eq", "value": "manufacturerPartId" },
+            { "attribute": "name", "operator": "eq", "value": "customerPartId" },
+            { "attribute": "name", "operator": "eq", "value": "versionNumber" },
+            { "attribute": "specificAssetIds", "operator": "eq", "value": "partInstanceId" }
+          ]
+        },
+        {
+          "attribute": "visibleSemanticIds", "operator": "includes",
+          "values": [ { "attribute": "modelUrn", "operator": "eq", "value": "Traceabilityv1.1.0" } ]
+        }
+      ]
+    }
+  }
+]
