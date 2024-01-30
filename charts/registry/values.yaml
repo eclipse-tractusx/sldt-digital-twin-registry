@@ -52,6 +52,14 @@ registry:
   service:
     port: 8080
     type: ClusterIP
+  livenessProbe:
+    failureThreshold: 3
+    periodSeconds: 3
+    initialDelaySeconds: 100
+  readinessProbe:
+    failureThreshold: 3
+    periodSeconds: 3
+    initialDelaySeconds: 100
   dataSource:
     driverClassName: org.postgresql.Driver
     sqlInitPlatform: pg
