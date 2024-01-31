@@ -3,6 +3,28 @@ entries:
   digital-twin-registry:
   - apiVersion: v2
     appVersion: 0.3.23
+    created: "2024-01-31T10:45:23.723301317Z"
+    dependencies:
+    - condition: enablePostgres
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.12.10
+    - condition: enableKeycloak
+      name: keycloak
+      repository: https://charts.bitnami.com/bitnami
+      version: 16.1.7
+    description: Tractus-X Digital Twin Registry Helm Chart
+    digest: 4bda348786d84453dab127572a06925d1d530d328b5c3f8056f0face25dbc8dc
+    home: https://eclipse-tractusx.github.io/
+    name: digital-twin-registry
+    sources:
+    - https://github.com/eclipse-tractusx/sldt-digital-twin-registry
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/sldt-digital-twin-registry/releases/download/digital-twin-registry-0.4.1/digital-twin-registry-0.4.1.tgz
+    version: 0.4.1
+  - apiVersion: v2
+    appVersion: 0.3.23
     created: "2024-01-30T15:20:56.854647787Z"
     dependencies:
     - condition: enablePostgres
@@ -981,4 +1003,4 @@ entries:
     urls:
     - https://github.com/eclipse-tractusx/sldt-digital-twin-registry/releases/download/v0.2.0-M3-multi-tenancy/registry-0.2.3.tgz
     version: 0.2.3
-generated: "2024-01-30T15:20:56.854739699Z"
+generated: "2024-01-31T10:45:23.72339934Z"
