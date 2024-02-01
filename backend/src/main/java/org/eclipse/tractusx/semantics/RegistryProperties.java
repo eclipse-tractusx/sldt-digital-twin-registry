@@ -1,6 +1,5 @@
-/********************************************************************************
- * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
+/*******************************************************************************
+ * Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,7 +15,8 @@
  * under the License.
  *
  * SPDX-License-Identifier: Apache-2.0
- ********************************************************************************/
+ *
+ ******************************************************************************/
 
 package org.eclipse.tractusx.semantics;
 
@@ -48,6 +48,11 @@ public class RegistryProperties {
      * This wildcard-allowed-types is used to make only specificAssetIds public for defined types.
      */
     private List<String> externalSubjectIdWildcardAllowedTypes;
+
+    /**
+     * This flag turns on the granular access control logic if set to true.
+     */
+    private Boolean useGranularAccessControl;
 
     /**
      * Properties for Identity Management system
