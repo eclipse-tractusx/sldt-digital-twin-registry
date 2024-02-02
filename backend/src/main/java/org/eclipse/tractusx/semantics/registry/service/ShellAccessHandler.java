@@ -1,6 +1,5 @@
-/********************************************************************************
- * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
+/*******************************************************************************
+ * Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,7 +15,8 @@
  * under the License.
  *
  * SPDX-License-Identifier: Apache-2.0
- ********************************************************************************/
+ *
+ ******************************************************************************/
 
 package org.eclipse.tractusx.semantics.registry.service;
 
@@ -63,7 +63,7 @@ public class ShellAccessHandler {
       }
 
       Set<ShellIdentifier> filteredIdentifiers = filterSpecificAssetIdsByTenantId( shell.getIdentifiers(), externalSubjectId );
-      boolean hasOnlyPublicAccess = !filteredIdentifiers.stream().anyMatch( shellIdentifier -> {
+      boolean hasOnlyPublicAccess = filteredIdentifiers.stream().noneMatch( shellIdentifier -> {
                if ( shellIdentifier.getExternalSubjectId() == null ) {
                   return false;
                }
@@ -75,10 +75,10 @@ public class ShellAccessHandler {
          // Filter out globalAssetId from specificAssetId. TODO: implement to save globalAssetId in separate database column
          // GlobalAssetId is set via mapper. In case of only read access, no globalAssetId should be shown.
          Set<ShellIdentifier> filteredIdentifiersWithNoGlobalAssetId = filteredIdentifiers.stream().filter(
-               shellIdentifier -> !shellIdentifier.getKey().equals( ShellIdentifier.GLOBAL_ASSET_ID_KEY ) )
+                     shellIdentifier -> !shellIdentifier.getKey().equals( ShellIdentifier.GLOBAL_ASSET_ID_KEY ) )
                .collect( Collectors.toSet() );
          return new Shell()
-               .withIdentifiers(filteredIdentifiersWithNoGlobalAssetId)
+               .withIdentifiers( filteredIdentifiersWithNoGlobalAssetId )
                .withSubmodels( shell.getSubmodels() )
                .withIdExternal( shell.getIdExternal() )
                .withId( shell.getId() )
@@ -96,18 +96,20 @@ public class ShellAccessHandler {
       Set<ShellIdentifier> externalSubjectIdSet = new HashSet<>();
       for ( ShellIdentifier identifier : shellIdentifiers ) {
          // Check if specificAssetId is globalAssetId -> TODO: implement to save globalAssetId in separate database column
-         if(identifier.getKey().equals( ShellIdentifier.GLOBAL_ASSET_ID_KEY )){
+         if ( identifier.getKey().equals( ShellIdentifier.GLOBAL_ASSET_ID_KEY ) ) {
             externalSubjectIdSet.add( identifier );
          }
          if ( identifier.getExternalSubjectId() != null ) {
             Set<ShellIdentifierExternalSubjectReferenceKey> optionalReferenceKey =
-                  identifier.getExternalSubjectId().getKeys().stream().filter( shellIdentifierExternalSubjectReferenceKey ->
-                        // Match if externalSubjectId = tenantId
-                        shellIdentifierExternalSubjectReferenceKey.getValue().equals( tenantId ) ||
+                  identifier.getExternalSubjectId().getKeys().stream()
+                        .filter( shellIdentifierExternalSubjectReferenceKey ->
+                              // Match if externalSubjectId = tenantId
+                              shellIdentifierExternalSubjectReferenceKey.getValue().equals( tenantId )
                               // or match if externalSubjectId = externalSubjectIdWildcardPrefix and key of identifier (for example manufacturerPartId) is allowing wildcard.
-                              (shellIdentifierExternalSubjectReferenceKey.getValue().equals( externalSubjectIdWildcardPrefix ) &&
-                                    externalSubjectIdWildcardAllowedTypes.contains( identifier.getKey() )) ).collect( Collectors.toSet() );
-            if ( optionalReferenceKey != null && !optionalReferenceKey.isEmpty() ) {
+                              || (shellIdentifierExternalSubjectReferenceKey.getValue().equals( externalSubjectIdWildcardPrefix )
+                                  && externalSubjectIdWildcardAllowedTypes.contains( identifier.getKey() )) )
+                        .collect( Collectors.toSet() );
+            if ( !optionalReferenceKey.isEmpty() ) {
                identifier.getExternalSubjectId().setKeys( optionalReferenceKey );
                externalSubjectIdSet.add( identifier );
             }

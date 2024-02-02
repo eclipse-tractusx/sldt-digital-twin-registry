@@ -1,6 +1,5 @@
-/********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+/*******************************************************************************
+ * Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,11 +15,12 @@
  * under the License.
  *
  * SPDX-License-Identifier: Apache-2.0
- ********************************************************************************/
+ *
+ ******************************************************************************/
 package org.eclipse.tractusx.semantics.registry.service;
 
 public class EntityNotFoundException extends RuntimeException {
-    public EntityNotFoundException(String message){
-        super(message);
-    }
+   public EntityNotFoundException( String message ) {
+      super( message );
+   }
 }
