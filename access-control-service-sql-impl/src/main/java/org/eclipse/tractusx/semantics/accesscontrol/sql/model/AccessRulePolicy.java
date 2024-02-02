@@ -71,7 +71,6 @@ public class AccessRulePolicy {
       return getStringValueOfRule( BPN_RULE_NAME );
    }
 
-   @JsonIgnore
    private Set<String> getStringValuesOfRule( final String ruleName ) {
       return accessRules.stream().filter( rule -> ruleName.equals( rule.attribute() ) )
             .flatMap( rule -> {
@@ -88,18 +87,18 @@ public class AccessRulePolicy {
             .findAny().orElse( null );
    }
 
-   private static String getAccessRulePolicyValueStringFunction( final AccessRulePolicyValue idValue, final String ruleName ) {
+   private String getAccessRulePolicyValueStringFunction( final AccessRulePolicyValue idValue, final String ruleName ) {
       assertSingleValued( idValue, ruleName );
       return idValue.value();
    }
 
-   private static void assertSingleValued( final AccessRulePolicyValue idValue, final String path ) {
+   private void assertSingleValued( final AccessRulePolicyValue idValue, final String path ) {
       if ( !idValue.hasSingleValue() ) {
          throw new IllegalStateException( "Entry of " + path + " must have single value!" );
       }
    }
 
-   private static void assertMultiValued( AccessRulePolicyValue idValue, String path ) {
+   private void assertMultiValued( AccessRulePolicyValue idValue, String path ) {
       if ( idValue.hasSingleValue() ) {
          throw new IllegalStateException( "Entry of " + path + " must have multiple values!" );
       }

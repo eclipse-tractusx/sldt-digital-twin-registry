@@ -41,7 +41,7 @@ public class SqlBackedAccessControlRuleService implements AccessControlRuleServi
 
    private final AccessControlRuleRepository repository;
 
-   public SqlBackedAccessControlRuleService( @Autowired AccessControlRuleRepository repository ) {
+   public SqlBackedAccessControlRuleService( AccessControlRuleRepository repository ) {
       this.repository = repository;
    }
 
