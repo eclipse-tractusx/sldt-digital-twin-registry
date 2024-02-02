@@ -20,12 +20,12 @@
 
 package org.eclipse.tractusx.semantics.accesscontrol.sql.repository;
 
+import static org.assertj.core.api.Assertions.*;
+
 import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.assertj.core.api.Assertions;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRule;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -36,8 +36,7 @@ import org.springframework.dao.DataRetrievalFailureException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 class FileBasedAccessControlRuleRepositoryTest {
-
-   private final ObjectMapper objectMapper = new ObjectMapper();
+   private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
    public static Stream<Arguments> bpnFilteringProvider() {
       return Stream.<Arguments> builder()
@@ -50,22 +49,22 @@ class FileBasedAccessControlRuleRepositoryTest {
    @SuppressWarnings( "DataFlowIssue" )
    @ParameterizedTest
    @MethodSource( "bpnFilteringProvider" )
-   void testFindAllByBpnExpectFilteredResults( final String bpn, final List<String> expectedRuleIds ) {
+   void testFindAllByBpnWithinValidityPeriodExpectFilteredResults( final String bpn, final List<Long> expectedRuleIds ) {
       final var filePath = Path.of( getClass().getResource( "/example-access-rules.json" ).getFile() );
       final var underTest = new FileBasedAccessControlRuleRepository( objectMapper, filePath.toAbsolutePath().toString() );
 
-      List<AccessRule> actual = underTest.findAllByBpn( bpn );
+      List<AccessRule> actual = underTest.findAllByBpnWithinValidityPeriod( bpn );
 
       final var actualIds = actual.stream().map( AccessRule::getId ).toList();
-      Assertions.assertThat( actualIds ).isEqualTo( expectedRuleIds );
+      assertThat( actualIds ).isEqualTo( expectedRuleIds );
    }
 
    @Test
-   void testFindAllByBpnWithMissingResourceExpectException() {
+   void testFindAllByBpnWithinValidityPeriodWithMissingResourceExpectException() {
       final var filePath = Path.of( "unknown.json" );
       final var underTest = new FileBasedAccessControlRuleRepository( objectMapper, filePath.toAbsolutePath().toString() );
 
-      Assertions.assertThatThrownBy( () -> underTest.findAllByBpn( "BPNL00000000000A" ) )
+      assertThatThrownBy( () -> underTest.findAllByBpnWithinValidityPeriod( "BPNL00000000000A" ) )
             .isInstanceOf( DataRetrievalFailureException.class );
    }
 }

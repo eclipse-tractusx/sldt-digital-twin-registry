@@ -22,7 +22,9 @@ package org.eclipse.tractusx.semantics.accesscontrol.sql.repository;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRule;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,10 +51,20 @@ public class FileBasedAccessControlRuleRepository implements AccessControlRuleRe
    }
 
    @Override
-   public List<AccessRule> findAllByBpn( String bpn ) {
+   public List<AccessRule> findAllByBpnWithinValidityPeriod( String bpn ) {
       try {
          return objectMapper.readValue( accessControlRulePath.toFile(), RULE_LIST_TYPE ).stream()
                .filter( rule -> rule.getTargetTenant().equals( bpn ) )
+               .filter( rule -> {
+                  Instant now = Instant.now();
+                  final var validFromIsEmptyOrInThePast = Optional.ofNullable( rule.getValidFrom() )
+                        .map( now::isAfter )
+                        .orElse( true );
+                  final var validToIsEmptyOrInTheFuture = Optional.ofNullable( rule.getValidTo() )
+                        .map( now::isBefore )
+                        .orElse( true );
+                  return validFromIsEmptyOrInThePast && validToIsEmptyOrInTheFuture;
+               } )
                .toList();
       } catch ( IOException e ) {
          throw new DataRetrievalFailureException( e.getMessage(), e );

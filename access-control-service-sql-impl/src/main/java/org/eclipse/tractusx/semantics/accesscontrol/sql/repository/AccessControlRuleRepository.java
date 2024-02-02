@@ -26,5 +26,5 @@ import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRule;
 
 public interface AccessControlRuleRepository {
 
-   List<AccessRule> findAllByBpn( String bpn );
+   List<AccessRule> findAllByBpnWithinValidityPeriod( String bpn );
 }

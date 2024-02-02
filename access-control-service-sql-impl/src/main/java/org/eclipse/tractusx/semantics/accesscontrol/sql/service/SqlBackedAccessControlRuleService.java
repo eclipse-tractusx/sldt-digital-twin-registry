@@ -81,7 +81,7 @@ public class SqlBackedAccessControlRuleService implements AccessControlRuleServi
    }
 
    private Stream<AccessRulePolicy> findPotentiallyMatchingAccessControlRules( String bpn ) throws DenyAccessException {
-      List<AccessRule> allByBpn = repository.findAllByBpn( bpn );
+      List<AccessRule> allByBpn = repository.findAllByBpnWithinValidityPeriod( bpn );
       if ( allByBpn == null || allByBpn.isEmpty() ) {
          throw new DenyAccessException( "No matching rules are found." );
       }
