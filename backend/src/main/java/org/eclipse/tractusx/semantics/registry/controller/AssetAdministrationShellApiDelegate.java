@@ -172,7 +172,7 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
         List<SpecificAssetId> listSpecificAssetId = assetIds.stream().map( this::decodeSAID).collect( Collectors.toList());
         final var result  = shellService.findExternalShellIdsByIdentifiersByExactMatch(
               shellMapper.fromApiDto(listSpecificAssetId), limit, cursor,getExternalSubjectIdOrEmpty(externalSubjectId));
-       return new ResponseEntity<>( Objects.requireNonNullElseGet( result, GetAllAssetAdministrationShellIdsByAssetLink200Response::new ), HttpStatus.OK );
+       return new ResponseEntity<>( result, HttpStatus.OK );
     }
 
     private SpecificAssetId decodeSAID(byte[] encodedId){

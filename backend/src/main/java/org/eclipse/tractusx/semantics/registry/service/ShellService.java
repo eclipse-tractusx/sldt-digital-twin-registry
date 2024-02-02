@@ -23,6 +23,7 @@ import static org.springframework.data.domain.PageRequest.ofSize;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -268,12 +269,14 @@ public class ShellService {
          List<String> assetIdList = queryResult.subList( startIndex, queryResult.size() ).stream().limit( pageSize ).collect( Collectors.toList() );
 
          String nextCursor = getCursorEncoded( queryResult, assetIdList );
-         GetAllAssetAdministrationShellIdsByAssetLink200Response response = new GetAllAssetAdministrationShellIdsByAssetLink200Response();
+         final var response = new GetAllAssetAdministrationShellIdsByAssetLink200Response();
          response.setResult( assetIdList );
          response.setPagingMetadata( new PagedResultPagingMetadata().cursor( nextCursor ) );
          return response;
       } catch ( DenyAccessException e ) {
-         return null;
+         final var response = new GetAllAssetAdministrationShellIdsByAssetLink200Response();
+         response.setResult( Collections.emptyList() );
+         return response;
       }
    }
 

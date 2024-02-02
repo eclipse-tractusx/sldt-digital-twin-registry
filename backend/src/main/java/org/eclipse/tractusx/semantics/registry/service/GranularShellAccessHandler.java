@@ -23,6 +23,7 @@ package org.eclipse.tractusx.semantics.registry.service;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -127,7 +128,8 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
                                    || visibilityCriteria.visibleSpecificAssetIdNames().contains( identifier.getKey() ) )
             //TODO: Do we need to clear the list of external subject Ids?
             .map( identifier -> {
-               identifier.getExternalSubjectId().setKeys( Collections.emptySet() );
+               Optional.ofNullable( identifier.getExternalSubjectId() )
+                     .ifPresent( extSubId -> extSubId.setKeys( Collections.emptySet() ) );
                return identifier;
             } )
             .collect( Collectors.toSet() );

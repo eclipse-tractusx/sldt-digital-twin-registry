@@ -51,7 +51,7 @@ public class FileBasedAccessControlRuleRepository implements AccessControlRuleRe
    }
 
    @Override
-   public List<AccessRule> findAllByBpnWithinValidityPeriod( String bpn ) {
+   public List<AccessRule> findAllByBpnWithinValidityPeriod( final String bpn ) {
       try {
          return objectMapper.readValue( accessControlRulePath.toFile(), RULE_LIST_TYPE ).stream()
                .filter( rule -> rule.getTargetTenant().equals( bpn ) )
