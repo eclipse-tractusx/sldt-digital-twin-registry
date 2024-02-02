@@ -105,19 +105,25 @@
 
 	<modules>
 		<module>backend</module>
-		<module>access-control-service-interface</module>
-		<!-- more modules are expected to come -->
+        <module>access-control-service-interface</module>
+        <module>access-control-service-sql-impl</module>
+        <!-- more modules are expected to come -->
     </modules>
 
 	<dependencyManagement>
 		<dependencies>
 			<!-- Predefined potential dependencies and versions -->
 			<!-- Modules -->
-			<dependency>
-				<groupId>org.eclipse.tractusx.digital_twin_registry</groupId>
-				<artifactId>digital-twin-registry-access-control-service-interface</artifactId>
-				<version>${project.version}</version>
-			</dependency>
+            <dependency>
+                <groupId>org.eclipse.tractusx.digital_twin_registry</groupId>
+                <artifactId>digital-twin-registry-access-control-service-interface</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.tractusx.digital_twin_registry</groupId>
+                <artifactId>digital-twin-registry-access-control-service-sql-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
 			<!-- Java Stuff -->
 			<dependency>
