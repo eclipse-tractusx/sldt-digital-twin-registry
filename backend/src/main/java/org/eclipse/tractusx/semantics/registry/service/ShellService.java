@@ -185,8 +185,7 @@ public class ShellService {
 
    @Transactional
    public Shell findShellByExternalIdWithoutFiltering( String externalShellId ) {
-      return shellRepository.findByIdExternal( externalShellId )
-            .orElseThrow( () -> new EntityNotFoundException( String.format( "Shell for identifier %s not found", externalShellId ) ) );
+      return doFindShellByExternalIdWithoutFiltering( externalShellId );
    }
 
    @Transactional( readOnly = true )
@@ -202,7 +201,7 @@ public class ShellService {
          currentPage.stream()
                .map( shell -> shellAccessHandler.filterShellProperties( shell, externalSubjectId ) )
                .filter( Objects::nonNull )
-               .limit( pageSize - resultList.size() )
+               .limit( (long) pageSize - resultList.size() )
                .forEach( resultList::add );
          hasNext = currentPage.hasNext();
       }
@@ -351,7 +350,7 @@ public class ShellService {
 
    @Transactional
    public Set<ShellIdentifier> save( String externalShellId, Set<ShellIdentifier> shellIdentifiers, String externalSubjectId ) {
-      Shell shellFromDb = findShellByExternalIdWithoutFiltering( externalShellId );
+      Shell shellFromDb = doFindShellByExternalIdWithoutFiltering( externalShellId );
 
       List<ShellIdentifier> identifiersToUpdate = shellIdentifiers.stream().map( identifier -> identifier.withShellId( shellFromDb ) )
             .collect( Collectors.toList() );
@@ -387,7 +386,7 @@ public class ShellService {
 
    @Transactional
    public Submodel save( String externalShellId, Submodel submodel, String externalSubjectId ) {
-      Shell shellFromDb = findShellByExternalIdWithoutFiltering( externalShellId );
+      Shell shellFromDb = doFindShellByExternalIdWithoutFiltering( externalShellId );
       submodel.setShellId( shellFromDb );
 
       //uniqueness on shellId and idShort
@@ -411,7 +410,7 @@ public class ShellService {
 
    @Transactional
    public void update( String externalShellId, Submodel submodel, String externalSubjectId ) {
-      Shell shellFromDb = findShellByExternalIdWithoutFiltering( externalShellId );
+      Shell shellFromDb = doFindShellByExternalIdWithoutFiltering( externalShellId );
       shellFromDb.add( submodel );
       submodel.setShellId( shellFromDb );
       mapSubmodel( shellFromDb.getSubmodels() );
@@ -420,7 +419,7 @@ public class ShellService {
 
    @Transactional
    public void deleteSubmodel( String externalShellId, String externalSubModelId, String externalSubjectId ) {
-      Shell shellFromDb = findShellByExternalIdWithoutFiltering( externalShellId );
+      Shell shellFromDb = doFindShellByExternalIdWithoutFiltering( externalShellId );
       Submodel submodelId = findSubmodelMinimalByExternalId( shellFromDb.getId(), externalSubModelId );
       shellFromDb.getSubmodels().remove( submodelId );
       submodelRepository.deleteById( submodelId.getId() );
@@ -467,6 +466,10 @@ public class ShellService {
                   e.getMessage() ), shell.getIdExternal(), HttpStatus.BAD_REQUEST.value() );
          }
       } ).collect( Collectors.toList() );
+   }
+   private Shell doFindShellByExternalIdWithoutFiltering( String externalShellId ) {
+      return shellRepository.findByIdExternal( externalShellId )
+            .orElseThrow( () -> new EntityNotFoundException( String.format( "Shell for identifier %s not found", externalShellId ) ) );
    }
 
 }
