@@ -23,24 +23,22 @@ package org.eclipse.tractusx.semantics.registry.service;
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.accesscontrol.api.AccessControlRuleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ShellAccessHandlerConfiguration {
 
-    @ConditionalOnProperty(prefix = "registry", name = "use-granular-access-control", matchIfMissing = true, havingValue = "false")
-    @Bean
-    @Autowired
-    public ShellAccessHandler createDefaultShellAccessHandler(final RegistryProperties registryProperties) {
-        return new DefaultShellAccessHandler(registryProperties);
-    }
-
-    @ConditionalOnProperty(prefix = "registry", name = "use-granular-access-control", havingValue = "true")
-    @Bean
-    @Autowired
-    public ShellAccessHandler createGranularShellAccessHandler(final RegistryProperties registryProperties, final AccessControlRuleService accessControlRuleService) {
-        return new GranularShellAccessHandler(registryProperties, accessControlRuleService);
-    }
+   @Bean
+   @Autowired
+   public ShellAccessHandler shellAccessHandler(
+         final RegistryProperties registryProperties, final AccessControlRuleService accessControlRuleService ) {
+      final ShellAccessHandler result;
+      if ( Boolean.TRUE.equals( registryProperties.getUseGranularAccessControl() ) ) {
+         result = new GranularShellAccessHandler( registryProperties, accessControlRuleService );
+      } else {
+         result = new DefaultShellAccessHandler( registryProperties );
+      }
+      return result;
+   }
 }
