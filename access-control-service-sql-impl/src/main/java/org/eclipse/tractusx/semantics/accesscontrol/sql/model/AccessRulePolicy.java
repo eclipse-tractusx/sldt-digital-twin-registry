@@ -34,10 +34,10 @@ import lombok.Data;
 @Data
 public class AccessRulePolicy {
 
-   private static final String BPN_RULE_NAME = "bpn";
-   private static final String MANDATORY_SPECIFIC_ASSET_IDS_RULE_NAME = "mandatorySpecificAssetIds";
-   private static final String VISIBLE_SPECIFIC_ASSET_ID_NAMES_RULE_NAME = "visibleSpecificAssetIdNames";
-   private static final String VISIBLE_SEMANTIC_IDS_RULE_NAME = "visibleSemanticIds";
+   static final String BPN_RULE_NAME = "bpn";
+   static final String MANDATORY_SPECIFIC_ASSET_IDS_RULE_NAME = "mandatorySpecificAssetIds";
+   static final String VISIBLE_SPECIFIC_ASSET_ID_NAMES_RULE_NAME = "visibleSpecificAssetIdNames";
+   static final String VISIBLE_SEMANTIC_IDS_RULE_NAME = "visibleSemanticIds";
 
    @JsonProperty( "accessRules" )
    private Set<AccessRulePolicyValue> accessRules;

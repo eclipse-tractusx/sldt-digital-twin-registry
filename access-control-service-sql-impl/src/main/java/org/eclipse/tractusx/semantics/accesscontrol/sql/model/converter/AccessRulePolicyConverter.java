@@ -30,12 +30,12 @@ import jakarta.persistence.AttributeConverter;
 
 public class AccessRulePolicyConverter implements AttributeConverter<AccessRulePolicy, String> {
 
-   private final ObjectMapper objectMapper = new ObjectMapper();
+   private static final ObjectMapper SHARED_OBJECT_MAPPER = new ObjectMapper();
 
    @Override
    public String convertToDatabaseColumn( AccessRulePolicy attribute ) {
       try {
-         return objectMapper.writeValueAsString( attribute );
+         return SHARED_OBJECT_MAPPER.writeValueAsString( attribute );
       } catch ( JsonProcessingException e ) {
          throw new JsonConversionException( e );
       }
@@ -44,7 +44,7 @@ public class AccessRulePolicyConverter implements AttributeConverter<AccessRuleP
    @Override
    public AccessRulePolicy convertToEntityAttribute( String dbData ) {
       try {
-         return objectMapper.readValue( dbData, AccessRulePolicy.class );
+         return SHARED_OBJECT_MAPPER.readValue( dbData, AccessRulePolicy.class );
       } catch ( JsonProcessingException e ) {
          throw new JsonConversionException( e );
       }

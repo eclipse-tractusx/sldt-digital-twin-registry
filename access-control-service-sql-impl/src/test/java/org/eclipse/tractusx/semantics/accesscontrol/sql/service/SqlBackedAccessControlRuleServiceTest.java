@@ -20,6 +20,8 @@
 
 package org.eclipse.tractusx.semantics.accesscontrol.sql.service;
 
+import static org.assertj.core.api.Assertions.*;
+
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
@@ -100,7 +102,7 @@ class SqlBackedAccessControlRuleServiceTest {
 
    @BeforeEach
    void setUp() {
-      ObjectMapper objectMapper = new ObjectMapper();
+      ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
       final var filePath = Path.of( getClass().getResource( "/example-access-rules.json" ).getFile() );
       AccessControlRuleRepository repository = new FileBasedAccessControlRuleRepository( objectMapper, filePath.toAbsolutePath().toString() );
       underTest = new SqlBackedAccessControlRuleService( repository );
@@ -110,7 +112,7 @@ class SqlBackedAccessControlRuleServiceTest {
    void testFilterValidSpecificAssetIdsForLookupWhenNoMatchingSpecificAssetIdsProvidedExpectException() {
       final var specificAssetIds = new HashSet<SpecificAssetId>();
 
-      Assertions.assertThatThrownBy( () -> underTest.filterValidSpecificAssetIdsForLookup( specificAssetIds, BPNA ) )
+      assertThatThrownBy( () -> underTest.filterValidSpecificAssetIdsForLookup( specificAssetIds, BPNA ) )
             .isInstanceOf( DenyAccessException.class );
    }
 
@@ -120,14 +122,14 @@ class SqlBackedAccessControlRuleServiceTest {
          Set<SpecificAssetId> specificAssetIds, String bpn, Set<SpecificAssetId> expectedSpecificAssetIds ) throws DenyAccessException {
       final var actual = underTest.filterValidSpecificAssetIdsForLookup( specificAssetIds, bpn );
 
-      Assertions.assertThat( actual ).isEqualTo( expectedSpecificAssetIds );
+      assertThat( actual ).isEqualTo( expectedSpecificAssetIds );
    }
 
    @Test
    void testFetchVisibilityCriteriaForShellWhenNoMatchingBpnExpectException() {
       final var specificAssetIds = Set.of( MANUFACTURER_PART_ID_99991, CUSTOMER_PART_ID_CONTOSO001, REVISION_NUMBER_01 );
 
-      Assertions.assertThatThrownBy( () -> underTest.fetchVisibilityCriteriaForShell( specificAssetIds, BPNB ) )
+      assertThatThrownBy( () -> underTest.fetchVisibilityCriteriaForShell( specificAssetIds, BPNB ) )
             .isInstanceOf( DenyAccessException.class );
    }
 
@@ -138,13 +140,13 @@ class SqlBackedAccessControlRuleServiceTest {
          Set<String> expectedSpecificAssetIdNames, Set<String> expectedSemanticIds ) throws DenyAccessException {
       final var actual = underTest.fetchVisibilityCriteriaForShell( specificAssetIds, bpn );
 
-      Assertions.assertThat( actual.visibleSemanticIds() ).isEqualTo( expectedSemanticIds );
-      Assertions.assertThat( actual.visibleSpecificAssetIdNames() ).isEqualTo( expectedSpecificAssetIdNames );
+      assertThat( actual.visibleSemanticIds() ).isEqualTo( expectedSemanticIds );
+      assertThat( actual.visibleSpecificAssetIdNames() ).isEqualTo( expectedSpecificAssetIdNames );
    }
 
    @Test
    void testFetchApplicableRulesForPartnerWhenBpnNotFoundExpectException() {
-      Assertions.assertThatThrownBy( () -> underTest.fetchApplicableRulesForPartner( BPNB ) )
+      assertThatThrownBy( () -> underTest.fetchApplicableRulesForPartner( BPNB ) )
             .isInstanceOf( DenyAccessException.class );
    }
 
@@ -152,10 +154,11 @@ class SqlBackedAccessControlRuleServiceTest {
    void testFetchApplicableRulesForPartnerWhenBpnFoundExpectRuleList() throws DenyAccessException {
       Set<AccessRule> actual = underTest.fetchApplicableRulesForPartner( BPNA );
 
-      Assertions.assertThat( actual ).hasSize( 2 );
-      Assertions.assertThat( actual ).isEqualTo( Set.of(
-            new AccessRule( Set.of( MANUFACTURER_PART_ID_99991, CUSTOMER_PART_ID_ACME001, REVISION_NUMBER_01 ), Set.of( PRODUCT_CARBON_FOOTPRINTV_1_1_0 ) ),
-            new AccessRule( Set.of( MANUFACTURER_PART_ID_99991, CUSTOMER_PART_ID_ACME001, PART_INSTANCE_ID_00001 ), Set.of( TRACEABILITYV_1_1_0 ) )
-      ) );
+      assertThat( actual ).hasSize( 2 )
+            .isEqualTo( Set.of(
+                  new AccessRule( Set.of( MANUFACTURER_PART_ID_99991, CUSTOMER_PART_ID_ACME001, REVISION_NUMBER_01 ),
+                        Set.of( PRODUCT_CARBON_FOOTPRINTV_1_1_0 ) ),
+                  new AccessRule( Set.of( MANUFACTURER_PART_ID_99991, CUSTOMER_PART_ID_ACME001, PART_INSTANCE_ID_00001 ), Set.of( TRACEABILITYV_1_1_0 ) )
+            ) );
    }
 }

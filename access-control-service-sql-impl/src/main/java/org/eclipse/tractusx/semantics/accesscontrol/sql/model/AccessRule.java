@@ -20,6 +20,8 @@
 
 package org.eclipse.tractusx.semantics.accesscontrol.sql.model;
 
+import java.time.Instant;
+
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.converter.AccessRulePolicyConverter;
 
 import jakarta.persistence.Column;
@@ -57,11 +59,17 @@ public class AccessRule {
    private PolicyType policyType;
 
    @Lob
-   @Column( name = "policy", nullable = false)
+   @Column( name = "policy", nullable = false )
    @Convert( converter = AccessRulePolicyConverter.class )
    private AccessRulePolicy policy;
 
    @Column( name = "description", length = 256 )
    private String description;
+
+   @Column( name = "valid_from" )
+   private Instant validFrom;
+
+   @Column( name = "valid_to" )
+   private Instant validTo;
 
 }
