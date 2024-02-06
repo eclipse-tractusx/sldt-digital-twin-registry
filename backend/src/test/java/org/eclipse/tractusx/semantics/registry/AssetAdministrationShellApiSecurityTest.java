@@ -665,7 +665,6 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
             shellPayload.setSpecificAssetIds(null);
             SpecificAssetId asset1 = TestUtil.createSpecificAssetId("CustomerPartId","tenantTwoAssetIdValue",List.of(jwtTokenFactory.tenantTwo().getTenantId()));
-            //TODO: Can this happen in real life???
             SpecificAssetId asset2 = TestUtil.createSpecificAssetId("CustomerPartId2","tenantThreeAssetIdValue",List.of(jwtTokenFactory.tenantThree().getTenantId()));
             SpecificAssetId asset3 = TestUtil.createSpecificAssetId("MaterialNumber","withoutTenantAssetIdValue",List.of(jwtTokenFactory.tenantTwo().getTenantId()));
             // Define specificAsset with wildcard which not allowed. (Only manufacturerPartId is defined in application.yml)

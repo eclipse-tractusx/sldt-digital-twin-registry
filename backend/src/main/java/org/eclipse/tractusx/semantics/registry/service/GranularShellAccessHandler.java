@@ -61,7 +61,6 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
 
    @Override
    public Specification<Shell> shellFilterSpecification( String sortFieldName, ShellCursor cursor, String externalSubjectId ) {
-      //TODO: must be reviewed, not sure this will be good
       return ( root, query, criteriaBuilder ) -> {
          Instant searchValue = cursor.getShellSearchCursor();
          query.orderBy( criteriaBuilder.asc( criteriaBuilder.coalesce( root.get( sortFieldName ), Instant.now() ) ) );
@@ -82,17 +81,16 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
    }
 
    /**
-    * TODO: update documentation
-    * This method filter out the shell-properties based on externalSubjectId in the specificAssetIds.<br>
+    * This method filters out the shell-properties based on externalSubjectId in the specificAssetIds.<br>
     * 1. Condition: The owner of the shell has full access to the shell.<br>
-    * 2. Condition: If the given @param externalSubjectId is included in one of the specificAssetIds, all shell-properties are visible. Only the list of specificAssetIds are limited to given externalSubjectId.<br>
-    * 3. Condition: If the given @param externalSubjectId is not included in one of the specificAssetIds, only few properties are visible:idShort, submodelDescriptors
+    * 2. Condition: If there is an access rule giving access to the @param externalSubjectId to see a specificAssetId it will be visible<br>
+    * 3. Condition: If there is an access rule giving access to the @param externalSubjectId to see a submodel it will be visible<br>
+    * 4. Condition: If only PUBLIC_READABLE access rules apply, the shell content will be filtered even further
     *
     * @param shell
     * @param externalSubjectId externalSubjectId/tenantId
     * @return filtered Shell
     */
-   //Could map to null if the shell should not be visible at all
    @Override
    @Nullable
    public Shell filterShellProperties( Shell shell, String externalSubjectId ) {
@@ -109,7 +107,6 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
          Set<Submodel> filteredSubmodels = shell.getSubmodels().stream()
                .filter( submodel -> submodel.getSemanticId().getKeys().stream()
                      .anyMatch( key -> key.getType() == ReferenceKeyType.SUBMODEL
-                                       //TODO: is it okay to use full text matching for the semantic Id comparisons???
                                        && visibilityCriteria.visibleSemanticIds().contains( key.getValue() ) ) )
                .collect( Collectors.toSet() );
          return shell.withIdentifiers( filteredIdentifiers ).withSubmodels( filteredSubmodels );

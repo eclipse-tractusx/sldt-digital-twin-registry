@@ -22,7 +22,6 @@ package org.eclipse.tractusx.semantics.registry.service;
 
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.accesscontrol.api.AccessControlRuleService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,7 +29,6 @@ import org.springframework.context.annotation.Configuration;
 public class ShellAccessHandlerConfiguration {
 
    @Bean
-   @Autowired
    public ShellAccessHandler shellAccessHandler(
          final RegistryProperties registryProperties, final AccessControlRuleService accessControlRuleService ) {
       final ShellAccessHandler result;
