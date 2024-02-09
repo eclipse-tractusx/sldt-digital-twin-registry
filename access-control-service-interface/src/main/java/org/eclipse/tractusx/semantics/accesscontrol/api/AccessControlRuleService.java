@@ -20,18 +20,24 @@
 
 package org.eclipse.tractusx.semantics.accesscontrol.api;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.tractusx.semantics.accesscontrol.api.exception.DenyAccessException;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.AccessRule;
+import org.eclipse.tractusx.semantics.accesscontrol.api.model.ShellVisibilityContext;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.ShellVisibilityCriteria;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.SpecificAssetId;
 
 public interface AccessControlRuleService {
 
-   Set<SpecificAssetId> filterValidSpecificAssetIdsForLookup( Set<SpecificAssetId> specificAssetIds, String bpn ) throws DenyAccessException;
+   List<String> filterValidSpecificAssetIdsForLookup(
+         Set<SpecificAssetId> userQuery, List<ShellVisibilityContext> shellContexts, String bpn ) throws DenyAccessException;
 
-   ShellVisibilityCriteria fetchVisibilityCriteriaForShell( Set<SpecificAssetId> specificAssetIds, String bpn ) throws DenyAccessException;
+   ShellVisibilityCriteria fetchVisibilityCriteriaForShell( ShellVisibilityContext shellContext, String bpn ) throws DenyAccessException;
+
+   Map<String, ShellVisibilityCriteria> fetchVisibilityCriteriaForShells( List<ShellVisibilityContext> shellContexts, String bpn );
 
    Set<AccessRule> fetchApplicableRulesForPartner( String bpn ) throws DenyAccessException;
 

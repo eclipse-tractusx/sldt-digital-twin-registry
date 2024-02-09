@@ -24,10 +24,12 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.nio.file.Path;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Stream;
 
-import org.assertj.core.api.Assertions;
+import org.eclipse.tractusx.semantics.accesscontrol.api.model.ShellVisibilityContext;
 import org.eclipse.tractusx.semantics.accesscontrol.api.exception.DenyAccessException;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.AccessRule;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.SpecificAssetId;
@@ -68,15 +70,15 @@ class SqlBackedAccessControlRuleServiceTest {
             .add( Arguments.of(
                   Set.of( MANUFACTURER_PART_ID_99991, CUSTOMER_PART_ID_ACME001, PART_INSTANCE_ID_00001, REVISION_NUMBER_02 ),
                   BPNA,
-                  Set.of( MANUFACTURER_PART_ID_99991, CUSTOMER_PART_ID_ACME001, PART_INSTANCE_ID_00001 ) ) )
+                  false ) ) //the rules will hide some of the query parameters
             .add( Arguments.of(
                   Set.of( MANUFACTURER_PART_ID_99991, CUSTOMER_PART_ID_ACME001, PART_INSTANCE_ID_00002, VERSION_NUMBER_01, REVISION_NUMBER_01 ),
                   BPNA,
-                  Set.of( MANUFACTURER_PART_ID_99991, CUSTOMER_PART_ID_ACME001, PART_INSTANCE_ID_00002, REVISION_NUMBER_01 ) ) )
+                  false ) ) //the rules will hide some of the query parameters
             .add( Arguments.of(
                   Set.of( MANUFACTURER_PART_ID_99991, CUSTOMER_PART_ID_ACME001, PART_INSTANCE_ID_00001, VERSION_NUMBER_01, REVISION_NUMBER_01 ),
                   BPNA,
-                  Set.of( MANUFACTURER_PART_ID_99991, CUSTOMER_PART_ID_ACME001, PART_INSTANCE_ID_00001, VERSION_NUMBER_01, REVISION_NUMBER_01 ) ) )
+                  true ) )
             .build();
    }
 
@@ -105,31 +107,39 @@ class SqlBackedAccessControlRuleServiceTest {
       ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
       final var filePath = Path.of( getClass().getResource( "/example-access-rules.json" ).getFile() );
       AccessControlRuleRepository repository = new FileBasedAccessControlRuleRepository( objectMapper, filePath.toAbsolutePath().toString() );
-      underTest = new SqlBackedAccessControlRuleService( repository );
+      underTest = new SqlBackedAccessControlRuleService( repository, "PUBLIC_READABLE" );
    }
 
    @Test
    void testFilterValidSpecificAssetIdsForLookupWhenNoMatchingSpecificAssetIdsProvidedExpectException() {
       final var specificAssetIds = new HashSet<SpecificAssetId>();
+      final var shellContexts = List.of( new ShellVisibilityContext( UUID.randomUUID().toString(), specificAssetIds ) );
 
-      assertThatThrownBy( () -> underTest.filterValidSpecificAssetIdsForLookup( specificAssetIds, BPNA ) )
+      assertThatThrownBy( () -> underTest.filterValidSpecificAssetIdsForLookup( specificAssetIds, shellContexts, BPNB ) )
             .isInstanceOf( DenyAccessException.class );
    }
 
    @ParameterizedTest
    @MethodSource( "matchingSpecificAssetIdFilterProvider" )
    void testFilterValidSpecificAssetIdsForLookupWhenMatchingSpecificAssetIdsProvidedExpectFilteredIds(
-         Set<SpecificAssetId> specificAssetIds, String bpn, Set<SpecificAssetId> expectedSpecificAssetIds ) throws DenyAccessException {
-      final var actual = underTest.filterValidSpecificAssetIdsForLookup( specificAssetIds, bpn );
+         Set<SpecificAssetId> specificAssetIds, String bpn, boolean shouldMatch ) throws DenyAccessException {
+      final var aasId = UUID.randomUUID().toString();
+      final var shellContext = List.of( new ShellVisibilityContext( aasId, specificAssetIds ) );
+      final var actual = underTest.filterValidSpecificAssetIdsForLookup( specificAssetIds, shellContext, bpn );
 
-      assertThat( actual ).isEqualTo( expectedSpecificAssetIds );
+      if ( shouldMatch ) {
+         assertThat( actual ).isEqualTo( List.of( aasId ) );
+      } else {
+         assertThat( actual ).isEmpty();
+      }
    }
 
    @Test
    void testFetchVisibilityCriteriaForShellWhenNoMatchingBpnExpectException() {
       final var specificAssetIds = Set.of( MANUFACTURER_PART_ID_99991, CUSTOMER_PART_ID_CONTOSO001, REVISION_NUMBER_01 );
+      ShellVisibilityContext shellContext = new ShellVisibilityContext( UUID.randomUUID().toString(), specificAssetIds );
 
-      assertThatThrownBy( () -> underTest.fetchVisibilityCriteriaForShell( specificAssetIds, BPNB ) )
+      assertThatThrownBy( () -> underTest.fetchVisibilityCriteriaForShell( shellContext, BPNB ) )
             .isInstanceOf( DenyAccessException.class );
    }
 
@@ -138,7 +148,9 @@ class SqlBackedAccessControlRuleServiceTest {
    void testFetchVisibilityCriteriaForShellWhenMatchingSpecificAssetIdsProvidedExpectFilteringList(
          Set<SpecificAssetId> specificAssetIds, String bpn,
          Set<String> expectedSpecificAssetIdNames, Set<String> expectedSemanticIds ) throws DenyAccessException {
-      final var actual = underTest.fetchVisibilityCriteriaForShell( specificAssetIds, bpn );
+      ShellVisibilityContext shellContext = new ShellVisibilityContext( UUID.randomUUID().toString(), specificAssetIds );
+
+      final var actual = underTest.fetchVisibilityCriteriaForShell( shellContext, bpn );
 
       assertThat( actual.visibleSemanticIds() ).isEqualTo( expectedSemanticIds );
       assertThat( actual.visibleSpecificAssetIdNames() ).isEqualTo( expectedSpecificAssetIdNames );

@@ -189,11 +189,9 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
          super.testFindExternalShellIdsBySpecificAssetIdsWithTenantBasedVisibilityExpectSuccess();
       }
 
-      //@Test
+      @Test
       public void testFindExternalShellIdsBySpecificAssetIdsWithTenantBasedVisibilityAndWildcardExpectSuccess() throws Exception {
-         //TODO: enable when we are no longer using the file based access rules
-         // This test is using a random prefix in the the name of the specificAssetId that has to match
-         //super.testFindExternalShellIdsBySpecificAssetIdsWithTenantBasedVisibilityAndWildcardExpectSuccess();
+         super.testFindExternalShellIdsBySpecificAssetIdsWithTenantBasedVisibilityAndWildcardExpectSuccess();
       }
 
       @Test
@@ -211,10 +209,9 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
          super.testGetAllShellsByOwningTenantId();
       }
 
-      //@Test
+      @Test
       public void testGetAllShellsWithPublicAccessByTenantId() throws Exception {
-         //TODO: enable when public access is implemented
-         //super.testGetAllShellsWithPublicAccessByTenantId();
+         super.testGetAllShellsWithPublicAccessByTenantId();
       }
 
       @Test
@@ -222,10 +219,9 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
          super.testGetShellByExternalIdByOwningTenantId();
       }
 
-      //@Test
+      @Test
       public void testGetAllShellByExternalIdWithPublicAccessByTenantId() throws Exception {
-         //TODO: enable when public access is implemented
-         //super.testGetAllShellByExternalIdWithPublicAccessByTenantId();
+         super.testGetAllShellByExternalIdWithPublicAccessByTenantId();
       }
    }
 

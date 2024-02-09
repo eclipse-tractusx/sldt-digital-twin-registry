@@ -97,6 +97,13 @@ public class DefaultShellAccessHandler implements ShellAccessHandler {
       return shell.withIdentifiers( filteredIdentifiers );
    }
 
+   @Override
+   public List<Shell> filterListOfShellProperties( List<Shell> shells, String externalSubjectId ) {
+      return shells.stream()
+            .map( shell -> filterShellProperties( shell, externalSubjectId ) )
+            .toList();
+   }
+
    private Set<ShellIdentifier> filterSpecificAssetIdsByTenantId( Set<ShellIdentifier> shellIdentifiers, String tenantId ) {
       // the owning tenant should always see all identifiers
       if ( tenantId.equals( owningTenantId ) ) {

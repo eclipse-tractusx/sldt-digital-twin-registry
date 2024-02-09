@@ -900,7 +900,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
           // asset3 is visible for tenantTwo and tenantThree
           SpecificAssetId asset4 = TestUtil.createSpecificAssetId(keyPrefix + "tenantTwo_tenantThree","value_3",List.of(jwtTokenFactory.tenantTwo().getTenantId(),jwtTokenFactory.tenantThree().getTenantId()));
           // asset4 is visible for tenantTwo, because externalSubjectId = tenantTwo
-          SpecificAssetId asset5 = TestUtil.createSpecificAssetId(keyPrefix + "tenantTwo","value_2",List.of(jwtTokenFactory.tenantTwo().getTenantId()));
+          SpecificAssetId asset5 = TestUtil.createSpecificAssetId("tenantTwo","value_2_private",List.of(jwtTokenFactory.tenantTwo().getTenantId()));
 
           shellPayload.setSpecificAssetIds(List.of(asset1,asset2,asset3,asset4,asset5));
 
@@ -910,7 +910,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
           SpecificAssetId sa2 = TestUtil.createSpecificAssetId( "manufacturerPartId","value_2",null);
           SpecificAssetId sa3 = TestUtil.createSpecificAssetId( "bpId","value_3",null);
           SpecificAssetId sa4 = TestUtil.createSpecificAssetId(keyPrefix + "tenantTwo_tenantThree","value_3",null);
-          SpecificAssetId sa5 = TestUtil.createSpecificAssetId(keyPrefix + "tenantTwo","value_2",null);
+          SpecificAssetId sa5 = TestUtil.createSpecificAssetId("tenantTwo","value_2_private",null);
 
           String encodedSa1 = Base64.getUrlEncoder().encodeToString(serialize( sa1));
           String encodedSa2 = Base64.getUrlEncoder().encodeToString(serialize( sa2));
@@ -1105,7 +1105,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
           // asset2 is visible for everyone, because externalSubjectId = PUBLIC_READABLE and specificAssetKey is manufacturerPartId (which is in the list of allowedTypes via application.yml)
           SpecificAssetId asset2 = TestUtil.createSpecificAssetId("manufacturerPartId","value_2",List.of(getExternalSubjectIdWildcardPrefix()));
           // asset3 is visible for tenantTwo, because externalSubjectId = tenantTwo
-          SpecificAssetId asset3 = TestUtil.createSpecificAssetId(keyPrefix + "tenantTwo","value_2",List.of(jwtTokenFactory.tenantTwo().getTenantId()));
+          SpecificAssetId asset3 = TestUtil.createSpecificAssetId("tenantTwo","value_2_public",List.of(jwtTokenFactory.tenantTwo().getTenantId()));
 
           shellPayload.setSpecificAssetIds(List.of(asset1,asset2,asset3));
           performShellCreateRequest(mapper.writeValueAsString(shellPayload));
@@ -1202,7 +1202,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
           // asset2 is visible for everyone, because externalSubjectId = PUBLIC_READABLE and specificAssetKey is manufacturerPartId (which is in the list of allowedTypes via application.yml)
           SpecificAssetId asset2 = TestUtil.createSpecificAssetId("manufacturerPartId","value_2",List.of(getExternalSubjectIdWildcardPrefix()));
           // asset3 is visible for tenantTwo, because externalSubjectId = tenantTwo
-          SpecificAssetId asset3 = TestUtil.createSpecificAssetId(keyPrefix + "tenantTwo","value_2",List.of(jwtTokenFactory.tenantTwo().getTenantId()));
+          SpecificAssetId asset3 = TestUtil.createSpecificAssetId("tenantTwo","value_2_public",List.of(jwtTokenFactory.tenantTwo().getTenantId()));
 
           shellPayload.setSpecificAssetIds(List.of(asset1,asset2,asset3));
           performShellCreateRequest(mapper.writeValueAsString(shellPayload));

@@ -79,6 +79,54 @@
     }
   },
   {
+    "id": 4, "tid": "TENANT_ONE", "targetTenant": "TENANT_TWO",
+    "policyType": "AAS", "policy": {
+      "accessRules": [
+        { "attribute": "bpn", "operator": "eq", "value": "TENANT_TWO" },
+        {
+          "attribute": "mandatorySpecificAssetIds", "operator": "includes",
+          "values": [
+            { "attribute": "tenantTwo", "operator": "eq", "value": "value_2_public" }
+          ]
+        },
+        {
+          "attribute": "visibleSpecificAssetIdNames", "operator": "includes",
+          "values": [
+            { "attribute": "name", "operator": "eq", "value": "tenantTwo" }
+          ]
+        },
+        {
+          "attribute": "visibleSemanticIds", "operator": "includes",
+          "values": [ { "attribute": "modelUrn", "operator": "eq", "value": "semanticIdExample" } ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 5, "tid": "TENANT_ONE", "targetTenant": "TENANT_TWO",
+    "policyType": "AAS", "policy": {
+      "accessRules": [
+        { "attribute": "bpn", "operator": "eq", "value": "TENANT_TWO" },
+        {
+          "attribute": "mandatorySpecificAssetIds", "operator": "includes",
+          "values": [
+            { "attribute": "tenantTwo", "operator": "eq", "value": "value_2_private" }
+          ]
+        },
+        {
+          "attribute": "visibleSpecificAssetIdNames", "operator": "includes",
+          "values": [
+            { "attribute": "name", "operator": "eq", "value": "tenantTwo" }
+          ]
+        },
+        {
+          "attribute": "visibleSemanticIds", "operator": "includes",
+          "values": [ { "attribute": "modelUrn", "operator": "eq", "value": "semanticIdExample" } ]
+        }
+      ]
+    }
+  },
+  {
     "id": 999, "tid": "TENANT_ONE", "targetTenant": "PUBLIC_READABLE",
     "policyType": "AAS", "policy": {
       "accessRules": [
@@ -92,7 +140,8 @@
         {
           "attribute": "visibleSpecificAssetIdNames", "operator": "includes",
           "values": [
-            { "attribute": "name", "operator": "eq", "value": "manufacturerPartId" }
+            { "attribute": "name", "operator": "eq", "value": "manufacturerPartId" },
+            { "attribute": "name", "operator": "eq", "value": "assetLifecyclePhase" }
           ]
         },
         {

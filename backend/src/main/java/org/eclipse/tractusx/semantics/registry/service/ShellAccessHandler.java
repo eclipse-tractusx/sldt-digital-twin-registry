@@ -20,11 +20,13 @@
 
 package org.eclipse.tractusx.semantics.registry.service;
 
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.tractusx.semantics.accesscontrol.api.exception.DenyAccessException;
+import org.eclipse.tractusx.semantics.accesscontrol.api.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
-import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
+import org.eclipse.tractusx.semantics.registry.model.projection.ShellIdentifierMinimal;
 import org.eclipse.tractusx.semantics.registry.utils.ShellCursor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.Nullable;
@@ -34,10 +36,14 @@ public interface ShellAccessHandler {
    @Nullable
    Shell filterShellProperties( Shell shell, String externalSubjectId );
 
+   List<Shell> filterListOfShellProperties( List<Shell> shells, String externalSubjectId );
+
    Specification<Shell> shellFilterSpecification( String sortFieldName, ShellCursor cursor, String externalSubjectId );
 
-   default Set<ShellIdentifier> filterShellIdsForLookup( Set<ShellIdentifier> shellIdentifiers, String externalSubjectId ) throws DenyAccessException {
-      return shellIdentifiers;
+   default List<String> filterToVisibleShellIdsForLookup( Set<SpecificAssetId> userQuery, List<ShellIdentifierMinimal> shellIdentifiers,
+         String externalSubjectId )
+         throws DenyAccessException {
+      throw new UnsupportedOperationException( "Only supported in case of granular access control." );
    }
 
    default boolean supportsGranularAccessControl() {

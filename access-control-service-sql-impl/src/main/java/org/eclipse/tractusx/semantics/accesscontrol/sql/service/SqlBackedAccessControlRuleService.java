@@ -22,54 +22,78 @@ package org.eclipse.tractusx.semantics.accesscontrol.sql.service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.tractusx.semantics.accesscontrol.api.AccessControlRuleService;
+import org.eclipse.tractusx.semantics.accesscontrol.api.model.ShellVisibilityContext;
 import org.eclipse.tractusx.semantics.accesscontrol.api.exception.DenyAccessException;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.ShellVisibilityCriteria;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRule;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRulePolicy;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.repository.AccessControlRuleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-@Service
+import lombok.NonNull;
+
 public class SqlBackedAccessControlRuleService implements AccessControlRuleService {
 
    private final AccessControlRuleRepository repository;
+   private final String bpnWildcard;
 
-   public SqlBackedAccessControlRuleService( AccessControlRuleRepository repository ) {
+   public SqlBackedAccessControlRuleService( @NonNull AccessControlRuleRepository repository, @NonNull String bpnWildcard ) {
       this.repository = repository;
+      this.bpnWildcard = bpnWildcard;
    }
 
    @Override
-   public Set<SpecificAssetId> filterValidSpecificAssetIdsForLookup( Set<SpecificAssetId> specificAssetIds, String bpn ) throws DenyAccessException {
-      Set<String> visibleSpecificAssetIdNames = findMatchingAccessControlRules( specificAssetIds, bpn ).stream()
-            .flatMap( accessControlRule -> Stream.concat(
-                  accessControlRule.getVisibleSpecificAssetIdNames().stream(),
-                  accessControlRule.getMandatorySpecificAssetIds().stream().map( SpecificAssetId::name ) ) )
-            .collect( Collectors.toSet() );
-      return specificAssetIds.stream()
-            .filter( id -> visibleSpecificAssetIdNames.contains( id.name() ) )
-            .collect( Collectors.toSet() );
+   public List<String> filterValidSpecificAssetIdsForLookup(
+         Set<SpecificAssetId> userQuery, List<ShellVisibilityContext> shellContext, String bpn ) throws DenyAccessException {
+      Set<AccessRulePolicy> allAccessControlRulesForBpn = findPotentiallyMatchingAccessControlRules( bpn ).collect( Collectors.toSet() );
+      return shellContext.stream()
+            .filter( aShellContext -> {
+               Set<String> visibleSpecificAssetIdNames = allAccessControlRulesForBpn.stream()
+                     .filter( accessControlRule -> aShellContext.specificAssetIds().containsAll( accessControlRule.getMandatorySpecificAssetIds() ) )
+                     .flatMap( accessControlRule -> accessControlRule.getVisibleSpecificAssetIdNames().stream() )
+                     .collect( Collectors.toSet() );
+               return aShellContext.specificAssetIds().stream()
+                     .filter( id -> visibleSpecificAssetIdNames.contains( id.name() ) )
+                     .collect( Collectors.toSet() ).containsAll( userQuery );
+            } )
+            .map( ShellVisibilityContext::aasId )
+            .toList();
    }
 
    @Override
-   public ShellVisibilityCriteria fetchVisibilityCriteriaForShell( Set<SpecificAssetId> specificAssetIds, String bpn ) throws DenyAccessException {
-      Set<AccessRulePolicy> matchingAccessControlRules = findMatchingAccessControlRules( specificAssetIds, bpn );
+   public ShellVisibilityCriteria fetchVisibilityCriteriaForShell( ShellVisibilityContext shellContext, String bpn ) throws DenyAccessException {
+      Set<AccessRulePolicy> matchingAccessControlRules = findMatchingAccessControlRules( shellContext, bpn );
       Set<String> visibleSpecificAssetIdNames = matchingAccessControlRules.stream()
-            .flatMap( accessControlRule -> Stream.concat(
-                  accessControlRule.getVisibleSpecificAssetIdNames().stream(),
-                  accessControlRule.getMandatorySpecificAssetIds().stream().map( SpecificAssetId::name ) ) )
+            .flatMap( accessControlRule -> accessControlRule.getVisibleSpecificAssetIdNames().stream() )
             .collect( Collectors.toSet() );
       Set<String> visibleSemanticIds = matchingAccessControlRules.stream()
             .map( AccessRulePolicy::getVisibleSemanticIds )
             .flatMap( Collection::stream )
             .collect( Collectors.toSet() );
-      return new ShellVisibilityCriteria( visibleSpecificAssetIdNames, visibleSemanticIds );
+      boolean publicOnly = matchingAccessControlRules.stream().noneMatch( rule -> rule.getBpn().equals( bpn ) );
+      return new ShellVisibilityCriteria( shellContext.aasId(), visibleSpecificAssetIdNames, visibleSemanticIds, publicOnly );
+   }
+
+   @Override
+   public Map<String, ShellVisibilityCriteria> fetchVisibilityCriteriaForShells( List<ShellVisibilityContext> shellContexts, String bpn ) {
+      return shellContexts.stream()
+            .map( aShellContext -> {
+               try {
+                  return fetchVisibilityCriteriaForShell( aShellContext, bpn );
+               } catch ( DenyAccessException e ) {
+                  return null;
+               }
+            } )
+            .filter( Objects::nonNull )
+            .collect( Collectors.toMap( ShellVisibilityCriteria::aasId, Function.identity() ) );
    }
 
    @Override
@@ -81,16 +105,16 @@ public class SqlBackedAccessControlRuleService implements AccessControlRuleServi
    }
 
    private Stream<AccessRulePolicy> findPotentiallyMatchingAccessControlRules( String bpn ) throws DenyAccessException {
-      List<AccessRule> allByBpn = repository.findAllByBpnWithinValidityPeriod( bpn );
+      List<AccessRule> allByBpn = repository.findAllByBpnWithinValidityPeriod( bpn, bpnWildcard );
       if ( allByBpn == null || allByBpn.isEmpty() ) {
          throw new DenyAccessException( "No matching rules are found." );
       }
       return allByBpn.stream().map( AccessRule::getPolicy );
    }
 
-   private Set<AccessRulePolicy> findMatchingAccessControlRules( Set<SpecificAssetId> specificAssetIds, String bpn ) throws DenyAccessException {
+   private Set<AccessRulePolicy> findMatchingAccessControlRules( ShellVisibilityContext shellContext, String bpn ) throws DenyAccessException {
       Set<AccessRulePolicy> matching = findPotentiallyMatchingAccessControlRules( bpn )
-            .filter( accessControlRule -> specificAssetIds.containsAll( accessControlRule.getMandatorySpecificAssetIds() ) )
+            .filter( accessControlRule -> shellContext.specificAssetIds().containsAll( accessControlRule.getMandatorySpecificAssetIds() ) )
             .collect( Collectors.toSet() );
       if ( matching.isEmpty() ) {
          throw new DenyAccessException( "No matching rules are found." );
