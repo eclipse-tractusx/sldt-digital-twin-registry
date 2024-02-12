@@ -17,14 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  *
  ******************************************************************************/
+package org.eclipse.tractusx.semantics.registry.model.projection;
 
-package org.eclipse.tractusx.semantics.accesscontrol.sql.repository;
-
-import java.util.List;
-
-import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRule;
-
-public interface AccessControlRuleRepository {
-
-   List<AccessRule> findAllByBpnWithinValidityPeriod( String bpn, String bpnWildcard );
+public record ShellIdentifierMinimal(String shellId, String namespace, String identifier) {
 }

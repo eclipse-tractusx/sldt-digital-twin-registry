@@ -36,6 +36,8 @@ import org.springframework.dao.DataRetrievalFailureException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 class FileBasedAccessControlRuleRepositoryTest {
+
+   private static final String PUBLIC_READABLE = "PUBLIC_READABLE";
    private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
    public static Stream<Arguments> bpnFilteringProvider() {
@@ -53,7 +55,7 @@ class FileBasedAccessControlRuleRepositoryTest {
       final var filePath = Path.of( getClass().getResource( "/example-access-rules.json" ).getFile() );
       final var underTest = new FileBasedAccessControlRuleRepository( objectMapper, filePath.toAbsolutePath().toString() );
 
-      List<AccessRule> actual = underTest.findAllByBpnWithinValidityPeriod( bpn );
+      List<AccessRule> actual = underTest.findAllByBpnWithinValidityPeriod( bpn, PUBLIC_READABLE );
 
       final var actualIds = actual.stream().map( AccessRule::getId ).toList();
       assertThat( actualIds ).isEqualTo( expectedRuleIds );
@@ -64,7 +66,7 @@ class FileBasedAccessControlRuleRepositoryTest {
       final var filePath = Path.of( "unknown.json" );
       final var underTest = new FileBasedAccessControlRuleRepository( objectMapper, filePath.toAbsolutePath().toString() );
 
-      assertThatThrownBy( () -> underTest.findAllByBpnWithinValidityPeriod( "BPNL00000000000A" ) )
+      assertThatThrownBy( () -> underTest.findAllByBpnWithinValidityPeriod( "BPNL00000000000A", PUBLIC_READABLE ) )
             .isInstanceOf( DataRetrievalFailureException.class );
    }
 }

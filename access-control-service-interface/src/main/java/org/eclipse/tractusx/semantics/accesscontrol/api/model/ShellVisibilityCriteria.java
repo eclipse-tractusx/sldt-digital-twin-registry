@@ -22,5 +22,8 @@ package org.eclipse.tractusx.semantics.accesscontrol.api.model;
 
 import java.util.Set;
 
-public record ShellVisibilityCriteria(Set<String> visibleSpecificAssetIdNames, Set<String> visibleSemanticIds) {
+import lombok.NonNull;
+
+public record ShellVisibilityCriteria(
+      @NonNull String aasId, @NonNull Set<String> visibleSpecificAssetIdNames, @NonNull Set<String> visibleSemanticIds, boolean publicOnly) {
 }

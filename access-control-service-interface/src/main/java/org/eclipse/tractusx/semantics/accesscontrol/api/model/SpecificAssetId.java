@@ -20,5 +20,7 @@
 
 package org.eclipse.tractusx.semantics.accesscontrol.api.model;
 
-public record SpecificAssetId(String name, String value) {
+import lombok.NonNull;
+
+public record SpecificAssetId(@NonNull String name, @NonNull String value) {
 }

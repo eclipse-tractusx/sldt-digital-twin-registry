@@ -1,6 +1,6 @@
 ###############################################################
-# Copyright (c) 2021, 2023 Robert Bosch Manufacturing Solutions GmbH
-# Copyright (c) 2021, 2023 Contributors to the Eclipse Foundation
+# Copyright (c) 2021, 2023, 2024 Robert Bosch Manufacturing Solutions GmbH
+# Copyright (c) 2021, 2023, 2024 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -49,6 +49,7 @@ registry:
   tenantId: default-tenant
   externalSubjectIdWildcardPrefix: PUBLIC_READABLE
   externalSubjectIdWildcardAllowedTypes: manufacturerPartId,assetLifecyclePhase
+  useGranularAccessControl: "false"
   service:
     port: 8080
     type: ClusterIP

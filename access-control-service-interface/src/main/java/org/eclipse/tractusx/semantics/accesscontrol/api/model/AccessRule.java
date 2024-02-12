@@ -22,6 +22,8 @@ package org.eclipse.tractusx.semantics.accesscontrol.api.model;
 
 import java.util.Set;
 
-public record AccessRule(Set<SpecificAssetId> requiredSpecificAssetIds, Set<String> visibleSemanticIds) {
+import lombok.NonNull;
+
+public record AccessRule(@NonNull Set<SpecificAssetId> requiredSpecificAssetIds, @NonNull Set<String> visibleSemanticIds) {
 
 }

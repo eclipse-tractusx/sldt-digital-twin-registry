@@ -22,6 +22,8 @@ package org.eclipse.tractusx.semantics.registry.service;
 
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.accesscontrol.api.AccessControlRuleService;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.repository.AccessControlRuleRepository;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.service.SqlBackedAccessControlRuleService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,8 +31,14 @@ import org.springframework.context.annotation.Configuration;
 public class ShellAccessHandlerConfiguration {
 
    @Bean
+   public AccessControlRuleService accessControlRuleService(
+         final AccessControlRuleRepository accessControlRuleRepository, final RegistryProperties registryProperties ) {
+      return new SqlBackedAccessControlRuleService( accessControlRuleRepository, registryProperties.getExternalSubjectIdWildcardPrefix() );
+   }
+
+   @Bean
    public ShellAccessHandler shellAccessHandler(
-         final RegistryProperties registryProperties, final AccessControlRuleService accessControlRuleService ) {
+         final AccessControlRuleService accessControlRuleService, final RegistryProperties registryProperties ) {
       final ShellAccessHandler result;
       if ( Boolean.TRUE.equals( registryProperties.getUseGranularAccessControl() ) ) {
          result = new GranularShellAccessHandler( registryProperties, accessControlRuleService );

@@ -38,12 +38,14 @@ import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.aas.registry.model.GetAllAssetAdministrationShellIdsByAssetLink200Response;
 import org.eclipse.tractusx.semantics.aas.registry.model.PagedResultPagingMetadata;
 import org.eclipse.tractusx.semantics.accesscontrol.api.exception.DenyAccessException;
+import org.eclipse.tractusx.semantics.accesscontrol.api.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.registry.dto.BatchResultDto;
 import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
 import org.eclipse.tractusx.semantics.registry.dto.SubmodelCollectionDto;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
 import org.eclipse.tractusx.semantics.registry.model.Submodel;
+import org.eclipse.tractusx.semantics.registry.model.projection.ShellIdentifierMinimal;
 import org.eclipse.tractusx.semantics.registry.model.projection.ShellMinimal;
 import org.eclipse.tractusx.semantics.registry.repository.ShellIdentifierRepository;
 import org.eclipse.tractusx.semantics.registry.repository.ShellRepository;
@@ -194,23 +196,24 @@ public class ShellService {
       pageSize = getPageSize( pageSize );
       ShellCursor cursor = new ShellCursor( pageSize, cursorVal );
       var specification = shellAccessHandler.shellFilterSpecification( SORT_FIELD_NAME_SHELL, cursor, externalSubjectId );
-      final var resultList = new ArrayList<Shell>();
+      final var foundList = new ArrayList<Shell>();
       boolean hasNext = true;
-      while ( resultList.size() < pageSize && hasNext ) {
-         Page<Shell> currentPage = shellRepository.findAll( specification, ofSize( cursor.getRecordSize() ) );
-         currentPage.stream()
-               .map( shell -> shellAccessHandler.filterShellProperties( shell, externalSubjectId ) )
-               .filter( Objects::nonNull )
-               .limit( (long) pageSize - resultList.size() )
-               .forEach( resultList::add );
+      //fetch 1 more item to make sure there is a visible item for the next page
+      int fetchSize = pageSize + 1;
+      while ( foundList.size() < fetchSize && hasNext ) {
+         Page<Shell> currentPage = shellRepository.findAll( specification, ofSize( fetchSize ) );
+         List<Shell> shells = shellAccessHandler.filterListOfShellProperties( currentPage.stream().toList(), externalSubjectId );
+         shells.stream()
+               .limit( (long) pageSize - foundList.size() )
+               .forEach( foundList::add );
          hasNext = currentPage.hasNext();
       }
       String nextCursor = null;
 
+      final boolean hasNextPage = foundList.size() > pageSize;
+      List<Shell> resultList = foundList.stream().limit( pageSize ).toList();
       if ( !resultList.isEmpty() ) {
-         nextCursor = cursor.getEncodedCursorShell(
-               resultList.get( resultList.size() - 1 ).getCreatedDate(),
-               hasNext );
+         nextCursor = cursor.getEncodedCursorShell( resultList.get( resultList.size() - 1 ).getCreatedDate(), hasNextPage );
       }
 
       return ShellCollectionDto.builder()
@@ -255,19 +258,36 @@ public class ShellService {
    public GetAllAssetAdministrationShellIdsByAssetLink200Response findExternalShellIdsByIdentifiersByExactMatch( Set<ShellIdentifier> shellIdentifiers,
          Integer pageSize, String cursor, String externalSubjectId ) {
 
+      pageSize = getPageSize( pageSize );
       try {
-         final var filtered = shellAccessHandler.filterShellIdsForLookup( shellIdentifiers, externalSubjectId );
-         List<String> keyValueCombinations = filtered.stream().map( shellIdentifier -> shellIdentifier.getKey() + shellIdentifier.getValue() ).toList();
+         List<String> keyValueCombinations = shellIdentifiers.stream().map( shellIdentifier -> shellIdentifier.getKey() + shellIdentifier.getValue() ).toList();
 
-         List<String> queryResult = shellRepository.findExternalShellIdsByIdentifiersByExactMatch( keyValueCombinations,
-               keyValueCombinations.size(), externalSubjectId, externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes, owningTenantId,
-               ShellIdentifier.GLOBAL_ASSET_ID_KEY );
-         pageSize = getPageSize( pageSize );
+         //TODO: if we can define a sorting order, we should consider doing it on the database side
+         final List<String> assetIdList = new ArrayList<>();
+         String nextCursor;
+         if ( shellAccessHandler.supportsGranularAccessControl() ) {
+            List<ShellIdentifierMinimal> queryResults = shellIdentifierRepository
+                  .findMinimalShellIdsBySpecificAssetIds( keyValueCombinations, keyValueCombinations.size() );
+            Set<SpecificAssetId> userQuery = shellIdentifiers.stream()
+                  .map( id -> new SpecificAssetId( id.getKey(), id.getValue() ) )
+                  .collect( Collectors.toSet() );
+            List<String> allVisible = shellAccessHandler.filterToVisibleShellIdsForLookup( userQuery, queryResults, externalSubjectId );
+            allVisible.stream()
+                  .skip( getCursorDecoded( cursor, allVisible ) )
+                  .limit( pageSize )
+                  .forEach( assetIdList::add );
+            nextCursor = getCursorEncoded( allVisible, assetIdList );
+         } else {
+            List<String> queryResult = shellRepository.findExternalShellIdsByIdentifiersByExactMatch( keyValueCombinations,
+                  keyValueCombinations.size(), externalSubjectId, externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes, owningTenantId,
+                  ShellIdentifier.GLOBAL_ASSET_ID_KEY );
+            pageSize = getPageSize( pageSize );
 
-         int startIndex = getCursorDecoded( cursor, queryResult );
-         List<String> assetIdList = queryResult.subList( startIndex, queryResult.size() ).stream().limit( pageSize ).collect( Collectors.toList() );
+            int startIndex = getCursorDecoded( cursor, queryResult );
+            queryResult.stream().skip( startIndex ).limit( pageSize ).forEach( assetIdList::add );
 
-         String nextCursor = getCursorEncoded( queryResult, assetIdList );
+            nextCursor = getCursorEncoded( queryResult, assetIdList );
+         }
          final var response = new GetAllAssetAdministrationShellIdsByAssetLink200Response();
          response.setResult( assetIdList );
          response.setPagingMetadata( new PagedResultPagingMetadata().cursor( nextCursor ) );
@@ -289,13 +309,17 @@ public class ShellService {
       return null;
    }
 
+   private String getCursorDecoded( String cursor ) {
+      return Optional.ofNullable( cursor )
+            .map( Base64.getDecoder()::decode )
+            .map( String::new )
+            .orElse( null );
+   }
+
    private int getCursorDecoded( String cursor, List<String> queryResult ) {
-      if ( cursor != null ) {
-         var decodedBytes = Base64.getDecoder().decode( cursor );
-         var decodedValue = new String( decodedBytes );
-         return queryResult.indexOf( decodedValue ) + 1;
-      }
-      return 0;
+      return Optional.ofNullable( getCursorDecoded( cursor ) )
+            .map( decodedValue -> queryResult.indexOf( decodedValue ) + 1 )
+            .orElse( 0 );
    }
 
    @Transactional( readOnly = true )
@@ -467,6 +491,7 @@ public class ShellService {
          }
       } ).collect( Collectors.toList() );
    }
+
    private Shell doFindShellByExternalIdWithoutFiltering( String externalShellId ) {
       return shellRepository.findByIdExternal( externalShellId )
             .orElseThrow( () -> new EntityNotFoundException( String.format( "Shell for identifier %s not found", externalShellId ) ) );
