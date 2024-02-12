@@ -204,7 +204,7 @@ public class ShellService {
          Page<Shell> currentPage = shellRepository.findAll( specification, ofSize( fetchSize ) );
          List<Shell> shells = shellAccessHandler.filterListOfShellProperties( currentPage.stream().toList(), externalSubjectId );
          shells.stream()
-               .limit( (long) pageSize - foundList.size() )
+               .limit( (long) fetchSize - foundList.size() )
                .forEach( foundList::add );
          hasNext = currentPage.hasNext();
       }
@@ -278,7 +278,7 @@ public class ShellService {
                   .forEach( assetIdList::add );
             nextCursor = getCursorEncoded( allVisible, assetIdList );
          } else {
-            List<String> queryResult = shellRepository.findExternalShellIdsByIdentifiersByExactMatch( keyValueCombinations,
+            List<String> queryResult = shellIdentifierRepository.findExternalShellIdsByIdentifiersByExactMatch( keyValueCombinations,
                   keyValueCombinations.size(), externalSubjectId, externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes, owningTenantId,
                   ShellIdentifier.GLOBAL_ASSET_ID_KEY );
             pageSize = getPageSize( pageSize );
