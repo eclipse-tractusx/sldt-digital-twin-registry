@@ -29,9 +29,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import org.eclipse.tractusx.semantics.accesscontrol.api.model.ShellVisibilityContext;
 import org.eclipse.tractusx.semantics.accesscontrol.api.exception.DenyAccessException;
-import org.eclipse.tractusx.semantics.accesscontrol.api.model.AccessRule;
+import org.eclipse.tractusx.semantics.accesscontrol.api.model.ShellVisibilityContext;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.repository.AccessControlRuleRepository;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.repository.FileBasedAccessControlRuleRepository;
@@ -154,23 +153,5 @@ class SqlBackedAccessControlRuleServiceTest {
 
       assertThat( actual.visibleSemanticIds() ).isEqualTo( expectedSemanticIds );
       assertThat( actual.visibleSpecificAssetIdNames() ).isEqualTo( expectedSpecificAssetIdNames );
-   }
-
-   @Test
-   void testFetchApplicableRulesForPartnerWhenBpnNotFoundExpectException() {
-      assertThatThrownBy( () -> underTest.fetchApplicableRulesForPartner( BPNB ) )
-            .isInstanceOf( DenyAccessException.class );
-   }
-
-   @Test
-   void testFetchApplicableRulesForPartnerWhenBpnFoundExpectRuleList() throws DenyAccessException {
-      Set<AccessRule> actual = underTest.fetchApplicableRulesForPartner( BPNA );
-
-      assertThat( actual ).hasSize( 2 )
-            .isEqualTo( Set.of(
-                  new AccessRule( Set.of( MANUFACTURER_PART_ID_99991, CUSTOMER_PART_ID_ACME001, REVISION_NUMBER_01 ),
-                        Set.of( PRODUCT_CARBON_FOOTPRINTV_1_1_0 ) ),
-                  new AccessRule( Set.of( MANUFACTURER_PART_ID_99991, CUSTOMER_PART_ID_ACME001, PART_INSTANCE_ID_00001 ), Set.of( TRACEABILITYV_1_1_0 ) )
-            ) );
    }
 }

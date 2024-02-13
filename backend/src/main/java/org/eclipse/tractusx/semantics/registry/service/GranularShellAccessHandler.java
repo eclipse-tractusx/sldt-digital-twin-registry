@@ -30,8 +30,8 @@ import java.util.stream.Collectors;
 
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.accesscontrol.api.AccessControlRuleService;
-import org.eclipse.tractusx.semantics.accesscontrol.api.model.ShellVisibilityContext;
 import org.eclipse.tractusx.semantics.accesscontrol.api.exception.DenyAccessException;
+import org.eclipse.tractusx.semantics.accesscontrol.api.model.ShellVisibilityContext;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.ShellVisibilityCriteria;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.registry.model.ReferenceKeyType;
@@ -71,7 +71,8 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
    }
 
    @Override
-   public List<String> filterToVisibleShellIdsForLookup( Set<SpecificAssetId> userQuery, List<ShellIdentifierMinimal> shellIdentifiers, String externalSubjectId )
+   public List<String> filterToVisibleShellIdsForLookup( Set<SpecificAssetId> userQuery, List<ShellIdentifierMinimal> shellIdentifiers,
+         String externalSubjectId )
          throws DenyAccessException {
       List<String> idsInTheExistingOrder = shellIdentifiers.stream()
             .map( ShellIdentifierMinimal::shellId )
@@ -107,7 +108,7 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
    @Override
    @Nullable
    public Shell filterShellProperties( Shell shell, String externalSubjectId ) {
-      if ( externalSubjectId.equals( owningTenantId ) ) {
+      if ( owningTenantId.equals( externalSubjectId ) ) {
          return shell;
       }
 
@@ -125,7 +126,7 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
 
    @Override
    public List<Shell> filterListOfShellProperties( List<Shell> shells, String externalSubjectId ) {
-      if ( externalSubjectId.equals( owningTenantId ) ) {
+      if ( owningTenantId.equals( externalSubjectId ) ) {
          return shells;
       }
 
@@ -133,6 +134,9 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
             .map( this::toShellVisibilityContext )
             .toList();
       final var visibilityCriteria = accessControlRuleService.fetchVisibilityCriteriaForShells( visibilityContexts, externalSubjectId );
+      if ( visibilityCriteria.isEmpty() ) {
+         return Collections.emptyList();
+      }
       return shells.stream()
             .map( shell -> filterShellContents( shell, visibilityCriteria.get( shell.getIdExternal() ) ) )
             .filter( Objects::nonNull )

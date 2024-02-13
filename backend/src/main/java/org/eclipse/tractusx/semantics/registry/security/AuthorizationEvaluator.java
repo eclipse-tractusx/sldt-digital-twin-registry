@@ -1,6 +1,5 @@
-/********************************************************************************
- * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
+/*******************************************************************************
+ * Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,18 +15,20 @@
  * under the License.
  *
  * SPDX-License-Identifier: Apache-2.0
- ********************************************************************************/
+ *
+ ******************************************************************************/
 package org.eclipse.tractusx.semantics.registry.security;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import static org.eclipse.tractusx.semantics.registry.security.AuthorizationEvaluator.Roles.*;
 
 import java.util.Collection;
 import java.util.Map;
 
-import static org.eclipse.tractusx.semantics.registry.security.AuthorizationEvaluator.Roles.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This class contains methods validating JWT tokens for correctness and ensuring that the JWT token contains a desired role.
@@ -49,65 +50,69 @@ import static org.eclipse.tractusx.semantics.registry.security.AuthorizationEval
 @Slf4j
 public class AuthorizationEvaluator {
 
-    private final String clientId;
+   private final String clientId;
 
-    public AuthorizationEvaluator(String clientId) {
-        this.clientId = clientId;
-    }
+   public AuthorizationEvaluator( String clientId ) {
+      this.clientId = clientId;
+   }
 
-    public boolean hasRoleViewDigitalTwin() {
-        return containsRole(ROLE_VIEW_DIGITAL_TWIN);
-    }
+   public boolean hasRoleViewDigitalTwin() {
+      return containsRole( ROLE_VIEW_DIGITAL_TWIN );
+   }
 
-    public boolean hasRoleAddDigitalTwin() {
-        return containsRole(ROLE_ADD_DIGITAL_TWIN);
-    }
+   public boolean hasRoleAddDigitalTwin() {
+      return containsRole( ROLE_ADD_DIGITAL_TWIN );
+   }
 
-    public boolean hasRoleUpdateDigitalTwin() {
-        return containsRole(ROLE_UPDATE_DIGITAL_TWIN);
-    }
+   public boolean hasRoleUpdateDigitalTwin() {
+      return containsRole( ROLE_UPDATE_DIGITAL_TWIN );
+   }
 
-    public boolean hasRoleDeleteDigitalTwin() {
-        return containsRole(ROLE_DELETE_DIGITAL_TWIN);
-    }
+   public boolean hasRoleDeleteDigitalTwin() {
+      return containsRole( ROLE_DELETE_DIGITAL_TWIN );
+   }
 
-    private boolean containsRole(String role){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(!(authentication instanceof JwtAuthenticationToken)){
-            return false;
-        }
+   public boolean hasRoleSubmodelAccessControl() {
+      return containsRole( ROLE_SUBMODEL_ACCESS_CONTROL );
+   }
 
-        JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) (authentication);
-        Map<String, Object> claims = jwtAuthenticationToken.getToken().getClaims();
+   private boolean containsRole( String role ) {
+      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+      if ( !(authentication instanceof JwtAuthenticationToken) ) {
+         return false;
+      }
 
-        Object resourceAccess = claims.get("resource_access");
-        if (!(resourceAccess instanceof Map)) {
-            return false;
-        }
+      JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) (authentication);
+      Map<String, Object> claims = jwtAuthenticationToken.getToken().getClaims();
 
-        Object resource = ((Map<String, Object>) resourceAccess).get(clientId);
-        if(!(resource instanceof Map)){
-            return false;
-        }
+      Object resourceAccess = claims.get( "resource_access" );
+      if ( !(resourceAccess instanceof Map) ) {
+         return false;
+      }
 
-        Object roles =  ((Map<String, Object>)resource).get("roles");
-        if(!(roles instanceof Collection)){
-            return false;
-        }
+      Object resource = ((Map<String, Object>) resourceAccess).get( clientId );
+      if ( !(resource instanceof Map) ) {
+         return false;
+      }
 
-        Collection<String> rolesList = (Collection<String> ) roles;
-        return rolesList.contains(role);
-    }
+      Object roles = ((Map<String, Object>) resource).get( "roles" );
+      if ( !(roles instanceof Collection) ) {
+         return false;
+      }
 
-    /**
-     * Represents the roles defined for the registry.
-     */
-    public static final class Roles {
-        public static final String ROLE_VIEW_DIGITAL_TWIN = "view_digital_twin";
-        public static final String ROLE_UPDATE_DIGITAL_TWIN = "update_digital_twin";
-        public static final String ROLE_ADD_DIGITAL_TWIN = "add_digital_twin";
-        public static final String ROLE_DELETE_DIGITAL_TWIN = "delete_digital_twin";
-    }
+      Collection<String> rolesList = (Collection<String>) roles;
+      return rolesList.contains( role );
+   }
 
+   /**
+    * Represents the roles defined for the registry.
+    */
+   public static final class Roles {
+      public static final String ROLE_VIEW_DIGITAL_TWIN = "view_digital_twin";
+      public static final String ROLE_UPDATE_DIGITAL_TWIN = "update_digital_twin";
+      public static final String ROLE_ADD_DIGITAL_TWIN = "add_digital_twin";
+      public static final String ROLE_DELETE_DIGITAL_TWIN = "delete_digital_twin";
+      public static final String ROLE_SUBMODEL_ACCESS_CONTROL = "submodel_access_control";
+   }
 }
 

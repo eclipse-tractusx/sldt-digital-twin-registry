@@ -403,12 +403,13 @@ The endpoint for a Submodel Descriptor must be setup as follows:
 The AAS Registry needs to be integrated with an OAuth2 compliant authorization server. Every API call has to provide a valid Bearer Token issued by this authorization server.
 Authorization is supported by Role Based Access Control (RBAC). Following roles are available:
 
-| Role                | 	Description                                                                                                                   | 
-|---------------------|--------------------------------------------------------------------------------------------------------------------------------|
-| view_digital_twin   | Can read all digital twins.                                                                                                    |
-| add_digital_twin    | Can add a digital twin.                                                                                                        |
-| update_digital_twin | Can update a digital twin.  |
-| delete_digital_twin | Can delete a digital twin. |
+| Role                    | Description                                              | 
+|-------------------------|----------------------------------------------------------|
+| view_digital_twin       | Can read all digital twins.                              |
+| add_digital_twin        | Can add a digital twin.                                  |
+| update_digital_twin     | Can update a digital twin.                               |
+| delete_digital_twin     | Can delete a digital twin.                               |
+| submodel_access_control | Can perform submodel access control authorization calls. |
 
 Depending on being a Data Provider or a Data Consumer there are different tokens for authentication and authorization needed.
 #### Data Provider

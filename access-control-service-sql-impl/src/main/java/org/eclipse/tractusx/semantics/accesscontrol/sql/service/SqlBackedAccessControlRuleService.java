@@ -30,8 +30,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.tractusx.semantics.accesscontrol.api.AccessControlRuleService;
-import org.eclipse.tractusx.semantics.accesscontrol.api.model.ShellVisibilityContext;
 import org.eclipse.tractusx.semantics.accesscontrol.api.exception.DenyAccessException;
+import org.eclipse.tractusx.semantics.accesscontrol.api.model.ShellVisibilityContext;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.ShellVisibilityCriteria;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRule;
@@ -94,14 +94,6 @@ public class SqlBackedAccessControlRuleService implements AccessControlRuleServi
             } )
             .filter( Objects::nonNull )
             .collect( Collectors.toMap( ShellVisibilityCriteria::aasId, Function.identity() ) );
-   }
-
-   @Override
-   public Set<org.eclipse.tractusx.semantics.accesscontrol.api.model.AccessRule> fetchApplicableRulesForPartner( String bpn ) throws DenyAccessException {
-      return findPotentiallyMatchingAccessControlRules( bpn )
-            .map( accessControlRule -> new org.eclipse.tractusx.semantics.accesscontrol.api.model.AccessRule(
-                  accessControlRule.getMandatorySpecificAssetIds(), accessControlRule.getVisibleSemanticIds() ) )
-            .collect( Collectors.toSet() );
    }
 
    private Stream<AccessRulePolicy> findPotentiallyMatchingAccessControlRules( String bpn ) throws DenyAccessException {
