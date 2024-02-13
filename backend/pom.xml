@@ -63,23 +63,9 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
-        <!-- Springboot 3 requires Jakarta 6. But Jetty is not compatible with Jakarta 6 yet. But the tests needs jakarta in version 6.0.0.
-          Temporary solution until jetty will be compatible with Jakarta (version +12.See https://www.eclipse.org/lists/jetty-users/msg10348.html):
-          1. Define jakarta dependency with 6.0.0 and scope test. Add dot to end of groupId.
-          2. Define jakarta dependency with 5.0.0 to run the application successfuly.
-          -> Maven run the tests first then compile.
-          TODO: If new jetty is available, remove the test dependency and use jakarta in version 6.0.0
-          -->
-        <dependency>
-            <groupId>jakarta.servlet.</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-            <version>6.0.0</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
