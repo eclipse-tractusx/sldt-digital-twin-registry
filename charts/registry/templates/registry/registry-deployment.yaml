@@ -35,14 +35,13 @@ spec:
         {{- include "dtr.selectorLabels" . | nindent 8 }}
     spec:
       securityContext:
-        runAsUser: 100
+        {{- toYaml .Values.registry.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           image: {{ .Values.registry.image.registry }}/{{ .Values.registry.image.repository }}:{{ .Values.registry.image.version | default .Chart.AppVersion }}
           imagePullPolicy: {{ .Values.registry.imagePullPolicy }}
           securityContext:
-            runAsUser: 100
-            allowPrivilegeEscalation: false
+            {{- toYaml .Values.registry.securityContext | nindent 12 }}
           {{- if not .Values.registry.authentication }}
           args: ["--spring.profiles.active=local"]
           {{- end }}
