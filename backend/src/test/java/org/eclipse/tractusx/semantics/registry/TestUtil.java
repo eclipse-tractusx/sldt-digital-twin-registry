@@ -25,7 +25,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
@@ -41,12 +44,18 @@ import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
 import org.eclipse.tractusx.semantics.aas.registry.model.ReferenceTypes;
 import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRule;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRulePolicy;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.model.policy.AccessRulePolicyValue;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.model.policy.PolicyOperator;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class TestUtil {
+
+   public static final String PUBLIC_READABLE = "PUBLIC_READABLE";
 
    public static AssetAdministrationShellDescriptor createCompleteAasDescriptor() {
       return createCompleteAasDescriptor( "semanticIdExample", "http://endpoint-address" );
@@ -275,5 +284,31 @@ public class TestUtil {
       mapper.setSerializationInclusion( JsonInclude.Include.NON_NULL );
       mapper.writeValue( os, obj );
       return os.toByteArray();
+   }
+
+   public static AccessRule createAccessRule(
+         String targetTenant, Map<String, String> mandatorySpecificAssetIds, Set<String> visibleSpecificAssetIds, Set<String> visibleSemanticIds ) {
+      final AccessRulePolicy policy = new AccessRulePolicy();
+      policy.setAccessRules( Set.of(
+            new AccessRulePolicyValue( AccessRulePolicy.BPN_RULE_NAME, PolicyOperator.EQUALS, targetTenant, null ),
+            new AccessRulePolicyValue( AccessRulePolicy.MANDATORY_SPECIFIC_ASSET_IDS_RULE_NAME, PolicyOperator.INCLUDES, null,
+                  mandatorySpecificAssetIds.entrySet().stream()
+                        .map( entry -> new AccessRulePolicyValue( entry.getKey(), PolicyOperator.EQUALS, entry.getValue(), null ) )
+                        .collect( Collectors.toSet() ) ),
+            new AccessRulePolicyValue( AccessRulePolicy.VISIBLE_SPECIFIC_ASSET_ID_NAMES_RULE_NAME, PolicyOperator.INCLUDES, null,
+                  visibleSpecificAssetIds.stream()
+                        .map( id -> new AccessRulePolicyValue( "name", PolicyOperator.EQUALS, id, null ) )
+                        .collect( Collectors.toSet() ) ),
+            new AccessRulePolicyValue( AccessRulePolicy.VISIBLE_SEMANTIC_IDS_RULE_NAME, PolicyOperator.INCLUDES, null,
+                  visibleSemanticIds.stream()
+                        .map( id -> new AccessRulePolicyValue( "modelUrn", PolicyOperator.EQUALS, id, null ) )
+                        .collect( Collectors.toSet() ) )
+      ) );
+      AccessRule accessRule = new AccessRule();
+      accessRule.setTid( "owner" );
+      accessRule.setTargetTenant( targetTenant );
+      accessRule.setPolicyType( AccessRule.PolicyType.AAS );
+      accessRule.setPolicy( policy );
+      return accessRule;
    }
 }

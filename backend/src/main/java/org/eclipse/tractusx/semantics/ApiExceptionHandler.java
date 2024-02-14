@@ -22,6 +22,7 @@ package org.eclipse.tractusx.semantics;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -43,6 +44,7 @@ import org.springframework.web.method.annotation.MethodArgumentConversionNotSupp
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
@@ -98,7 +100,19 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
    @ResponseStatus( HttpStatus.BAD_REQUEST )
    public ResponseEntity<Object> handleDuplicateKeyException( DuplicateKeyException duplicateKeyException ) {
       return new ResponseEntity<>(
-            new Result().messages( List.of( new Message().messageType( Message.MessageTypeEnum.ERROR ).text(duplicateKeyException.getMessage() ) ) ),
+            new Result().messages( List.of( new Message().messageType( Message.MessageTypeEnum.ERROR ).text( duplicateKeyException.getMessage() ) ) ),
+            HttpStatus.BAD_REQUEST );
+   }
+
+   @ExceptionHandler( { ConstraintViolationException.class } )
+   @ResponseStatus( HttpStatus.BAD_REQUEST )
+   public ResponseEntity<Object> handleConstraintViolationException( ConstraintViolationException constraintViolationException ) {
+      final var messages = constraintViolationException.getConstraintViolations().stream()
+            .map( violation -> new Message().messageType( Message.MessageTypeEnum.ERROR )
+                  .text( violation.getPropertyPath().toString() + ": " + violation.getMessage() ) )
+            .toList();
+      return new ResponseEntity<>(
+            new Result().messages( messages ),
             HttpStatus.BAD_REQUEST );
    }
 

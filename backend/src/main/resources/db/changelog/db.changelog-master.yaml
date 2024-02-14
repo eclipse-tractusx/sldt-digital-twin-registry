@@ -24,6 +24,14 @@ databaseChangeLog:
       value: uuid
       dbms: postgresql, h2
   - property:
+      name: clob_type
+      value: CLOB
+      dbms: h2
+  - property:
+      name: clob_type
+      value: TEXT
+      dbms: postgresql
+  - property:
       name: uuid_function
       value: uuid_generate_v4()
       dbms: postgresql
@@ -43,4 +51,7 @@ databaseChangeLog:
       relativeToChangelogFile: true
   - include:
       file: db.changelog-v3.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: db.changelog-v4.yaml
       relativeToChangelogFile: true

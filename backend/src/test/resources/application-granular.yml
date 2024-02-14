@@ -24,5 +24,3 @@
 
 registry:
   use-granular-access-control: true
-
-ACCESS_CONTROL_RULES_PATH: src/test/resources/test-access-rules.json

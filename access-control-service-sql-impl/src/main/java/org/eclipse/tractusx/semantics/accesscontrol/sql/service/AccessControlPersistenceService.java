@@ -18,30 +18,23 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.semantics.accesscontrol.sql.model.converter;
+package org.eclipse.tractusx.semantics.accesscontrol.sql.service;
 
-import org.apache.commons.lang3.StringUtils;
+import java.util.List;
+import java.util.Optional;
+
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRule;
-import org.mapstruct.AfterMapping;
-import org.mapstruct.MappingTarget;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
-@Component
-public class CustomAccessRuleMapper {
+public interface AccessControlPersistenceService {
 
-   private final String ownerTenant;
+   List<AccessRule> getAllRules();
 
-   public CustomAccessRuleMapper( @Value( "${registry.idm.owning-tenant-id:}" ) String ownerTenant ) {
-      this.ownerTenant = StringUtils.stripToNull( ownerTenant );
-   }
+   Optional<AccessRule> getRuleById( Long ruleId );
 
-   @AfterMapping
-   public void calledWithTarget( @MappingTarget AccessRule target ) {
-      target.setTargetTenant( target.getPolicy().getBpn() );
-      // only fill Tid if null to avoid overwrites in case of updates
-      if ( target.getTid() == null ) {
-         target.setTid( ownerTenant );
-      }
-   }
+   AccessRule saveRule( AccessRule rule );
+
+   AccessRule updateRule( Long ruleId, AccessRule rule );
+
+   void deleteRule( Long ruleId );
+
 }

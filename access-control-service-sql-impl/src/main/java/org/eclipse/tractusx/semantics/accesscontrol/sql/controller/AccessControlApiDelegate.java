@@ -20,10 +20,63 @@
 
 package org.eclipse.tractusx.semantics.accesscontrol.sql.controller;
 
+import java.util.List;
+
+import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRule;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.model.converter.AccessRuleMapper;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.api.AccessControlsApiDelegate;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.CreateAccessRule;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.GetAllAccessRules200Response;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.ReadUpdateAccessRule;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.service.AccessControlPersistenceService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-//TODO: must be implemented
 @Service
 public class AccessControlApiDelegate implements AccessControlsApiDelegate {
+
+   private final AccessControlPersistenceService accessControlPersistenceService;
+   private final AccessRuleMapper accessRuleMapper;
+
+   public AccessControlApiDelegate( final AccessControlPersistenceService accessControlPersistenceService, AccessRuleMapper accessRuleMapper ) {
+      this.accessControlPersistenceService = accessControlPersistenceService;
+      this.accessRuleMapper = accessRuleMapper;
+   }
+
+   @Override
+   public ResponseEntity<ReadUpdateAccessRule> createNewAccessRule( CreateAccessRule createAccessRule ) {
+      AccessRule savedRule = accessControlPersistenceService.saveRule( accessRuleMapper.map( createAccessRule ) );
+      return ResponseEntity.status( HttpStatus.CREATED ).body( accessRuleMapper.map( savedRule ) );
+   }
+
+   @Override
+   public ResponseEntity<Void> deleteAccessRuleByRuleId( Long ruleId ) {
+      accessControlPersistenceService.deleteRule( ruleId );
+      return ResponseEntity.status( HttpStatus.NO_CONTENT ).build();
+   }
+
+   @Override
+   public ResponseEntity<ReadUpdateAccessRule> getAccessRuleByRuleId( Long ruleId ) {
+      return accessControlPersistenceService.getRuleById( ruleId )
+            .map( accessRuleMapper::map )
+            .map( rule -> ResponseEntity.ok().body( rule ) )
+            .orElse( ResponseEntity.notFound().build() );
+   }
+
+   @Override
+   public ResponseEntity<GetAllAccessRules200Response> getAllAccessRules() {
+      List<ReadUpdateAccessRule> items = accessControlPersistenceService.getAllRules().stream()
+            .map( accessRuleMapper::map )
+            .toList();
+      GetAllAccessRules200Response response = new GetAllAccessRules200Response();
+      response.setItems( items );
+      return ResponseEntity.ok().body( response );
+   }
+
+   @Override
+   public ResponseEntity<ReadUpdateAccessRule> updateAccessRuleByRuleId( Long ruleId, ReadUpdateAccessRule readUpdateAccessRule ) {
+      AccessRule updatedRule = accessControlPersistenceService.updateRule( ruleId, accessRuleMapper.map( readUpdateAccessRule ) );
+      return ResponseEntity.ok().body( accessRuleMapper.map( updatedRule ) );
+   }
 }

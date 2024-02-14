@@ -29,20 +29,22 @@ import org.eclipse.tractusx.semantics.accesscontrol.sql.validation.ValidValidity
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
+import jakarta.persistence.Table;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import lombok.Data;
 
-//@Entity
-//@Table( name = "ACCESS_RULE" )
+@Entity
+@Table( name = "ACCESS_RULE" )
 @Data
 @ValidValidityPeriod( groups = { OnCreate.class, OnUpdate.class } )
 public class AccessRule {

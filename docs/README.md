@@ -410,6 +410,8 @@ Authorization is supported by Role Based Access Control (RBAC). Following roles 
 | update_digital_twin     | Can update a digital twin.                               |
 | delete_digital_twin     | Can delete a digital twin.                               |
 | submodel_access_control | Can perform submodel access control authorization calls. |
+| read_access_rules       | Can read the rules defined for access control.           |
+| write_access_rules      | Can write the rules defined for access control.          |
 
 Depending on being a Data Provider or a Data Consumer there are different tokens for authentication and authorization needed.
 #### Data Provider
