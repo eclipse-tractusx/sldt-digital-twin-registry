@@ -492,9 +492,18 @@ public class ShellService {
       } ).collect( Collectors.toList() );
    }
 
+   public boolean hasAccessToShellWithVisibleSubmodelEndpoint( String endpointAddress, String externalSubjectId ) {
+      List<Shell> shells = shellRepository.findAllBySubmodelEndpointAddress( endpointAddress );
+      List<Shell> filtered = shellAccessHandler.filterListOfShellProperties( shells, externalSubjectId );
+      return filtered.stream()
+            .filter( Objects::nonNull )
+            .anyMatch( shell -> shell.getSubmodels().stream()
+                  .anyMatch( submodel -> submodel.getEndpoints().stream()
+                        .anyMatch( endpoint -> Objects.equals( endpointAddress, endpoint.getEndpointAddress() ) ) ) );
+   }
+
    private Shell doFindShellByExternalIdWithoutFiltering( String externalShellId ) {
       return shellRepository.findByIdExternal( externalShellId )
             .orElseThrow( () -> new EntityNotFoundException( String.format( "Shell for identifier %s not found", externalShellId ) ) );
    }
-
 }

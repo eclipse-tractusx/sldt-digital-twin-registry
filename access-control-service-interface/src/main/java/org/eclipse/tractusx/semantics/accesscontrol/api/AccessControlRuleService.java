@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.tractusx.semantics.accesscontrol.api.exception.DenyAccessException;
-import org.eclipse.tractusx.semantics.accesscontrol.api.model.AccessRule;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.ShellVisibilityContext;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.ShellVisibilityCriteria;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.SpecificAssetId;
@@ -38,7 +37,5 @@ public interface AccessControlRuleService {
    ShellVisibilityCriteria fetchVisibilityCriteriaForShell( ShellVisibilityContext shellContext, String bpn ) throws DenyAccessException;
 
    Map<String, ShellVisibilityCriteria> fetchVisibilityCriteriaForShells( List<ShellVisibilityContext> shellContexts, String bpn );
-
-   Set<AccessRule> fetchApplicableRulesForPartner( String bpn ) throws DenyAccessException;
 
 }

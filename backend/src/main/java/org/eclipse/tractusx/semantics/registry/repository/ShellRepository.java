@@ -129,4 +129,16 @@ public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecific
          @Param( "publicWildcardAllowedTypes" ) List<String> publicWildcardAllowedTypes,
          @Param( "owningTenantId" ) String owningTenantId,
          @Param( "globalAssetId" ) String globalAssetId );
+
+   @Query( """
+         SELECT s
+         FROM Shell s
+         WHERE
+            s.id IN (
+               SELECT filterendpoint.submodel.shellId.id
+               FROM SubmodelEndpoint filterendpoint
+               WHERE filterendpoint.endpointAddress = :endpointAddress
+            )
+         """)
+   List<Shell> findAllBySubmodelEndpointAddress( String endpointAddress );
 }
