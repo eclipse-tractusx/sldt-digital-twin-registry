@@ -163,13 +163,14 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
    @DisplayName( "Custom AAS API Authorization Tests" )
    class CustomAASApiTest extends AssetAdministrationShellApiSecurityTest.CustomAASApiTest {
 
-      //TODO: Test will be ignored, because the new api does not provided batch, fetch and query. This will be come later in version 0.3.1
-      // @Test
+      @Test
+      @Disabled("Test will be ignored, because the new api does not provided batch, fetch and query. This will be come later in version 0.3.1")
       public void testRbacCreateShellInBatch() throws Exception {
          super.testRbacCreateShellInBatch();
       }
 
-      //        @Test - don't have /fetch
+      @Test
+      @Disabled( "Don't have /fetch" )
       public void testRbacForFetchShellsByIds() throws Exception {
          super.testRbacForFetchShellsByIds();
       }
@@ -189,8 +190,8 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
          super.testGetShellWithFilteredSpecificAssetIdsByTenantId();
       }
 
-      //TODO: Test will be ignored, because the new api does not provided batch, fetch and query. This will be come later in version 0.3.1
-      //@Test
+      @Test
+      @Disabled("Test will be ignored, because the new api does not provided batch, fetch and query. This will be come later in version 0.3.1")
       public void testFetchShellsWithFilteredSpecificAssetIdsByTenantId() throws Exception {
          super.testFetchShellsWithFilteredSpecificAssetIdsByTenantId();
       }
@@ -338,7 +339,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
       }
 
       @Test
-      @Disabled("disabled while we have no way to create dynamic rules")
+      @Disabled( "disabled while we have no way to create dynamic rules" )
       void testPostSubmodelDescriptorAuthorizedWithoutMatchingSemanticIdExpectForbidden() throws Exception {
          AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor( UUID.randomUUID().toString(), "http://endpoint-address" );
          shellPayload.setId( UUID.randomUUID().toString() );
@@ -387,7 +388,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
       }
 
       @Test
-      @Disabled("disabled while we have no way to create dynamic rules")
+      @Disabled( "disabled while we have no way to create dynamic rules" )
       void testPostSubmodelDescriptorAuthorizedWithoutMatchingShellExpectForbidden() throws Exception {
          AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
          shellPayload.setSpecificAssetIds( null );

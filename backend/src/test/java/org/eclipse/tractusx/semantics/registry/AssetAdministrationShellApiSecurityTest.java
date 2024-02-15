@@ -35,6 +35,7 @@ import org.eclipse.tractusx.semantics.aas.registry.model.ReferenceTypes;
 import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -51,131 +52,131 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdministrationShellApi {
 
-    @Nested
-    @DisplayName("Authentication Tests")
-    class SecurityTests {
-        @Test
-        public void testWithoutAuthenticationTokenProvidedExpectUnauthorized() throws Exception {
-                       mvc.perform(
-                            MockMvcRequestBuilders
-                                  .get(SINGLE_SHELL_BASE_PATH, UUID.randomUUID())
-                                    .accept(MediaType.APPLICATION_JSON)
-                    )
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isUnauthorized());
-        }
+   @Nested
+   @DisplayName( "Authentication Tests" )
+   class SecurityTests {
+      @Test
+      public void testWithoutAuthenticationTokenProvidedExpectUnauthorized() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( SINGLE_SHELL_BASE_PATH, UUID.randomUUID() )
+                           .accept( MediaType.APPLICATION_JSON )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isUnauthorized() );
+      }
 
-        @Test
-        public void testWithAuthenticationTokenProvidedExpectUnauthorized() throws Exception {
-            mvc.perform(
-                            MockMvcRequestBuilders
-                                    .get(SINGLE_SHELL_BASE_PATH, UUID.randomUUID())
-                                    .accept(MediaType.APPLICATION_JSON)
-                    )
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isUnauthorized());
-        }
+      @Test
+      public void testWithAuthenticationTokenProvidedExpectUnauthorized() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( SINGLE_SHELL_BASE_PATH, UUID.randomUUID() )
+                           .accept( MediaType.APPLICATION_JSON )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isUnauthorized() );
+      }
 
-        @Test
-        public void testWithInvalidAuthenticationTokenConfigurationExpectUnauthorized() throws Exception {
-            mvc.perform(
-                            MockMvcRequestBuilders
-                                    .get(SINGLE_SHELL_BASE_PATH, UUID.randomUUID())
-                                    .accept(MediaType.APPLICATION_JSON)
-                                    .with(jwtTokenFactory.withoutResourceAccess())
-                    )
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isForbidden());
+      @Test
+      public void testWithInvalidAuthenticationTokenConfigurationExpectUnauthorized() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( SINGLE_SHELL_BASE_PATH, UUID.randomUUID() )
+                           .accept( MediaType.APPLICATION_JSON )
+                           .with( jwtTokenFactory.withoutResourceAccess() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isForbidden() );
 
-            mvc.perform(
-                            MockMvcRequestBuilders
-                                    .get(SINGLE_SHELL_BASE_PATH, UUID.randomUUID())
-                                    .accept(MediaType.APPLICATION_JSON)
-                                    .with(jwtTokenFactory.withoutRoles())
-                    )
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isForbidden());
-        }
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( SINGLE_SHELL_BASE_PATH, UUID.randomUUID() )
+                           .accept( MediaType.APPLICATION_JSON )
+                           .with( jwtTokenFactory.withoutRoles() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isForbidden() );
+      }
 
-    }
+   }
 
-    @Nested
-    @DisplayName("Shell Authorization Test")
-    class ShellCrudTest {
-        String shellId;
+   @Nested
+   @DisplayName( "Shell Authorization Test" )
+   class ShellCrudTest {
+      String shellId;
 
-        @BeforeEach
-        public void before() throws Exception{
-            AssetAdministrationShellDescriptor shellPayload1 = TestUtil.createCompleteAasDescriptor();
-            shellPayload1.setId(UUID.randomUUID().toString());
-            performShellCreateRequest(mapper.writeValueAsString(shellPayload1));
-            shellId = shellPayload1.getId();
+      @BeforeEach
+      public void before() throws Exception {
+         AssetAdministrationShellDescriptor shellPayload1 = TestUtil.createCompleteAasDescriptor();
+         shellPayload1.setId( UUID.randomUUID().toString() );
+         performShellCreateRequest( mapper.writeValueAsString( shellPayload1 ) );
+         shellId = shellPayload1.getId();
 
-        }
+      }
 
-        @Test
-        public void testRbacForGetAll() throws Exception {
-            mvc.perform(
-                            MockMvcRequestBuilders
-                                    .get(SHELL_BASE_PATH)
-                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
-                                    .accept(MediaType.APPLICATION_JSON)
-                                    // test with wrong role
-                                    .with(jwtTokenFactory.addTwin())
-                    )
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isForbidden());
+      @Test
+      public void testRbacForGetAll() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( SHELL_BASE_PATH )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
+                           .accept( MediaType.APPLICATION_JSON )
+                           // test with wrong role
+                           .with( jwtTokenFactory.addTwin() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isForbidden() );
 
-            mvc.perform(
-                            MockMvcRequestBuilders
-                                    .get(SHELL_BASE_PATH)
-                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
-                                    .accept(MediaType.APPLICATION_JSON)
-                                    .with(jwtTokenFactory.readTwin())
-                    )
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isOk());
-        }
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( SHELL_BASE_PATH )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
+                           .accept( MediaType.APPLICATION_JSON )
+                           .with( jwtTokenFactory.readTwin() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isOk() );
+      }
 
-        @Test
-        public void testRbacForGetById() throws Exception {
-            // get shell by id
-            mvc.perform(
-                            MockMvcRequestBuilders
-                                    .get(SINGLE_SHELL_BASE_PATH, shellId )
-                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
-                                    .accept(MediaType.APPLICATION_JSON)
-                                    // test with wrong role
-                                    .with(jwtTokenFactory.deleteTwin())
-                    )
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isForbidden());
+      @Test
+      public void testRbacForGetById() throws Exception {
+         // get shell by id
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( SINGLE_SHELL_BASE_PATH, shellId )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
+                           .accept( MediaType.APPLICATION_JSON )
+                           // test with wrong role
+                           .with( jwtTokenFactory.deleteTwin() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isForbidden() );
 
-            mvc.perform(
-                            MockMvcRequestBuilders
-                                    .get(SINGLE_SHELL_BASE_PATH, getEncodedValue(shellId  ) )
-                                    .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
-                                    .accept(MediaType.APPLICATION_JSON)
-                                    .with(jwtTokenFactory.readTwin())
-                    )
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isOk());
-        }
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( SINGLE_SHELL_BASE_PATH, getEncodedValue( shellId ) )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
+                           .accept( MediaType.APPLICATION_JSON )
+                           .with( jwtTokenFactory.readTwin() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isOk() );
+      }
 
-        @Test
-        public void testRbacForCreate() throws Exception {
-            AssetAdministrationShellDescriptor shellPayload1 = TestUtil.createCompleteAasDescriptor();
-            shellPayload1.setId(UUID.randomUUID().toString());
-            mvc.perform(
-                            MockMvcRequestBuilders
-                                    .post(SHELL_BASE_PATH)
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(mapper.writeValueAsString(shellPayload1))
-                                    // test with wrong role
-                                    .with(jwtTokenFactory.readTwin())
-                    )
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isForbidden());
+      @Test
+      public void testRbacForCreate() throws Exception {
+         AssetAdministrationShellDescriptor shellPayload1 = TestUtil.createCompleteAasDescriptor();
+         shellPayload1.setId( UUID.randomUUID().toString() );
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .post( SHELL_BASE_PATH )
+                           .contentType( MediaType.APPLICATION_JSON )
+                           .content( mapper.writeValueAsString( shellPayload1 ) )
+                           // test with wrong role
+                           .with( jwtTokenFactory.readTwin() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isForbidden() );
 
          shellPayload1.setId( UUID.randomUUID().toString() );
          mvc.perform(
@@ -538,9 +539,9 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
    @DisplayName( "Custom AAS API Authorization Tests" )
    class CustomAASApiTest {
 
-      //TODO: Test will be ignored, because the new api does not provided batch, fetch and query. This will be come later in version 0.3.1
-      // @Test
-      public void testRbacCreateShellInBatch() throws Exception {
+      @Test
+      @Disabled( "Test will be ignored, because the new api does not provided batch, fetch and query. This will be come later in version 0.3.1" )
+      void testRbacCreateShellInBatch() throws Exception {
          ObjectNode shell = createShell();
          ArrayNode batchShellBody = emptyArrayNode().add( shell );
 
@@ -567,8 +568,9 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                .andExpect( status().isCreated() );
       }
 
-      //        @Test - don't have /fetch
-      public void testRbacForFetchShellsByIds() throws Exception {
+      @Test
+      @Disabled( "Don't have /fetch" )
+      void testRbacForFetchShellsByIds() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
                            .post( SHELL_BASE_PATH + "/fetch" )
@@ -704,9 +706,9 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                .andExpect( jsonPath( "$.specificAssetIds[*].value", not( hasItems( "tenantThreeAssetIdValue", "ignoreWildcard" ) ) ) );
       }
 
-      //TODO: Test will be ignored, because the new api does not provided batch, fetch and query. This will be come later in version 0.3.1
-      //@Test
-      public void testFetchShellsWithFilteredSpecificAssetIdsByTenantId() throws Exception {
+      @Test
+      @Disabled( "Test will be ignored, because the new api does not provided batch, fetch and query. This will be come later in version 0.3.1" )
+      void testFetchShellsWithFilteredSpecificAssetIdsByTenantId() throws Exception {
          ObjectNode shellPayload = createBaseIdPayload( "example", "example" );
          String tenantTwoAssetIdValue = "tenantTwofgkj129293";
          String tenantThreeAssetIdValue = "tenantThree543412394";
