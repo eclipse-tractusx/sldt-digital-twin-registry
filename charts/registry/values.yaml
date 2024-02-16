@@ -20,7 +20,7 @@
 
 
 # enables the default postgres database
-enablePostgres: true
+enablePostgres: false
 # enables the default keycloak identity provider
 # relies on a postgres instance
 enableKeycloak: false
@@ -56,9 +56,9 @@ registry:
     sqlInitPlatform: pg
     ## The url, user, and password parameter will be ignored if 'enablePostgres' is set to true.
     ## In that case the postgresql auth parameters are used.
-    url: jdbc:postgresql://database:5432
-    user: default-user
-    password: ""
+    url: jdbc:postgresql://hippo-primary.postgres-operator.svc:5432/hippo
+    user: "hippo"
+    password: "datalake"
   ingress:
     enabled: false
     tls: false
