@@ -17,24 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  *
  ******************************************************************************/
-package org.eclipse.tractusx.semantics.accesscontrol.sql.model.policy;
+package org.eclipse.tractusx.semantics.accesscontrol.sql.validation;
 
-import java.util.Optional;
-import java.util.Set;
-
-import org.eclipse.tractusx.semantics.accesscontrol.sql.validation.OnCreate;
-import org.eclipse.tractusx.semantics.accesscontrol.sql.validation.OnUpdate;
-import org.eclipse.tractusx.semantics.accesscontrol.sql.validation.ValidAccessRulePolicyValue;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import jakarta.validation.Valid;
-
-@ValidAccessRulePolicyValue( groups = { OnCreate.class, OnUpdate.class } )
-public record AccessRulePolicyValue(String attribute, PolicyOperator operator, String value, @Valid Set<AccessRulePolicyValue> values) {
-
-   @JsonIgnore
-   public boolean hasSingleValue() {
-      return (operator != null && operator.isSingleValued()) || Optional.ofNullable( value ).isPresent();
-   }
+public interface OnUpdate {
 }
