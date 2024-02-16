@@ -67,8 +67,28 @@
          <artifactId>spring-context</artifactId>
       </dependency>
       <dependency>
-         <groupId>org.springframework.boot</groupId>
-         <artifactId>spring-boot-starter-data-jpa</artifactId>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-web</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-tx</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>jakarta.servlet</groupId>
+         <artifactId>jakarta.servlet-api</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>jakarta.validation</groupId>
+         <artifactId>jakarta.validation-api</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>jakarta.persistence</groupId>
+         <artifactId>jakarta.persistence-api</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>jakarta.annotation</groupId>
+         <artifactId>jakarta.annotation-api</artifactId>
       </dependency>
       <dependency>
          <groupId>com.fasterxml.jackson.core</groupId>
@@ -77,6 +97,14 @@
       <dependency>
          <groupId>com.fasterxml.jackson.datatype</groupId>
          <artifactId>jackson-datatype-jsr310</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.openapitools</groupId>
+         <artifactId>jackson-databind-nullable</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>io.swagger.core.v3</groupId>
+         <artifactId>swagger-annotations</artifactId>
       </dependency>
 
       <!-- Tests -->
@@ -91,6 +119,11 @@
       <dependency>
          <groupId>org.slf4j</groupId>
          <artifactId>slf4j-simple</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.mockito</groupId>
+         <artifactId>mockito-core</artifactId>
+         <scope>test</scope>
       </dependency>
    </dependencies>
    <build>
@@ -113,6 +146,37 @@
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-deploy-plugin</artifactId>
+         </plugin>
+         <plugin>
+            <groupId>org.openapitools</groupId>
+            <artifactId>openapi-generator-maven-plugin</artifactId>
+            <executions>
+               <execution>
+                  <id>generate-aas-registry-api-stubs</id>
+                  <goals>
+                     <goal>generate</goal>
+                  </goals>
+                  <configuration>
+                     <inputSpec>${project.basedir}/src/main/resources/static/access-control-openapi.yaml</inputSpec>
+                     <generatorName>spring</generatorName>
+                     <generateSupportingFiles>true</generateSupportingFiles>
+                     <packageName>org.eclipse.tractusx.semantics.accesscontrol.sql.rest</packageName>
+                     <modelPackage>org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model</modelPackage>
+                     <apiPackage>org.eclipse.tractusx.semantics.accesscontrol.sql.rest.api</apiPackage>
+
+                     <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
+                     <configOptions>
+                        <oas3>true</oas3>
+                        <delegatePattern>true</delegatePattern>
+                        <packageName>org.eclipse.tractusx</packageName>
+                        <useBeanValidation>true</useBeanValidation>
+                        <useSpringfox>false</useSpringfox>
+                        <useSpringBoot3>true</useSpringBoot3>
+                     </configOptions>
+                     <invokerPackage>org.eclipse.tractusx.semantics</invokerPackage>
+                  </configuration>
+               </execution>
+            </executions>
          </plugin>
       </plugins>
    </build>
