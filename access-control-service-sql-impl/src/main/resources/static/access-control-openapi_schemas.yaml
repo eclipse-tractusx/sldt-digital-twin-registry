@@ -50,15 +50,11 @@ schemas:
     description: Optional validity end of the rule.
     type: string
     format: date-time
-  SingleOperatorType:
+  OperatorType:
     type: string
     description: Operators for a single value
     enum:
       - eq
-  ListOperatorType:
-    type: string
-    description: Operators for a list values
-    enum:
       - includes
   AccessRuleValue:
     description: Policy with a single value
@@ -67,7 +63,7 @@ schemas:
       attribute:
         type: string
       operator:
-        $ref: "#/schemas/SingleOperatorType"
+        $ref: "#/schemas/OperatorType"
       value:
         type: string
     required:
@@ -82,7 +78,7 @@ schemas:
       attribute:
         type: string
       operator:
-        $ref: "#/schemas/ListOperatorType"
+        $ref: "#/schemas/OperatorType"
       values:
         type: array
         items:

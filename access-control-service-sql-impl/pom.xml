@@ -111,6 +111,12 @@
          <artifactId>commons-lang3</artifactId>
       </dependency>
 
+      <!-- Mapping -->
+      <dependency>
+         <groupId>org.mapstruct</groupId>
+         <artifactId>mapstruct</artifactId>
+      </dependency>
+
       <!-- Tests -->
       <dependency>
          <groupId>org.assertj</groupId>
