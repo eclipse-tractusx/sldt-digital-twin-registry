@@ -1,0 +1,309 @@
+###############################################################
+# Copyright (c) 2024 Robert Bosch Manufacturing Solutions GmbH and others
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache License, Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0.
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+###############################################################
+
+schemas:
+  EntityId:
+    description: The auto-generated Id of the entity
+    minimum: 1
+    type: integer
+    format: int64
+    example: "1"
+  TenantId:
+    description: The Id of the provider tenant
+    minLength: 1
+    maxLength: 36
+    pattern: "^[0-9]{8}-[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{12}$"
+    type: string
+    example: "00000000-1111-2222-3333-444444444444"
+  PolicyType:
+    description: Type of the policy. Only AAS supported.
+    type: string
+    enum:
+      - AAS
+    nullable: false
+  Description:
+    description: Optional description of the rule.
+    type: string
+    minLength: 0
+    maxLength: 256
+  ValidityStartDateTime:
+    description: Optional validity start of the rule.
+    type: string
+    format: date-time
+  ValidityEndDateTime:
+    description: Optional validity end of the rule.
+    type: string
+    format: date-time
+  SingleOperatorType:
+    type: string
+    description: Operators for a single value
+    enum:
+      - eq
+  ListOperatorType:
+    type: string
+    description: Operators for a list values
+    enum:
+      - includes
+  AccessRuleValue:
+    description: Policy with a single value
+    type: object
+    properties:
+      attribute:
+        type: string
+      operator:
+        $ref: "#/schemas/SingleOperatorType"
+      value:
+        type: string
+    required:
+      - attribute
+      - operator
+      - value
+    additionalProperties: false
+  AccessRuleValues:
+    description: Policy with list values
+    type: object
+    properties:
+      attribute:
+        type: string
+      operator:
+        $ref: "#/schemas/ListOperatorType"
+      values:
+        type: array
+        items:
+          $ref: "#/schemas/AccessRuleValue"
+        minItems: 1
+        uniqueItems: true
+    required:
+      - attribute
+      - operator
+      - values
+    additionalProperties: false
+  AasPolicy:
+    description: Describes an AAS policy
+    type: object
+    properties:
+      accessRules:
+        type: array
+        description: The components of the Access Rule Policy
+        items:
+          "anyOf":
+            - { $ref: "#/schemas/AccessRuleValue" }
+            - { $ref: "#/schemas/AccessRuleValues" }
+        minLength: 1
+        uniqueItems: true
+    required:
+      - accessRules
+    additionalProperties: false
+  CreateAccessRule:
+    type: object
+    description: Creates an Access Rule
+    properties:
+      #tid: Auto-populated in case of create
+      policyType:
+        $ref: "#/schemas/PolicyType"
+      policy:
+        $ref: "#/schemas/AasPolicy"
+      description:
+        $ref: "#/schemas/Description"
+      validFrom:
+        $ref: "#/schemas/ValidityStartDateTime"
+      validTo:
+        $ref: "#/schemas/ValidityEndDateTime"
+    required:
+      - policyType
+      - policy
+    additionalProperties: false
+    example:
+      {
+        "policyType": "AAS",
+        "policy": {
+          "accessRules": [
+            {
+              "attribute": "bpn",
+              "operator": "eq",
+              "value": "BPNL00000000000A"
+            },
+            {
+              "attribute": "mandatorySpecificAssetIds",
+              "operator": "includes",
+              "values": [
+                {
+                  "attribute": "manufacturerPartId",
+                  "operator": "eq",
+                  "value": "99991"
+                },
+                {
+                  "attribute": "customerPartId",
+                  "operator": "eq",
+                  "value": "ACME001"
+                }
+              ]
+            },
+            {
+              "attribute": "visibleSpecificAssetIdNames",
+              "operator": "includes",
+              "values": [
+                {
+                  "attribute": "name",
+                  "operator": "eq",
+                  "value": "manufacturerPartId"
+                },
+                {
+                  "attribute": "name",
+                  "operator": "eq",
+                  "value": "customerPartId"
+                },
+                {
+                  "attribute": "name",
+                  "operator": "eq",
+                  "value": "partInstanceId"
+                }
+              ]
+            },
+            {
+              "attribute": "visibleSemanticIds",
+              "operator": "includes",
+              "values": [
+                {
+                  "attribute": "modelUrn",
+                  "operator": "eq",
+                  "value": "Traceabilityv1.1.0"
+                },
+                {
+                  "attribute": "modelUrn",
+                  "operator": "eq",
+                  "value": "ProductCarbonFootprintv1.1.0"
+                }
+              ]
+            }
+          ]
+        },
+        "description": "Access rule description.",
+        "validFrom": "2024-01-02T03:04:05Z",
+        "validTo": "2024-06-07T08:09:10Z"
+      }
+  ReadUpdateAccessRule:
+    type: object
+    description: An Access Rule
+    properties:
+      id:
+        $ref: "#/schemas/EntityId"
+      tid:
+        $ref: "#/schemas/TenantId"
+      policyType:
+        $ref: "#/schemas/PolicyType"
+      policy:
+        $ref: "#/schemas/AasPolicy"
+      description:
+        $ref: "#/schemas/Description"
+      validFrom:
+        $ref: "#/schemas/ValidityStartDateTime"
+      validTo:
+        $ref: "#/schemas/ValidityEndDateTime"
+    required:
+      - id
+      - tid
+      - policyType
+      - policy
+    additionalProperties: false
+    example:
+      {
+        "id": 1,
+        "tid": "00000000-1111-2222-3333-444444444444",
+        "policyType": "AAS",
+        "policy": {
+          "accessRules": [
+            {
+              "attribute": "bpn",
+              "operator": "eq",
+              "value": "BPNL00000000000A"
+            },
+            {
+              "attribute": "mandatorySpecificAssetIds",
+              "operator": "includes",
+              "values": [
+                {
+                  "attribute": "manufacturerPartId",
+                  "operator": "eq",
+                  "value": "99991"
+                },
+                {
+                  "attribute": "customerPartId",
+                  "operator": "eq",
+                  "value": "ACME001"
+                }
+              ]
+            },
+            {
+              "attribute": "visibleSpecificAssetIdNames",
+              "operator": "includes",
+              "values": [
+                {
+                  "attribute": "name",
+                  "operator": "eq",
+                  "value": "manufacturerPartId"
+                },
+                {
+                  "attribute": "name",
+                  "operator": "eq",
+                  "value": "customerPartId"
+                },
+                {
+                  "attribute": "name",
+                  "operator": "eq",
+                  "value": "partInstanceId"
+                }
+              ]
+            },
+            {
+              "attribute": "visibleSemanticIds",
+              "operator": "includes",
+              "values": [
+                {
+                  "attribute": "modelUrn",
+                  "operator": "eq",
+                  "value": "Traceabilityv1.1.0"
+                },
+                {
+                  "attribute": "modelUrn",
+                  "operator": "eq",
+                  "value": "ProductCarbonFootprintv1.1.0"
+                }
+              ]
+            }
+          ]
+        },
+        "description": "Access rule description.",
+        "validFrom": "2024-01-02T03:04:05Z",
+        "validTo": "2024-06-07T08:09:10Z"
+      }
+parameters:
+  RuleId:
+    name: ruleId
+    in: path
+    description: The Access Rule's Id
+    required: true
+    style: simple
+    explode: false
+    schema:
+      description: The auto-generated Id of the entity
+      minimum: 1
+      type: integer
+      format: int64
+      example: "1"
