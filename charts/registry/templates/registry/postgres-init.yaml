@@ -35,7 +35,7 @@ data:
   {{- $password:= ( .Values.postgresql.auth.password | b64enc) | default ( index $secret.data "password" ) | quote }}
   password: {{ $password }}
   SPRING_DATASOURCE_PASSWORD: {{ $password }}
-  SPRING_DATASOURCE_URL: {{ printf "jdbc:postgresql://%s-postgresql:%v/%s" .Release.Name .Values.postgresql.service.ports.postgresql .Values.postgresql.auth.database | b64enc }}
+  SPRING_DATASOURCE_URL: {{ printf "jdbc:postgresql://%s:%v/%s" (include "dtr.postgres.primary.fullname" .) .Values.postgresql.service.ports.postgresql .Values.postgresql.auth.database | b64enc }}
   SPRING_DATASOURCE_USERNAME: {{ .Values.postgresql.auth.username | b64enc }}
 # 2. Check if default postgresql secret (Release.Name-postgresql) exists
 {{ else if $defaultSecret -}}
@@ -45,7 +45,7 @@ data:
   {{- $password:= ( .Values.postgresql.auth.password | b64enc) | default ( index $defaultSecret.data "password" ) | quote }}
   password: {{ $password }}
   SPRING_DATASOURCE_PASSWORD: {{ $password }}
-  SPRING_DATASOURCE_URL: {{ printf "jdbc:postgresql://%s-postgresql:%v/%s" .Release.Name .Values.postgresql.service.ports.postgresql .Values.postgresql.auth.database | b64enc }}
+  SPRING_DATASOURCE_URL: {{ printf "jdbc:postgresql://%s:%v/%s" (include "dtr.postgres.primary.fullname" .) .Values.postgresql.service.ports.postgresql .Values.postgresql.auth.database | b64enc }}
   SPRING_DATASOURCE_USERNAME: {{ .Values.postgresql.auth.username | b64enc }}
 {{ else -}}
 # 3. If no secret exists, use provided value from values file or generate a random one if secret not exists.
@@ -54,7 +54,7 @@ stringData:
   postgres-password: {{ $password }}
   password: {{ $password }}
   SPRING_DATASOURCE_PASSWORD: {{ $password }}
-  SPRING_DATASOURCE_URL: {{ printf "jdbc:postgresql://%s-postgresql:%v/%s" .Release.Name .Values.postgresql.service.ports.postgresql .Values.postgresql.auth.database }}
+  SPRING_DATASOURCE_URL: {{ printf "jdbc:postgresql://%s:%v/%s" (include "dtr.postgres.primary.fullname" .) .Values.postgresql.service.ports.postgresql .Values.postgresql.auth.database }}
   SPRING_DATASOURCE_USERNAME: {{ .Values.postgresql.auth.username }}
 {{ end }}
 {{- end -}}
