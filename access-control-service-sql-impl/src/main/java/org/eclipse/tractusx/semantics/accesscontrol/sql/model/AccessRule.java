@@ -23,6 +23,9 @@ package org.eclipse.tractusx.semantics.accesscontrol.sql.model;
 import java.time.Instant;
 
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.converter.AccessRulePolicyConverter;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.validation.OnCreate;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.validation.OnUpdate;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.validation.ValidValidityPeriod;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -32,44 +35,57 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import lombok.Data;
 
 //@Entity
-//@Table(name = "access_control_rule")
+//@Table( name = "ACCESS_RULE" )
 @Data
+@ValidValidityPeriod( groups = { OnCreate.class, OnUpdate.class } )
 public class AccessRule {
 
    public enum PolicyType {
       AAS
    }
 
+   @Null( groups = OnCreate.class )
+   @NotNull( groups = OnUpdate.class )
    @Id
    @GeneratedValue( strategy = GenerationType.AUTO )
-   @Column( name = "id", nullable = false, updatable = false )
+   @Column( name = "ID", nullable = false, updatable = false )
    private Long id;
 
-   @Column( name = "tid", nullable = false, updatable = false, length = 36 )
+   @NotNull( groups = { OnCreate.class, OnUpdate.class } )
+   @Column( name = "TID", nullable = false, updatable = false, length = 36 )
    private String tid;
 
-   @Column( name = "target_tenant", nullable = false, updatable = false, length = 36 )
+   @NotNull( groups = { OnCreate.class, OnUpdate.class } )
+   @NotBlank( groups = { OnCreate.class, OnUpdate.class } )
+   @Column( name = "TARGET_TENANT", nullable = false, updatable = false, length = 36 )
    private String targetTenant;
 
+   @NotNull( groups = { OnCreate.class, OnUpdate.class } )
    @Enumerated( EnumType.STRING )
-   @Column( name = "policy_type", nullable = false, length = 10 )
+   @Column( name = "POLICY_TYPE", nullable = false, length = 10 )
    private PolicyType policyType;
 
+   @Valid
+   @NotNull( groups = { OnCreate.class, OnUpdate.class } )
    @Lob
-   @Column( name = "policy", nullable = false )
+   @Column( name = "POLICY", nullable = false )
    @Convert( converter = AccessRulePolicyConverter.class )
    private AccessRulePolicy policy;
 
-   @Column( name = "description", length = 256 )
+   @Column( name = "DESCRIPTION", length = 256 )
    private String description;
 
-   @Column( name = "valid_from" )
+   @Column( name = "VALID_FROM" )
    private Instant validFrom;
 
-   @Column( name = "valid_to" )
+   @Column( name = "VALID_TO" )
    private Instant validTo;
 
 }

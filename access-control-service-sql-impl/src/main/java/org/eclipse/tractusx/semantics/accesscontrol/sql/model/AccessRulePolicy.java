@@ -20,39 +20,52 @@
 
 package org.eclipse.tractusx.semantics.accesscontrol.sql.model;
 
+import java.util.Collection;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.policy.AccessRulePolicyValue;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.validation.OnCreate;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.validation.OnUpdate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
 public class AccessRulePolicy {
 
-   static final String BPN_RULE_NAME = "bpn";
-   static final String MANDATORY_SPECIFIC_ASSET_IDS_RULE_NAME = "mandatorySpecificAssetIds";
-   static final String VISIBLE_SPECIFIC_ASSET_ID_NAMES_RULE_NAME = "visibleSpecificAssetIdNames";
-   static final String VISIBLE_SEMANTIC_IDS_RULE_NAME = "visibleSemanticIds";
+   public static final String BPN_RULE_NAME = "bpn";
+   public static final String MANDATORY_SPECIFIC_ASSET_IDS_RULE_NAME = "mandatorySpecificAssetIds";
+   public static final String VISIBLE_SPECIFIC_ASSET_ID_NAMES_RULE_NAME = "visibleSpecificAssetIdNames";
+   public static final String VISIBLE_SEMANTIC_IDS_RULE_NAME = "visibleSemanticIds";
 
+   @Valid
+   @NotNull( groups = { OnCreate.class, OnUpdate.class } )
+   @Size( min = 4, groups = { OnCreate.class, OnUpdate.class } )
    @JsonProperty( "accessRules" )
    private Set<AccessRulePolicyValue> accessRules;
 
+   private Set<SpecificAssetId> mandatorySpecificAssetIds;
+
    @JsonIgnore
+   @Valid
+   @Size( min = 1, groups = { OnCreate.class, OnUpdate.class } )
+   @NotNull( groups = { OnCreate.class, OnUpdate.class } )
    public Set<SpecificAssetId> getMandatorySpecificAssetIds() {
       return accessRules.stream().filter( rule -> MANDATORY_SPECIFIC_ASSET_IDS_RULE_NAME.equals( rule.attribute() ) )
-            .flatMap( rule -> {
-               assertMultiValued( rule, MANDATORY_SPECIFIC_ASSET_IDS_RULE_NAME );
-               return rule.values().stream();
-            } )
-            .map( idValue -> {
-               assertSingleValued( idValue, MANDATORY_SPECIFIC_ASSET_IDS_RULE_NAME + ".*" );
-               return new SpecificAssetId( idValue.attribute(), idValue.value() );
-            } )
+            .map( AccessRulePolicyValue::values )
+            .filter( Objects::nonNull )
+            .flatMap( Collection::stream )
+            .map( idValue -> new SpecificAssetId( idValue.attribute(), idValue.value() ) )
             .collect( Collectors.toSet() );
    }
 
@@ -67,40 +80,23 @@ public class AccessRulePolicy {
    }
 
    @JsonIgnore
+   @NotNull( groups = { OnCreate.class, OnUpdate.class } )
+   @NotBlank( groups = { OnCreate.class, OnUpdate.class } )
    public String getBpn() {
-      return getStringValueOfRule( BPN_RULE_NAME );
+      return accessRules.stream().filter( rule -> BPN_RULE_NAME.equals( rule.attribute() ) )
+            .map( this::getAccessRulePolicyValueStringFunction )
+            .filter( Objects::nonNull )
+            .findAny().orElse( null );
    }
 
    private Set<String> getStringValuesOfRule( final String ruleName ) {
       return accessRules.stream().filter( rule -> ruleName.equals( rule.attribute() ) )
-            .flatMap( rule -> {
-               assertMultiValued( rule, ruleName );
-               return rule.values().stream();
-            } )
-            .map(  idValue -> getAccessRulePolicyValueStringFunction( idValue, ruleName ) )
+            .flatMap( rule -> rule.values().stream() )
+            .map( this::getAccessRulePolicyValueStringFunction )
             .collect( Collectors.toSet() );
    }
 
-   private String getStringValueOfRule( final String ruleName ) {
-      return accessRules.stream().filter( rule -> ruleName.equals( rule.attribute() ) )
-            .map(  idValue -> getAccessRulePolicyValueStringFunction( idValue, ruleName ) )
-            .findAny().orElse( null );
-   }
-
-   private String getAccessRulePolicyValueStringFunction( final AccessRulePolicyValue idValue, final String ruleName ) {
-      assertSingleValued( idValue, ruleName );
-      return idValue.value();
-   }
-
-   private void assertSingleValued( final AccessRulePolicyValue idValue, final String path ) {
-      if ( !idValue.hasSingleValue() ) {
-         throw new IllegalStateException( "Entry of " + path + " must have single value!" );
-      }
-   }
-
-   private void assertMultiValued( AccessRulePolicyValue idValue, String path ) {
-      if ( idValue.hasSingleValue() ) {
-         throw new IllegalStateException( "Entry of " + path + " must have multiple values!" );
-      }
+   private String getAccessRulePolicyValueStringFunction( final AccessRulePolicyValue idValue ) {
+      return Optional.ofNullable( idValue ).map( AccessRulePolicyValue::value ).orElse( null );
    }
 }

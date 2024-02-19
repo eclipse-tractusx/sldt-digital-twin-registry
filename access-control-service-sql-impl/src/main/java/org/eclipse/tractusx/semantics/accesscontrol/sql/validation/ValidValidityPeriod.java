@@ -17,24 +17,26 @@
  * SPDX-License-Identifier: Apache-2.0
  *
  ******************************************************************************/
-package org.eclipse.tractusx.semantics.accesscontrol.sql.model.policy;
+package org.eclipse.tractusx.semantics.accesscontrol.sql.validation;
 
-import java.util.Optional;
-import java.util.Set;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import org.eclipse.tractusx.semantics.accesscontrol.sql.validation.OnCreate;
-import org.eclipse.tractusx.semantics.accesscontrol.sql.validation.OnUpdate;
-import org.eclipse.tractusx.semantics.accesscontrol.sql.validation.ValidAccessRulePolicyValue;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+@Retention( RetentionPolicy.RUNTIME )
+@Target( ElementType.TYPE )
+@Constraint( validatedBy = ValidityPeriodValidator.class )
+@Documented
+public @interface ValidValidityPeriod {
 
-import jakarta.validation.Valid;
+   String message() default "Invalid validity period.";
 
-@ValidAccessRulePolicyValue( groups = { OnCreate.class, OnUpdate.class } )
-public record AccessRulePolicyValue(String attribute, PolicyOperator operator, String value, @Valid Set<AccessRulePolicyValue> values) {
+   Class<?>[] groups() default {};
 
-   @JsonIgnore
-   public boolean hasSingleValue() {
-      return (operator != null && operator.isSingleValued()) || Optional.ofNullable( value ).isPresent();
-   }
+   Class<? extends Payload>[] payload() default {};
 }
