@@ -616,10 +616,18 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
    @DisplayName( "Tenant based specificAssetId visibility test" )
    class TenantBasedVisibilityTest {
 
+      String keyPrefix;
+
+      @BeforeEach
+      void setUp() {
+         keyPrefix = UUID.randomUUID().toString();
+      }
+
       @Test
       public void testGetAllShellsWithDefaultClosedFilteredSpecificAssetIdsByTenantId() throws Exception {
-         AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
-         shellPayload.setId( UUID.randomUUID().toString() );
+         AssetAdministrationShellDescriptor shellPayload = TestUtil
+               .createCompleteAasDescriptor( keyPrefix + "semanticId", "http://example.com/" );
+         shellPayload.setId( keyPrefix );
          List<SpecificAssetId> shellpayloadSpecificAssetIDs = shellPayload.getSpecificAssetIds();
          shellpayloadSpecificAssetIDs.forEach( specificAssetId -> specificAssetId.setExternalSubjectId( null ) );
          shellPayload.setSpecificAssetIds( shellpayloadSpecificAssetIDs );
@@ -656,23 +664,23 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
 
       @Test
       public void testGetShellWithFilteredSpecificAssetIdsByTenantId() throws Exception {
-
-         AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+         AssetAdministrationShellDescriptor shellPayload = TestUtil
+               .createCompleteAasDescriptor( keyPrefix + "semanticId", "http://example.com/" );
+         shellPayload.setId( keyPrefix );
          shellPayload.setSpecificAssetIds( null );
-         SpecificAssetId asset1 = TestUtil.createSpecificAssetId( "CustomerPartId", "tenantTwoAssetIdValue",
+         SpecificAssetId asset1 = TestUtil.createSpecificAssetId( keyPrefix + "CustomerPartId", "tenantTwoAssetIdValue",
                List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
-         SpecificAssetId asset2 = TestUtil.createSpecificAssetId( "CustomerPartId2", "tenantThreeAssetIdValue",
+         SpecificAssetId asset2 = TestUtil.createSpecificAssetId( keyPrefix + "CustomerPartId2", "tenantThreeAssetIdValue",
                List.of( jwtTokenFactory.tenantThree().getTenantId() ) );
-         SpecificAssetId asset3 = TestUtil.createSpecificAssetId( "MaterialNumber", "withoutTenantAssetIdValue",
+         SpecificAssetId asset3 = TestUtil.createSpecificAssetId( keyPrefix + "MaterialNumber", "withoutTenantAssetIdValue",
                List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
          // Define specificAsset with wildcard which not allowed. (Only manufacturerPartId is defined in application.yml)
-         SpecificAssetId asset4 = TestUtil.createSpecificAssetId( "BPID", "ignoreWildcard", List.of( getExternalSubjectIdWildcardPrefix() ) );
+         SpecificAssetId asset4 = TestUtil.createSpecificAssetId( keyPrefix + "BPID", "ignoreWildcard", List.of( getExternalSubjectIdWildcardPrefix() ) );
          // Define specificAsset with wildcard which is allowed. (Only manufacturerPartId is defined in application.yml)
-         SpecificAssetId asset5 = TestUtil.createSpecificAssetId( "manufacturerPartId", "wildcardAllowed", List.of( getExternalSubjectIdWildcardPrefix() ) );
+         SpecificAssetId asset5 = TestUtil.createSpecificAssetId( "manufacturerPartId", keyPrefix + "wildcardAllowed",
+               List.of( getExternalSubjectIdWildcardPrefix() ) );
 
          shellPayload.setSpecificAssetIds( List.of( asset1, asset2, asset3, asset4, asset5 ) );
-
-         shellPayload.setId( UUID.randomUUID().toString() );
          performShellCreateRequest( mapper.writeValueAsString( shellPayload ) );
 
          String shellId = shellPayload.getId();
@@ -690,7 +698,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                .andExpect( jsonPath( "$.id", equalTo( shellId ) ) )
                .andExpect( jsonPath( "$.specificAssetIds[*].value",
                      containsInAnyOrder( "tenantTwoAssetIdValue", "tenantThreeAssetIdValue", "withoutTenantAssetIdValue", "ignoreWildcard",
-                           "wildcardAllowed" ) ) );
+                           keyPrefix + "wildcardAllowed" ) ) );
 
          // test with tenant two
          mvc.perform(
@@ -703,8 +711,10 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isOk() )
                .andExpect( jsonPath( "$.id", equalTo( shellId ) ) )
-               .andExpect( jsonPath( "$.specificAssetIds[*].value", hasItems( "tenantTwoAssetIdValue", "withoutTenantAssetIdValue", "wildcardAllowed" ) ) )
-               .andExpect( jsonPath( "$.specificAssetIds[*].value", not( hasItems( "tenantThreeAssetIdValue", "ignoreWildcard" ) ) ) );
+               .andExpect( jsonPath( "$.specificAssetIds[*].value",
+                     hasItems( "tenantTwoAssetIdValue", "withoutTenantAssetIdValue", keyPrefix + "wildcardAllowed" ) ) )
+               .andExpect( jsonPath( "$.specificAssetIds[*].value",
+                     not( hasItems( "tenantThreeAssetIdValue", "ignoreWildcard" ) ) ) );
       }
 
       @Test
@@ -888,32 +898,34 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
       @Test
       public void testFindExternalShellIdsBySpecificAssetIdsWithTenantBasedVisibilityAndWildcardExpectSuccess() throws Exception {
          // the keyPrefix ensures that this test can run against a persistent database multiple times
-         String keyPrefix = UUID.randomUUID().toString();
-         AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+         AssetAdministrationShellDescriptor shellPayload = TestUtil
+               .createCompleteAasDescriptor( keyPrefix + "semanticId", "http://example.com/" );
+         shellPayload.setId( keyPrefix );
          shellPayload.setSpecificAssetIds( null );
-         shellPayload.setId( UUID.randomUUID().toString() );
 
          // asset1 is only visible for the owner because the externalSubjectId = null
          SpecificAssetId asset1 = TestUtil.createSpecificAssetId( keyPrefix + "defaultClosed", "value_1", null );
          // asset2 is visible for everyone, because externalSubjectId = PUBLIC_READABLE and specificAssetKey is manufacturerPartId (which is in the list of allowedTypes via application.yml)
-         SpecificAssetId asset2 = TestUtil.createSpecificAssetId( "manufacturerPartId", "value_2", List.of( getExternalSubjectIdWildcardPrefix() ) );
+         SpecificAssetId asset2 = TestUtil.createSpecificAssetId( "manufacturerPartId", keyPrefix + "value_2",
+               List.of( getExternalSubjectIdWildcardPrefix() ) );
          // asset3 is visible only for the owner, because externalSubjectId = PUBLIC_READABLE but specificAssetKey is bpId (which is not in the list of allowedTypes via application.yml)
-         SpecificAssetId asset3 = TestUtil.createSpecificAssetId( "bpId", "value_3", List.of( getExternalSubjectIdWildcardPrefix() ) );
+         SpecificAssetId asset3 = TestUtil.createSpecificAssetId( keyPrefix + "bpId", "value_3", List.of( getExternalSubjectIdWildcardPrefix() ) );
          // asset3 is visible for tenantTwo and tenantThree
          SpecificAssetId asset4 = TestUtil.createSpecificAssetId( keyPrefix + "tenantTwo_tenantThree", "value_3",
                List.of( jwtTokenFactory.tenantTwo().getTenantId(), jwtTokenFactory.tenantThree().getTenantId() ) );
          // asset4 is visible for tenantTwo, because externalSubjectId = tenantTwo
-         SpecificAssetId asset5 = TestUtil.createSpecificAssetId( "tenantTwo", "value_2_private", List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
+         SpecificAssetId asset5 = TestUtil.createSpecificAssetId( keyPrefix + "tenantTwo", "value_2_private",
+               List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
 
          shellPayload.setSpecificAssetIds( List.of( asset1, asset2, asset3, asset4, asset5 ) );
 
          performShellCreateRequest( mapper.writeValueAsString( shellPayload ) );
 
          SpecificAssetId sa1 = TestUtil.createSpecificAssetId( keyPrefix + "defaultClosed", "value_1", null );
-         SpecificAssetId sa2 = TestUtil.createSpecificAssetId( "manufacturerPartId", "value_2", null );
-         SpecificAssetId sa3 = TestUtil.createSpecificAssetId( "bpId", "value_3", null );
+         SpecificAssetId sa2 = TestUtil.createSpecificAssetId( "manufacturerPartId", keyPrefix + "value_2", null );
+         SpecificAssetId sa3 = TestUtil.createSpecificAssetId( keyPrefix + "bpId", "value_3", null );
          SpecificAssetId sa4 = TestUtil.createSpecificAssetId( keyPrefix + "tenantTwo_tenantThree", "value_3", null );
-         SpecificAssetId sa5 = TestUtil.createSpecificAssetId( "tenantTwo", "value_2_private", null );
+         SpecificAssetId sa5 = TestUtil.createSpecificAssetId( keyPrefix + "tenantTwo", "value_2_private", null );
 
          String encodedSa1 = Base64.getUrlEncoder().encodeToString( serialize( sa1 ) );
          String encodedSa2 = Base64.getUrlEncoder().encodeToString( serialize( sa2 ) );
@@ -1048,15 +1060,19 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
    @DisplayName( "Tenant based Shell visibility test" )
    class TenantBasedShellVisibilityTest {
 
+      String keyPrefix;
+
       @BeforeEach
       public void before() {
          shellRepository.deleteAll();
+         keyPrefix = UUID.randomUUID().toString();
       }
 
       @Test
       public void testGetAllShellsByOwningTenantId() throws Exception {
-         AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
-         shellPayload.setId( UUID.randomUUID().toString() );
+         AssetAdministrationShellDescriptor shellPayload = TestUtil
+               .createCompleteAasDescriptor( keyPrefix + "semanticId", "http://example.com/" );
+         shellPayload.setId( keyPrefix );
          List<SpecificAssetId> shellpayloadSpecificAssetIDs = shellPayload.getSpecificAssetIds();
          // Make all specificAssetIds to closed with externalSubjectId==null.
          shellpayloadSpecificAssetIDs.forEach( specificAssetId -> specificAssetId.setExternalSubjectId( null ) );
@@ -1098,17 +1114,19 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
       @Test
       public void testGetAllShellsWithPublicAccessByTenantId() throws Exception {
          // the keyPrefix ensures that this test can run against a persistent database multiple times
-         String keyPrefix = UUID.randomUUID().toString();
-         AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+         AssetAdministrationShellDescriptor shellPayload = TestUtil
+               .createCompleteAasDescriptor( keyPrefix + "semanticId", "http://example.com/" );
+         shellPayload.setId( keyPrefix );
          shellPayload.setSpecificAssetIds( null );
-         shellPayload.setId( UUID.randomUUID().toString() );
 
          // asset1 is only visible for the owner because the externalSubjectId = null
          SpecificAssetId asset1 = TestUtil.createSpecificAssetId( keyPrefix + "defaultClosed", "value_1", null );
          // asset2 is visible for everyone, because externalSubjectId = PUBLIC_READABLE and specificAssetKey is manufacturerPartId (which is in the list of allowedTypes via application.yml)
-         SpecificAssetId asset2 = TestUtil.createSpecificAssetId( "manufacturerPartId", "value_2", List.of( getExternalSubjectIdWildcardPrefix() ) );
+         SpecificAssetId asset2 = TestUtil.createSpecificAssetId( "manufacturerPartId", keyPrefix + "value_2",
+               List.of( getExternalSubjectIdWildcardPrefix() ) );
          // asset3 is visible for tenantTwo, because externalSubjectId = tenantTwo
-         SpecificAssetId asset3 = TestUtil.createSpecificAssetId( "tenantTwo", "value_2_public", List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
+         SpecificAssetId asset3 = TestUtil.createSpecificAssetId( keyPrefix + "tenantTwo", "value_2_public",
+               List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
 
          shellPayload.setSpecificAssetIds( List.of( asset1, asset2, asset3 ) );
          performShellCreateRequest( mapper.writeValueAsString( shellPayload ) );
@@ -1154,8 +1172,9 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
 
       @Test
       public void testGetShellByExternalIdByOwningTenantId() throws Exception {
-         AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
-         shellPayload.setId( UUID.randomUUID().toString() );
+         AssetAdministrationShellDescriptor shellPayload = TestUtil
+               .createCompleteAasDescriptor( keyPrefix + "semanticId", "http://example.com/" );
+         shellPayload.setId( keyPrefix );
          List<SpecificAssetId> shellpayloadSpecificAssetIDs = shellPayload.getSpecificAssetIds();
          // Make all specificAssetIds to closed with externalSubjectId==null.
          shellpayloadSpecificAssetIDs.forEach( specificAssetId -> specificAssetId.setExternalSubjectId( null ) );
@@ -1194,17 +1213,19 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
       @Test
       public void testGetAllShellByExternalIdWithPublicAccessByTenantId() throws Exception {
          // the keyPrefix ensures that this test can run against a persistent database multiple times
-         String keyPrefix = UUID.randomUUID().toString();
-         AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+         AssetAdministrationShellDescriptor shellPayload = TestUtil
+               .createCompleteAasDescriptor( keyPrefix + "semanticId", "http://example.com/" );
+         shellPayload.setId( keyPrefix );
          shellPayload.setSpecificAssetIds( null );
-         shellPayload.setId( UUID.randomUUID().toString() );
 
          // asset1 is only visible for the owner because the externalSubjectId = null
          SpecificAssetId asset1 = TestUtil.createSpecificAssetId( keyPrefix + "defaultClosed", "value_1", null );
          // asset2 is visible for everyone, because externalSubjectId = PUBLIC_READABLE and specificAssetKey is manufacturerPartId (which is in the list of allowedTypes via application.yml)
-         SpecificAssetId asset2 = TestUtil.createSpecificAssetId( "manufacturerPartId", "value_2", List.of( getExternalSubjectIdWildcardPrefix() ) );
+         SpecificAssetId asset2 = TestUtil.createSpecificAssetId( "manufacturerPartId", keyPrefix + "value_2",
+               List.of( getExternalSubjectIdWildcardPrefix() ) );
          // asset3 is visible for tenantTwo, because externalSubjectId = tenantTwo
-         SpecificAssetId asset3 = TestUtil.createSpecificAssetId( "tenantTwo", "value_2_public", List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
+         SpecificAssetId asset3 = TestUtil.createSpecificAssetId( keyPrefix + "tenantTwo", "value_2_public",
+               List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
 
          shellPayload.setSpecificAssetIds( List.of( asset1, asset2, asset3 ) );
          performShellCreateRequest( mapper.writeValueAsString( shellPayload ) );

@@ -21,19 +21,25 @@
 package org.eclipse.tractusx.semantics.accesscontrol.sql.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-import java.nio.file.Path;
+import java.io.File;
+import java.io.IOException;
+import java.time.Instant;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.tractusx.semantics.accesscontrol.api.exception.DenyAccessException;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.ShellVisibilityContext;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.SpecificAssetId;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRule;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.repository.AccessControlRuleRepository;
-import org.eclipse.tractusx.semantics.accesscontrol.sql.repository.FileBasedAccessControlRuleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -59,7 +65,6 @@ class SqlBackedAccessControlRuleServiceTest {
    private static final SpecificAssetId REVISION_NUMBER_02 = new SpecificAssetId( REVISION_NUMBER, "02" );
    private static final String BPNA = "BPNL00000000000A";
    private static final String BPNB = "BPNL00000000000B";
-   private static final String BPNC = "BPNL00000000000C";
    private static final String TRACEABILITYV_1_1_0 = "Traceability" + "v1.1.0";
    private static final String PRODUCT_CARBON_FOOTPRINTV_1_1_0 = "ProductCarbonFootprintv1.1.0";
    private SqlBackedAccessControlRuleService underTest;
@@ -102,10 +107,24 @@ class SqlBackedAccessControlRuleServiceTest {
    }
 
    @BeforeEach
-   void setUp() {
+   void setUp() throws IOException {
       ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
-      final var filePath = Path.of( getClass().getResource( "/example-access-rules.json" ).getFile() );
-      AccessControlRuleRepository repository = new FileBasedAccessControlRuleRepository( objectMapper, filePath.toAbsolutePath().toString() );
+      final var file = new File( Objects.requireNonNull( getClass().getResource( "/example-access-rules.json" ) ).getFile() );
+      final List<AccessRule> allRules = objectMapper.readerForListOf( AccessRule.class ).readValue( file );
+      final var rulesByBpn = allRules.stream()
+            .filter( rule -> rule.getValidFrom() == null || rule.getValidFrom().isBefore( Instant.now() ) )
+            .filter( rule -> rule.getValidTo() == null || rule.getValidTo().isAfter( Instant.now() ) )
+            .collect( Collectors.groupingBy( AccessRule::getTargetTenant ) );
+      AccessControlRuleRepository repository = mock();
+      when( repository.findAll() ).thenReturn( allRules );
+      when( repository.findAllByBpnWithinValidityPeriod( anyString(), anyString(), any( Instant.class ) ) )
+            .thenAnswer( invocationOnMock -> {
+               String bpn = invocationOnMock.getArgument( 0, String.class );
+               String wildcard = invocationOnMock.getArgument( 1, String.class );
+               return Stream.of( bpn, wildcard )
+                     .flatMap( key -> rulesByBpn.getOrDefault( key, Collections.emptyList() ).stream() )
+                     .toList();
+            } );
       underTest = new SqlBackedAccessControlRuleService( repository, "PUBLIC_READABLE" );
    }
 

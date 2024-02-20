@@ -20,11 +20,24 @@
 
 package org.eclipse.tractusx.semantics.accesscontrol.sql.repository;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRule;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
-public interface AccessControlRuleRepository {
+@Repository
+public interface AccessControlRuleRepository extends JpaRepository<AccessRule, Long> {
 
-   List<AccessRule> findAllByBpnWithinValidityPeriod( String bpn, String bpnWildcard );
+   @Query( """
+         SELECT r
+         FROM AccessRule r
+         WHERE
+            r.targetTenant IN (:bpn, :bpnWildcard)
+            AND ( r.validFrom IS NULL OR r.validFrom <= :now )
+            AND ( r.validTo IS NULL OR r.validTo >= :now )
+         """ )
+   List<AccessRule> findAllByBpnWithinValidityPeriod( String bpn, String bpnWildcard, Instant now );
 }

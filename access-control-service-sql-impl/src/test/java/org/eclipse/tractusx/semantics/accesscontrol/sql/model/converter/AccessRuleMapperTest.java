@@ -36,8 +36,8 @@ import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRulePolicy;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.policy.AccessRulePolicyValue;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.policy.PolicyOperator;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.AasPolicy;
-import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.AasPolicyAccessRulesInner;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.AccessRuleValue;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.AccessRuleValues;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.CreateAccessRule;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.OperatorType;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.PolicyType;
@@ -58,7 +58,7 @@ class AccessRuleMapperTest {
    private static final OffsetDateTime NOW_DATE = NOW.atOffset( ZoneOffset.UTC );
    private static final OffsetDateTime ONE_MINUTE_AGO_DATE = ONE_MINUTE_AGO.atOffset( ZoneOffset.UTC );
 
-   private final AccessRuleMapper underTest = new AccessRuleMapperImpl( new CustomAccessRuleMapper() );
+   private final AccessRuleMapper underTest = new AccessRuleMapperImpl( new CustomAccessRuleMapper(INPUT_BPNA) );
 
    @Test
    void testMapCreateAccessRuleWithFullyPopulatedDataExpectSuccess() {
@@ -74,7 +74,7 @@ class AccessRuleMapperTest {
       assertThat( actual )
             .isNotNull()
             .hasFieldOrPropertyWithValue( "id", null )
-            .hasFieldOrPropertyWithValue( "tid", null )
+            .hasFieldOrPropertyWithValue( "tid", INPUT_BPNA )
             .hasFieldOrPropertyWithValue( "targetTenant", INPUT_BPNA )
             .hasFieldOrPropertyWithValue( "policyType", AccessRule.PolicyType.AAS )
             .hasFieldOrPropertyWithValue( "description", INPUT_DESCRIPTION )
@@ -101,7 +101,7 @@ class AccessRuleMapperTest {
       assertThat( actual )
             .isNotNull()
             .hasFieldOrPropertyWithValue( "id", null )
-            .hasFieldOrPropertyWithValue( "tid", null )
+            .hasFieldOrPropertyWithValue( "tid", INPUT_BPNA )
             .hasFieldOrPropertyWithValue( "targetTenant", INPUT_BPNA )
             .hasFieldOrPropertyWithValue( "policyType", AccessRule.PolicyType.AAS )
             .hasFieldOrPropertyWithValue( "description", null )
@@ -202,16 +202,16 @@ class AccessRuleMapperTest {
       assertThat( actual.getPolicy().getAccessRules() )
             .isNotNull()
             .hasSize( 4 )
-            .contains( new AasPolicyAccessRulesInner().attribute( BPN_RULE_NAME ).operator( OperatorType.EQ ).value( INPUT_BPNB ).values( null ) )
-            .contains( new AasPolicyAccessRulesInner().attribute( MANDATORY_SPECIFIC_ASSET_IDS_RULE_NAME ).operator( OperatorType.INCLUDES ).values(
+            .contains( new AccessRuleValues().attribute( BPN_RULE_NAME ).operator( OperatorType.EQ ).value( INPUT_BPNB ) )
+            .contains( new AccessRuleValues().attribute( MANDATORY_SPECIFIC_ASSET_IDS_RULE_NAME ).operator( OperatorType.INCLUDES ).values(
                   INPUT_MANDATORY_SPEC_ASSET_IDS.entrySet().stream()
                         .map( entry -> new AccessRuleValue().attribute( entry.getKey() ).operator( OperatorType.EQ ).value( entry.getValue() ) )
                         .collect( Collectors.toSet() ) ) )
-            .contains( new AasPolicyAccessRulesInner().attribute( VISIBLE_SPECIFIC_ASSET_ID_NAMES_RULE_NAME ).operator( OperatorType.INCLUDES ).values(
+            .contains( new AccessRuleValues().attribute( VISIBLE_SPECIFIC_ASSET_ID_NAMES_RULE_NAME ).operator( OperatorType.INCLUDES ).values(
                   INPUT_VISIBLE_SPEC_ASSET_ID_NAMES.stream()
                         .map( item -> new AccessRuleValue().attribute( "name" ).operator( OperatorType.EQ ).value( item ) )
                         .collect( Collectors.toSet() ) ) )
-            .contains( new AasPolicyAccessRulesInner().attribute( VISIBLE_SEMANTIC_IDS_RULE_NAME ).operator( OperatorType.INCLUDES ).values(
+            .contains( new AccessRuleValues().attribute( VISIBLE_SEMANTIC_IDS_RULE_NAME ).operator( OperatorType.INCLUDES ).values(
                   INPUT_VISIBLE_SEMANTIC_IDS.stream()
                         .map( item -> new AccessRuleValue().attribute( "modelUrn" ).operator( OperatorType.EQ ).value( item ) )
                         .collect( Collectors.toSet() ) ) );
@@ -238,30 +238,30 @@ class AccessRuleMapperTest {
       assertThat( actual.getPolicy().getAccessRules() )
             .isNotNull()
             .hasSize( 4 )
-            .contains( new AasPolicyAccessRulesInner().attribute( BPN_RULE_NAME ).operator( OperatorType.EQ ).value( INPUT_BPNB ).values( null ) )
-            .contains( new AasPolicyAccessRulesInner().attribute( MANDATORY_SPECIFIC_ASSET_IDS_RULE_NAME ).operator( OperatorType.INCLUDES ).values(
+            .contains( new AccessRuleValues().attribute( BPN_RULE_NAME ).operator( OperatorType.EQ ).value( INPUT_BPNB ) )
+            .contains( new AccessRuleValues().attribute( MANDATORY_SPECIFIC_ASSET_IDS_RULE_NAME ).operator( OperatorType.INCLUDES ).values(
                   INPUT_MANDATORY_SPEC_ASSET_IDS.entrySet().stream()
                         .map( entry -> new AccessRuleValue().attribute( entry.getKey() ).operator( OperatorType.EQ ).value( entry.getValue() ) )
                         .collect( Collectors.toSet() ) ) )
-            .contains(new AasPolicyAccessRulesInner().attribute( VISIBLE_SPECIFIC_ASSET_ID_NAMES_RULE_NAME )
+            .contains(new AccessRuleValues().attribute( VISIBLE_SPECIFIC_ASSET_ID_NAMES_RULE_NAME )
                   .operator( OperatorType.INCLUDES ).values( Set.of() ) )
-            .contains( new AasPolicyAccessRulesInner().attribute( VISIBLE_SEMANTIC_IDS_RULE_NAME )
+            .contains( new AccessRuleValues().attribute( VISIBLE_SEMANTIC_IDS_RULE_NAME )
                   .operator( OperatorType.INCLUDES ).values( Set.of() ) );
    }
 
    @SuppressWarnings( "SameParameterValue" )
    private AasPolicy generatePolicy( String bpn, Map<String, String> msaId, Set<String> vsaId, Set<String> semId ) {
       return new AasPolicy()
-            .addAccessRulesItem( new AasPolicyAccessRulesInner().attribute( BPN_RULE_NAME ).operator( OperatorType.EQ ).value( bpn ) )
-            .addAccessRulesItem( new AasPolicyAccessRulesInner().attribute( MANDATORY_SPECIFIC_ASSET_IDS_RULE_NAME ).values(
+            .addAccessRulesItem( new AccessRuleValues().attribute( BPN_RULE_NAME ).operator( OperatorType.EQ ).value( bpn ) )
+            .addAccessRulesItem( new AccessRuleValues().attribute( MANDATORY_SPECIFIC_ASSET_IDS_RULE_NAME ).values(
                   msaId.entrySet().stream()
                         .map( entity -> new AccessRuleValue().attribute( entity.getKey() ).operator( OperatorType.EQ ).value( entity.getValue() ) )
                         .collect( Collectors.toSet() ) ) )
-            .addAccessRulesItem( new AasPolicyAccessRulesInner().attribute( VISIBLE_SPECIFIC_ASSET_ID_NAMES_RULE_NAME ).values(
+            .addAccessRulesItem( new AccessRuleValues().attribute( VISIBLE_SPECIFIC_ASSET_ID_NAMES_RULE_NAME ).values(
                   vsaId.stream()
                         .map( item -> new AccessRuleValue().attribute( "name" ).operator( OperatorType.EQ ).value( item ) )
                         .collect( Collectors.toSet() ) ) )
-            .addAccessRulesItem( new AasPolicyAccessRulesInner().attribute( VISIBLE_SEMANTIC_IDS_RULE_NAME ).values(
+            .addAccessRulesItem( new AccessRuleValues().attribute( VISIBLE_SEMANTIC_IDS_RULE_NAME ).values(
                   semId.stream()
                         .map( item -> new AccessRuleValue().attribute( "modelUrn" ).operator( OperatorType.EQ ).value( item ) )
                         .collect( Collectors.toSet() ) ) );

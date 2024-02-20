@@ -72,6 +72,15 @@ public class OAuthSecurityConfig {
 
                     //submodel access control requires special role
                     .requestMatchers( HttpMethod.POST, "/**/submodel-descriptor/authorized" ).access( "@authorizationEvaluator.hasRoleSubmodelAccessControl()" )
+
+                    //read access rules
+                    .requestMatchers( HttpMethod.GET, "/**/access-controls/rules" ).access( "@authorizationEvaluator.hasRoleReadAccessRules()" )
+                    .requestMatchers( HttpMethod.GET, "/**/access-controls/rules/**" ).access( "@authorizationEvaluator.hasRoleReadAccessRules()" )
+
+                    //write access rules
+                    .requestMatchers( HttpMethod.POST, "/**/access-controls/rules" ).access( "@authorizationEvaluator.hasRoleWriteAccessRules()" )
+                    .requestMatchers( HttpMethod.PUT, "/**/access-controls/rules/**" ).access( "@authorizationEvaluator.hasRoleWriteAccessRules()" )
+                    .requestMatchers( HttpMethod.DELETE, "/**/access-controls/rules/**" ).access( "@authorizationEvaluator.hasRoleWriteAccessRules()" )
               )
               .csrf(CsrfConfigurer::disable)
               .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy( SessionCreationPolicy.STATELESS ) )

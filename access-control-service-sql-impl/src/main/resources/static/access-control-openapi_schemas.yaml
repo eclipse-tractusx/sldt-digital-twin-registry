@@ -29,9 +29,8 @@ schemas:
     description: The Id of the provider tenant
     minLength: 1
     maxLength: 36
-    pattern: "^[0-9]{8}-[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{12}$"
     type: string
-    example: "00000000-1111-2222-3333-444444444444"
+    example: "BPNL00000000000B"
   PolicyType:
     description: Type of the policy. Only AAS supported.
     type: string
@@ -80,6 +79,8 @@ schemas:
         type: string
       operator:
         $ref: "#/schemas/OperatorType"
+      value:
+        type: string
       values:
         type: array
         items:
@@ -89,7 +90,6 @@ schemas:
     required:
       - attribute
       - operator
-      - values
     additionalProperties: false
   AasPolicy:
     description: Describes an AAS policy
@@ -99,9 +99,7 @@ schemas:
         type: array
         description: The components of the Access Rule Policy
         items:
-          "anyOf":
-            - { $ref: "#/schemas/AccessRuleValue" }
-            - { $ref: "#/schemas/AccessRuleValues" }
+          $ref: "#/schemas/AccessRuleValues"
         minLength: 1
         uniqueItems: true
     required:
