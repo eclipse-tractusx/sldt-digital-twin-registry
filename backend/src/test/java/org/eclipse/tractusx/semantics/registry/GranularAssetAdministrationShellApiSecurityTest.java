@@ -20,17 +20,34 @@
 
 package org.eclipse.tractusx.semantics.registry;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
 import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRule;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRulePolicy;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.model.policy.AccessRulePolicyValue;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.model.policy.PolicyOperator;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.repository.AccessControlRuleRepository;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.AasPolicy;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.AccessRuleValue;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.AccessRuleValues;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.CreateAccessRule;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.OperatorType;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.PolicyType;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.ReadUpdateAccessRule;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -44,15 +61,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles( profiles = { "granular", "test" } )
 @EnableConfigurationProperties( RegistryProperties.class )
 public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdministrationShellApiSecurityTest {
-
-   private static final String HTTP_EDC_DATA_PLANE_URL_REQUEST = "{\"submodelEndpointUrl\": \"http://edc-data-plane/url\"}";
-   private static final String EXISTING_URL = "http://endpoint-address";
-   private static final String EXISTING_URL_REQUEST_FORMAT = "{\"submodelEndpointUrl\": \"%s\"}";
 
    @Nested
    @DisplayName( "Authentication Tests" )
@@ -319,11 +334,15 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
    @DisplayName( "Submodel endpoint authorization Tests" )
    class SubmodelEndpointAuthorizationApiTest {
 
+      private static final String HTTP_EDC_DATA_PLANE_URL_REQUEST = "{\"submodelEndpointUrl\": \"http://edc-data-plane/url\"}";
+      private static final String EXISTING_URL = "http://endpoint-address";
+      private static final String EXISTING_URL_REQUEST_FORMAT = "{\"submodelEndpointUrl\": \"%s\"}";
+
       @Autowired
       private AccessControlRuleRepository accessControlRuleRepository;
 
       @Test
-      void testPostSubmodelDescriptorAuthorizedWithoutTokenExpectForbidden() throws Exception {
+      void testPostSubmodelDescriptorAuthorizedWithoutTokenExpectUnauthorized() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
                            .post( "/api/v3.0/submodel-descriptor/authorized" )
@@ -490,9 +509,354 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isForbidden() );
       }
+
+      private String getRequestForUrl( String url ) {
+         return String.format( EXISTING_URL_REQUEST_FORMAT, url );
+      }
    }
 
-   private String getRequestForUrl( String url ) {
-      return String.format( EXISTING_URL_REQUEST_FORMAT, url );
+   @Nested
+   @DisplayName( "Access rule endpoint Tests" )
+   class AccessRuleEndpointApiTest {
+
+      private static final String BPN = "BPN";
+      private static final String MANDATORY_NAME = "mandatory-name";
+      private static final String MANDATORY_VALUE = "mandatory-value";
+      private static final String VISIBLE = "visible";
+      private static final String SEMANTIC_ID = "semanticId";
+      private static final OffsetDateTime DATE_TIME_FROM = OffsetDateTime.now( ZoneOffset.UTC ).truncatedTo( ChronoUnit.SECONDS );
+      private static final OffsetDateTime DATE_TIME_TO = DATE_TIME_FROM.plusMinutes( 1L );
+
+      private final AasPolicy defaultPolicy = getAasPolicy( BPN, Map.of( MANDATORY_NAME, MANDATORY_VALUE ), Set.of( VISIBLE ), Set.of( SEMANTIC_ID ) );
+      @Autowired
+      private AccessControlRuleRepository accessControlRuleRepository;
+      @Autowired
+      private ObjectMapper objectMapper;
+
+      @Test
+      void testGetAccessRulesWithoutTokenExpectUnauthorized() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( "/api/v3.0/access-controls/rules" )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isUnauthorized() );
+      }
+
+      @Test
+      void testPostAccessRuleWithoutTokenExpectUnauthorized() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .post( "/api/v3.0/access-controls/rules" )
+                           .contentType( MediaType.APPLICATION_JSON )
+                           .content( objectMapper.writeValueAsString( new CreateAccessRule()
+                                 .policyType( PolicyType.AAS )
+                                 .policy( defaultPolicy )
+                                 .description( UUID.randomUUID().toString() ) ) )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isUnauthorized() );
+      }
+
+      @Test
+      void testGetAnAccessRuleWithoutTokenExpectUnauthorized() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( "/api/v3.0/access-controls/rules/1" )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isUnauthorized() );
+      }
+
+      @Test
+      void testPutAnAccessRuleWithoutTokenExpectUnauthorized() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .put( "/api/v3.0/access-controls/rules/1" )
+                           .contentType( MediaType.APPLICATION_JSON )
+                           .content( objectMapper.writeValueAsString( new ReadUpdateAccessRule()
+                                 .id( 1L )
+                                 .tid( jwtTokenFactory.tenantOne().getTenantId() )
+                                 .policyType( PolicyType.AAS )
+                                 .policy( defaultPolicy )
+                                 .description( UUID.randomUUID().toString() ) ) )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isUnauthorized() );
+      }
+
+      @Test
+      void testDeleteAnAccessRuleWithoutTokenExpectUnauthorized() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .delete( "/api/v3.0/access-controls/rules/1" )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isUnauthorized() );
+      }
+
+      @Test
+      void testGetAccessRulesWithWrongTokenExpectForbidden() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( "/api/v3.0/access-controls/rules" )
+                           .with( jwtTokenFactory.tenantOne().writeAccessRules() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isForbidden() );
+      }
+
+      @Test
+      void testPostAccessRuleWithWrongTokenExpectForbidden() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .post( "/api/v3.0/access-controls/rules" )
+                           .contentType( MediaType.APPLICATION_JSON )
+                           .content( objectMapper.writeValueAsString( new CreateAccessRule()
+                                 .policyType( PolicyType.AAS )
+                                 .policy( defaultPolicy )
+                                 .description( UUID.randomUUID().toString() ) ) )
+                           .with( jwtTokenFactory.tenantOne().readAccessRules() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isForbidden() );
+      }
+
+      @Test
+      void testGetAnAccessRuleWithWrongTokenExpectForbidden() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( "/api/v3.0/access-controls/rules/1" )
+                           .with( jwtTokenFactory.tenantOne().writeAccessRules() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isForbidden() );
+      }
+
+      @Test
+      void testPutAnAccessRuleWithWrongTokenExpectForbidden() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .put( "/api/v3.0/access-controls/rules/1" )
+                           .contentType( MediaType.APPLICATION_JSON )
+                           .content( objectMapper.writeValueAsString( new ReadUpdateAccessRule()
+                                 .id( 1L )
+                                 .tid( jwtTokenFactory.tenantOne().getTenantId() )
+                                 .policyType( PolicyType.AAS )
+                                 .policy( defaultPolicy )
+                                 .description( UUID.randomUUID().toString() ) ) )
+                           .with( jwtTokenFactory.tenantOne().readAccessRules() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isForbidden() );
+      }
+
+      @Test
+      void testDeleteAnAccessRuleWithWrongTokenExpectForbidden() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .delete( "/api/v3.0/access-controls/rules/1" )
+                           .with( jwtTokenFactory.tenantOne().readAccessRules() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isForbidden() );
+      }
+
+      @Test
+      void testGetAccessRulesWithTokenExpectSuccess() throws Exception {
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( "/api/v3.0/access-controls/rules" )
+                           .with( jwtTokenFactory.tenantOne().readAccessRules() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isOk() )
+               .andExpect( jsonPath( "$.items" ).exists() );
+      }
+
+      @Test
+      void testPostAccessRuleWithTokenExpectSuccess() throws Exception {
+         String description = UUID.randomUUID().toString();
+         String responseBody = mvc.perform(
+                     MockMvcRequestBuilders
+                           .post( "/api/v3.0/access-controls/rules" )
+                           .contentType( MediaType.APPLICATION_JSON )
+                           .content( objectMapper.writeValueAsString( new CreateAccessRule()
+                                 .policyType( PolicyType.AAS )
+                                 .policy( defaultPolicy )
+                                 .description( description )
+                                 .validFrom( DATE_TIME_FROM )
+                                 .validTo( DATE_TIME_TO ) ) )
+                           .with( jwtTokenFactory.tenantOne().writeAccessRules() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isCreated() )
+               .andExpect( jsonPath( "$.id" ).isNumber() )
+               .andExpect( jsonPath( "$.tid" ).value( jwtTokenFactory.tenantOne().getTenantId() ) )
+               .andExpect( jsonPath( "$.policyType" ).value( PolicyType.AAS.name() ) )
+               .andExpect( jsonPath( "$.policy" ).exists() )
+               .andExpect( jsonPath( "$.description" ).value( description ) )
+               .andExpect( jsonPath( "$.validFrom" ).value( DATE_TIME_FROM.toString() ) )
+               .andExpect( jsonPath( "$.validTo" ).value( DATE_TIME_TO.toString() ) )
+               .andReturn()
+               .getResponse()
+               .getContentAsString();
+         assertThat( objectMapper.readValue( responseBody, ReadUpdateAccessRule.class ).getPolicy() ).isEqualTo( defaultPolicy );
+      }
+
+      @Test
+      void testGetAnAccessRuleWithTokenExpectSuccess() throws Exception {
+         String description = UUID.randomUUID().toString();
+         AccessRule saved = saveDefaultRule( description );
+         String responseBody = mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( "/api/v3.0/access-controls/rules/" + saved.getId() )
+                           .with( jwtTokenFactory.tenantOne().readAccessRules() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isOk() )
+               .andExpect( jsonPath( "$.id" ).value( saved.getId() ) )
+               .andExpect( jsonPath( "$.tid" ).value( jwtTokenFactory.tenantOne().getTenantId() ) )
+               .andExpect( jsonPath( "$.policyType" ).value( PolicyType.AAS.name() ) )
+               .andExpect( jsonPath( "$.policy" ).exists() )
+               .andExpect( jsonPath( "$.description" ).value( description ) )
+               .andExpect( jsonPath( "$.validFrom" ).value( DATE_TIME_FROM.toString() ) )
+               .andExpect( jsonPath( "$.validTo" ).value( DATE_TIME_TO.toString() ) )
+               .andReturn()
+               .getResponse()
+               .getContentAsString();
+         assertThat( objectMapper.readValue( responseBody, ReadUpdateAccessRule.class ).getPolicy() ).isEqualTo( defaultPolicy );
+      }
+
+      @Test
+      void testPutAnAccessRuleWithTokenExpectSuccess() throws Exception {
+         AccessRulePolicy policy = new AccessRulePolicy();
+         policy.setAccessRules( new LinkedHashSet<>() );
+         AccessRule accessRule = new AccessRule();
+         accessRule.setTid( "tid" );
+         accessRule.setPolicyType( AccessRule.PolicyType.AAS );
+         accessRule.setPolicy( policy );
+         accessRule.setTargetTenant( "target" );
+         AccessRule saved = accessControlRuleRepository.saveAndFlush( accessRule );
+
+         String description = UUID.randomUUID().toString();
+         String responseBody = mvc.perform(
+                     MockMvcRequestBuilders
+                           .put( "/api/v3.0/access-controls/rules/" + saved.getId() )
+                           .contentType( MediaType.APPLICATION_JSON )
+                           .content( objectMapper.writeValueAsString( new ReadUpdateAccessRule()
+                                 .id( saved.getId() )
+                                 .tid( jwtTokenFactory.tenantOne().getTenantId() )
+                                 .policyType( PolicyType.AAS )
+                                 .policy( defaultPolicy )
+                                 .description( description )
+                                 .validFrom( DATE_TIME_FROM )
+                                 .validTo( DATE_TIME_TO ) ) )
+                           .with( jwtTokenFactory.tenantOne().writeAccessRules() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isOk() )
+               .andExpect( jsonPath( "$.id" ).value( saved.getId() ) )
+               .andExpect( jsonPath( "$.tid" ).value( jwtTokenFactory.tenantOne().getTenantId() ) )
+               .andExpect( jsonPath( "$.policyType" ).value( PolicyType.AAS.name() ) )
+               .andExpect( jsonPath( "$.policy" ).exists() )
+               .andExpect( jsonPath( "$.description" ).value( description ) )
+               .andExpect( jsonPath( "$.validFrom" ).value( DATE_TIME_FROM.toString() ) )
+               .andExpect( jsonPath( "$.validTo" ).value( DATE_TIME_TO.toString() ) )
+               .andReturn()
+               .getResponse()
+               .getContentAsString();
+         assertThat( objectMapper.readValue( responseBody, ReadUpdateAccessRule.class ).getPolicy() ).isEqualTo( defaultPolicy );
+      }
+
+      @Test
+      void testDeleteAnAccessRuleWithTokenExpectSuccess() throws Exception {
+         AccessRule saved = saveDefaultRule( UUID.randomUUID().toString() );
+         //verify that it exists
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( "/api/v3.0/access-controls/rules/" + saved.getId() )
+                           .with( jwtTokenFactory.tenantOne().readAccessRules() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isOk() );
+         //delete
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .delete( "/api/v3.0/access-controls/rules/" + saved.getId() )
+                           .with( jwtTokenFactory.tenantOne().writeAccessRules() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isNoContent() );
+         //verify that it does not exist
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .get( "/api/v3.0/access-controls/rules/" + saved.getId() )
+                           .with( jwtTokenFactory.tenantOne().readAccessRules() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isNotFound() );
+      }
+
+      private AccessRule saveDefaultRule( String description ) {
+         AccessRulePolicy policy = new AccessRulePolicy();
+         policy.setAccessRules( new LinkedHashSet<>( List.of(
+               new AccessRulePolicyValue( AccessRulePolicy.BPN_RULE_NAME, PolicyOperator.EQUALS, BPN, null ),
+               new AccessRulePolicyValue( AccessRulePolicy.MANDATORY_SPECIFIC_ASSET_IDS_RULE_NAME, PolicyOperator.INCLUDES, null, Set.of(
+                     new AccessRulePolicyValue( MANDATORY_NAME, PolicyOperator.EQUALS, MANDATORY_VALUE, null )
+               ) ),
+               new AccessRulePolicyValue( AccessRulePolicy.VISIBLE_SPECIFIC_ASSET_ID_NAMES_RULE_NAME, PolicyOperator.INCLUDES, null, Set.of(
+                     new AccessRulePolicyValue( "name", PolicyOperator.EQUALS, VISIBLE, null )
+               ) ),
+               new AccessRulePolicyValue( AccessRulePolicy.VISIBLE_SEMANTIC_IDS_RULE_NAME, PolicyOperator.INCLUDES, null, Set.of(
+                     new AccessRulePolicyValue( "modelUrn", PolicyOperator.EQUALS, SEMANTIC_ID, null )
+               ) )
+         ) ) );
+         AccessRule accessRule = new AccessRule();
+         accessRule.setTid( jwtTokenFactory.tenantOne().getTenantId() );
+         accessRule.setPolicyType( AccessRule.PolicyType.AAS );
+         accessRule.setPolicy( policy );
+         accessRule.setTargetTenant( jwtTokenFactory.tenantTwo().getTenantId() );
+         accessRule.setDescription( description );
+         accessRule.setValidFrom( DATE_TIME_FROM.toInstant() );
+         accessRule.setValidTo( DATE_TIME_TO.toInstant() );
+         return accessControlRuleRepository.saveAndFlush( accessRule );
+      }
+
+      private AasPolicy getAasPolicy( String bpn, Map<String, String> mandatoryName, Set<String> visible, Set<String> semanticIds ) {
+         final Set<AccessRuleValues> rules = new LinkedHashSet<>();
+         rules.add( new AccessRuleValues()
+               .attribute( AccessRulePolicy.BPN_RULE_NAME )
+               .operator( OperatorType.EQ )
+               .value( bpn ) );
+         rules.add( new AccessRuleValues()
+               .attribute( AccessRulePolicy.MANDATORY_SPECIFIC_ASSET_IDS_RULE_NAME )
+               .operator( OperatorType.INCLUDES )
+               .values( mandatoryName.entrySet().stream()
+                     .map( entry -> new AccessRuleValue()
+                           .attribute( entry.getKey() )
+                           .operator( OperatorType.EQ )
+                           .value( entry.getValue() ) )
+                     .collect( Collectors.toSet() ) ) );
+         rules.add( new AccessRuleValues()
+               .attribute( AccessRulePolicy.VISIBLE_SPECIFIC_ASSET_ID_NAMES_RULE_NAME )
+               .operator( OperatorType.INCLUDES )
+               .values( visible.stream()
+                     .map( item -> new AccessRuleValue()
+                           .attribute( "name" )
+                           .operator( OperatorType.EQ )
+                           .value( item ) )
+                     .collect( Collectors.toSet() ) ) );
+         rules.add( new AccessRuleValues()
+               .attribute( AccessRulePolicy.VISIBLE_SEMANTIC_IDS_RULE_NAME )
+               .operator( OperatorType.INCLUDES )
+               .values( semanticIds.stream()
+                     .map( item -> new AccessRuleValue()
+                           .attribute( "modelUrn" )
+                           .operator( OperatorType.EQ )
+                           .value( item ) )
+                     .collect( Collectors.toSet() ) ) );
+         return new AasPolicy().accessRules( rules );
+      }
    }
 }
