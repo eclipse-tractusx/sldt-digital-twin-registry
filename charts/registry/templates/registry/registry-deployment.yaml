@@ -69,8 +69,10 @@ spec:
           envFrom:
             - secretRef:
                 name: {{ include "dtr.fullname" . }}
+            {{- if .Values.enablePostgres }}
             - secretRef:
                 name: {{ .Values.postgresql.auth.existingSecret }}
+            {{- end }}
           resources:
 {{ .Values.registry.resources | toYaml | indent 12 }}
       imagePullSecrets:
