@@ -1,5 +1,6 @@
 /*******************************************************************************
  * Copyright (c) 2024 Robert Bosch Manufacturing Solutions GmbH and others
+ * Copyright (c) 2024 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -15,7 +16,6 @@
  * under the License.
  *
  * SPDX-License-Identifier: Apache-2.0
- *
  ******************************************************************************/
 
 package org.eclipse.tractusx.semantics.accesscontrol.api.model;

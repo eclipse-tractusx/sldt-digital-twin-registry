@@ -1,6 +1,6 @@
-/********************************************************************************
- * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
+/*******************************************************************************
+ * Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,7 +16,8 @@
  * under the License.
  *
  * SPDX-License-Identifier: Apache-2.0
- ********************************************************************************/
+ ******************************************************************************/
+
 package org.eclipse.tractusx.semantics.registry.model;
 
 import java.time.Instant;
