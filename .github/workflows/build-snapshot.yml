@@ -46,6 +46,7 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
           cache: maven
+          
       - name: Cache SonarCloud packages
         uses: actions/cache@v4
         with:
