@@ -98,9 +98,20 @@
 		<!-- test libs -->
 		<assertj.version>3.24.2</assertj.version>
 		<junit.version>5.9.3</junit.version>
+		<jacoco.version>0.8.11</jacoco.version>
+
+		<!-- sonar plugin -->
+		<sonar-maven-plugin.version>3.10.0.2594</sonar-maven-plugin.version>
+		
 
 		<!-- build -->
 		<maven.compiler.version>3.8.1</maven.compiler.version>
+
+
+		<!-- Sonar related properties -->
+		<sonar.organization>eclipse-tractusx</sonar.organization>
+		<sonar.projectKey>eclipse-tractusx_sldt-digital-twin-registry</sonar.projectKey>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 
 	<modules>
@@ -405,6 +416,27 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco.version}</version>
+				<executions>
+						<execution>
+								<goals>
+										<goal>prepare-agent</goal>
+								</goals>
+						</execution>
+						<execution>
+								<id>report</id>
+								<phase>test</phase>
+								<goals>
+										<goal>report</goal>
+								</goals>
+						</execution>
+				</executions>
+		</plugin>
+		</plugins>
 	</build>
 
 	<repositories>
