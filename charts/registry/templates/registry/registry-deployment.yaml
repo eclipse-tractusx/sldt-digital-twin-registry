@@ -1,6 +1,6 @@
-###############################################################
-# Copyright (c) 2021, 2023 Robert Bosch Manufacturing Solutions GmbH
-# Copyright (c) 2021, 2023 Contributors to the Eclipse Foundation
+################################################################################
+# Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
+# Copyright (c) 2021 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -16,7 +16,7 @@
 # under the License.
 #
 # SPDX-License-Identifier: Apache-2.0
-###############################################################
+################################################################################
 
 apiVersion: apps/v1
 kind: Deployment
@@ -35,14 +35,13 @@ spec:
         {{- include "dtr.selectorLabels" . | nindent 8 }}
     spec:
       securityContext:
-        runAsUser: 100
+        {{- toYaml .Values.registry.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           image: {{ .Values.registry.image.registry }}/{{ .Values.registry.image.repository }}:{{ .Values.registry.image.version | default .Chart.AppVersion }}
           imagePullPolicy: {{ .Values.registry.imagePullPolicy }}
           securityContext:
-            runAsUser: 100
-            allowPrivilegeEscalation: false
+            {{- toYaml .Values.registry.securityContext | nindent 12 }}
           {{- if not .Values.registry.authentication }}
           args: ["--spring.profiles.active=local"]
           {{- end }}
@@ -70,6 +69,10 @@ spec:
           envFrom:
             - secretRef:
                 name: {{ include "dtr.fullname" . }}
+            {{- if .Values.enablePostgres }}
+            - secretRef:
+                name: {{ .Values.postgresql.auth.existingSecret }}
+            {{- end }}
           resources:
 {{ .Values.registry.resources | toYaml | indent 12 }}
       imagePullSecrets:

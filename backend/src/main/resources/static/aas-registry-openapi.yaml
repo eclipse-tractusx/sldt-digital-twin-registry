@@ -1,6 +1,6 @@
-###############################################################
-# Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
-# Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
+################################################################################
+# Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
+# Copyright (c) 2021 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -16,7 +16,7 @@
 # under the License.
 #
 # SPDX-License-Identifier: Apache-2.0
-###############################################################
+################################################################################
 
 # aas-registry-openapi.yaml
 # https://app.swaggerhub.com/apis/Plattform_i40/AssetAdministrationShellRegistryServiceSpecification/V3.0_SSP-001
@@ -840,6 +840,48 @@ paths:
           description: Asset identifier key-value-pairs deleted successfully
       x-semanticIds:
         - https://admin-shell.io/aas/API/DeleteAllAssetLinksById/1/0/RC02
+  /submodel-descriptor/authorized:
+    post:
+      tags:
+        - _PRIVATE_ Submodel Access Control Registry API
+      summary: "Private endpoint that verifies whether the caller has access to the specified submodel endpoint or not."
+      operationId: PostSubmodelDescriptorAuthorized
+      parameters:
+        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
+      requestBody:
+        description: The URL of the target request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmodelEndpointAuthorization'
+        required: true
+      responses:
+        "200":
+          description: The caller has access to the specified endpoint
+        "400":
+          description: "Bad Request, e.g. the request parameters of the format of the request body is wrong."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
+        default:
+          description: Default error handling for unmentioned status codes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
 components:
   securitySchemes:
     bearerAuth:
@@ -1501,6 +1543,19 @@ components:
           type: string
         value:
           type: string
+    SubmodelEndpointAuthorization:
+      type: object
+      properties:
+        submodelEndpointUrl:
+          type: string
+          description: The full submodel endpoint URL requested by the end user (starting with the EDC Data Plane base URL and including the request path)
+          pattern: "^(http|https)://.+$"
+          minimum: 10
+          maximum: 2048
+          example: https://edc-dataplane/public/submodel/api/v2/path?param=true
+      required:
+        - submodelEndpointUrl
+      additionalProperties: false
   responses:
     bad-request:
       description: "Bad Request, e.g. the request parameters of the format of the request body is wrong."
@@ -1594,7 +1649,7 @@ components:
       in: header
       name: Edc-Bpn
       schema:
-        type: String
+        type: string
         description: Incoming external_subject_id/bpn
   #        format: byte
   examples:

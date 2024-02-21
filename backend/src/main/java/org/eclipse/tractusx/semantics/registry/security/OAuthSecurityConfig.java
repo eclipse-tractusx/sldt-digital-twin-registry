@@ -1,6 +1,6 @@
-/********************************************************************************
- * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
+/*******************************************************************************
+ * Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,7 +16,8 @@
  * under the License.
  *
  * SPDX-License-Identifier: Apache-2.0
- ********************************************************************************/
+ ******************************************************************************/
+
 package org.eclipse.tractusx.semantics.registry.security;
 
 import org.eclipse.tractusx.semantics.RegistryProperties;
@@ -68,10 +69,22 @@ public class OAuthSecurityConfig {
 
                     //getDescription allowed for reader
                     .requestMatchers( HttpMethod.GET, "/**/description" ).access( "@authorizationEvaluator.hasRoleViewDigitalTwin()" )
+
+                    //submodel access control requires special role
+                    .requestMatchers( HttpMethod.POST, "/**/submodel-descriptor/authorized" ).access( "@authorizationEvaluator.hasRoleSubmodelAccessControl()" )
+
+                    //read access rules
+                    .requestMatchers( HttpMethod.GET, "/**/access-controls/rules" ).access( "@authorizationEvaluator.hasRoleReadAccessRules()" )
+                    .requestMatchers( HttpMethod.GET, "/**/access-controls/rules/**" ).access( "@authorizationEvaluator.hasRoleReadAccessRules()" )
+
+                    //write access rules
+                    .requestMatchers( HttpMethod.POST, "/**/access-controls/rules" ).access( "@authorizationEvaluator.hasRoleWriteAccessRules()" )
+                    .requestMatchers( HttpMethod.PUT, "/**/access-controls/rules/**" ).access( "@authorizationEvaluator.hasRoleWriteAccessRules()" )
+                    .requestMatchers( HttpMethod.DELETE, "/**/access-controls/rules/**" ).access( "@authorizationEvaluator.hasRoleWriteAccessRules()" )
               )
               .csrf(CsrfConfigurer::disable)
-              .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-              .oauth2ResourceServer(oauth2ResourceServerConfigurer -> oauth2ResourceServerConfigurer.jwt());
+              .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy( SessionCreationPolicy.STATELESS ) )
+              .oauth2ResourceServer(oauth2ResourceServerConfigurer -> oauth2ResourceServerConfigurer.jwt() );
 
         return http.build();
     }

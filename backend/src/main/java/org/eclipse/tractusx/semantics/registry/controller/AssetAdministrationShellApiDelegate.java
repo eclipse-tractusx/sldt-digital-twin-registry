@@ -1,6 +1,6 @@
-/********************************************************************************
- * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
+/*******************************************************************************
+ * Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,11 +16,13 @@
  * under the License.
  *
  * SPDX-License-Identifier: Apache-2.0
- ********************************************************************************/
+ ******************************************************************************/
+
 package org.eclipse.tractusx.semantics.registry.controller;
 
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -148,9 +150,9 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     @Override
     public ResponseEntity<Void> putAssetAdministrationShellDescriptorById( byte[] aasIdentifier, AssetAdministrationShellDescriptor assetAdministrationShellDescriptor, @RequestHeader String externalSubjectId ) {
         Shell shell = shellMapper.fromApiDto( assetAdministrationShellDescriptor );
-        Shell shellFromDb = shellService.findShellByExternalId( getDecodedId( aasIdentifier),getExternalSubjectIdOrEmpty(externalSubjectId) );
-        shellService.update( shell.withId( shellFromDb.getId() ).withIdExternal(getDecodedId(aasIdentifier)  ),getDecodedId(aasIdentifier));
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        Shell shellFromDb = shellService.findShellByExternalIdWithoutFiltering( getDecodedId( aasIdentifier ) );
+        shellService.update( shell.withId( shellFromDb.getId() ).withIdExternal( getDecodedId( aasIdentifier ) ), getDecodedId( aasIdentifier ) );
+        return new ResponseEntity<>( HttpStatus.NO_CONTENT );
     }
 
     @Override
@@ -168,10 +170,10 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
             return new ResponseEntity<>(new GetAllAssetAdministrationShellIdsByAssetLink200Response(), HttpStatus.OK);
         }
 
-        List<SpecificAssetId> listSpecificAssetId =assetIds.stream().map( this::decodeSAID).collect( Collectors.toList());
-        GetAllAssetAdministrationShellIdsByAssetLink200Response result  =
-              shellService.findExternalShellIdsByIdentifiersByExactMatch(shellMapper.fromApiDto(listSpecificAssetId), limit, cursor,getExternalSubjectIdOrEmpty(externalSubjectId));
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        List<SpecificAssetId> listSpecificAssetId = assetIds.stream().map( this::decodeSAID).collect( Collectors.toList());
+        final var result  = shellService.findExternalShellIdsByIdentifiersByExactMatch(
+              shellMapper.fromApiDto(listSpecificAssetId), limit, cursor,getExternalSubjectIdOrEmpty(externalSubjectId));
+       return new ResponseEntity<>( result, HttpStatus.OK );
     }
 
     private SpecificAssetId decodeSAID(byte[] encodedId){
@@ -210,5 +212,5 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
             throw new IllegalArgumentException("Incorrect Base64 encoded value provided as parameter");
         }
     }
-    }
+}
 
