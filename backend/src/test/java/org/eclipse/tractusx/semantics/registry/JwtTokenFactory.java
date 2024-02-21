@@ -103,7 +103,10 @@ public class JwtTokenFactory {
                List.of( AuthorizationEvaluator.Roles.ROLE_VIEW_DIGITAL_TWIN,
                      AuthorizationEvaluator.Roles.ROLE_ADD_DIGITAL_TWIN,
                      AuthorizationEvaluator.Roles.ROLE_UPDATE_DIGITAL_TWIN,
-                     AuthorizationEvaluator.Roles.ROLE_DELETE_DIGITAL_TWIN )
+                     AuthorizationEvaluator.Roles.ROLE_DELETE_DIGITAL_TWIN,
+                     AuthorizationEvaluator.Roles.ROLE_SUBMODEL_ACCESS_CONTROL,
+                     AuthorizationEvaluator.Roles.ROLE_READ_ACCESS_RULES,
+                     AuthorizationEvaluator.Roles.ROLE_WRITE_ACCESS_RULES )
          );
       }
 
@@ -125,6 +128,14 @@ public class JwtTokenFactory {
 
       public RequestPostProcessor submodelAccessControl() {
          return authenticationWithRoles( tenantId, List.of( AuthorizationEvaluator.Roles.ROLE_SUBMODEL_ACCESS_CONTROL ) );
+      }
+
+      public RequestPostProcessor readAccessRules() {
+         return authenticationWithRoles( tenantId, List.of( AuthorizationEvaluator.Roles.ROLE_READ_ACCESS_RULES ) );
+      }
+
+      public RequestPostProcessor writeAccessRules() {
+         return authenticationWithRoles( tenantId, List.of( AuthorizationEvaluator.Roles.ROLE_WRITE_ACCESS_RULES ) );
       }
 
       public RequestPostProcessor withoutResourceAccess() {
