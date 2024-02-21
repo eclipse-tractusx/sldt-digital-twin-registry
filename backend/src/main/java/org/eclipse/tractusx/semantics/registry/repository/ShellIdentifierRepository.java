@@ -20,6 +20,7 @@
 
 package org.eclipse.tractusx.semantics.registry.repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -27,6 +28,7 @@ import java.util.UUID;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
 import org.eclipse.tractusx.semantics.registry.model.projection.ShellIdentifierMinimal;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -41,19 +43,36 @@ public interface ShellIdentifierRepository extends JpaRepository<ShellIdentifier
    Set<ShellIdentifier> findByShellId( Shell shellId );
 
    @Query( value = """
-            SELECT NEW org.eclipse.tractusx.semantics.registry.model.projection.ShellIdentifierMinimal(sid.shellId.idExternal, sid.key, sid.value)
-            FROM ShellIdentifier sid
-            WHERE
-                 sid.shellId.id IN (
-                    SELECT filtersid.shellId.id
-                    FROM ShellIdentifier filtersid
-                    WHERE
-                        CONCAT(filtersid.key, filtersid.value) IN (:keyValueCombinations)
-                    GROUP BY filtersid.shellId.id
-                    HAVING COUNT(*) = :keyValueCombinationsSize
-                )
+           SELECT s.id
+           FROM ShellIdentifier sid
+              JOIN sid.shellId s
+           WHERE
+              CONCAT( sid.key, sid.value ) IN ( :keyValueCombinations )
+              AND (
+                 s.createdDate > :cutoffDate
+                 OR ( s.createdDate = :cutoffDate AND s.idExternal > :cursorValue )
+              )
+           GROUP BY s.id, s.createdDate, s.idExternal
+           HAVING COUNT(*) = :keyValueCombinationsSize
+           ORDER BY s.createdDate ASC, s.idExternal ASC
          """ )
-   List<ShellIdentifierMinimal> findMinimalShellIdsBySpecificAssetIds( List<String> keyValueCombinations, int keyValueCombinationsSize );
+   List<UUID> findAPageOfShellIdsBySpecificAssetIds(
+         List<String> keyValueCombinations, int keyValueCombinationsSize, Instant cutoffDate, String cursorValue, Pageable pageable );
+
+   @Query( value = """
+            SELECT NEW org.eclipse.tractusx.semantics.registry.model.projection.ShellIdentifierMinimal(s.idExternal, sid.key, sid.value)
+            FROM ShellIdentifier sid
+               JOIN sid.shellId s
+            WHERE
+               s.id IN ( :shellIds )
+               AND (
+                  s.createdDate > :cutoffDate
+                  OR ( s.createdDate = :cutoffDate AND s.idExternal > :cursorValue )
+               )
+            ORDER BY s.createdDate ASC, s.idExternal ASC
+         """ )
+   List<ShellIdentifierMinimal> findMinimalShellIdsByShellIds(
+         List<UUID> shellIds, Instant cutoffDate, String cursorValue );
 
    /**
     * Returns external shell ids for the given keyValueCombinations.
@@ -74,7 +93,11 @@ public interface ShellIdentifierRepository extends JpaRepository<ShellIdentifier
          FROM shell s
             JOIN shell_identifier si ON s.id = si.fk_shell_id
          WHERE
-            CONCAT(si.namespace, si.identifier) IN (:keyValueCombinations)
+            CONCAT( si.namespace, si.identifier ) IN ( :keyValueCombinations )
+            AND (
+               s.created_date > :cutoffDate
+               OR ( s.created_date = :cutoffDate AND s.id_external > :cursorValue )
+            )
             AND (
                :tenantId = :owningTenantId
                OR si.namespace = :globalAssetId
@@ -90,8 +113,10 @@ public interface ShellIdentifierRepository extends JpaRepository<ShellIdentifier
                      AND sies.FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID = si.id
                )
             )
-         GROUP BY s.id_external
+         GROUP BY s.id_external, s.created_date
          HAVING COUNT(*) = :keyValueCombinationsSize
+         ORDER BY s.created_date, s.id_external
+         LIMIT :pageSize
          """, nativeQuery = true )
    List<String> findExternalShellIdsByIdentifiersByExactMatch( @Param( "keyValueCombinations" ) List<String> keyValueCombinations,
          @Param( "keyValueCombinationsSize" ) int keyValueCombinationsSize,
@@ -99,5 +124,8 @@ public interface ShellIdentifierRepository extends JpaRepository<ShellIdentifier
          @Param( "publicWildcardPrefix" ) String publicWildcardPrefix,
          @Param( "publicWildcardAllowedTypes" ) List<String> publicWildcardAllowedTypes,
          @Param( "owningTenantId" ) String owningTenantId,
-         @Param( "globalAssetId" ) String globalAssetId );
+         @Param( "globalAssetId" ) String globalAssetId,
+         @Param( "cutoffDate" ) Instant cutoffDate,
+         @Param( "cursorValue" ) String cursorValue,
+         @Param( "pageSize" ) int pageSize);
 }
