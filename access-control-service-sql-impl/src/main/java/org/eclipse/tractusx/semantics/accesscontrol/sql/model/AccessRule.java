@@ -56,7 +56,7 @@ public class AccessRule {
    @Null( groups = OnCreate.class )
    @NotNull( groups = OnUpdate.class )
    @Id
-   @GeneratedValue( strategy = GenerationType.AUTO )
+   @GeneratedValue( strategy = GenerationType.SEQUENCE, generator = "ACCESS_RULE_SEQ")
    @Column( name = "ID", nullable = false, updatable = false )
    private Long id;
 

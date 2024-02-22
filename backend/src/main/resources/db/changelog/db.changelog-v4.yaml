@@ -43,7 +43,6 @@ databaseChangeLog:
                     nullable: false
                     validateNullable: true
                   autoIncrement: true
-                  generationType: ALWAYS
                   startWith: 1
                   incrementBy: 50
               - column:

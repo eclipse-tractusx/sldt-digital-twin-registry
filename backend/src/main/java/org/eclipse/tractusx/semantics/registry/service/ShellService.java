@@ -494,6 +494,7 @@ public class ShellService {
       } ).collect( Collectors.toList() );
    }
 
+   @Transactional(readOnly = true)
    public boolean hasAccessToShellWithVisibleSubmodelEndpoint( String endpointAddress, String externalSubjectId ) {
       List<Shell> shells = shellRepository.findAllBySubmodelEndpointAddress( endpointAddress );
       List<Shell> filtered = shellAccessHandler.filterListOfShellProperties( shells, externalSubjectId );
