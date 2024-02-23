@@ -36,3 +36,16 @@ In case you want to publish your image into a remote container registry, apply t
 
 ## Install Instructions
 For detailed install instructions please refer to our [INSTALL.md](https://github.com/eclipse-tractusx/sldt-digital-twin-registry/blob/main/INSTALL.md)
+
+## License
+[Apache License 2.0](https://github.com/eclipse-tractusx/sldt-digital-twin-registry/blob/main/LICENSE)
+
+## Notice for Docker image
+Below you can find the information regarding Docker Notice for this application.
+
+- [digital-twin-registry Docker Notice](https://github.com/eclipse-tractusx/sldt-digital-twin-registry/blob/main/backend/DOCKER_NOTICE.md)
+
+## Contact
+Contact the Eclipse Tractus-X developers via the developer mailing list.
+
+* https://accounts.eclipse.org/mailing-list/tractusx-dev
