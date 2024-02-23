@@ -48,7 +48,7 @@ registry:
   idpClientId: default-client
   tenantId: default-tenant
   externalSubjectIdWildcardPrefix: PUBLIC_READABLE
-  externalSubjectIdWildcardAllowedTypes: manufacturerPartId,assetLifecyclePhase
+  externalSubjectIdWildcardAllowedTypes: manufacturerPartId,digitalTwinType
   useGranularAccessControl: "false"
   service:
     port: 8080
