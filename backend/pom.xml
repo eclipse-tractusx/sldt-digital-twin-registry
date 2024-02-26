@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (c) 2021-2023 T-Systems International GmbH
-    Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
+    Copyright (c) 2021 T-Systems International GmbH and others
+    Copyright (c) 2021 Contributors to the Eclipse Foundation
 
     See the NOTICE file(s) distributed with this work for additional
     information regarding copyright ownership.
@@ -17,7 +17,7 @@
     under the License.
 
     SPDX-License-Identifier: Apache-2.0
--->
+  -->
 
 <!-- Maven POM file to the SLDT services -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -52,32 +52,30 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.eclipse.tractusx.digital_twin_registry</groupId>
+            <artifactId>digital-twin-registry-access-control-service-interface</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.tractusx.digital_twin_registry</groupId>
+            <artifactId>digital-twin-registry-access-control-service-sql-impl</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-        <!-- Springboot 3 requires Jakarta 6. But Jetty is not compatible with Jakarta 6 yet. But the tests needs jakarta in version 6.0.0.
-          Temporary solution until jetty will be compatible with Jakarta (version +12.See https://www.eclipse.org/lists/jetty-users/msg10348.html):
-          1. Define jakarta dependency with 6.0.0 and scope test. Add dot to end of groupId.
-          2. Define jakarta dependency with 5.0.0 to run the application successfuly.
-          -> Maven run the tests first then compile.
-          TODO: If new jetty is available, remove the test dependency and use jakarta in version 6.0.0
-          -->
-        <dependency>
-            <groupId>jakarta.servlet.</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-            <version>6.0.0</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
             <exclusions>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
         </dependency>
         <dependency>
             <groupId>jakarta.validation</groupId>

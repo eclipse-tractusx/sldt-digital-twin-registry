@@ -1,0 +1,154 @@
+[
+  {
+    "id": 1, "tid": "TENANT_ONE", "targetTenant": "TENANT_ONE",
+    "policyType": "AAS", "policy": {
+      "accessRules": [
+        { "attribute": "bpn", "operator": "eq", "value": "TENANT_ONE" },
+        {
+          "attribute": "mandatorySpecificAssetIds", "operator": "includes",
+          "values": [
+            { "attribute": "identifier1KeyExample", "operator": "eq", "value": "identifier1ValueExample" },
+            { "attribute": "identifier2KeyExample", "operator": "eq", "value": "identifier2ValueExample" }
+          ]
+        },
+        {
+          "attribute": "visibleSpecificAssetIdNames", "operator": "includes",
+          "values": [
+            { "attribute": "name", "operator": "eq", "value": "identifier1KeyExample" },
+            { "attribute": "name", "operator": "eq", "value": "identifier2KeyExample" }
+          ]
+        },
+        {
+          "attribute": "visibleSemanticIds", "operator": "includes",
+          "values": [ { "attribute": "modelUrn", "operator": "eq", "value": "semanticIdExample" } ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 2, "tid": "TENANT_ONE", "targetTenant": "TENANT_ONE",
+    "policyType": "AAS", "policy": {
+      "accessRules": [
+        { "attribute": "bpn", "operator": "eq", "value": "TENANT_ONE" },
+        {
+          "attribute": "mandatorySpecificAssetIds", "operator": "includes",
+          "values": [
+            { "attribute": "findExternal_1_tenantOne", "operator": "eq", "value": "value_1:tenantOne" }
+          ]
+        },
+        {
+          "attribute": "visibleSpecificAssetIdNames", "operator": "includes",
+          "values": [
+            { "attribute": "name", "operator": "eq", "value": "findExternal_1_tenantOne" }
+          ]
+        },
+        {
+          "attribute": "visibleSemanticIds", "operator": "includes",
+          "values": [ { "attribute": "modelUrn", "operator": "eq", "value": "semanticIdExample" } ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 3, "tid": "TENANT_ONE", "targetTenant": "TENANT_TWO",
+    "policyType": "AAS", "policy": {
+      "accessRules": [
+        { "attribute": "bpn", "operator": "eq", "value": "TENANT_TWO" },
+        {
+          "attribute": "mandatorySpecificAssetIds", "operator": "includes",
+          "values": [
+            { "attribute": "CustomerPartId", "operator": "eq", "value": "tenantTwoAssetIdValue" },
+            { "attribute": "MaterialNumber", "operator": "eq", "value": "withoutTenantAssetIdValue" },
+            { "attribute": "BPID", "operator": "eq", "value": "ignoreWildcard" }
+          ]
+        },
+        {
+          "attribute": "visibleSpecificAssetIdNames", "operator": "includes",
+          "values": [
+            { "attribute": "name", "operator": "eq", "value": "CustomerPartId" },
+            { "attribute": "name", "operator": "eq", "value": "MaterialNumber" },
+            { "attribute": "name", "operator": "eq", "value": "BPID" },
+            { "attribute": "name", "operator": "eq", "value": "manufacturerPartId" }
+          ]
+        },
+        {
+          "attribute": "visibleSemanticIds", "operator": "includes",
+          "values": [ { "attribute": "modelUrn", "operator": "eq", "value": "semanticIdExample" } ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 4, "tid": "TENANT_ONE", "targetTenant": "TENANT_TWO",
+    "policyType": "AAS", "policy": {
+      "accessRules": [
+        { "attribute": "bpn", "operator": "eq", "value": "TENANT_TWO" },
+        {
+          "attribute": "mandatorySpecificAssetIds", "operator": "includes",
+          "values": [
+            { "attribute": "tenantTwo", "operator": "eq", "value": "value_2_public" }
+          ]
+        },
+        {
+          "attribute": "visibleSpecificAssetIdNames", "operator": "includes",
+          "values": [
+            { "attribute": "name", "operator": "eq", "value": "tenantTwo" }
+          ]
+        },
+        {
+          "attribute": "visibleSemanticIds", "operator": "includes",
+          "values": [ { "attribute": "modelUrn", "operator": "eq", "value": "semanticIdExample" } ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 5, "tid": "TENANT_ONE", "targetTenant": "TENANT_TWO",
+    "policyType": "AAS", "policy": {
+      "accessRules": [
+        { "attribute": "bpn", "operator": "eq", "value": "TENANT_TWO" },
+        {
+          "attribute": "mandatorySpecificAssetIds", "operator": "includes",
+          "values": [
+            { "attribute": "tenantTwo", "operator": "eq", "value": "value_2_private" }
+          ]
+        },
+        {
+          "attribute": "visibleSpecificAssetIdNames", "operator": "includes",
+          "values": [
+            { "attribute": "name", "operator": "eq", "value": "tenantTwo" }
+          ]
+        },
+        {
+          "attribute": "visibleSemanticIds", "operator": "includes",
+          "values": [ { "attribute": "modelUrn", "operator": "eq", "value": "semanticIdExample" } ]
+        }
+      ]
+    }
+  },
+  {
+    "id": 999, "tid": "TENANT_ONE", "targetTenant": "PUBLIC_READABLE",
+    "policyType": "AAS", "policy": {
+      "accessRules": [
+        { "attribute": "bpn", "operator": "eq", "value": "PUBLIC_READABLE" },
+        {
+          "attribute": "mandatorySpecificAssetIds", "operator": "includes",
+          "values": [
+            { "attribute": "manufacturerPartId", "operator": "eq", "value": "value_2" }
+          ]
+        },
+        {
+          "attribute": "visibleSpecificAssetIdNames", "operator": "includes",
+          "values": [
+            { "attribute": "name", "operator": "eq", "value": "manufacturerPartId" },
+            { "attribute": "name", "operator": "eq", "value": "assetLifecyclePhase" }
+          ]
+        },
+        {
+          "attribute": "visibleSemanticIds", "operator": "includes",
+          "values": [ { "attribute": "modelUrn", "operator": "eq", "value": "semanticIdExample" } ]
+        }
+      ]
+    }
+  }
+]

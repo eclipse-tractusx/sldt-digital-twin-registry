@@ -1,7 +1,11 @@
 # DTR Postman Collection
 
 ## Postman
+### DTR Postman Collection:
 The postman collection can be used to call all provided APIs of the DTR.
+
+### Access rule management Postman Collection:
+The postman collection can be used to call all provided APIs of the access rule management.
 
 ### Setup Postman
 

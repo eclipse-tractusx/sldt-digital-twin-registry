@@ -1,6 +1,6 @@
-###############################################################
-# Copyright (c) 2021-2022 T-Systems International GmbH
-# Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+################################################################################
+# Copyright (c) 2021 T-Systems International GmbH and others
+# Copyright (c) 2021 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -16,7 +16,7 @@
 # under the License.
 #
 # SPDX-License-Identifier: Apache-2.0
-###############################################################
+################################################################################
 
 server:
   port: 4243
@@ -65,6 +65,8 @@ registry:
   external-subject-id-wildcard-allowed-types:
   idm:
     public-client-id: catenax-portal
+  use-granular-access-control: false
+  granular-access-control-fetch-size: 500
 
 springdoc:
   cache:

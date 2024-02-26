@@ -1,6 +1,6 @@
-/********************************************************************************
- * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
+/*******************************************************************************
+ * Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,7 +16,8 @@
  * under the License.
  *
  * SPDX-License-Identifier: Apache-2.0
- ********************************************************************************/
+ ******************************************************************************/
+
 package org.eclipse.tractusx.semantics.registry.repository;
 
 import java.util.Optional;
@@ -31,9 +32,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SubmodelRepository extends JpaRepository<Submodel, UUID> , JpaSpecificationExecutor<Submodel> {
+public interface SubmodelRepository extends JpaRepository<Submodel, UUID>, JpaSpecificationExecutor<Submodel> {
 
    Optional<Submodel> findByShellIdAndIdExternal( Shell shellId, String externalId );
-   @Query( value = "select s from Submodel s where s.shellId.id = :shellId and s.idExternal = :externalId")
-   Optional<Submodel> findMinimalRepresentationByShellIdAndIdExternal(@Param("shellId") UUID shellId,@Param("externalId") String externalId );
+
+   @Query( value = "SELECT s FROM Submodel s WHERE s.shellId.id = :shellId AND s.idExternal = :externalId" )
+   Optional<Submodel> findMinimalRepresentationByShellIdAndIdExternal( @Param( "shellId" ) UUID shellId, @Param( "externalId" ) String externalId );
 }

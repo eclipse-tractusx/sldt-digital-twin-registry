@@ -1,6 +1,6 @@
-/********************************************************************************
- * Copyright (c) 2021-2023 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2023 Contributors to the Eclipse Foundation
+/*******************************************************************************
+ * Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
+ * Copyright (c) 2021 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -16,103 +16,37 @@
  * under the License.
  *
  * SPDX-License-Identifier: Apache-2.0
- ********************************************************************************/
+ ******************************************************************************/
 
 package org.eclipse.tractusx.semantics.registry.service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import org.eclipse.tractusx.semantics.RegistryProperties;
+import org.eclipse.tractusx.semantics.accesscontrol.api.exception.DenyAccessException;
+import org.eclipse.tractusx.semantics.accesscontrol.api.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
-import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
-import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierExternalSubjectReferenceKey;
-import org.springframework.stereotype.Service;
+import org.eclipse.tractusx.semantics.registry.model.projection.ShellIdentifierMinimal;
+import org.eclipse.tractusx.semantics.registry.utils.ShellCursor;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.lang.Nullable;
 
-import lombok.extern.slf4j.Slf4j;
+public interface ShellAccessHandler {
 
-@Slf4j
-@Service
-public class ShellAccessHandler {
-   private final String owningTenantId;
-   private final String externalSubjectIdWildcardPrefix;
-   private final List<String> externalSubjectIdWildcardAllowedTypes;
+   @Nullable
+   Shell filterShellProperties( Shell shell, String externalSubjectId );
 
-   public ShellAccessHandler( RegistryProperties registryProperties ) {
-      this.owningTenantId = registryProperties.getIdm().getOwningTenantId();
-      this.externalSubjectIdWildcardPrefix = registryProperties.getExternalSubjectIdWildcardPrefix();
-      this.externalSubjectIdWildcardAllowedTypes = registryProperties.getExternalSubjectIdWildcardAllowedTypes();
+   List<Shell> filterListOfShellProperties( List<Shell> shells, String externalSubjectId );
+
+   Specification<Shell> shellFilterSpecification( String sortFieldName, ShellCursor cursor, String externalSubjectId );
+
+   default List<String> filterToVisibleShellIdsForLookup( Set<SpecificAssetId> userQuery, List<ShellIdentifierMinimal> shellIdentifiers,
+         String externalSubjectId )
+         throws DenyAccessException {
+      throw new UnsupportedOperationException( "Only supported in case of granular access control." );
    }
 
-   /**
-    * This method filter out the shell-properties based on externalSubjectId in the specificAssetIds.<br>
-    * 1. Condition: The owner of the shell has full access to the shell.<br>
-    * 2. Condition: If the given @param externalSubjectId is included in one of the specificAssetIds, all shell-properties are visible. Only the list of specificAssetIds are limited to given externalSubjectId.<br>
-    * 3. Condition: If the given @param externalSubjectId is not included in one of the specificAssetIds, only few properties are visible:idShort, submodelDescriptors
-    *
-    *
-    * @param shell
-    * @param externalSubjectId externalSubjectId/tenantId
-    * @return filtered Shell
-    */
-   public Shell filterShellProperties( Shell shell, String externalSubjectId ) {
-      if ( externalSubjectId.equals( owningTenantId ) ) {
-         return shell;
-      }
-
-      Set<ShellIdentifier> filteredIdentifiers = filterSpecificAssetIdsByTenantId( shell.getIdentifiers(), externalSubjectId );
-      boolean hasOnlyPublicAccess = !filteredIdentifiers.stream().anyMatch( shellIdentifier -> {
-               if ( shellIdentifier.getExternalSubjectId() == null ) {
-                  return false;
-               }
-               return shellIdentifier.getExternalSubjectId().getKeys().stream().anyMatch( key -> key.getValue().equals( externalSubjectId ) );
-            }
-      );
-
-      if ( hasOnlyPublicAccess ) {
-         // Filter out globalAssetId from specificAssetId. TODO: implement to save globalAssetId in separate database column
-         // GlobalAssetId is set via mapper. In case of only read access, no globalAssetId should be shown.
-         Set<ShellIdentifier> filteredIdentifiersWithNoGlobalAssetId = filteredIdentifiers.stream().filter(
-               shellIdentifier -> !shellIdentifier.getKey().equals( ShellIdentifier.GLOBAL_ASSET_ID_KEY ) )
-               .collect( Collectors.toSet() );
-         return new Shell()
-               .withIdentifiers(filteredIdentifiersWithNoGlobalAssetId)
-               .withSubmodels( shell.getSubmodels() )
-               .withIdExternal( shell.getIdExternal() )
-               .withId( shell.getId() )
-               .withCreatedDate( shell.getCreatedDate() );
-      }
-      return shell.withIdentifiers( filteredIdentifiers );
-   }
-
-   private Set<ShellIdentifier> filterSpecificAssetIdsByTenantId( Set<ShellIdentifier> shellIdentifiers, String tenantId ) {
-      // the owning tenant should always see all identifiers
-      if ( tenantId.equals( owningTenantId ) ) {
-         return shellIdentifiers;
-      }
-
-      Set<ShellIdentifier> externalSubjectIdSet = new HashSet<>();
-      for ( ShellIdentifier identifier : shellIdentifiers ) {
-         // Check if specificAssetId is globalAssetId -> TODO: implement to save globalAssetId in separate database column
-         if(identifier.getKey().equals( ShellIdentifier.GLOBAL_ASSET_ID_KEY )){
-            externalSubjectIdSet.add( identifier );
-         }
-         if ( identifier.getExternalSubjectId() != null ) {
-            Set<ShellIdentifierExternalSubjectReferenceKey> optionalReferenceKey =
-                  identifier.getExternalSubjectId().getKeys().stream().filter( shellIdentifierExternalSubjectReferenceKey ->
-                        // Match if externalSubjectId = tenantId
-                        shellIdentifierExternalSubjectReferenceKey.getValue().equals( tenantId ) ||
-                              // or match if externalSubjectId = externalSubjectIdWildcardPrefix and key of identifier (for example manufacturerPartId) is allowing wildcard.
-                              (shellIdentifierExternalSubjectReferenceKey.getValue().equals( externalSubjectIdWildcardPrefix ) &&
-                                    externalSubjectIdWildcardAllowedTypes.contains( identifier.getKey() )) ).collect( Collectors.toSet() );
-            if ( optionalReferenceKey != null && !optionalReferenceKey.isEmpty() ) {
-               identifier.getExternalSubjectId().setKeys( optionalReferenceKey );
-               externalSubjectIdSet.add( identifier );
-            }
-         }
-      }
-      return externalSubjectIdSet;
+   default boolean supportsGranularAccessControl() {
+      return false;
    }
 }
