@@ -53,6 +53,10 @@ public class RegistryProperties {
      * This flag turns on the granular access control logic if set to true.
      */
     private Boolean useGranularAccessControl;
+    /**
+     * Configures the number of records fetched in one batch when a page of shells is requested.
+     */
+    private Integer granularAccessControlFetchSize;
 
     /**
      * Properties for Identity Management system
