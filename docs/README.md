@@ -28,6 +28,27 @@ Because now the DTR is deployed decentralized on each Data Provider side. There 
 The whole search and the embedding of the now decentralized Digital Twin is shown below:
 
 ### decentralized Digital Twin Registry environment
+```mermaid
+graph TD
+    subgraph Consumer_Environment [Consumer Environment]
+        Consumer_Application[Consumer Application] --> Consumer_EDC[Consumer EDC]
+    end
+
+    subgraph Central_Environment [Portal]
+        Portal_SSI[SSI]
+    end
+
+    subgraph Provider_Environment[Provider Environment]
+        Provider_EDC --> Decentralized_DTR[Decentralized DTR]
+        Provider[Provider] --> |create twins| Decentralized_DTR
+        Keycloak -.->|get token| Provider
+        Keycloak -.->|get token| Provider_EDC 
+    end
+
+    Consumer_EDC -->|request twins| Provider_EDC
+    Consumer_EDC --> Central_Environment
+    Provider_EDC --> Central_Environment
+```
 
 ![](img/decentralEnviroment.PNG)
 
