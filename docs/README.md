@@ -430,6 +430,9 @@ The AAS Registry can be accessed on behalf of a user. The token has to be obtain
 *Support contact*	tractusx-dev@eclipse.org
 
 ### Access control to Digital Twins Based on the BPN (Business Partner Number)/ TenantId
+
+#### Classic implementation
+
 The visibility of `specificAssetIds` in the Digital Twin Registry based on the Business Partner Number (BPN) (Which is send via header Edc-Bpn) can be controlled with the attribute `externalSubjectId`. Hence, the `externalSubjectId` is identified with the BPN. 
 The communication between consumer and provider is via EDC. Before the provider EDC sends the request to the DTR, the property Edc-Bpn with the BPN of the consumer will be set by the provider EDC.
 
@@ -464,7 +467,6 @@ The defined string for `"PUBLIC_READABLE"` and the list of allowed types to mark
 * `registry.externalSubjectIdWildcardAllowedTypes` (Default is `"manufacturerPartId,assetLifecyclePhase"` )
 
 Detailed information can be found [here](../INSTALL.md)
-
 _________________
 
 
@@ -604,6 +606,201 @@ Any (external) readers with respect to the `"PUBLIC_READABLE"` flag at `specific
 * `submodelDescriptors`
 
 of this *Digital Twin*.
+
+#### Granular access control implementation
+
+The granular access control implementation is provided as an alternative option to enforce visibility rules of the *Digital Twin* details. These can be:
+
+1. The visibility of the *Digital Twin* as a whole
+2. The visibility of certain `specificAssetId` names and values of the *Digital Twin*
+3. The visibility of certain `submodelDescriptors` of the *Digital Twin*
+4. Restricting access to *Digital Twin* details which are `"PUBLIC_READABLE"` 
+   (only showing the `id`, the public readable `specificAssetId` names and values, the `createdDate` and the filtered `submodelDescriptors` )
+
+##### Configuring granular access control
+
+To enable granular access control (instead of the classic implementation), the `registry.useGranularAccessControl` configuration HELM chart property must be set to `"true"`.
+This will in turn set `registry.use-granular-access-control` Spring property to `true`, which will activate the granular access control.
+
+In addition to the aforementioned property, we can set the number of records fetched when listing records. This can be done by setting the 
+`registry.granularAccessControlFetchSize` HELM chart property. The default value is `"500"`. Providing this property will set the `registry.granular-access-control-fetch-size` 
+Spring property of the Digital Twin Registry to the equivalent int value. In general, the higher we can set this value, the fewer fetches will be required when shells are 
+listed and filtered. It is recommended to use at least 1000 if the registry has more than 100 000 Digital Twins.
+
+##### Creating an access rule
+
+The access rules can be managed using the provided access rule API ([See API specs here](../access-control-service-sql-impl/src/main/resources/static/access-control-openapi.yaml)).
+
+> [!NOTE] 
+> In order to use the API, the client must have the `read_access_rules` and `write_access_rules` roles.
+
+Please refer to the following table to get familiar with the schema of the access rules.
+
+| Property    | Type     | Required on create | Description                                                                            |
+|-------------|----------|--------------------|----------------------------------------------------------------------------------------|
+| id          | long     | No (read-only)     | The auto-incremented Id of the rule.                                                   |
+| tid         | string   | No (read-only)     | The Id of the owner tenant (the owner of the Digital Twin Registry).                   |
+| policyType  | enum     | Yes                | Defines the policy language used for the rule's policy. Possible values: `AAS`.        |
+| policy      | json     | Yes                | The definition of the access rule.                                                     |
+| description | string   | No (optional)      | An short, optional description or note to help with the maintenance of the rule.       |
+| validFrom   | datetime | No (optional)      | An optional timestamp representing the earlier time when the rule should be in effect. |
+| validTo     | datetime | No (optional)      | An optional timestamp representing the latest time when the rule should be in effect.  |
+
+An example policy:
+
+```json
+{
+   "id": 1,
+   "tid": "00000000-1111-2222-3333-444444444444",
+   "policyType": "AAS",
+   "policy": {
+      "accessRules": [
+         {
+            "attribute": "bpn",
+            "operator": "eq",
+            "value": "BPNL00000000000A"
+         },
+         {
+            "attribute": "mandatorySpecificAssetIds",
+            "operator": "includes",
+            "values": [
+               {
+                  "attribute": "manufacturerPartId",
+                  "operator": "eq",
+                  "value": "99991"
+               },
+               {
+                  "attribute": "customerPartId",
+                  "operator": "eq",
+                  "value": "ACME001"
+               }
+            ]
+         },
+         {
+            "attribute": "visibleSpecificAssetIdNames",
+            "operator": "includes",
+            "values": [
+               {
+                  "attribute": "name",
+                  "operator": "eq",
+                  "value": "manufacturerPartId"
+               },
+               {
+                  "attribute": "name",
+                  "operator": "eq",
+                  "value": "customerPartId"
+               },
+               {
+                  "attribute": "name",
+                  "operator": "eq",
+                  "value": "partInstanceId"
+               }
+            ]
+         },
+         {
+            "attribute": "visibleSemanticIds",
+            "operator": "includes",
+            "values": [
+               {
+                  "attribute": "modelUrn",
+                  "operator": "eq",
+                  "value": "Traceabilityv1.1.0"
+               },
+               {
+                  "attribute": "modelUrn",
+                  "operator": "eq",
+                  "value": "ProductCarbonFootprintv1.1.0"
+               }
+            ]
+         }
+      ]
+   },
+   "description": "Access rule description.",
+   "validFrom": "2024-01-02T03:04:05Z",
+   "validTo": "2024-06-07T08:09:10Z"
+}
+```
+
+The example policy above can be split into multiple parts when read.
+
+1. Validity - It is valid between `2024-01-02T03:04:05Z` and `2024-06-07T08:09:10Z`. Otherwise, it is ignored.
+2. Scope - Outlining when a rule is applicable.
+    1. The first access rule (`$.policy.accessRules[0]`) defines the *bpn* (*externalSubjectId*) of the tenant to whom the policy applies.
+    2. The second access rule (`$.policy.accessRules[1]`) defines the *mandatorySpecificAssetIds* which must be present in the *Digital Twin* in order for the rule to be applicable. The rule will become applicable only if __all__ *specificAssetId* name-value pairs of the rule are present in the *Digital Twin*.
+3. Effect - Defines which parts of the matching *Digital Twins* should be visible when the client's *externalSubjectId* matches the rule's.
+    1. The third access rule (`$.policy.accessRules[2]`) defines the *visibleSpecificAssetIdNames*. These are the names of the *specificAssetIds* from the *Digital Twin* which should be visible when the rule matches.
+    2. The fourth access rule (`$.policy.accessRules[3]`) defines the *visibleSemanticIds*. These *semanticIds* are identifying the *submodelDescriptors* from the *Digital Twin* which should be visible when the rule matches.
+
+##### How the rule evaluation works?
+
+In general, when a shell's visibility is evaluated, we must: 
+
+1. Take the *externalSubjectId* of the client, the *ownerTenantId* of the *Digital Twin Registry* and the contents of the *Digital Twin* in question.
+2. If the *externalSubjectId* is equal to the *ownerTenantId*, the client can see the full content.
+3. Otherwise, we must fetch all access rules which belong to the client's *externalSubjectId* or `PUBLIC_READABLE`; and is in the specified validity period
+4. Then, for each *specificAssetId* of the *Digital Twin*, we must verify whether there is at least one applicable rule that gives access to the *specificAssetId* of the *Digital Twin*. 
+5. Similarly, for each *submodelDescriptor* of the *Digital Twin*, we must verify whether there is at least one applicable rule that gives access to the *semanticId* of the *submodelDescriptor* from the *Digital Twin*.
+
+The process acn be summed up in a more visual way as shown in the diagram below:
+
+```mermaid
+flowchart LR
+    START
+    START-->isAdmin{Is\nexternalSubjectId\n=\nownerTenantId?}
+    isAdmin-- no -->fetchRules[Fetch valid rules\nfor externalSubjectId\nor PUBLIC_READABLE]
+    isAdmin-- yes -->showAll[Show full content]
+    fetchRules-->anyRules{Any rules found?}
+    anyRules-- yes -->startForEach((For each rule))
+    startForEach-->isRuleMatching{Is the\nrule matching\nthe Digital Twin?}
+   isRuleMatching-- no -->endForEach((For each rule))
+   isRuleMatching-- yes -->applyRule[Apply rule effect]
+   applyRule-->endForEach
+   endForEach-->isShellVisible{Is the\nDigital Twin\nvisible?}
+   isShellVisible-- yes -->showFiltered[Show filtered Digital Twin]
+   isShellVisible-- no -->denied[Hide Digital Twin]
+   anyRules-- no -->denied
+   showAll-->END
+    denied-->END
+    showFiltered-->END
+```
+
+###### Lookup shells - `GET {{baseUrl}}/api/v3.0/lookup/shells?assetIds=...`
+
+In case of the lookup shells, the filtering and access control of the *Digital Twins* is done using the following steps:
+
+1. A page (fetchSize) of *Digital Twins* is loaded which are matching the client's query expression.
+2. The list of shells fetched in the previous step is filtered by applying the access control rules to them one-by-one.
+3. The process is repeated until we have the desired number of *Digital Twins* or there are no more *Digital Twins* to fetch.
+4. The AAS Ids of the visible *Digital Twins* are returned.
+
+###### Get all shells - `GET {{baseUrl}}/api/v3.0/shell-descriptors`
+
+The process is similar to the lookup shells, the filtering and access control of the *Digital Twins* is done as follows:
+
+1. A page (fetchSize) of *Digital Twins* is loaded.
+2. The list of shells fetched in the previous step is filtered by applying the access control rules to them one-by-one.
+3. The process is repeated until we have the desired number of *Digital Twins* or there are no more *Digital Twins* to fetch.
+4. The visible properties of the visible *Digital Twins* are returned.
+
+###### Get Shell by AAS Id - `GET {{baseUrl}}/api/v3.0/shell-descriptors/:aasIdentifier`
+
+To determine the visibility of a single *Digital Twin*, we can simply:
+
+1. Fetch the *Digital Twin*
+2. Apply the access control rules using the process defined at the beginning of this section
+3. Return the visible parts of the *Digital Twin* (or empty result in case the *Digital Twin* is not visible at all)
+
+#### Public readable
+
+When a *Digital Twin* is only visible because there are applicable `PUBLIC_READABLE` rules which make certain properties visible,
+the shell details are further limited. This means, that we are returning only:
+
+- the `id`,
+- the `idEsternal` (*AAS Id*),
+- the public readable `specificAssetId` names and values,
+- the `createdDate`
+- the filtered `submodelDescriptors`
+
 
 ## 7 Quality scenarios
 
