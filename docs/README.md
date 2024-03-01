@@ -27,17 +27,56 @@ A consumer is searching for an endpoint for a Digital Twin. For this he uses the
 Because now the DTR is deployed decentralized on each Data Provider side. There are some new services to help to find twins. 
 The whole search and the embedding of the now decentralized Digital Twin is shown below:
 
-### decentralized Digital Twin Registry environment
+### Architectural Overview- Decentralized Digital Twin Registry environment
+```mermaid
+graph TD
+    subgraph Consumer_Environment [Consumer Environment]
+        Consumer_Application[Consumer Application] --> Consumer_EDC[Consumer EDC]
+    end
 
-![](img/decentralEnviroment.PNG)
+    subgraph Central_Environment [Portal]
+        Portal_SSI[SSI]
+    end
 
-### Architectural Overview
-![](img/Architecture_dDTR.PNG)
+    subgraph Provider_Environment[Provider Environment]
+        Provider_EDC --> Decentralized_DTR[Decentralized DTR]
+        Provider[Provider] --> |create twins| Decentralized_DTR
+        Keycloak -.->|get token| Provider
+        Keycloak -.->|get token| Provider_EDC 
+    end
+
+    Consumer_EDC -->|request twins| Provider_EDC
+    Consumer_EDC --> Central_Environment
+    Provider_EDC --> Central_Environment
+```
 
 ## Asset Administration Shell Domain Model
 The Asset Administration Shell Registry is an address book for Asset Administration Shell Descriptors. The diagram below, shows the domain model of the Asset Administration Shell Registry (AAS Registry).Only the main fields are shown.
+```mermaid
+classDiagram
+    AssetAdministrationShellDescriptor -- SubmodelDescriptor
+    AssetAdministrationShellDescriptor -- SpecificAssetId
+    SubmodelDescriptor -- Endpoint
+    Endpoint -- ProtocolInformation
+    
+    class AssetAdministrationShellDescriptor{
+      +String id
+    }
 
-![](img/Model_with_impotant_fields.PNG)
+    class SubmodelDescriptor{
+      +String id
+    }
+    class Endpoint{
+      -String id
+    }
+    class ProtocolInformation{
+      +String href
+    }
+    class SpecificAssetId{
+      +String name
+      +String value
+    }
+```
 
 The following table shows the synonyms for each of the domain objects above.
 
@@ -209,7 +248,12 @@ To be able to register a DigitalTwin the following prerequisites must be met.
 
 #### Register Twins (simplified without token management by IDM)
 
-![](img/POST_Register_Twin_simplified.PNG)
+```mermaid
+sequenceDiagram
+    Client->>+Decentralized digital Twin registry: POST /api/v3.0/shell-descriptors
+    Decentralized digital Twin registry->>+Client: 200 Ok Response success
+    Note left of Client: Registers the AAS Descriptor by providing <br>- assetIds to make discovery possible (e.g. VIN)<br>- Submodel Descriptor Endpoint 
+```
 
 ### Data Provider
 
@@ -330,9 +374,28 @@ At last both EDCs do the final negotiation and the consumer EDC receives the edr
 
 
 #### Search for Twins (simplified)
+```mermaid
+sequenceDiagram
+    participant Service
+    participant ConsumerEDC as Consumer EDC
+    participant ProviderEDC as Provider EDC
+    participant DecentralDigitalTwinRegistry as Decentral Digital Twin Registry
 
-![](img/GET_Endpoint_simplified.PNG)
-
+    Service->>+ConsumerEDC: GET EDR Token
+    ConsumerEDC->+ProviderEDC: EDC Negotiations
+    ConsumerEDC-->>-Service: EDR Token
+    Service->>+ProviderEDC: GET lookup/shells/assetIds
+    ProviderEDC->>+DecentralDigitalTwinRegistry: GET lookup/shells/assetIds
+    DecentralDigitalTwinRegistry-->>-ProviderEDC: AssetAdministrationShellIds
+    ProviderEDC-->>-Service: AssetAdministrationShellIds
+    Service->>+ProviderEDC: GET /shell-descriptors/{aasIdentifier}
+    ProviderEDC->>+DecentralDigitalTwinRegistry: GET /shell-descriptors/{aasIdentifier}
+    DecentralDigitalTwinRegistry-->>-ProviderEDC: AssetAdministrationShellDescriptor
+    ProviderEDC-->>-Service: AssetAdministrationShellDescriptor
+    Service->>Service: Extract Endpoint
+    Service->>ProviderEDC: Get Endpoint (from Submodel Descriptor)
+        ProviderEDC-->>-Service: Endpoint
+```
 ## 5 Deployment-view
 
 For Deployment needed:
@@ -423,10 +486,6 @@ Depending on being a Data Provider or a Data Consumer there are different tokens
 
 ### Authentication on behalf of a user
 The AAS Registry can be accessed on behalf of a user. The token has to be obtained via the OpenID Connect flow. The AAS Registry will validate these tokens.
-
-#### Postman configuration
-![](img/image005.png)
-
 *Support contact*	tractusx-dev@eclipse.org
 
 ### Access control to Digital Twins Based on the BPN (Business Partner Number)/ TenantId
