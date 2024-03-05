@@ -63,4 +63,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify --batch-mode sonar:sonar
+        run: mvn -B --batch-mode sonar:sonar -Dsonar.projectKey=eclipse-tractusx_sldt-digital-twin-registry
