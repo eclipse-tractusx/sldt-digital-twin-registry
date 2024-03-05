@@ -108,6 +108,7 @@
 
 		<!-- Sonar related properties -->
 		<sonar.organization>eclipse-tractusx</sonar.organization>
+		<sonar.projectName>sldt-digital-twin-registry</sonar.projectName>
 		<sonar.projectKey>eclipse-tractusx_sldt-digital-twin-registry</sonar.projectKey>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
