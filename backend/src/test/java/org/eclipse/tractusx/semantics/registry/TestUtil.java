@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetKind;
+import org.eclipse.tractusx.semantics.aas.registry.model.AssetLink;
 import org.eclipse.tractusx.semantics.aas.registry.model.Endpoint;
 import org.eclipse.tractusx.semantics.aas.registry.model.Key;
 import org.eclipse.tractusx.semantics.aas.registry.model.KeyTypes;
@@ -240,6 +241,20 @@ public class TestUtil {
       specificAssetId1.setSupplementalSemanticIds( List.of( reference ) );
       specificAssetId1.setExternalSubjectId( reference );
       return specificAssetId1;
+   }
+
+   public static AssetLink createAssetLink() {
+      AssetLink assetLink = new AssetLink();
+      assetLink.setName( "identifier1KeyExample" );
+      assetLink.setValue( "identifier1ValueExample" );
+      return assetLink;
+   }
+
+   public static AssetLink createAssetLink(String name, String value) {
+      AssetLink assetLink = new AssetLink();
+      assetLink.setName( name );
+      assetLink.setValue( value );
+      return assetLink;
    }
 
    public static SpecificAssetId createSpecificAssetId( String name, String value, List<String> externalSubjectIds ) {

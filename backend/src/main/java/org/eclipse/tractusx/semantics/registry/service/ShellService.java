@@ -42,6 +42,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.aas.registry.model.GetAllAssetAdministrationShellIdsByAssetLink200Response;
 import org.eclipse.tractusx.semantics.aas.registry.model.PagedResultPagingMetadata;
+import org.eclipse.tractusx.semantics.aas.registry.model.SearchAllShellsByAssetLink200Response;
 import org.eclipse.tractusx.semantics.accesscontrol.api.exception.DenyAccessException;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.registry.dto.BatchResultDto;
@@ -291,6 +292,33 @@ public class ShellService {
          return response;
       } catch ( DenyAccessException e ) {
          final var response = new GetAllAssetAdministrationShellIdsByAssetLink200Response();
+         response.setResult( Collections.emptyList() );
+         return response;
+      }
+   }
+
+   @Transactional( readOnly = true )
+   public SearchAllShellsByAssetLink200Response findExternalShellIdsByAssetLinkByExactMatch( Set<ShellIdentifier> shellIdentifiers,
+         Integer pageSize, String cursor, String externalSubjectId ) {
+
+      pageSize = getPageSize( pageSize );
+      final String cursorValue = getCursorDecoded( cursor ).orElse( DEFAULT_EXTERNAL_ID );
+      try {
+         final List<String> visibleAssetIds;
+         if ( shellAccessHandler.supportsGranularAccessControl() ) {
+            visibleAssetIds = fetchAPageOfAasIdsUsingGranularAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize );
+         } else {
+            visibleAssetIds = fetchAPageOfAasIdsUsingLegacyAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize );
+         }
+
+         final var assetIdList = visibleAssetIds.stream().limit( pageSize ).toList();
+         final String nextCursor = getCursorEncoded( visibleAssetIds, assetIdList );
+         final var response = new SearchAllShellsByAssetLink200Response();
+         response.setResult( assetIdList );
+         response.setPagingMetadata( new PagedResultPagingMetadata().cursor( nextCursor ) );
+         return response;
+      } catch ( DenyAccessException e ) {
+         final var response = new SearchAllShellsByAssetLink200Response();
          response.setResult( Collections.emptyList() );
          return response;
       }

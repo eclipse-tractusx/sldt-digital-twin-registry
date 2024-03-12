@@ -744,6 +744,59 @@ paths:
                   $ref: '#/components/examples/lookup-shells-by-aas-identifier-response'
       x-semanticIds:
         - https://admin-shell.io/aas/API/GetAllAssetAdministrationShellIdsByAssetLink/1/0/RC02
+  /lookup/shellsByAssetLink:
+    post:
+      tags:
+        - Registry and Discovery Interface
+      summary: Returns a list of Asset Administration Shell ids linked to specific Asset identifiers
+      operationId: SearchAllShellsByAssetLink
+      x-semanticIds:
+        - https://admin-shell.io/aas/API/SearchAllAssetAdministrationShellIdsByAssetLink/3/1
+      parameters:
+        - name: limit
+          in: query
+          description: The maximum number of elements in the response array
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+        - name: cursor
+          in: query
+          description: A server-generated identifier retrieved from pagingMetadata that specifies from which position the result listing should continue
+          required: false
+          schema:
+            type: string
+        - $ref: '#/components/parameters/ExternalSubjectIdHeader'
+      requestBody:
+        description: Asset identifier key-value-pairs
+        content:
+          application/json:
+            schema:
+              type: array
+              maxItems: 10000
+              items:
+                $ref: '#/components/schemas/AssetLink'
+            examples:
+              complete:
+                $ref: '#/components/examples/lookup-shells-by-aas-identifier-post'
+      responses:
+        '200':
+          description: Requested Asset Administration Shell ids
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PagedResult'
+                  - type: object
+                    properties:
+                      result:
+                        type: array
+                        items:
+                          type: string
+        '400':
+          $ref: 'https://api.swaggerhub.com/domains/Plattform_i40/Part2-API-Schemas/V3.1.0#/components/responses/bad-request'
+        default:
+          $ref: 'https://api.swaggerhub.com/domains/Plattform_i40/Part2-API-Schemas/V3.1.0#/components/responses/default'
   /lookup/shells/{aasIdentifier}:
     get:
       tags:
@@ -1401,6 +1454,18 @@ components:
           maxItems: 10000
           items:
             $ref: '#/components/schemas/ProtocolInformation_securityAttributes'
+    AssetLink:
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 64
+          pattern: "^([\\t\\n\\r -\ud7ff\ue000-\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
+        value:
+          type: string
+          minLength: 1
+          maxLength: 2000
+          pattern: "^([\\t\\n\\r -\ud7ff\ue000-\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
     SpecificAssetId:
       type: object
       allOf:
@@ -1653,6 +1718,18 @@ components:
         description: Incoming external_subject_id/bpn
   #        format: byte
   examples:
+    lookup-shells-by-aas-identifier-post:
+      value:
+        [
+          {
+            "name": "globalAssetId",
+            "value": "urn:uuid:882fc530-b69b-4707-95f6-5dbc5e9baaa8"
+          },
+          {
+            "name": "PartInstanceID",
+            "value": "24975539203421"
+          }
+        ]
     lookup-shells-by-aas-identifier-query:
       value:
         [

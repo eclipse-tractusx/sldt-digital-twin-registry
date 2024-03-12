@@ -22,7 +22,6 @@ package org.eclipse.tractusx.semantics.registry.controller;
 
 import java.util.Base64;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,9 +31,11 @@ import org.eclipse.tractusx.semantics.aas.registry.api.LookupApiDelegate;
 import org.eclipse.tractusx.semantics.aas.registry.api.ShellDescriptorsApiDelegate;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetKind;
+import org.eclipse.tractusx.semantics.aas.registry.model.AssetLink;
 import org.eclipse.tractusx.semantics.aas.registry.model.GetAllAssetAdministrationShellIdsByAssetLink200Response;
 import org.eclipse.tractusx.semantics.aas.registry.model.GetAssetAdministrationShellDescriptorsResult;
 import org.eclipse.tractusx.semantics.aas.registry.model.GetSubmodelDescriptorsResult;
+import org.eclipse.tractusx.semantics.aas.registry.model.SearchAllShellsByAssetLink200Response;
 import org.eclipse.tractusx.semantics.aas.registry.model.ServiceDescription;
 import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
@@ -174,6 +175,19 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
         final var result  = shellService.findExternalShellIdsByIdentifiersByExactMatch(
               shellMapper.fromApiDto(listSpecificAssetId), limit, cursor,getExternalSubjectIdOrEmpty(externalSubjectId));
        return new ResponseEntity<>( result, HttpStatus.OK );
+    }
+
+    @Override
+    public ResponseEntity<SearchAllShellsByAssetLink200Response> searchAllShellsByAssetLink(
+          Integer limit, String cursor, @RequestHeader String externalSubjectId,List<AssetLink> assetIds) {
+
+        if (assetIds == null || assetIds.isEmpty()) {
+            return new ResponseEntity<>(new SearchAllShellsByAssetLink200Response(), HttpStatus.OK);
+        }
+
+        final var result  = shellService.findExternalShellIdsByAssetLinkByExactMatch(
+              shellMapper.fromAssetLinkApiDto(assetIds), limit, cursor,getExternalSubjectIdOrEmpty(externalSubjectId));
+        return new ResponseEntity<>( result, HttpStatus.OK );
     }
 
     private SpecificAssetId decodeSAID(byte[] encodedId){
