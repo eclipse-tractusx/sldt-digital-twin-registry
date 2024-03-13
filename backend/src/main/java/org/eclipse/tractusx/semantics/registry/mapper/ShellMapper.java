@@ -61,6 +61,13 @@ public interface ShellMapper {
     })
     ShellIdentifier fromApiDto(SpecificAssetId apiDto);
 
+   @Mappings({
+         @Mapping(target = "key", source = "name"),
+   })
+   ShellIdentifier fromApiDto(AssetLink apiDto);
+
+   Set<ShellIdentifier> fromAssetLinkApiDto(List<AssetLink> apiDto);
+
    ShellIdentifierSupplemSemanticReference maptoShellIdentifierSupplemSemanticReference ( Reference supplementalSemanticId );
 
    ShellIdentifierSemanticReference maptoShellIdentifierSemanticReference ( Reference semanticId );
