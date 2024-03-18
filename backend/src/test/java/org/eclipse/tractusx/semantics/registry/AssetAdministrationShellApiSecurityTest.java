@@ -1276,7 +1276,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
       public void testGetDescriptionOnlyDeleteRoleExpectForbidden() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( "/api/v3.0/description" )
+                           .get( "/api/v3/description" )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.deleteTwin() )
                )
@@ -1288,7 +1288,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
       public void testGetDescriptionNoRoleExpectForbidden() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( "/api/v3.0/description" )
+                           .get( "/api/v3/description" )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.withoutRoles() )
                )
@@ -1300,7 +1300,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
       public void testGetDescriptionReadRoleExpectSuccess() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( "/api/v3.0/description" )
+                           .get( "/api/v3/description" )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.readTwin() )
                )
@@ -1312,7 +1312,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
       public void testGetDescriptionReadRoleExpectUnauthorized() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( "/api/v3.0/description" )
+                           .get( "/api/v3/description" )
                            .accept( MediaType.APPLICATION_JSON )
                )
                .andDo( MockMvcResultHandlers.print() )

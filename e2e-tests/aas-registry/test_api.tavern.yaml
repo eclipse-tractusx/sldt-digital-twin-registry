@@ -27,7 +27,7 @@ includes:
 stages:
   - name: Test get shell descriptors without access token
     request:
-      url: "{aas_registry_api_url:s}/api/v3.0/shell-descriptors"
+      url: "{aas_registry_api_url:s}/api/v3/shell-descriptors"
       method: GET
     response:
       status_code: 401
@@ -37,7 +37,7 @@ stages:
 
   - name: Authenticated request
     request:
-      url: "{aas_registry_api_url:s}/api/v3.0/shell-descriptors"
+      url: "{aas_registry_api_url:s}/api/v3/shell-descriptors"
       method: GET
       headers:
         Content-Type: application/json
@@ -61,7 +61,7 @@ stages:
 
   - name: Create shell descriptor expect success
     request:
-      url: "{aas_registry_api_url:s}/api/v3.0/shell-descriptors"
+      url: "{aas_registry_api_url:s}/api/v3/shell-descriptors"
       method: POST
       headers:
         Content-Type: application/json
@@ -77,7 +77,7 @@ stages:
 
   - name: Get shell descriptor by id
     request:
-      url: "{aas_registry_api_url:s}/api/v3.0/shell-descriptors/{encoded_shell_id:s}"
+      url: "{aas_registry_api_url:s}/api/v3/shell-descriptors/{encoded_shell_id:s}"
       method: GET
       headers:
         Content-Type: application/json
@@ -97,7 +97,7 @@ stages:
 
   - name: Update shell descriptor by id
     request:
-      url: "{aas_registry_api_url:s}/api/v3.0/shell-descriptors/{encoded_shell_id:s}"
+      url: "{aas_registry_api_url:s}/api/v3/shell-descriptors/{encoded_shell_id:s}"
       method: PUT
       headers:
         Content-Type: application/json
@@ -111,7 +111,7 @@ stages:
 
   - name: Delete shell descriptor by id
     request:
-      url: "{aas_registry_api_url:s}/api/v3.0/shell-descriptors/{encoded_shell_id:s}"
+      url: "{aas_registry_api_url:s}/api/v3/shell-descriptors/{encoded_shell_id:s}"
       method: DELETE
       headers:
         Content-Type: application/json

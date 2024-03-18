@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added API POST lookup/shellsByAssetLink to retrieve shell ids without base64 encryption.
 - Added v3.1.0 postman collection for new API.
 ## fixed
+- Changed API path from api/v3.0/ to api/v3/
 
 ## 0.4.1-RC2
 ### Added

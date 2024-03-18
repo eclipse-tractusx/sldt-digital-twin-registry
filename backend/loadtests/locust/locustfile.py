@@ -37,7 +37,7 @@ class AasRegistryTask(HttpUser):
     def createAndQueryAasDescriptor(self):
         shell = generate_shell()
         headers = { 'Content-Type' : 'application/json', 'Edc-Bpn' : 'BPN_COMPANY_1'}
-        with self.client.post("/api/v3.0/shell-descriptors", data=json.dumps(shell), headers= headers, catch_response=True) as response:
+        with self.client.post("/api/v3/shell-descriptors", data=json.dumps(shell), headers= headers, catch_response=True) as response:
             if response.status_code != 201:
                 response.failure(f"Expected 201 but status code was {response.status_code}")
                 raise RescheduleTask()
@@ -45,14 +45,14 @@ class AasRegistryTask(HttpUser):
         shell_id = shell['id']
         shell_id_encoded = str(base64.urlsafe_b64encode(shell_id.encode("utf-8")), "utf-8")
 
-        with self.client.get(f"/api/v3.0/shell-descriptors/{shell_id_encoded}", name = "/api/v3.0/shell-descriptors/{id}", headers= headers, catch_response=True) as response:
+        with self.client.get(f"/api/v3/shell-descriptors/{shell_id_encoded}", name = "/api/v3/shell-descriptors/{id}", headers= headers, catch_response=True) as response:
             if response.status_code != 200:
                 response.failure(f"Expected 200 but status code was {response.status_code}")
                 raise RescheduleTask()
 
         specificAssetIds = shell['specificAssetIds']
         decodedAssetIds = urllib.parse.quote_plus(json.dumps(specificAssetIds))
-        with self.client.get(f"/api/v3.0/lookup/shells?assetIds={decodedAssetIds}", name = "/api/v3.0/lookup/shells?assetIds={assetIds}", headers= headers, catch_response=True) as response:
+        with self.client.get(f"/api/v3/lookup/shells?assetIds={decodedAssetIds}", name = "/api/v3/lookup/shells?assetIds={assetIds}", headers= headers, catch_response=True) as response:
             if response.status_code != 200:
                 response.failure(f"Expected 200 but status code was {response.status_code}")
                 raise RescheduleTask()

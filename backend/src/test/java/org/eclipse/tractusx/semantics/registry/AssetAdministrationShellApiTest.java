@@ -1231,7 +1231,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
       public void testGetDescriptionExpectSuccess() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( "/api/v3.0/description" )
+                           .get( "/api/v3/description" )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )

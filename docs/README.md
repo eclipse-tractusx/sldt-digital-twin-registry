@@ -250,7 +250,7 @@ To be able to register a DigitalTwin the following prerequisites must be met.
 
 ```mermaid
 sequenceDiagram
-    Client->>+Decentralized digital Twin registry: POST /api/v3.0/shell-descriptors
+    Client->>+Decentralized digital Twin registry: POST /api/v3/shell-descriptors
     Decentralized digital Twin registry->>+Client: 200 Ok Response success
     Note left of Client: Registers the AAS Descriptor by providing <br>- assetIds to make discovery possible (e.g. VIN)<br>- Submodel Descriptor Endpoint 
 ```
@@ -533,7 +533,7 @@ _________________
 Example to create a *Digital Twin* with `specificAssetIds`:
 ```
 POST Method:
-{{registry-baseurl}}/api/v3.0/shell-descriptors
+{{registry-baseurl}}/api/v3/shell-descriptors
 ```
 
 ```json
@@ -823,7 +823,7 @@ flowchart LR
     showFiltered-->END
 ```
 
-###### Lookup shells - `GET {{baseUrl}}/api/v3.0/lookup/shells?assetIds=...`
+###### Lookup shells - `GET {{baseUrl}}/api/v3/lookup/shells?assetIds=...`
 
 In case of the lookup shells, the filtering and access control of the *Digital Twins* is done using the following steps:
 
@@ -832,7 +832,7 @@ In case of the lookup shells, the filtering and access control of the *Digital T
 3. The process is repeated until we have the desired number of *Digital Twins* or there are no more *Digital Twins* to fetch.
 4. The AAS Ids of the visible *Digital Twins* are returned.
 
-###### Get all shells - `GET {{baseUrl}}/api/v3.0/shell-descriptors`
+###### Get all shells - `GET {{baseUrl}}/api/v3/shell-descriptors`
 
 The process is similar to the lookup shells, the filtering and access control of the *Digital Twins* is done as follows:
 
@@ -841,7 +841,7 @@ The process is similar to the lookup shells, the filtering and access control of
 3. The process is repeated until we have the desired number of *Digital Twins* or there are no more *Digital Twins* to fetch.
 4. The visible properties of the visible *Digital Twins* are returned.
 
-###### Get Shell by AAS Id - `GET {{baseUrl}}/api/v3.0/shell-descriptors/:aasIdentifier`
+###### Get Shell by AAS Id - `GET {{baseUrl}}/api/v3/shell-descriptors/:aasIdentifier`
 
 To determine the visibility of a single *Digital Twin*, we can simply:
 
