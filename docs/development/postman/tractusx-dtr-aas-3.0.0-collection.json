@@ -25,7 +25,7 @@
 								}
 							}
 						},
-						"url": "{{baseUrl}}/api/v3/shell-descriptors"
+						"url": "{{baseUrl}}/api/v3.0/shell-descriptors"
 					},
 					"response": []
 				},
@@ -45,13 +45,13 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/v3/shell-descriptors",
+							"raw": "{{baseUrl}}/api/v3.0/shell-descriptors",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"v3",
+								"v3.0",
 								"shell-descriptors"
 							],
 							"query": [
@@ -91,13 +91,13 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/v3/shell-descriptors/:aasIdentifier",
+							"raw": "{{baseUrl}}/api/v3.0/shell-descriptors/:aasIdentifier",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"v3",
+								"v3.0",
 								"shell-descriptors",
 								":aasIdentifier"
 							],
@@ -130,13 +130,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/v3/shell-descriptors/:aasIdentifier",
+							"raw": "{{baseUrl}}/api/v3.0/shell-descriptors/:aasIdentifier",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"v3",
+								"v3.0",
 								"shell-descriptors",
 								":aasIdentifier"
 							],
@@ -160,13 +160,13 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/v3/shell-descriptors/:aasIdentifier",
+							"raw": "{{baseUrl}}/api/v3.0/shell-descriptors/:aasIdentifier",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"v3",
+								"v3.0",
 								"shell-descriptors",
 								":aasIdentifier"
 							],
@@ -199,13 +199,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/v3/shell-descriptors/:aasIdentifier/submodel-descriptors",
+							"raw": "{{baseUrl}}/api/v3.0/shell-descriptors/:aasIdentifier/submodel-descriptors",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"v3",
+								"v3.0",
 								"shell-descriptors",
 								":aasIdentifier",
 								"submodel-descriptors"
@@ -237,13 +237,13 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/v3/shell-descriptors/:aasIdentifier/submodel-descriptors",
+							"raw": "{{baseUrl}}/api/v3.0/shell-descriptors/:aasIdentifier/submodel-descriptors",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"v3",
+								"v3.0",
 								"shell-descriptors",
 								":aasIdentifier",
 								"submodel-descriptors"
@@ -280,13 +280,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/v3/shell-descriptors/:aasIdentifier/submodel-descriptors/:submodelIdentifier",
+							"raw": "{{baseUrl}}/api/v3.0/shell-descriptors/:aasIdentifier/submodel-descriptors/:submodelIdentifier",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"v3",
+								"v3.0",
 								"shell-descriptors",
 								":aasIdentifier",
 								"submodel-descriptors",
@@ -326,13 +326,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/v3/shell-descriptors/:aasIdentifier/submodel-descriptors/:submodelIdentifier",
+							"raw": "{{baseUrl}}/api/v3.0/shell-descriptors/:aasIdentifier/submodel-descriptors/:submodelIdentifier",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"v3",
+								"v3.0",
 								"shell-descriptors",
 								":aasIdentifier",
 								"submodel-descriptors",
@@ -363,13 +363,13 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/v3/shell-descriptors/:aasIdentifier/submodel-descriptors/:submodelIdentifier",
+							"raw": "{{baseUrl}}/api/v3.0/shell-descriptors/:aasIdentifier/submodel-descriptors/:submodelIdentifier",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"v3",
+								"v3.0",
 								"shell-descriptors",
 								":aasIdentifier",
 								"submodel-descriptors",
@@ -409,13 +409,13 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/v3/lookup/shells?assetIds=[{\"name\":\"oen\",\"value\":\"1239485\"},{\"name\":\"manufacturePartId\",\"value\":\"1234\"}]",
+							"raw": "{{baseUrl}}/api/v3.0/lookup/shells?assetIds=[{\"name\":\"oen\",\"value\":\"1239485\"},{\"name\":\"manufacturePartId\",\"value\":\"1234\"}]",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"v3",
+								"v3.0",
 								"lookup",
 								"shells"
 							],
@@ -452,13 +452,13 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/v3/lookup/shells/:aasIdentifier",
+							"raw": "{{baseUrl}}/api/v3.0/lookup/shells/:aasIdentifier",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"v3",
+								"v3.0",
 								"lookup",
 								"shells",
 								":aasIdentifier"
@@ -496,13 +496,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/v3/lookup/shells/:aasIdentifier",
+							"raw": "{{baseUrl}}/api/v3.0/lookup/shells/:aasIdentifier",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"v3",
+								"v3.0",
 								"lookup",
 								"shells",
 								":aasIdentifier"
