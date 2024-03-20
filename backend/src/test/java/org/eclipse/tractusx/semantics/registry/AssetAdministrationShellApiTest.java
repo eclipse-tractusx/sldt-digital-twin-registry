@@ -24,12 +24,14 @@ import static org.eclipse.tractusx.semantics.registry.TestUtil.*;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
+import org.eclipse.tractusx.semantics.aas.registry.model.AssetLink;
 import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
 import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
@@ -774,6 +776,73 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                .andExpect( jsonPath( "$.result", hasSize( 0 ) ) );
       }
 
+
+      @Test
+      public void testFindExternalShellIdsByAssetLinkExpectSuccess() throws Exception {
+
+         AssetAdministrationShellDescriptor shellPayload1 = TestUtil.createCompleteAasDescriptor();
+         shellPayload1.setId( UUID.randomUUID().toString() );
+         performShellCreateRequest( mapper.writeValueAsString( shellPayload1 ) );
+
+         AssetAdministrationShellDescriptor shellPayload2 = TestUtil.createCompleteAasDescriptor();
+         shellPayload2.setId( UUID.randomUUID().toString() );
+         performShellCreateRequest( mapper.writeValueAsString( shellPayload2 ) );
+
+         AssetLink assetLink1 = TestUtil.createAssetLink();
+         List<AssetLink> list1 = new ArrayList<>();
+         list1.add( assetLink1 );
+
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .post( LOOKUP_SHELL_BASE_PATH_POST )
+                           .queryParam( "limit", "1" )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
+                           .accept( MediaType.APPLICATION_JSON )
+                           .contentType( MediaType.APPLICATION_JSON )
+                           .content( mapper.writeValueAsBytes(list1) )
+                           .with( jwtTokenFactory.allRoles() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isOk() )
+               .andExpect( jsonPath( "$.paging_metadata.cursor" ).exists() );
+
+         // Test first shell match with single assetLink
+
+         AssetLink assetLink2 = TestUtil.createAssetLink( "identifier99KeyExample", "identifier99ValueExample" );
+         List<AssetLink> list2 = new ArrayList<>();
+         list2.add( assetLink2 );
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .post( LOOKUP_SHELL_BASE_PATH_POST )
+                           .queryParam( "limit", "10" )
+                           .accept( MediaType.APPLICATION_JSON )
+                           .contentType( MediaType.APPLICATION_JSON )
+                           .content( mapper.writeValueAsBytes(list2) )
+                           .with( jwtTokenFactory.allRoles() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isOk() )
+               .andExpect( jsonPath( "$.paging_metadata.cursor" ).doesNotExist() );
+
+         // Test first and second shell match with common assetLink
+
+         AssetLink assetLink3 = TestUtil.createAssetLink( "commonAssetIdKey", "commonAssetIdValue" );
+         List<AssetLink> list3 = new ArrayList<>();
+         list3.add( assetLink3 );
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .post( LOOKUP_SHELL_BASE_PATH_POST )
+                           .queryParam( "limit", "10" )
+                           .accept( MediaType.APPLICATION_JSON )
+                           .contentType( MediaType.APPLICATION_JSON )
+                           .content( mapper.writeValueAsBytes(list3) )
+                           .with( jwtTokenFactory.allRoles() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isOk() )
+               .andExpect( jsonPath( "$.result", hasSize( 0 ) ) );
+      }
+
       @Test
       public void testFindExternalShellIdByGlobalAssetIdExpectSuccess() throws Exception {
 
@@ -796,6 +865,39 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                            .queryParam( "assetIds", encodedSa1)
                            .accept( MediaType.APPLICATION_JSON )
+                           .with( jwtTokenFactory.allRoles() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isOk() )
+               .andExpect( jsonPath( "$.result", hasSize( 1 ) ) )
+               // ensure that only three results match
+               .andExpect( jsonPath( "$.result", contains( shellPayload.getId() ) ) );
+      }
+
+      @Test
+      public void testFindExternalShellIdByGlobalAssetIdAssetLinkExpectSuccess() throws Exception {
+
+         String globalAssetId = UUID.randomUUID().toString();
+
+         AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+         shellPayload.setId( UUID.randomUUID().toString() );
+         shellPayload.setGlobalAssetId( globalAssetId );
+         String payload = mapper.writeValueAsString( shellPayload );
+         performShellCreateRequest(payload );
+
+         // for lookup global asset id is handled as AssetLink
+         AssetLink SAGlobal = TestUtil.createAssetLink("globalAssetId",globalAssetId);
+
+         List<AssetLink> list = new ArrayList<>();
+         list.add( SAGlobal );
+
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .post( LOOKUP_SHELL_BASE_PATH_POST )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
+                           .accept( MediaType.APPLICATION_JSON )
+                           .contentType( MediaType.APPLICATION_JSON )
+                           .content( mapper.writeValueAsBytes(list) )
                            .with( jwtTokenFactory.allRoles() )
                )
                .andDo( MockMvcResultHandlers.print() )
@@ -1129,7 +1231,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
       public void testGetDescriptionExpectSuccess() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( "/api/v3.0/description" )
+                           .get( "/api/v3/description" )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.allRoles() )
                )
