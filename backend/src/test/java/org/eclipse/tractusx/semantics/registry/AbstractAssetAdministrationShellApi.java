@@ -46,13 +46,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @EnableConfigurationProperties( RegistryProperties.class)
 public abstract class AbstractAssetAdministrationShellApi {
 
-    protected static final String SHELL_BASE_PATH = "/api/v3.0/shell-descriptors";
-    protected static final String SINGLE_SHELL_BASE_PATH = "/api/v3.0/shell-descriptors/{aasIdentifier}";
-    protected static final String LOOKUP_SHELL_BASE_PATH = "/api/v3.0/lookup/shells";
-    protected static final String LOOKUP_SHELL_BASE_PATH_POST = "/api/v3.0/lookup/shellsByAssetLink";
-    protected static final String SINGLE_LOOKUP_SHELL_BASE_PATH = "/api/v3.0/lookup/shells/{aasIdentifier}";
-    protected static final String SUB_MODEL_BASE_PATH = "/api/v3.0/shell-descriptors/{aasIdentifier}/submodel-descriptors";
-    protected static final String SINGLE_SUB_MODEL_BASE_PATH = "/api/v3.0/shell-descriptors/{aasIdentifier}/submodel-descriptors/{submodelIdentifier}";
+    protected static final String SHELL_BASE_PATH = "/api/v3/shell-descriptors";
+    protected static final String SINGLE_SHELL_BASE_PATH = "/api/v3/shell-descriptors/{aasIdentifier}";
+    protected static final String LOOKUP_SHELL_BASE_PATH = "/api/v3/lookup/shells";
+    protected static final String LOOKUP_SHELL_BASE_PATH_POST = "/api/v3/lookup/shellsByAssetLink";
+    protected static final String SINGLE_LOOKUP_SHELL_BASE_PATH = "/api/v3/lookup/shells/{aasIdentifier}";
+    protected static final String SUB_MODEL_BASE_PATH = "/api/v3/shell-descriptors/{aasIdentifier}/submodel-descriptors";
+    protected static final String SINGLE_SUB_MODEL_BASE_PATH = "/api/v3/shell-descriptors/{aasIdentifier}/submodel-descriptors/{submodelIdentifier}";
 
     protected static final String EXTERNAL_SUBJECT_ID_HEADER = "Edc-Bpn";
 
