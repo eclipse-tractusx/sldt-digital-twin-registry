@@ -790,8 +790,14 @@ The example policy above can be split into multiple parts when read.
     1. The first access rule (`$.policy.accessRules[0]`) defines the *bpn* (*externalSubjectId*) of the tenant to whom the policy applies.
     2. The second access rule (`$.policy.accessRules[1]`) defines the *mandatorySpecificAssetIds* which must be present in the *Digital Twin* in order for the rule to be applicable. The rule will become applicable only if __all__ *specificAssetId* name-value pairs of the rule are present in the *Digital Twin*.
 3. Effect - Defines which parts of the matching *Digital Twins* should be visible when the client's *externalSubjectId* matches the rule's.
-    1. The third access rule (`$.policy.accessRules[2]`) defines the *visibleSpecificAssetIdNames*. These are the names of the *specificAssetIds* from the *Digital Twin* which should be visible when the rule matches.
-    2. The fourth access rule (`$.policy.accessRules[3]`) defines the *visibleSemanticIds*. These *semanticIds* are identifying the *submodelDescriptors* from the *Digital Twin* which should be visible when the rule matches.
+    1. The third access rule (`$.policy.accessRules[2]`) defines the *visibleSpecificAssetIdNames*. When the rule matches, the *specificAssetIds* from the
+       *Digital Twin* with these names should be visible using one of the cases below:
+       1. When the same name is present as a name in the *mandatorySpecificAssetIds* and the *visibleSpecificAssetIdNames*, then the rule will only make a
+          *specificAssetId* from the *Digital Twin* when the *specificAssetId* is listed as an item of the *mandatorySpecificAssetIds*.
+       2. Otherwise, if the name is only present as a *visibleSpecificAssetIdNames* without being present on the *mandatorySpecificAssetIds* as well, the rule
+          will make visible any *specificAssetId* from the *Digital Twin* if the name of the *specificAssetId* matches the name from the *visibleSpecificAssetIdNames*,
+          regardless of the value of the *specificAssetId* in the *Digital Twin*.
+     2. The fourth access rule (`$.policy.accessRules[3]`) defines the *visibleSemanticIds*. These *semanticIds* are identifying the *submodelDescriptors* from the *Digital Twin* which should be visible when the rule matches.
 
 ##### How the rule evaluation works?
 
@@ -843,7 +849,10 @@ The process is similar to the lookup shells, the filtering and access control of
 2. The list of shells fetched in the previous step is filtered by applying the access control rules to them one-by-one.
 3. The process is repeated until we have the desired number of *Digital Twins* or there are no more *Digital Twins* to fetch.
 4. The visible properties of the visible *Digital Twins* are returned.
-
+   1. If the list of *specificAssetIds* in the shell has *multiple* entries with the same name, then the following rules apply:
+      1. Usecase 1: A rule includes a specificAssetId (for example customerPartId=123) as *mandatorySpecificAssetId and visibleSpecificAssetId*. The Shell has multiple entries with the same name and *one of the entry* matched the value from mandatorySpecificAssetId, then only the matched entry is visible.
+      2. Usecase 2: A rule includes a specificAssetId (for example customerPartId=123) as *mandatorySpecificAssetId and visibleSpecificAssetId*. The Shell has multiple entries with the same name and *none of the entries* matched the value from mandatorySpecificAssetId, then no entries with the same name is visible.
+      
 ###### Get Shell by AAS Id - `GET {{baseUrl}}/api/v3/shell-descriptors/:aasIdentifier`
 
 To determine the visibility of a single *Digital Twin*, we can simply:

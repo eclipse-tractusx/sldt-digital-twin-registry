@@ -24,6 +24,7 @@ import static org.eclipse.tractusx.semantics.registry.TestUtil.*;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
@@ -664,10 +665,6 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
 
       @Test
       public void testGetShellWithFilteredSpecificAssetIdsByTenantId() throws Exception {
-         AssetAdministrationShellDescriptor shellPayload = TestUtil
-               .createCompleteAasDescriptor( keyPrefix + "semanticId", "http://example.com/" );
-         shellPayload.setId( keyPrefix );
-         shellPayload.setSpecificAssetIds( null );
          SpecificAssetId asset1 = TestUtil.createSpecificAssetId( keyPrefix + "CustomerPartId", "tenantTwoAssetIdValue",
                List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
          SpecificAssetId asset2 = TestUtil.createSpecificAssetId( keyPrefix + "CustomerPartId2", "tenantThreeAssetIdValue",
@@ -680,11 +677,22 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
          SpecificAssetId asset5 = TestUtil.createSpecificAssetId( "manufacturerPartId", keyPrefix + "wildcardAllowed",
                List.of( getExternalSubjectIdWildcardPrefix() ) );
 
-         shellPayload.setSpecificAssetIds( List.of( asset1, asset2, asset3, asset4, asset5 ) );
+         List<SpecificAssetId> specificAssetIds = List.of( asset1, asset2, asset3, asset4, asset5 );
+         List<SpecificAssetId> expectedSpecificAssetIdsTenantTwo = List.of( asset1, asset3, asset5 );
+         testGetShellWithFilteredSpecificAssetIdsByTenantId( specificAssetIds, expectedSpecificAssetIdsTenantTwo );
+      }
+
+      public void testGetShellWithFilteredSpecificAssetIdsByTenantId( List<SpecificAssetId> specificAssetIds, List<SpecificAssetId> expectedSpecificAssetIds )
+            throws Exception {
+         AssetAdministrationShellDescriptor shellPayload = TestUtil
+               .createCompleteAasDescriptor( keyPrefix + "semanticId", "http://example.com/" );
+         shellPayload.setId( keyPrefix );
+         shellPayload.setSpecificAssetIds( specificAssetIds );
          performShellCreateRequest( mapper.writeValueAsString( shellPayload ) );
 
          String shellId = shellPayload.getId();
          String encodedShellId = getEncodedValue( shellId );
+
          // Owner of tenant has access to all specificAssetIds
          mvc.perform(
                      MockMvcRequestBuilders
@@ -696,11 +704,13 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isOk() )
                .andExpect( jsonPath( "$.id", equalTo( shellId ) ) )
-               .andExpect( jsonPath( "$.specificAssetIds[*].value",
-                     containsInAnyOrder( "tenantTwoAssetIdValue", "tenantThreeAssetIdValue", "withoutTenantAssetIdValue", "ignoreWildcard",
-                           keyPrefix + "wildcardAllowed" ) ) );
+               .andExpect( jsonPath( "$.specificAssetIds[*].name", hasItems( specificAssetIds.stream().map( SpecificAssetId::getName ).toArray() ) ) )
+               .andExpect( jsonPath( "$.specificAssetIds[*].value", hasItems( specificAssetIds.stream().map( SpecificAssetId::getValue ).toArray() ) ) );
 
          // test with tenant two
+         ArrayList<SpecificAssetId> hiddenSpecificAssetIds = new ArrayList<>( specificAssetIds );
+         hiddenSpecificAssetIds.removeAll( expectedSpecificAssetIds );
+
          mvc.perform(
                      MockMvcRequestBuilders
                            .get( SINGLE_SHELL_BASE_PATH, encodedShellId )
@@ -711,10 +721,10 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isOk() )
                .andExpect( jsonPath( "$.id", equalTo( shellId ) ) )
-               .andExpect( jsonPath( "$.specificAssetIds[*].value",
-                     hasItems( "tenantTwoAssetIdValue", "withoutTenantAssetIdValue", keyPrefix + "wildcardAllowed" ) ) )
-               .andExpect( jsonPath( "$.specificAssetIds[*].value",
-                     not( hasItems( "tenantThreeAssetIdValue", "ignoreWildcard" ) ) ) );
+               .andExpect( jsonPath( "$.specificAssetIds[*].name", hasItems( expectedSpecificAssetIds.stream().map( SpecificAssetId::getName ).toArray() ) ) )
+               .andExpect( jsonPath( "$.specificAssetIds[*].value", hasItems( expectedSpecificAssetIds.stream().map( SpecificAssetId::getValue ).toArray() ) ) )
+               .andExpect(
+                     jsonPath( "$.specificAssetIds[*].value", not( hasItems( hiddenSpecificAssetIds.stream().map( SpecificAssetId::getValue ).toArray() ) ) ) );
       }
 
       @Test
