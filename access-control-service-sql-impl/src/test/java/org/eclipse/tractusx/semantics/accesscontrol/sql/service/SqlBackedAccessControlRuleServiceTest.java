@@ -29,6 +29,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -89,19 +90,37 @@ class SqlBackedAccessControlRuleServiceTest {
    public static Stream<Arguments> matchingSpecificAssetIdVisibilityProvider() {
       return Stream.<Arguments> builder()
             .add( Arguments.of(
-                  Set.of( MANUFACTURER_PART_ID_99991, CUSTOMER_PART_ID_ACME001, PART_INSTANCE_ID_00001, VERSION_NUMBER_01 ),
+                  Set.of( MANUFACTURER_PART_ID_99991, CUSTOMER_PART_ID_ACME001, PART_INSTANCE_ID_00001, PART_INSTANCE_ID_00002, VERSION_NUMBER_01 ),
                   BPNA,
-                  Set.of( MANUFACTURER_PART_ID, CUSTOMER_PART_ID, PART_INSTANCE_ID, VERSION_NUMBER ),
+                  Map.of(
+                        MANUFACTURER_PART_ID_99991.name(),
+                        Set.of(),
+                        CUSTOMER_PART_ID_ACME001.name(), Set.of(),
+                        PART_INSTANCE_ID_00001.name(), Set.of( PART_INSTANCE_ID_00001.value() ),
+                        VERSION_NUMBER_01.name(), Set.of()
+                  ),
                   Set.of( TRACEABILITYV_1_1_0 ) ) )
             .add( Arguments.of(
                   Set.of( MANUFACTURER_PART_ID_99991, CUSTOMER_PART_ID_ACME001, PART_INSTANCE_ID_00002, REVISION_NUMBER_01 ),
                   BPNA,
-                  Set.of( MANUFACTURER_PART_ID, CUSTOMER_PART_ID, PART_INSTANCE_ID, REVISION_NUMBER ),
+                  Map.of(
+                        MANUFACTURER_PART_ID_99991.name(), Set.of(),
+                        CUSTOMER_PART_ID_ACME001.name(), Set.of(),
+                        PART_INSTANCE_ID_00001.name(), Set.of(),
+                        REVISION_NUMBER_01.name(), Set.of()
+                  ),
                   Set.of( PRODUCT_CARBON_FOOTPRINTV_1_1_0 ) ) )
             .add( Arguments.of(
                   Set.of( MANUFACTURER_PART_ID_99991, CUSTOMER_PART_ID_ACME001, PART_INSTANCE_ID_00001, VERSION_NUMBER_01, REVISION_NUMBER_01 ),
                   BPNA,
-                  Set.of( MANUFACTURER_PART_ID, CUSTOMER_PART_ID, PART_INSTANCE_ID, REVISION_NUMBER, VERSION_NUMBER ),
+                  Map.of(
+                        MANUFACTURER_PART_ID_99991.name(),
+                        Set.of(),
+                        CUSTOMER_PART_ID_ACME001.name(), Set.of(),
+                        PART_INSTANCE_ID_00001.name(), Set.of(),
+                        VERSION_NUMBER_01.name(), Set.of(),
+                        REVISION_NUMBER_01.name(), Set.of()
+                  ),
                   Set.of( PRODUCT_CARBON_FOOTPRINTV_1_1_0, TRACEABILITYV_1_1_0 ) ) )
             .build();
    }
@@ -165,7 +184,7 @@ class SqlBackedAccessControlRuleServiceTest {
    @MethodSource( "matchingSpecificAssetIdVisibilityProvider" )
    void testFetchVisibilityCriteriaForShellWhenMatchingSpecificAssetIdsProvidedExpectFilteringList(
          Set<SpecificAssetId> specificAssetIds, String bpn,
-         Set<String> expectedSpecificAssetIdNames, Set<String> expectedSemanticIds ) throws DenyAccessException {
+         Map<String, Set<String>> expectedSpecificAssetIdNames, Set<String> expectedSemanticIds ) throws DenyAccessException {
       ShellVisibilityContext shellContext = new ShellVisibilityContext( UUID.randomUUID().toString(), specificAssetIds );
 
       final var actual = underTest.fetchVisibilityCriteriaForShell( shellContext, bpn );

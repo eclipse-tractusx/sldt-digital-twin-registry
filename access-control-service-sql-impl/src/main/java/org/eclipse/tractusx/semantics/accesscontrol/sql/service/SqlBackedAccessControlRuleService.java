@@ -22,6 +22,8 @@ package org.eclipse.tractusx.semantics.accesscontrol.sql.service;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -65,9 +67,11 @@ public class SqlBackedAccessControlRuleService implements AccessControlRuleServi
                      .filter( accessControlRule -> aShellContext.specificAssetIds().containsAll( accessControlRule.getMandatorySpecificAssetIds() ) )
                      .flatMap( accessControlRule -> accessControlRule.getVisibleSpecificAssetIdNames().stream() )
                      .collect( Collectors.toSet() );
+               Map<String, Set<String>> duplicatedSpecificAssetIds = getDuplicateSpecificAssetIds( aShellContext );
                return aShellContext.specificAssetIds().stream()
-                     .filter( id -> visibleSpecificAssetIdNames.contains( id.name() ) )
-                     .collect( Collectors.toSet() ).containsAll( userQuery );
+                     .filter( id -> isSpecificAssetIdVisible( id, visibleSpecificAssetIdNames, duplicatedSpecificAssetIds ) )
+                     .collect( Collectors.toSet() )
+                     .containsAll( userQuery );
             } )
             .map( ShellVisibilityContext::aasId )
             .toList();
@@ -76,15 +80,28 @@ public class SqlBackedAccessControlRuleService implements AccessControlRuleServi
    @Override
    public ShellVisibilityCriteria fetchVisibilityCriteriaForShell( ShellVisibilityContext shellContext, String bpn ) throws DenyAccessException {
       Set<AccessRulePolicy> matchingAccessControlRules = findMatchingAccessControlRules( shellContext, bpn );
-      Set<String> visibleSpecificAssetIdNames = matchingAccessControlRules.stream()
-            .flatMap( accessControlRule -> accessControlRule.getVisibleSpecificAssetIdNames().stream() )
-            .collect( Collectors.toSet() );
+
+      Map<String, Set<String>> duplicatedSpecificAssetIds = getDuplicateSpecificAssetIds( shellContext );
+
+      Map<String, Set<String>> visibleSpecificAssetIds = new HashMap<>();
+      matchingAccessControlRules.forEach( rule -> {
+         rule.getMandatorySpecificAssetIds().forEach( specificAssetId -> {
+            if ( duplicatedSpecificAssetIds.containsKey( specificAssetId.name() ) ) {
+               visibleSpecificAssetIds.computeIfAbsent( specificAssetId.name(), k -> new HashSet<>() ).add( specificAssetId.value() );
+            }
+         } );
+
+         rule.getVisibleSpecificAssetIdNames().forEach( specificAssetIdName -> {
+            visibleSpecificAssetIds.computeIfAbsent( specificAssetIdName, k -> new HashSet<>() );
+         } );
+      } );
+
       Set<String> visibleSemanticIds = matchingAccessControlRules.stream()
             .map( AccessRulePolicy::getVisibleSemanticIds )
             .flatMap( Collection::stream )
             .collect( Collectors.toSet() );
       boolean publicOnly = matchingAccessControlRules.stream().noneMatch( rule -> rule.getBpn().equals( bpn ) );
-      return new ShellVisibilityCriteria( shellContext.aasId(), visibleSpecificAssetIdNames, visibleSemanticIds, publicOnly );
+      return new ShellVisibilityCriteria( shellContext.aasId(), visibleSpecificAssetIds, visibleSemanticIds, publicOnly );
    }
 
    @Override
@@ -122,5 +139,21 @@ public class SqlBackedAccessControlRuleService implements AccessControlRuleServi
          throw new DenyAccessException( NO_MATCHING_RULES_ARE_FOUND );
       }
       return matching;
+   }
+
+   private Map<String, Set<String>> getDuplicateSpecificAssetIds( ShellVisibilityContext shellContext ) {
+      return shellContext.specificAssetIds().stream()
+            .collect( Collectors.groupingBy( SpecificAssetId::name,
+                  Collectors.mapping( SpecificAssetId::value, Collectors.toSet() ) ) )
+            .entrySet().stream()
+            .filter( specificAssetIds -> specificAssetIds.getValue().size() > 1 )
+            .collect( Collectors.toMap( Map.Entry::getKey, Map.Entry::getValue ) );
+   }
+
+   private boolean isSpecificAssetIdVisible( SpecificAssetId specificAssetId, Set<String> visibleSpecificAssetIds,
+         Map<String, Set<String>> duplicatedSpecificAssetIds ) {
+      Set<String> identifierValues = duplicatedSpecificAssetIds.getOrDefault( specificAssetId.name(), Set.of() );
+      return visibleSpecificAssetIds.contains( specificAssetId.name() )
+            && (identifierValues.isEmpty() || identifierValues.contains( specificAssetId.value() ));
    }
 }
