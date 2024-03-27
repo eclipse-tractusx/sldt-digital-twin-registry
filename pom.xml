@@ -95,6 +95,9 @@
 		<h2.version>2.2.220</h2.version>
 		<liquibase.version>4.19.1</liquibase.version>
 
+		<!-- EDC -->
+		<edc.version>0.5.2-20240321-SNAPSHOT</edc.version>
+
 		<!-- test libs -->
 		<assertj.version>3.24.2</assertj.version>
 		<junit.version>5.9.3</junit.version>
@@ -107,6 +110,7 @@
 		<module>backend</module>
         <module>access-control-service-interface</module>
         <module>access-control-service-sql-impl</module>
+        <module>libraries/edc-extension</module>
         <!-- more modules are expected to come -->
     </modules>
 
@@ -280,6 +284,23 @@
 				<version>${snakeyaml.version}</version>
 			</dependency>
 
+			<!-- EDC -->
+			<dependency>
+				<groupId>org.eclipse.edc</groupId>
+				<artifactId>connector-core</artifactId>
+				<version>${edc.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.edc</groupId>
+				<artifactId>data-plane-spi</artifactId>
+				<version>${edc.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.edc</groupId>
+				<artifactId>data-plane-http-spi</artifactId>
+				<version>${edc.version}</version>
+			</dependency>
+
 			<!-- Persistence -->
 			<dependency>
 				<groupId>org.postgresql</groupId>
@@ -412,6 +433,11 @@
 			<id>Maven Central</id>
 			<name>maven-central</name>
 			<url>https://repo1.maven.org/maven2/</url>
+		</repository>
+		<repository><!-- Delete once new EDC signaling API dependencies are released -->
+			<id>Maven Snapshots</id>
+			<name>maven-snapshots</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
 		</repository>
 	</repositories>
 
