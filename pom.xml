@@ -96,7 +96,7 @@
 		<liquibase.version>4.19.1</liquibase.version>
 
 		<!-- EDC -->
-		<edc.version>0.5.2-20240327-SNAPSHOT</edc.version>
+		<edc.version>0.6.0</edc.version>
 
 		<!-- test libs -->
 		<assertj.version>3.24.2</assertj.version>
@@ -344,6 +344,18 @@
 				<version>10.1.18</version>
 				<scope>test</scope>
 			</dependency>
+			<dependency>
+				<groupId>org.eclipse.edc</groupId>
+				<artifactId>junit</artifactId>
+				<version>${edc.version}</version>
+				<scope>test</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>junit</groupId>
+						<artifactId>junit</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -466,11 +478,6 @@
 			<id>Maven Central</id>
 			<name>maven-central</name>
 			<url>https://repo1.maven.org/maven2/</url>
-		</repository>
-		<repository><!-- Delete once new EDC signaling API dependencies are released -->
-			<id>Maven Snapshots</id>
-			<name>maven-snapshots</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
 		</repository>
 	</repositories>
 

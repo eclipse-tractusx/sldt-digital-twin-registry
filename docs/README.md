@@ -679,6 +679,9 @@ The granular access control implementation is provided as an alternative option 
 4. Restricting access to *Digital Twin* details which are `"PUBLIC_READABLE"` 
    (only showing the `id`, the public readable `specificAssetId` names and values, the `createdDate` and the filtered `submodelDescriptors` )
 
+> [!NOTE]
+> We have created an EDC extension to let you leverage the benefits of granular access control to the full extent. Please read the related details [here](EDC-extension-configuration.md)!
+
 ##### Configuring granular access control
 
 To enable granular access control (instead of the classic implementation), the `registry.useGranularAccessControl` configuration HELM chart property must be set to `"true"`.
