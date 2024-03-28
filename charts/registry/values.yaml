@@ -48,8 +48,9 @@ registry:
   idpClientId: default-client
   tenantId: default-tenant
   externalSubjectIdWildcardPrefix: PUBLIC_READABLE
-  externalSubjectIdWildcardAllowedTypes: manufacturerPartId,assetLifecyclePhase
+  externalSubjectIdWildcardAllowedTypes: manufacturerPartId,digitalTwinType
   useGranularAccessControl: "false"
+  granularAccessControlFetchSize: "500"
   service:
     port: 8080
     type: ClusterIP

@@ -345,7 +345,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
       void testPostSubmodelDescriptorAuthorizedWithoutTokenExpectUnauthorized() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .post( "/api/v3.0/submodel-descriptor/authorized" )
+                           .post( "/api/v3/submodel-descriptor/authorized" )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( HTTP_EDC_DATA_PLANE_URL_REQUEST )
                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
@@ -358,7 +358,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
       void testPostSubmodelDescriptorAuthorizedWithoutAppropriateRoleExpectForbidden() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .post( "/api/v3.0/submodel-descriptor/authorized" )
+                           .post( "/api/v3/submodel-descriptor/authorized" )
                            .contentType( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.readTwin() )
                            .content( HTTP_EDC_DATA_PLANE_URL_REQUEST )
@@ -372,7 +372,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
       void testPostSubmodelDescriptorAuthorizedWithoutContentExpectBadRequest() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .post( "/api/v3.0/submodel-descriptor/authorized" )
+                           .post( "/api/v3/submodel-descriptor/authorized" )
                            .contentType( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.tenantOne().submodelAccessControl() )
                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
@@ -385,7 +385,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
       void testPostSubmodelDescriptorAuthorizedWithoutTenantIdExpectForbidden() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .post( "/api/v3.0/submodel-descriptor/authorized" )
+                           .post( "/api/v3/submodel-descriptor/authorized" )
                            .contentType( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.tenantOne().submodelAccessControl() )
                            .content( HTTP_EDC_DATA_PLANE_URL_REQUEST )
@@ -398,7 +398,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
       void testPostSubmodelDescriptorAuthorizedWithoutAnyShellsExpectForbidden() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .post( "/api/v3.0/submodel-descriptor/authorized" )
+                           .post( "/api/v3/submodel-descriptor/authorized" )
                            .contentType( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.tenantOne().submodelAccessControl() )
                            .content( HTTP_EDC_DATA_PLANE_URL_REQUEST )
@@ -432,7 +432,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
          //Tenant two should not have access because the rule does not give access to any semanticIds
          mvc.perform(
                      MockMvcRequestBuilders
-                           .post( "/api/v3.0/submodel-descriptor/authorized" )
+                           .post( "/api/v3/submodel-descriptor/authorized" )
                            .contentType( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.tenantTwo().submodelAccessControl() )
                            .content( getRequestForUrl( EXISTING_URL + randomId ) )
@@ -466,7 +466,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
          //Tenant two should have access due to the matching shell and semantic Id values
          mvc.perform(
                      MockMvcRequestBuilders
-                           .post( "/api/v3.0/submodel-descriptor/authorized" )
+                           .post( "/api/v3/submodel-descriptor/authorized" )
                            .contentType( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.tenantTwo().submodelAccessControl() )
                            .content( getRequestForUrl( EXISTING_URL + randomId ) )
@@ -500,7 +500,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
          //Tenant three should have access due to the non-visible shell (as it is only visible to tenantTwo
          mvc.perform(
                      MockMvcRequestBuilders
-                           .post( "/api/v3.0/submodel-descriptor/authorized" )
+                           .post( "/api/v3/submodel-descriptor/authorized" )
                            .contentType( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.tenantThree().submodelAccessControl() )
                            .content( getRequestForUrl( EXISTING_URL + randomId ) )
@@ -537,7 +537,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
       void testGetAccessRulesWithoutTokenExpectUnauthorized() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( "/api/v3.0/access-controls/rules" )
+                           .get( "/api/v3/access-controls/rules" )
                )
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isUnauthorized() );
@@ -547,7 +547,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
       void testPostAccessRuleWithoutTokenExpectUnauthorized() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .post( "/api/v3.0/access-controls/rules" )
+                           .post( "/api/v3/access-controls/rules" )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( objectMapper.writeValueAsString( new CreateAccessRule()
                                  .policyType( PolicyType.AAS )
@@ -562,7 +562,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
       void testGetAnAccessRuleWithoutTokenExpectUnauthorized() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( "/api/v3.0/access-controls/rules/1" )
+                           .get( "/api/v3/access-controls/rules/1" )
                )
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isUnauthorized() );
@@ -572,7 +572,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
       void testPutAnAccessRuleWithoutTokenExpectUnauthorized() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .put( "/api/v3.0/access-controls/rules/1" )
+                           .put( "/api/v3/access-controls/rules/1" )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( objectMapper.writeValueAsString( new ReadUpdateAccessRule()
                                  .id( 1L )
@@ -589,7 +589,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
       void testDeleteAnAccessRuleWithoutTokenExpectUnauthorized() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .delete( "/api/v3.0/access-controls/rules/1" )
+                           .delete( "/api/v3/access-controls/rules/1" )
                )
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isUnauthorized() );
@@ -599,7 +599,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
       void testGetAccessRulesWithWrongTokenExpectForbidden() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( "/api/v3.0/access-controls/rules" )
+                           .get( "/api/v3/access-controls/rules" )
                            .with( jwtTokenFactory.tenantOne().writeAccessRules() )
                )
                .andDo( MockMvcResultHandlers.print() )
@@ -610,7 +610,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
       void testPostAccessRuleWithWrongTokenExpectForbidden() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .post( "/api/v3.0/access-controls/rules" )
+                           .post( "/api/v3/access-controls/rules" )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( objectMapper.writeValueAsString( new CreateAccessRule()
                                  .policyType( PolicyType.AAS )
@@ -626,7 +626,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
       void testGetAnAccessRuleWithWrongTokenExpectForbidden() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( "/api/v3.0/access-controls/rules/1" )
+                           .get( "/api/v3/access-controls/rules/1" )
                            .with( jwtTokenFactory.tenantOne().writeAccessRules() )
                )
                .andDo( MockMvcResultHandlers.print() )
@@ -637,7 +637,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
       void testPutAnAccessRuleWithWrongTokenExpectForbidden() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .put( "/api/v3.0/access-controls/rules/1" )
+                           .put( "/api/v3/access-controls/rules/1" )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( objectMapper.writeValueAsString( new ReadUpdateAccessRule()
                                  .id( 1L )
@@ -655,7 +655,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
       void testDeleteAnAccessRuleWithWrongTokenExpectForbidden() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .delete( "/api/v3.0/access-controls/rules/1" )
+                           .delete( "/api/v3/access-controls/rules/1" )
                            .with( jwtTokenFactory.tenantOne().readAccessRules() )
                )
                .andDo( MockMvcResultHandlers.print() )
@@ -666,7 +666,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
       void testGetAccessRulesWithTokenExpectSuccess() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( "/api/v3.0/access-controls/rules" )
+                           .get( "/api/v3/access-controls/rules" )
                            .with( jwtTokenFactory.tenantOne().readAccessRules() )
                )
                .andDo( MockMvcResultHandlers.print() )
@@ -679,7 +679,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
          String description = UUID.randomUUID().toString();
          String responseBody = mvc.perform(
                      MockMvcRequestBuilders
-                           .post( "/api/v3.0/access-controls/rules" )
+                           .post( "/api/v3/access-controls/rules" )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( objectMapper.writeValueAsString( new CreateAccessRule()
                                  .policyType( PolicyType.AAS )
@@ -710,7 +710,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
          AccessRule saved = saveDefaultRule( description );
          String responseBody = mvc.perform(
                      MockMvcRequestBuilders
-                           .get( "/api/v3.0/access-controls/rules/" + saved.getId() )
+                           .get( "/api/v3/access-controls/rules/" + saved.getId() )
                            .with( jwtTokenFactory.tenantOne().readAccessRules() )
                )
                .andDo( MockMvcResultHandlers.print() )
@@ -742,7 +742,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
          String description = UUID.randomUUID().toString();
          String responseBody = mvc.perform(
                      MockMvcRequestBuilders
-                           .put( "/api/v3.0/access-controls/rules/" + saved.getId() )
+                           .put( "/api/v3/access-controls/rules/" + saved.getId() )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( objectMapper.writeValueAsString( new ReadUpdateAccessRule()
                                  .id( saved.getId() )
@@ -775,7 +775,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
          //verify that it exists
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( "/api/v3.0/access-controls/rules/" + saved.getId() )
+                           .get( "/api/v3/access-controls/rules/" + saved.getId() )
                            .with( jwtTokenFactory.tenantOne().readAccessRules() )
                )
                .andDo( MockMvcResultHandlers.print() )
@@ -783,7 +783,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
          //delete
          mvc.perform(
                      MockMvcRequestBuilders
-                           .delete( "/api/v3.0/access-controls/rules/" + saved.getId() )
+                           .delete( "/api/v3/access-controls/rules/" + saved.getId() )
                            .with( jwtTokenFactory.tenantOne().writeAccessRules() )
                )
                .andDo( MockMvcResultHandlers.print() )
@@ -791,7 +791,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
          //verify that it does not exist
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( "/api/v3.0/access-controls/rules/" + saved.getId() )
+                           .get( "/api/v3/access-controls/rules/" + saved.getId() )
                            .with( jwtTokenFactory.tenantOne().readAccessRules() )
                )
                .andDo( MockMvcResultHandlers.print() )

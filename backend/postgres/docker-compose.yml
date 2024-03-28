@@ -22,7 +22,7 @@ version: "3.9"
 services:
 
   postgres:
-    image: postgres:13.6-alpine
+    image: bitnami/postgresql:15.4.0-debian-11-r45
     container_name: postgres
     ports:
       - "5432:5432"

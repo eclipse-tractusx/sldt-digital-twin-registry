@@ -50,9 +50,9 @@ servers:
           - "443"
           - "4243"
       version_prefix:
-        default: v3.0
+        default: v3
         enum:
-          - v3.0
+          - v3
       context_root:
         description: Context root for the API
         default: ""

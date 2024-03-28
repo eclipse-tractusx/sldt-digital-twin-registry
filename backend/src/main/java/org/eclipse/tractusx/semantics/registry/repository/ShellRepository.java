@@ -20,6 +20,7 @@
 
 package org.eclipse.tractusx.semantics.registry.repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -142,4 +143,7 @@ public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecific
             )
          """)
    List<Shell> findAllBySubmodelEndpointAddress( String endpointAddress );
+
+   @Query("SELECT s.createdDate FROM Shell s WHERE s.idExternal = :idExternal")
+   Optional<Instant> getCreatedDateByIdExternal( String idExternal );
 }

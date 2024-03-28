@@ -29,7 +29,6 @@ databaseChangeLog:
             dataType: int
             incrementBy: 50
             minValue: 1
-            ordered: true
             sequenceName: ACCESS_RULE_SEQ
             startValue: 1
         - createTable:
@@ -44,7 +43,6 @@ databaseChangeLog:
                     nullable: false
                     validateNullable: true
                   autoIncrement: true
-                  generationType: ALWAYS
                   startWith: 1
                   incrementBy: 50
               - column:

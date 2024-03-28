@@ -26,7 +26,7 @@
 	<parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.2</version> <!-- need to be repeated in properties section for technical purposes -->
+        <version>3.2.3</version> <!-- need to be repeated in properties section for technical purposes -->
         <relativePath/> <!-- lookup parent from repository and not the filesystem -->
     </parent>
 
@@ -66,7 +66,7 @@
 
 		<!-- version properties -->
 		<!-- framework and base stuff -->
-		<spring.boot.version>3.2.2</spring.boot.version>
+		<spring.boot.version>3.2.3</spring.boot.version>
 		<springdoc.version>1.6.14</springdoc.version>
 		<lombok.version>1.18.24</lombok.version>
 		<swagger-annotations.version>1.5.20</swagger-annotations.version>
@@ -91,9 +91,12 @@
 		<!-- persistence -->
 		<mapstruct.version>1.5.3.Final</mapstruct.version>
 		<mapstruct.lombok.version>0.2.0</mapstruct.lombok.version>
-		<postgresql.version>42.5.1</postgresql.version>
+		<postgresql.version>42.7.2</postgresql.version>
 		<h2.version>2.2.220</h2.version>
 		<liquibase.version>4.19.1</liquibase.version>
+
+		<!-- EDC -->
+		<edc.version>0.5.2-20240321-SNAPSHOT</edc.version>
 
 		<!-- test libs -->
 		<assertj.version>3.24.2</assertj.version>
@@ -119,6 +122,7 @@
 		<module>backend</module>
         <module>access-control-service-interface</module>
         <module>access-control-service-sql-impl</module>
+        <module>libraries/edc-extension</module>
         <!-- more modules are expected to come -->
     </modules>
 
@@ -292,6 +296,23 @@
 				<version>${snakeyaml.version}</version>
 			</dependency>
 
+			<!-- EDC -->
+			<dependency>
+				<groupId>org.eclipse.edc</groupId>
+				<artifactId>connector-core</artifactId>
+				<version>${edc.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.edc</groupId>
+				<artifactId>data-plane-spi</artifactId>
+				<version>${edc.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.edc</groupId>
+				<artifactId>data-plane-http-spi</artifactId>
+				<version>${edc.version}</version>
+			</dependency>
+
 			<!-- Persistence -->
 			<dependency>
 				<groupId>org.postgresql</groupId>
@@ -445,6 +466,11 @@
 			<id>Maven Central</id>
 			<name>maven-central</name>
 			<url>https://repo1.maven.org/maven2/</url>
+		</repository>
+		<repository><!-- Delete once new EDC signaling API dependencies are released -->
+			<id>Maven Snapshots</id>
+			<name>maven-snapshots</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
 		</repository>
 	</repositories>
 

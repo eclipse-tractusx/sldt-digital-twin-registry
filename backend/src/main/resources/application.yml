@@ -66,6 +66,7 @@ registry:
   idm:
     public-client-id: catenax-portal
   use-granular-access-control: false
+  granular-access-control-fetch-size: 500
 
 springdoc:
   cache:
