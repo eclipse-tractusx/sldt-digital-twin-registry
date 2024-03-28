@@ -840,7 +840,10 @@ The process is similar to the lookup shells, the filtering and access control of
 2. The list of shells fetched in the previous step is filtered by applying the access control rules to them one-by-one.
 3. The process is repeated until we have the desired number of *Digital Twins* or there are no more *Digital Twins* to fetch.
 4. The visible properties of the visible *Digital Twins* are returned.
-
+   1. If the list of *specificAssetIds* in the shell has *multiple* entries with the same name, then the following rules apply:
+      1. Usecase 1: A rule includes a specificAssetId (for example customerPartId=123) as *mandatorySpecificAssetId and visibleSpecificAssetId*. The Shell has multiple entries with the same name and *one of the entry* matched the value from mandatorySpecificAssetId, then only the matched entry is visible.
+      2. Usecase 2: A rule includes a specificAssetId (for example customerPartId=123) as *mandatorySpecificAssetId and visibleSpecificAssetId*. The Shell has multiple entries with the same name and *none of the entries* matched the value from mandatorySpecificAssetId, then no entries with the same name is visible.
+      
 ###### Get Shell by AAS Id - `GET {{baseUrl}}/api/v3/shell-descriptors/:aasIdentifier`
 
 To determine the visibility of a single *Digital Twin*, we can simply:

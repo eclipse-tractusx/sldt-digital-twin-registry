@@ -22,6 +22,7 @@ package org.eclipse.tractusx.semantics.accesscontrol.api.model;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -37,7 +38,7 @@ class ShellVisibilityCriteriaTest {
       return Stream.<Arguments> builder()
             .add( Arguments.of( null, null, null, true ) )
             .add( Arguments.of( UUID.randomUUID().toString(), null, null, true ) )
-            .add( Arguments.of( null, Set.of(), null, false ) )
+            .add( Arguments.of( null, Map.of(), null, false ) )
             .add( Arguments.of( null, null, Set.of(), false ) )
             .build();
    }
@@ -45,7 +46,7 @@ class ShellVisibilityCriteriaTest {
    @ParameterizedTest
    @MethodSource( "nullProvider" )
    void testConstructorCalledWithNullExpectException(
-         String aasId, Set<String> visibleSpecificAssetIdNames, Set<String> visibleSemanticIds, boolean publicOnly ) {
+         String aasId, Map<String, Set<String>> visibleSpecificAssetIdNames, Set<String> visibleSemanticIds, boolean publicOnly ) {
       assertThatThrownBy( () -> new ShellVisibilityCriteria( aasId, visibleSpecificAssetIdNames, visibleSemanticIds, publicOnly ) )
             .isExactlyInstanceOf( NullPointerException.class );
    }
@@ -53,7 +54,8 @@ class ShellVisibilityCriteriaTest {
    @Test
    void testConstructorCalledWithValidDataExpectSuccess() {
       final String aasId = UUID.randomUUID().toString();
-      final Set<String> visibleSpecificAssetIdNames = Set.of( "name1" );
+
+      final Map<String, Set<String>> visibleSpecificAssetIdNames = Map.of( "name1", Set.of( "" ) );
       final Set<String> visibleSemanticIds = Set.of( "name2" );
       final boolean publicOnly = true;
 

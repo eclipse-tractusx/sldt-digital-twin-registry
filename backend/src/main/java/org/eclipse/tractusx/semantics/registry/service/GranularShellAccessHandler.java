@@ -23,6 +23,7 @@ package org.eclipse.tractusx.semantics.registry.service;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -151,7 +152,7 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
       Set<Submodel> filteredSubmodels = shell.getSubmodels().stream()
             .filter( submodel -> submodel.getSemanticId().getKeys().stream()
                   .anyMatch( key -> key.getType() == ReferenceKeyType.SUBMODEL
-                                    && visibilityCriteria.visibleSemanticIds().contains( key.getValue() ) ) )
+                        && visibilityCriteria.visibleSemanticIds().contains( key.getValue() ) ) )
             .collect( Collectors.toSet() );
       final Shell filtered;
       if ( visibilityCriteria.publicOnly() ) {
@@ -182,8 +183,7 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
    private Set<ShellIdentifier> filterSpecificAssetIdsByTenantId( Set<ShellIdentifier> shellIdentifiers, ShellVisibilityCriteria visibilityCriteria ) {
       //noinspection SimplifyStreamApiCallChains
       return shellIdentifiers.stream()
-            .filter( identifier -> identifier.getKey().equals( ShellIdentifier.GLOBAL_ASSET_ID_KEY )
-                                   || visibilityCriteria.visibleSpecificAssetIdNames().contains( identifier.getKey() ) )
+            .filter( identifier -> isSpecificAssetIdVisible( visibilityCriteria.visibleSpecificAssetIdNames(), identifier ) )
             //TODO: Do we need to clear the list of external subject Ids?
             .map( identifier -> {
                Optional.ofNullable( identifier.getExternalSubjectId() )
@@ -191,6 +191,11 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
                return identifier;
             } )
             .collect( Collectors.toSet() );
+   }
 
+   private boolean isSpecificAssetIdVisible( Map<String, Set<String>> visibleSpecificAssetIdNames, ShellIdentifier identifier ) {
+      Set<String> identifierValues = visibleSpecificAssetIdNames.get( identifier.getKey() );
+      return identifier.getKey().equals( ShellIdentifier.GLOBAL_ASSET_ID_KEY ) ||
+            identifierValues != null && (identifierValues.isEmpty() || identifierValues.contains( identifier.getValue() ));
    }
 }
