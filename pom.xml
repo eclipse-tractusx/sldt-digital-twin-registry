@@ -96,7 +96,7 @@
 		<liquibase.version>4.19.1</liquibase.version>
 
 		<!-- EDC -->
-		<edc.version>0.5.2-20240321-SNAPSHOT</edc.version>
+		<edc.version>0.5.2-20240327-SNAPSHOT</edc.version>
 
 		<!-- test libs -->
 		<assertj.version>3.24.2</assertj.version>
