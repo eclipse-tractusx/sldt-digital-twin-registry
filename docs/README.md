@@ -275,28 +275,31 @@ _note:_ that the "asset:prop:type" is standardized with "data.core.digitalTwinRe
 
 ```
 {
-    "@context": {},
-    "asset": {
-        "@type": "Asset",
-        "@id": "{{ASSET_ID}}", 
-        "properties": {
-            "description": "",
-            "type": "data.core.digitalTwinRegistry"
-        }
-    },
-    "dataAddress": {
-        "@type": "DataAddress",
-        "type": "HttpData",
-        "baseUrl": "{{BACKEND_SERVICE}}",
-        "proxyPath": "true",
-        "proxyBody": "true",
-        "proxyMethod": "true",
-        "proxyQueryParams": "true",
-        "oauth2:clientId": "{{REGISTRY_CLIENT_ID}}",
-        "oauth2:clientSecret": "{{REGISTRY_CLIENT_SECRET}}",
-        "oauth2:tokenUrl": "{{REGISTRY_TOKEN_ENDPOINT}}",
-        "oauth2:scope": "{{REGISTRY_TOKEN_SCOPE}}"
-    }
+   "@context":{
+      "edc":"https://w3id.org/edc/v0.0.1/ns/",
+      "cx-common":"https://w3id.org/catenax/ontology/common#",
+      "cx-taxo":"https://w3id.org/catenax/taxonomy#",
+      "dct":"https://purl.org/dc/terms/"
+   },
+   "@id":"{{ASSET_ID}}",
+   "properties":{
+      "dct:type":{
+         "@id":"cx-taxo:DigitalTwinRegistry"
+      }
+   },
+   "dataAddress":{
+      "@type":"DataAddress",
+      "type":"HttpData",
+      "baseUrl":"{{BACKEND_SERVICE}}",
+      "proxyPath":"true",
+      "proxyBody":"true",
+      "proxyMethod":"true",
+      "proxyQueryParams":"true",
+      "oauth2:clientId":"{{REGISTRY_CLIENT_ID}}",
+      "oauth2:clientSecretKey":"{{REGISTRY_CLIENT_SECRET_KEY}}",
+      "oauth2:tokenUrl":"{{REGISTRY_TOKEN_ENDPOINT}}",
+      "oauth2:scope":"{{REGISTRY_TOKEN_SCOPE}}"
+   }
 }
 ```
 
