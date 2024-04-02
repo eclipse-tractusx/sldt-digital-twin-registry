@@ -791,6 +791,7 @@ paths:
                     properties:
                       result:
                         type: array
+                        maxItems: 10000
                         items:
                           type: string
         '400':

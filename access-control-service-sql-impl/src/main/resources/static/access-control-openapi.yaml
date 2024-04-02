@@ -73,6 +73,7 @@ paths:
                 properties:
                   items:
                     type: array
+                    maxItems: 10000
                     items:
                       $ref: './access-control-openapi_schemas.yaml#/schemas/ReadUpdateAccessRule'
                 required:
