@@ -117,6 +117,23 @@ stages:
     response:
       status_code: 204
 
+  - name: Lookup shell without encoding
+    request:
+      url: "{aas_registry_api_url:s}/api/v3/lookup/shellsByAssetLink"
+      method: POST
+      headers:
+        Content-Type: application/json
+        Authorization: "Bearer {access_token}"
+        Edc-Bpn: "{edc_bpn:s}"
+      json: [{
+        "name": "PartInstanceID",
+        "value": "24975539203421"
+      }]
+    response:
+      status_code: 200
+      json:
+        result: ["{decoded_shell_id:s}"]
+
   - name: Delete shell descriptor by id
     request:
       url: "{aas_registry_api_url:s}/api/v3/shell-descriptors/{encoded_shell_id:s}"
@@ -128,19 +145,3 @@ stages:
     response:
       status_code: 204
 
-  - name: Lookup shell without encoding
-    request:
-      url: "{aas_registry_api_url:s}/api/v3/lookup/shellsByAssetLink"
-      method: POST
-      headers:
-        Content-Type: application/json
-        Authorization: "Bearer {access_token}"
-        Edc-Bpn: "{edc_bpn:s}"
-      json: [{
-          "name": "PartInstanceID",
-          "value": "24975539203421"
-      }]
-    response:
-      status_code: 200
-      json:
-        result: ["{decoded_shell_id:s}"]
