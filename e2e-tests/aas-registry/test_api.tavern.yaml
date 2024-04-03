@@ -69,7 +69,7 @@ stages:
         Edc-Bpn: "{edc_bpn:s}"
       json:
         id: "{decoded_shell_id:s}"
-        idShort: twin of a break (Testing)
+        idShort: digital twin of a break (Testing)
         specificAssetIds: [{
           "name":"PartInstanceID",
           "value":"24975539203421"
@@ -94,7 +94,7 @@ stages:
       json:
         description: []
         displayName: []
-        idShort: twin of a break (Testing)
+        idShort: digital twin of a break (Testing)
         id: "{decoded_shell_id:s}"
         specificAssetIds: [{
           "supplementalSemanticIds": [],
@@ -113,7 +113,7 @@ stages:
         Edc-Bpn: "{edc_bpn:s}"
       json:
         id: "{decoded_shell_id:s}"
-        idShort: twin of a break (Testing Update)
+        idShort: digital twin of a break (Testing Update)
     response:
       status_code: 204
 
