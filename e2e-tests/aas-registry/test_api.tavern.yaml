@@ -132,7 +132,7 @@ stages:
     response:
       status_code: 200
       json:
-        paging_metadata: "{}"
+        paging_metadata: {}
         result: ["{decoded_shell_id:s}"]
 
   - name: Delete shell descriptor by id
