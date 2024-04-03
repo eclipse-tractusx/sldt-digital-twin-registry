@@ -72,7 +72,7 @@ stages:
         idShort: digital twin of a break (Testing)
         specificAssetIds: [{
           "name":"PartInstanceID",
-          "value":"24975539203421"
+          "value":"24975539203422"
         }]
     response:
       status_code: 201
@@ -99,7 +99,7 @@ stages:
         specificAssetIds: [{
           "supplementalSemanticIds": [],
           "name":"PartInstanceID",
-          "value":"24975539203421"
+          "value":"24975539203422"
         }]
         submodelDescriptors: []
 
@@ -127,11 +127,12 @@ stages:
         Edc-Bpn: "{edc_bpn:s}"
       json: [{
         "name": "PartInstanceID",
-        "value": "24975539203421"
+        "value": "24975539203422"
       }]
     response:
       status_code: 200
       json:
+        paging_metadata: {},
         result: ["{decoded_shell_id:s}"]
 
   - name: Delete shell descriptor by id

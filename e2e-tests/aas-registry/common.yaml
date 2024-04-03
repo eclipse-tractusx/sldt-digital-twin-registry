@@ -25,5 +25,5 @@ description:
 variables:
   aas_registry_api_url: "{tavern.env_vars.AAS_REGISTRY_API_URL}"
   edc_bpn: "{tavern.env_vars.EDC_BPN}"
-  decoded_shell_id: 20062250-6b6e-4eba-bf90-7720ddc855e7
-  encoded_shell_id: "MjAwNjIyNTAtNmI2ZS00ZWJhLWJmOTAtNzcyMGRkYzg1NWU3"
+  decoded_shell_id: 20062250-6b6e-4eba-bf90-7720ddc855e6
+  encoded_shell_id: "MjAwNjIyNTAtNmI2ZS00ZWJhLWJmOTAtNzcyMGRkYzg1NWU2"
