@@ -97,6 +97,7 @@ stages:
         idShort: twin of a break (Testing)
         id: "{decoded_shell_id:s}"
         specificAssetIds: [{
+          "supplementalSemanticIds": [],
           "name":"PartInstanceID",
           "value":"24975539203421"
         }]
