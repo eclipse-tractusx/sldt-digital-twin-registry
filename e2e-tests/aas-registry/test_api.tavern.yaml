@@ -70,6 +70,10 @@ stages:
       json:
         id: "{decoded_shell_id:s}"
         idShort: twin of a break (Testing)
+        specificAssetIds: [{
+          "name":"PartInstanceID",
+          "value":"24975539203421"
+        }]
     response:
       status_code: 201
       headers:
@@ -92,7 +96,10 @@ stages:
         displayName: []
         idShort: twin of a break (Testing)
         id: "{decoded_shell_id:s}"
-        specificAssetIds: []
+        specificAssetIds: [{
+          "name":"PartInstanceID",
+          "value":"24975539203421"
+        }]
         submodelDescriptors: []
 
   - name: Update shell descriptor by id
@@ -119,3 +126,20 @@ stages:
         Edc-Bpn: "{edc_bpn:s}"
     response:
       status_code: 204
+
+  - name: Lookup shell without encoding
+    request:
+      url: "{aas_registry_api_url:s}/api/v3/lookup/shellsByAssetLink"
+      method: POST
+      headers:
+        Content-Type: application/json
+        Authorization: "Bearer {access_token}"
+        Edc-Bpn: "{edc_bpn:s}"
+      json: [{
+          "name": "PartInstanceID",
+          "value": "24975539203421"
+      }]
+    response:
+      status_code: 200
+      json:
+        result: ["{decoded_shell_id:s}"]
