@@ -18,14 +18,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.semantics.accesscontrol.api.model;
+package org.eclipse.tractusx.semantics.edc.dataplane.http.accesscontrol;
 
-import java.util.Map;
-import java.util.Set;
+public class AccessControlServiceException extends RuntimeException {
 
-import lombok.NonNull;
+   public AccessControlServiceException( final String message ) {
+      super( message );
+   }
 
-public record ShellVisibilityCriteria(
-      @NonNull String aasId, @NonNull Set<String> visibleSpecificAssetIdNamesRegardlessOfValues,
-      @NonNull Map<String, Set<String>> visibleSpecificAssetIdWhenMatchingValues, @NonNull Set<String> visibleSemanticIds, boolean publicOnly) {
+   public AccessControlServiceException( final Throwable cause ) {
+      super( cause );
+   }
 }

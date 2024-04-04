@@ -18,14 +18,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.semantics.accesscontrol.api.model;
+package org.eclipse.tractusx.semantics.edc.dataplane.http.accesscontrol.client;
 
 import java.util.Map;
-import java.util.Set;
 
-import lombok.NonNull;
+import org.eclipse.tractusx.semantics.edc.dataplane.http.accesscontrol.AccessControlServiceException;
 
-public record ShellVisibilityCriteria(
-      @NonNull String aasId, @NonNull Set<String> visibleSpecificAssetIdNamesRegardlessOfValues,
-      @NonNull Map<String, Set<String>> visibleSpecificAssetIdWhenMatchingValues, @NonNull Set<String> visibleSemanticIds, boolean publicOnly) {
+public interface HttpAccessVerificationClient {
+
+   boolean isAspectModelCall( String url );
+
+   boolean shouldAllowAccess(
+         final String requestedUriPath, final String requestedQueryString, Map<String, String> additionalHeaders ) throws AccessControlServiceException;
+
 }

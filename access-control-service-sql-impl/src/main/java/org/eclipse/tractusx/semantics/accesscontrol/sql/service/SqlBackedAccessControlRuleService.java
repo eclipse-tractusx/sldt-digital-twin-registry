@@ -61,13 +61,22 @@ public class SqlBackedAccessControlRuleService implements AccessControlRuleServi
       Set<AccessRulePolicy> allAccessControlRulesForBpn = findPotentiallyMatchingAccessControlRules( bpn ).collect( Collectors.toSet() );
       return shellContext.stream()
             .filter( aShellContext -> {
-               Set<String> visibleSpecificAssetIdNames = allAccessControlRulesForBpn.stream()
-                     .filter( accessControlRule -> aShellContext.specificAssetIds().containsAll( accessControlRule.getMandatorySpecificAssetIds() ) )
-                     .flatMap( accessControlRule -> accessControlRule.getVisibleSpecificAssetIdNames().stream() )
+               Set<String> visibleSpecificAssetIdNamesRegardlessOfValues = allAccessControlRulesForBpn.stream()
+                     .filter( accessControlRule -> aShellContext.specificAssetIds().containsAll(
+                           accessControlRule.getMandatorySpecificAssetIds() ) )
+                     .flatMap( this::keepVisibleSpecificAssetIdNamesWithoutValueRestrictions )
                      .collect( Collectors.toSet() );
+
+               Map<String, Set<String>> visibleSpecificAssetIdWhenMatchingValues = allAccessControlRulesForBpn.stream()
+                     .filter( accessControlRule -> aShellContext.specificAssetIds().containsAll(
+                           accessControlRule.getMandatorySpecificAssetIds() ) )
+                     .flatMap( this::keepVisibleSpecificAssetIdNamesWithValueRestrictions )
+                     .collect( Collectors.groupingBy( SpecificAssetId::name, Collectors.mapping( SpecificAssetId::value, Collectors.toSet() ) ) );
+
                return aShellContext.specificAssetIds().stream()
-                     .filter( id -> visibleSpecificAssetIdNames.contains( id.name() ) )
-                     .collect( Collectors.toSet() ).containsAll( userQuery );
+                     .filter( id -> isSpecificAssetIdVisible( id, visibleSpecificAssetIdNamesRegardlessOfValues, visibleSpecificAssetIdWhenMatchingValues ) )
+                     .collect( Collectors.toSet() )
+                     .containsAll( userQuery );
             } )
             .map( ShellVisibilityContext::aasId )
             .toList();
@@ -76,15 +85,21 @@ public class SqlBackedAccessControlRuleService implements AccessControlRuleServi
    @Override
    public ShellVisibilityCriteria fetchVisibilityCriteriaForShell( ShellVisibilityContext shellContext, String bpn ) throws DenyAccessException {
       Set<AccessRulePolicy> matchingAccessControlRules = findMatchingAccessControlRules( shellContext, bpn );
-      Set<String> visibleSpecificAssetIdNames = matchingAccessControlRules.stream()
-            .flatMap( accessControlRule -> accessControlRule.getVisibleSpecificAssetIdNames().stream() )
+      Set<String> visibleSpecificAssetIdNamesRegardlessOfValues = matchingAccessControlRules.stream()
+            .flatMap( this::keepVisibleSpecificAssetIdNamesWithoutValueRestrictions )
             .collect( Collectors.toSet() );
+
+      Map<String, Set<String>> visibleSpecificAssetIdWhenMatchingValues = matchingAccessControlRules.stream()
+            .flatMap( this::keepVisibleSpecificAssetIdNamesWithValueRestrictions )
+            .collect( Collectors.groupingBy( SpecificAssetId::name, Collectors.mapping( SpecificAssetId::value, Collectors.toSet() ) ) );
+
       Set<String> visibleSemanticIds = matchingAccessControlRules.stream()
             .map( AccessRulePolicy::getVisibleSemanticIds )
             .flatMap( Collection::stream )
             .collect( Collectors.toSet() );
       boolean publicOnly = matchingAccessControlRules.stream().noneMatch( rule -> rule.getBpn().equals( bpn ) );
-      return new ShellVisibilityCriteria( shellContext.aasId(), visibleSpecificAssetIdNames, visibleSemanticIds, publicOnly );
+      return new ShellVisibilityCriteria( shellContext.aasId(), visibleSpecificAssetIdNamesRegardlessOfValues, visibleSpecificAssetIdWhenMatchingValues,
+            visibleSemanticIds, publicOnly );
    }
 
    @Override
@@ -122,5 +137,21 @@ public class SqlBackedAccessControlRuleService implements AccessControlRuleServi
          throw new DenyAccessException( NO_MATCHING_RULES_ARE_FOUND );
       }
       return matching;
+   }
+
+   private boolean isSpecificAssetIdVisible( SpecificAssetId specificAssetId, Set<String> visibleSpecificAssetIdNamesRegardlessOfValues,
+         Map<String, Set<String>> visibleSpecificAssetIdWhenMatchingValues ) {
+      return visibleSpecificAssetIdNamesRegardlessOfValues.contains( specificAssetId.name() )
+            || visibleSpecificAssetIdWhenMatchingValues.getOrDefault( specificAssetId.name(), Set.of() ).contains( specificAssetId.value() );
+   }
+
+   private Stream<String> keepVisibleSpecificAssetIdNamesWithoutValueRestrictions( AccessRulePolicy accessRulePolicy ) {
+      return accessRulePolicy.getVisibleSpecificAssetIdNames().stream()
+            .filter( name -> accessRulePolicy.getMandatorySpecificAssetIds().stream().map( SpecificAssetId::name ).noneMatch( name::equals ) );
+   }
+
+   private Stream<SpecificAssetId> keepVisibleSpecificAssetIdNamesWithValueRestrictions( AccessRulePolicy accessRulePolicy ) {
+      return accessRulePolicy.getMandatorySpecificAssetIds().stream()
+            .filter( mandatory -> accessRulePolicy.getVisibleSpecificAssetIdNames().contains( mandatory.name() ) );
    }
 }

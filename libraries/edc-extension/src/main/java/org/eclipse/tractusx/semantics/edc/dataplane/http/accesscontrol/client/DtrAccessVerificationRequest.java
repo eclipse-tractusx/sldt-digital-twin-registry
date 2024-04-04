@@ -18,14 +18,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.semantics.accesscontrol.api.model;
+package org.eclipse.tractusx.semantics.edc.dataplane.http.accesscontrol.client;
 
-import java.util.Map;
-import java.util.Set;
-
-import lombok.NonNull;
-
-public record ShellVisibilityCriteria(
-      @NonNull String aasId, @NonNull Set<String> visibleSpecificAssetIdNamesRegardlessOfValues,
-      @NonNull Map<String, Set<String>> visibleSpecificAssetIdWhenMatchingValues, @NonNull Set<String> visibleSemanticIds, boolean publicOnly) {
+public record DtrAccessVerificationRequest(String submodelEndpointUrl) {
 }

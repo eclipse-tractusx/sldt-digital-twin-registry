@@ -23,6 +23,7 @@ package org.eclipse.tractusx.semantics.registry.service;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -151,7 +152,7 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
       Set<Submodel> filteredSubmodels = shell.getSubmodels().stream()
             .filter( submodel -> submodel.getSemanticId().getKeys().stream()
                   .anyMatch( key -> key.getType() == ReferenceKeyType.SUBMODEL
-                                    && visibilityCriteria.visibleSemanticIds().contains( key.getValue() ) ) )
+                        && visibilityCriteria.visibleSemanticIds().contains( key.getValue() ) ) )
             .collect( Collectors.toSet() );
       final Shell filtered;
       if ( visibilityCriteria.publicOnly() ) {
@@ -182,8 +183,7 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
    private Set<ShellIdentifier> filterSpecificAssetIdsByTenantId( Set<ShellIdentifier> shellIdentifiers, ShellVisibilityCriteria visibilityCriteria ) {
       //noinspection SimplifyStreamApiCallChains
       return shellIdentifiers.stream()
-            .filter( identifier -> identifier.getKey().equals( ShellIdentifier.GLOBAL_ASSET_ID_KEY )
-                                   || visibilityCriteria.visibleSpecificAssetIdNames().contains( identifier.getKey() ) )
+            .filter( identifier -> isSisSpecificAssetIdVisible( identifier, visibilityCriteria ) )
             //TODO: Do we need to clear the list of external subject Ids?
             .map( identifier -> {
                Optional.ofNullable( identifier.getExternalSubjectId() )
@@ -191,6 +191,13 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
                return identifier;
             } )
             .collect( Collectors.toSet() );
+   }
 
+   private boolean isSisSpecificAssetIdVisible( ShellIdentifier identifier, ShellVisibilityCriteria shellVisibilityCriteria ) {
+      Set<String> visibleSpecificAssetIdNamesRegardlessOfValues = shellVisibilityCriteria.visibleSpecificAssetIdNamesRegardlessOfValues();
+      Map<String, Set<String>> visibleSpecificAssetIdWhenMatchingValues = shellVisibilityCriteria.visibleSpecificAssetIdWhenMatchingValues();
+      return identifier.getKey().equals( ShellIdentifier.GLOBAL_ASSET_ID_KEY )
+            || visibleSpecificAssetIdNamesRegardlessOfValues.contains( identifier.getKey() )
+            || visibleSpecificAssetIdWhenMatchingValues.getOrDefault( identifier.getKey(), Set.of() ).contains( identifier.getValue() );
    }
 }

@@ -208,19 +208,194 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
       }
 
       @Test
+      @DisplayName( "Test GetShell with filtered specificAssetId by tenantId" )
       public void testGetShellWithFilteredSpecificAssetIdsByTenantId() throws Exception {
+         // Create and save rule
          accessControlRuleRepository.saveAllAndFlush( List.of(
-               TestUtil.createAccessRule( TestUtil.PUBLIC_READABLE,
+               // Rule for BPN
+               TestUtil.createAccessRule(
+                     // Rule for BPN
+                     TestUtil.PUBLIC_READABLE,
+                     // Rule for mandatory specificAssetIds
                      Map.of( keyPrefix + "BPID", "ignoreWildcard", "manufacturerPartId", keyPrefix + "wildcardAllowed" ),
+                     // Rule for visible specificAssetIds
                      Set.of( "manufacturerPartId" ), Set.of( keyPrefix + "semanticId" ) ),
-               TestUtil.createAccessRule( jwtTokenFactory.tenantTwo().getTenantId(),
+               TestUtil.createAccessRule(
+                     // Rule for BPN
+                     jwtTokenFactory.tenantTwo().getTenantId(),
+                     // Rule for mandatory specificAssetIds
                      Map.of( keyPrefix + "CustomerPartId", "tenantTwoAssetIdValue", keyPrefix + "MaterialNumber", "withoutTenantAssetIdValue" ),
+                     // Rule for visible specificAssetIds
                      Set.of( keyPrefix + "CustomerPartId", keyPrefix + "MaterialNumber" ), Set.of( keyPrefix + "semanticId" ) ),
-               TestUtil.createAccessRule( jwtTokenFactory.tenantThree().getTenantId(),
+               TestUtil.createAccessRule(
+                     // Rule for BPN
+                     jwtTokenFactory.tenantThree().getTenantId(),
+                     // Rule for mandatory specificAssetIds
                      Map.of( keyPrefix + "CustomerPartId2", "tenantThreeAssetIdValue" ),
+                     // Rule for visible specificAssetIds
                      Set.of( keyPrefix + "CustomerPartId2" ), Set.of( keyPrefix + "semanticId" ) )
          ) );
-         super.testGetShellWithFilteredSpecificAssetIdsByTenantId();
+
+         SpecificAssetId asset1 = TestUtil.createSpecificAssetId( keyPrefix + "CustomerPartId", "tenantTwoAssetIdValue",
+               List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
+         SpecificAssetId asset2 = TestUtil.createSpecificAssetId( keyPrefix + "CustomerPartId2", "tenantThreeAssetIdValue",
+               List.of( jwtTokenFactory.tenantThree().getTenantId() ) );
+         SpecificAssetId asset3 = TestUtil.createSpecificAssetId( keyPrefix + "MaterialNumber", "withoutTenantAssetIdValue",
+               List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
+         // Define specificAsset with wildcard which not allowed. (Only manufacturerPartId is defined in application.yml)
+         SpecificAssetId asset4 = TestUtil.createSpecificAssetId( keyPrefix + "BPID", "ignoreWildcard", List.of( getExternalSubjectIdWildcardPrefix() ) );
+         // Define specificAsset with wildcard which is allowed. (Only manufacturerPartId is defined in application.yml)
+         SpecificAssetId asset5 = TestUtil.createSpecificAssetId( "manufacturerPartId", keyPrefix + "wildcardAllowed",
+               List.of( getExternalSubjectIdWildcardPrefix() ) );
+
+         // Define all available specificAssetIds
+         List<SpecificAssetId> specificAssetIds = List.of( asset1, asset2, asset3, asset4, asset5 );
+         // Define available specificAssetIds for tenantTwo
+         List<SpecificAssetId> expectedSpecificAssetIdsTenantTwo = List.of( asset1, asset3, asset5 );
+         super.testGetShellWithFilteredSpecificAssetIdsByTenantId( specificAssetIds, expectedSpecificAssetIdsTenantTwo );
+      }
+
+      @Test
+      @DisplayName( "Test GetShell with filtered specificAssetIds with same keys where the specific mandatory Rule match over ANY rule by tenantId" )
+      public void testGetShellWithFilteredSpecificAssetIdsWithSameKeysAndMandatoryRuleMatchedOverAnyByTenantId() throws Exception {
+         // Create and save rule
+         accessControlRuleRepository.saveAllAndFlush( List.of(
+               // Rule for BPN
+               TestUtil.createAccessRule(
+                     // Rule for BPN
+                     TestUtil.PUBLIC_READABLE,
+                     // Rule for mandatory specificAssetIds
+                     Map.of( keyPrefix + "BPID", "ignoreWildcard", "manufacturerPartId", keyPrefix + "wildcardAllowed" ),
+                     // Rule for visible specificAssetIds
+                     Set.of( "manufacturerPartId" ), Set.of( keyPrefix + "semanticId" ) ),
+               TestUtil.createAccessRule(
+                     // Rule for BPN
+                     jwtTokenFactory.tenantTwo().getTenantId(),
+                     // Rule for mandatory specificAssetIds
+                     Map.of( keyPrefix + "CustomerPartId", "tenantTwoAssetIdValue", keyPrefix + "MaterialNumber", "withoutTenantAssetIdValue" ),
+                     // Rule for visible specificAssetIds
+                     Set.of( keyPrefix + "CustomerPartId", keyPrefix + "MaterialNumber" ), Set.of( keyPrefix + "semanticId" ) ) ) );
+
+         SpecificAssetId asset1 = TestUtil.createSpecificAssetId( keyPrefix + "CustomerPartId", "tenantTwoAssetIdValue",
+               List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
+         SpecificAssetId asset2 = TestUtil.createSpecificAssetId( keyPrefix + "CustomerPartId", "tenantThreeAssetIdValue",
+               List.of( jwtTokenFactory.tenantThree().getTenantId() ) );
+         SpecificAssetId asset3 = TestUtil.createSpecificAssetId( keyPrefix + "MaterialNumber", "withoutTenantAssetIdValue",
+               List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
+
+         // Define all available specificAssetIds
+         List<SpecificAssetId> specificAssetIds = List.of( asset1, asset2, asset3 );
+         // Define available specificAssetIds for tenantTwo
+         List<SpecificAssetId> expectedSpecificAssetIdsTenantTwo = List.of( asset1, asset3 );
+         super.testGetShellWithFilteredSpecificAssetIdsByTenantId( specificAssetIds, expectedSpecificAssetIdsTenantTwo );
+      }
+
+      @Test
+      @DisplayName( "Test GetShell with filtered specificAssetIds with same keys where the ANY Rule matched by tenantId" )
+      public void testGetShellWithFilteredSpecificAssetIdsWithSameKeysAndAnyRuleMatchedByTenantId() throws Exception {
+         // Create and save rule
+         accessControlRuleRepository.saveAllAndFlush( List.of(
+               TestUtil.createAccessRule(
+                     // Rule for BPN
+                     TestUtil.PUBLIC_READABLE,
+                     // Rule for mandatory specificAssetIds
+                     Map.of( keyPrefix + "BPID", "ignoreWildcard", "manufacturerPartId", keyPrefix + "wildcardAllowed" ),
+                     // Rule for visible specificAssetIds
+                     Set.of( "manufacturerPartId" ), Set.of( keyPrefix + "semanticId" ) ),
+               TestUtil.createAccessRule(
+                     // Rule for BPN
+                     jwtTokenFactory.tenantTwo().getTenantId(),
+                     // Rule for mandatory specificAssetIds
+                     Map.of( keyPrefix + "MaterialNumber", "withoutTenantAssetIdValue" ),
+                     // Rule for visible specificAssetIds
+                     Set.of( keyPrefix + "CustomerPartId", keyPrefix + "MaterialNumber" ), Set.of( keyPrefix + "semanticId" ) ) ) );
+
+         SpecificAssetId asset1 = TestUtil.createSpecificAssetId( keyPrefix + "CustomerPartId", "tenantTwoAssetIdValue",
+               List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
+         SpecificAssetId asset2 = TestUtil.createSpecificAssetId( keyPrefix + "CustomerPartId", "tenantThreeAssetIdValue",
+               List.of( jwtTokenFactory.tenantThree().getTenantId() ) );
+         SpecificAssetId asset3 = TestUtil.createSpecificAssetId( keyPrefix + "MaterialNumber", "withoutTenantAssetIdValue",
+               List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
+         SpecificAssetId asset4 = TestUtil.createSpecificAssetId( keyPrefix + "PartInstanceId", "OwnerAssetidValue",
+               List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
+
+         // Define all available specificAssetIds
+         List<SpecificAssetId> specificAssetIds = List.of( asset1, asset2, asset3, asset4 );
+         // Define available specificAssetIds for tenantTwo
+         List<SpecificAssetId> expectedSpecificAssetIdsTenantTwo = List.of( asset1, asset2, asset3 );
+         super.testGetShellWithFilteredSpecificAssetIdsByTenantId( specificAssetIds, expectedSpecificAssetIdsTenantTwo );
+      }
+
+      @Test
+      @DisplayName( "Test GetShell with filtered specificAssetIds with same keys where mandatory rule not match and disable specificAssetId by tenantId" )
+      public void testGetShellWithFilteredSpecificAssetIdsWithSameKeysAndMandatoryRuleNotMatchedTenantId() throws Exception {
+         // Create and save rule
+         accessControlRuleRepository.saveAllAndFlush( List.of(
+               TestUtil.createAccessRule(
+                     // Rule for BPN
+                     TestUtil.PUBLIC_READABLE,
+                     // Rule for mandatory specificAssetIds
+                     Map.of( keyPrefix + "BPID", "ignoreWildcard", "manufacturerPartId", keyPrefix + "wildcardAllowed" ),
+                     // Rule for visible specificAssetIds
+                     Set.of( "manufacturerPartId" ), Set.of( keyPrefix + "semanticId" ) ),
+               TestUtil.createAccessRule(
+                     // Rule for BPN
+                     jwtTokenFactory.tenantTwo().getTenantId(),
+                     // Rule for mandatory specificAssetIds
+                     Map.of( keyPrefix + "MaterialNumber", "withoutTenantAssetIdValue" ),
+                     // Rule for visible specificAssetIds
+                     Set.of( keyPrefix + "CustomerPartId", keyPrefix + "MaterialNumber" ), Set.of( keyPrefix + "semanticId" ) ) ) );
+
+         SpecificAssetId asset1 = TestUtil.createSpecificAssetId( keyPrefix + "CustomerPartId", "tenantTwoAssetIdValue",
+               List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
+         SpecificAssetId asset2 = TestUtil.createSpecificAssetId( keyPrefix + "CustomerPartId", "tenantThreeAssetIdValue",
+               List.of( jwtTokenFactory.tenantThree().getTenantId() ) );
+         SpecificAssetId asset3 = TestUtil.createSpecificAssetId( keyPrefix + "MaterialNumber", "withoutTenantAssetIdValue",
+               List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
+         SpecificAssetId asset4 = TestUtil.createSpecificAssetId( keyPrefix + "PartInstanceId", "OwnerAssetidValue",
+               List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
+
+         // Define all available specificAssetIds
+         List<SpecificAssetId> specificAssetIds = List.of( asset1, asset2, asset3, asset4 );
+         // Define available specificAssetIds for tenantTwo
+         List<SpecificAssetId> expectedSpecificAssetIdsTenantTwo = List.of( asset3 );
+         super.testGetShellWithFilteredSpecificAssetIdsByTenantId( specificAssetIds, expectedSpecificAssetIdsTenantTwo );
+      }
+
+      @Test
+      @DisplayName( "Test GetShell with filtered specificAssetIds with same keys and multiple rules where first rule with mandatory rule not match and the second rule matched with any by tenantId" )
+      public void testGetShellWithFilteredSpecificAssetIdsWithSameKeysAndMultipleRulesTenantId() throws Exception {
+         // Create and save rule
+         accessControlRuleRepository.saveAllAndFlush( List.of(
+               TestUtil.createAccessRule(
+                     // Rule for BPN
+                     jwtTokenFactory.tenantTwo().getTenantId(),
+                     // Rule for mandatory specificAssetIds
+                     Map.of( keyPrefix + "MaterialNumber", "notMatchedValue" ),
+                     // Rule for visible specificAssetIds
+                     Set.of( keyPrefix + "CustomerPartId", keyPrefix + "MaterialNumber" ), Set.of( keyPrefix + "semanticId" ) ),
+               TestUtil.createAccessRule(
+                     // Rule for BPN
+                     jwtTokenFactory.tenantTwo().getTenantId(),
+                     // Rule for mandatory specificAssetIds
+                     Map.of( keyPrefix + "CustomerPartId", "tenantTwoAssetIdValue" ),
+                     // Rule for visible specificAssetIds
+                     Set.of( keyPrefix + "CustomerPartId", keyPrefix + "MaterialNumber" ), Set.of( keyPrefix + "semanticId" ) ) ) );
+
+         SpecificAssetId asset1 = TestUtil.createSpecificAssetId( keyPrefix + "CustomerPartId", "tenantTwoAssetIdValue",
+               List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
+         SpecificAssetId asset2 = TestUtil.createSpecificAssetId( keyPrefix + "CustomerPartId", "tenantThreeAssetIdValue",
+               List.of( jwtTokenFactory.tenantThree().getTenantId() ) );
+         SpecificAssetId asset3 = TestUtil.createSpecificAssetId( keyPrefix + "MaterialNumber", "withoutTenantAssetIdValue",
+               List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
+         SpecificAssetId asset4 = TestUtil.createSpecificAssetId( keyPrefix + "PartInstanceId", "OwnerAssetidValue",
+               List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
+
+         // Define all available specificAssetIds
+         List<SpecificAssetId> specificAssetIds = List.of( asset1, asset2, asset3, asset4 );
+         // Define available specificAssetIds for tenantTwo
+         List<SpecificAssetId> expectedSpecificAssetIdsTenantTwo = List.of( asset1, asset3 );
+         super.testGetShellWithFilteredSpecificAssetIdsByTenantId( specificAssetIds, expectedSpecificAssetIdsTenantTwo );
       }
 
       @Test
