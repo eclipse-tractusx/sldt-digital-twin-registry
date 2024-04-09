@@ -699,7 +699,10 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
       private static final String MANDATORY_VALUE = "mandatory-value";
       private static final String VISIBLE = "visible";
       private static final String SEMANTIC_ID = "semanticId";
-      private static final OffsetDateTime DATE_TIME_FROM = OffsetDateTime.now( ZoneOffset.UTC ).truncatedTo( ChronoUnit.SECONDS );
+      private static final OffsetDateTime DATE_TIME_FROM = OffsetDateTime.now( ZoneOffset.UTC )
+            //Make sure the timestamp is never 00 seconds to avoid truncation when the expected value is calculated
+            .truncatedTo( ChronoUnit.MINUTES )
+            .truncatedTo( ChronoUnit.SECONDS ).plusSeconds( 12 );
       private static final OffsetDateTime DATE_TIME_TO = DATE_TIME_FROM.plusMinutes( 1L );
 
       private final AasPolicy defaultPolicy = getAasPolicy( BPN, Map.of( MANDATORY_NAME, MANDATORY_VALUE ), Set.of( VISIBLE ), Set.of( SEMANTIC_ID ) );
