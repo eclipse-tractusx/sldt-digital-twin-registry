@@ -1,0 +1,76 @@
+################################################################################
+# Copyright (c) 2024 Robert Bosch Manufacturing Solutions GmbH and others
+# Copyright (c) 2024 Contributors to the Eclipse Foundation
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache License, Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0.
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+################################################################################
+
+---
+
+name: Publish EDC extension to Maven Central
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: string
+        description: The name of the tag from which we would like to build an artifact
+        required: true
+
+jobs:
+  maven-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout if workflow_dispatch
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.tag }}
+      - name: setup-java
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+      - name: Setup Maven Action
+        uses: s4u/setup-maven-action@v1.7.0
+        with:
+          java-version: 17
+      - name: List Keys (set up GPG)
+        shell: bash
+        run: |
+          gpg -K --keyid-format=long
+      - name: Import GPG Private Key
+        shell: bash
+        run: |
+          echo "use-agent" >> ~/.gnupg/gpg.conf
+          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+          echo -e "${{ secrets.ORG_GPG_PRIVATE_KEY }}" | gpg --import --batch
+          for fpr in $(gpg --list-keys --with-colons | awk -F: '/fpr:/ {print $10}' | sort -u);
+          do
+            echo -e "5\\ny\\n" |  gpg --batch --command-fd 0 --expert --edit-key $fpr trust;
+          done
+      - name: Publish to the Maven Central Repository
+        shell: bash
+        run: |
+          mvn clean verify nexus-staging:deploy -Dgpg.passphrase=${{ secrets.ORG_GPG_PASSPHRASE }} -f libraries/edc-extension/pom.xml -P release-to-central
+        env:
+          MAVEN_USERNAME: ${{ secrets.ORG_OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.ORG_OSSRH_PASSWORD }}

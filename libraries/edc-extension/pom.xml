@@ -37,16 +37,22 @@
    <packaging>jar</packaging>
 
    <organization>
-      <name>${organization}</name>
-      <url>${url}</url>
+      <name>Tractus-X project</name>
+      <url>https://projects.eclipse.org/projects/automotive.tractusx</url>
    </organization>
+
+   <scm>
+      <url>https://github.com/eclipse-tractusx/sldt-digital-twin-registry/</url>
+      <connection>scm:git:https://github.com/eclipse-tractusx/sldt-digital-twin-registry.git</connection>
+      <developerConnection>scm:git:https://github.com/eclipse-tractusx/sldt-digital-twin-registry.git</developerConnection>
+   </scm>
 
    <licenses>
       <license>
-         <name>${licence_name}</name>
-         <url>${licence_url}</url>
-         <distribution>${licence_distribution}</distribution>
-         <comments>${licence_comments}</comments>
+         <name>Apache License, Version 2.0</name>
+         <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+         <distribution>repo</distribution>
+         <comments>An Eclipse Project</comments>
       </license>
    </licenses>
 
@@ -111,26 +117,74 @@
    </dependencies>
 
    <build>
+      <resources>
+         <resource>
+            <directory>${project.parent.basedir}</directory>
+            <includes>
+               <include>LICENSE</include>
+               <include>NOTICE.md</include>
+               <include>DEPENDENCIES</include>
+            </includes>
+            <targetPath>META-INF/</targetPath>
+         </resource>
+         <resource>
+            <directory>${project.basedir}/src/main/resources</directory>
+         </resource>
+      </resources>
       <plugins>
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-compiler-plugin</artifactId>
          </plugin>
-
          <plugin>
             <groupId>io.github.git-commit-id</groupId>
             <artifactId>git-commit-id-maven-plugin</artifactId>
          </plugin>
-
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
          </plugin>
-
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-deploy-plugin</artifactId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
          </plugin>
       </plugins>
    </build>
+
+   <profiles>
+      <profile>
+         <id>release-to-central</id>
+         <activation>
+            <activeByDefault>false</activeByDefault>
+         </activation>
+         <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-gpg-plugin</artifactId>
+               </plugin>
+               <plugin>
+                  <groupId>org.sonatype.plugins</groupId>
+                  <artifactId>nexus-staging-maven-plugin</artifactId>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+   </profiles>
+
+   <distributionManagement>
+      <snapshotRepository>
+         <id>ossrh</id>
+         <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      </snapshotRepository>
+      <repository>
+         <id>ossrh</id>
+         <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+      </repository>
+   </distributionManagement>
+
 </project>

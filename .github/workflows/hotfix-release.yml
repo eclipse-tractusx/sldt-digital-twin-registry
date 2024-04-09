@@ -27,6 +27,22 @@ on:
       version:
         description: 'Version'
         required: true
+      release_docker_image:
+        description: 'Should we release the Docker image?'
+        required: true
+        default: 'yes'
+        type: choice
+        options:
+          - 'yes'
+          - 'no'
+      release_edc:
+        description: 'Should we release the EDC extension?'
+        required: true
+        default: 'yes'
+        type: choice
+        options:
+          - 'yes'
+          - 'no'
 
 jobs:
   build:
@@ -59,7 +75,15 @@ jobs:
           git tag v${{ inputs.version }}
           git push origin v${{ inputs.version }}
   call-image-release:
+    if: ${{ inputs.release_docker_image == 'yes' }}
     uses: ./.github/workflows/publish-image-registry.yml
+    needs: build
+    secrets: inherit
+    with:
+      tag: v${{ inputs.version }}
+  call-edc-maven-central-publish:
+    if: ${{ inputs.release_edc == 'yes' }}
+    uses: ./.github/workflows/publish-edc-ext-to-maven-central.yml
     needs: build
     secrets: inherit
     with:
