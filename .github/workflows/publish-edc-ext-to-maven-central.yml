@@ -70,7 +70,7 @@ jobs:
       - name: Publish to the Maven Central Repository
         shell: bash
         run: |
-          mvn clean verify nexus-staging:deploy -Dgpg.passphrase=${{ secrets.ORG_GPG_PASSPHRASE }} -f libraries/edc-extension/pom.xml -P release-to-central
+          mvn clean verify nexus-staging:deploy -Dgpg.passphrase="${{ secrets.ORG_GPG_PASSPHRASE }}" -f libraries/edc-extension/pom.xml -P release-to-central
         env:
-          MAVEN_USERNAME: ${{ secrets.ORG_OSSRH_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.ORG_OSSRH_PASSWORD }}
+          MAVEN_USERNAME: "${{ secrets.ORG_OSSRH_USERNAME }}"
+          MAVEN_PASSWORD: "${{ secrets.ORG_OSSRH_PASSWORD }}"
