@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.4.3
+### Added
+- Added GitHub action for publishing edc extension to maven central repository.
+## fixed
+- Fixed regex pattern for SpecificAssetId value field. Now special characters like '+' or '=' are also allowed.
+
 ## 0.4.2
 ### Added
 - Added lookup api test in aas-registry-e2e-test action
