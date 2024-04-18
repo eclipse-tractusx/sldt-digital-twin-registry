@@ -1083,7 +1083,7 @@ components:
           type: string
         text:
           minLength: 0
-          pattern: "^([\\t\\n\\r \\_\\.\\/\\:\\#\\-a-zA-Z0-9]|[\\ud800\\udc00-\\ud800\\udfff]|[\\ud801\\udc00-\\udbfe\\udfff]|[\\udbff\\udc00-\\udbff\\udfff])*+$"
+          pattern: "^([\\t\\n\\r-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
           type: string
     LangStringNameType:
       type: object
@@ -1152,7 +1152,7 @@ components:
         value:
           maxLength: 2000
           minLength: 1
-          pattern: "^([\\t\\n\\r \\_\\.\\/\\:\\#\\-a-zA-Z0-9]|[\\ud800\\udc00-\\ud800\\udfff]|[\\ud801\\udc00-\\udbfe\\udfff]|[\\udbff\\udc00-\\udbff\\udfff])*+$"
+          pattern: "^([\\t\\n\\r-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
           type: string
     KeyTypes:
       type: string
@@ -1475,12 +1475,12 @@ components:
             name:
               maxLength: 64
               minLength: 1
-              pattern: "^([\\t\\n\\r \\_\\.\\/\\:\\#\\-a-zA-Z0-9]|[\\ud800\\udc00-\\ud800\\udfff]|[\\ud801\\udc00-\\udbfe\\udfff]|[\\udbff\\udc00-\\udbff\\udfff])*+$"
+              pattern: "^([\\t\\n\\r-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
               type: string
             value:
               maxLength: 2000
               minLength: 1
-              pattern: "^([\\t\\n\\r \\_\\.\\/\\:\\#\\-a-zA-Z0-9]|[\\ud800\\udc00-\\ud800\\udfff]|[\\ud801\\udc00-\\udbfe\\udfff]|[\\udbff\\udc00-\\udbff\\udfff])*+$"
+              pattern: "^([\\t\\n\\r-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
               type: string
             externalSubjectId:
               $ref: '#/components/schemas/Reference'
