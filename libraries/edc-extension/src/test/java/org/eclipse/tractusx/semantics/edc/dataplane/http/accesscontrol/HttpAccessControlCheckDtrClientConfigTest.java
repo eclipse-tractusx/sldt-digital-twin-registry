@@ -21,7 +21,7 @@
 package org.eclipse.tractusx.semantics.edc.dataplane.http.accesscontrol;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.eclipse.tractusx.semantics.edc.dataplane.http.accesscontrol.DtrDataPlaneAccessControlServiceExtension.*;
+import static org.eclipse.tractusx.semantics.edc.dataplane.http.accesscontrol.DtrDataPlaneAccessControlConfigExtension.*;
 import static org.mockito.Mockito.*;
 
 import org.eclipse.edc.spi.system.configuration.Config;

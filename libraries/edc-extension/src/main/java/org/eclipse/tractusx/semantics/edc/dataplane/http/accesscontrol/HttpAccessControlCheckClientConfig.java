@@ -20,7 +20,7 @@
 
 package org.eclipse.tractusx.semantics.edc.dataplane.http.accesscontrol;
 
-import static org.eclipse.tractusx.semantics.edc.dataplane.http.accesscontrol.DtrDataPlaneAccessControlServiceExtension.*;
+import static org.eclipse.tractusx.semantics.edc.dataplane.http.accesscontrol.DtrDataPlaneAccessControlConfigExtension.*;
 
 import java.util.Arrays;
 import java.util.Map;
