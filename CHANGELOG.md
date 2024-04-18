@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added GitHub action for publishing edc extension to maven central repository.
 ## fixed
 - Fixed regex pattern for SpecificAssetId value field and some other fields. Now special characters like '+','/','=' are also allowed.
+- security fix spring-web:6.1.5.jar
 
 ## 0.4.2
 ### Added
