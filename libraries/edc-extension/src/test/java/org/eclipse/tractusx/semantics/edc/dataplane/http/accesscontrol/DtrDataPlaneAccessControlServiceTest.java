@@ -96,7 +96,7 @@ class DtrDataPlaneAccessControlServiceTest {
       when( uriInfo.getRequestUri() ).thenReturn( URI.create( "http://edc.example.com/public/v2/api/dtr/resource?param1=value1" ) );
 
       //when
-      final Result<Void> actual = underTest.checkAccess( claimToken, address, additionalData, requestData );
+      final Result<Void> actual = underTest.checkAccess( claimToken, address, requestData, additionalData );
 
       //then
       verify( address ).getStringProperty( ADDRESS_HEADER_EDC_BPN );
@@ -115,7 +115,7 @@ class DtrDataPlaneAccessControlServiceTest {
       when( uriInfo.getRequestUri() ).thenReturn( URI.create( "http://edc.example.com/public/v2/api/dtr/resource?param1=value1" ) );
 
       //when
-      final Result<Void> actual = underTest.checkAccess( claimToken, address, additionalData, requestData );
+      final Result<Void> actual = underTest.checkAccess( claimToken, address, requestData, additionalData );
 
       //then
       verify( address ).getStringProperty( ADDRESS_HEADER_EDC_BPN );
@@ -138,7 +138,7 @@ class DtrDataPlaneAccessControlServiceTest {
       when( client.shouldAllowAccess( proxyPath, queryString, Map.of( HEADER_EDC_BPN, BPN_0001 ) ) ).thenReturn( true );
 
       //when
-      final Result<Void> actual = underTest.checkAccess( claimToken, address, additionalData, requestData );
+      final Result<Void> actual = underTest.checkAccess( claimToken, address, requestData, additionalData );
 
       //then
       verify( monitor, never() ).info( anyString() );
@@ -164,7 +164,7 @@ class DtrDataPlaneAccessControlServiceTest {
       when( client.shouldAllowAccess( proxyPath, queryString, Map.of( HEADER_EDC_BPN, BPN_0001 ) ) ).thenReturn( false );
 
       //when
-      final Result<Void> actual = underTest.checkAccess( claimToken, address, additionalData, requestData );
+      final Result<Void> actual = underTest.checkAccess( claimToken, address, requestData, additionalData );
 
       //then
       verify( monitor, never() ).info( anyString() );
@@ -190,7 +190,7 @@ class DtrDataPlaneAccessControlServiceTest {
       when( client.shouldAllowAccess( proxyPath, queryString, Collections.emptyMap() ) ).thenReturn( false );
 
       //when
-      final Result<Void> actual = underTest.checkAccess( claimToken, address, additionalData, requestData );
+      final Result<Void> actual = underTest.checkAccess( claimToken, address, requestData, additionalData );
 
       //then
       verify( monitor, never() ).info( anyString() );
@@ -217,7 +217,7 @@ class DtrDataPlaneAccessControlServiceTest {
       when( client.shouldAllowAccess( proxyPath, queryString, Map.of( HEADER_EDC_BPN, BPN_0001 ) ) ).thenReturn( false );
 
       //when
-      final Result<Void> actual = underTest.checkAccess( claimToken, address, additionalData, requestData );
+      final Result<Void> actual = underTest.checkAccess( claimToken, address, requestData, additionalData );
 
       //then
       verify( monitor, never() ).info( anyString() );

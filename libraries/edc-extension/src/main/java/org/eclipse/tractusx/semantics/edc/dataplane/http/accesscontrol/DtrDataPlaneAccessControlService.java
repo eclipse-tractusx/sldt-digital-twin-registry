@@ -56,7 +56,7 @@ public class DtrDataPlaneAccessControlService implements DataPlaneAccessControlS
    }
 
    @Override
-   public Result<Void> checkAccess( ClaimToken claimToken, DataAddress address, Map<String, Object> additionalData, Map<String, Object> requestData ) {
+   public Result<Void> checkAccess( ClaimToken claimToken, DataAddress address, Map<String, Object> requestData, Map<String, Object> additionalData ) {
       if ( isNotActive() ) {
          //no DTR clients are registered, therefore the extension is turned off
          return Result.success();
