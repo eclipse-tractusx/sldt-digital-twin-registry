@@ -67,6 +67,7 @@
 		<!-- version properties -->
 		<!-- framework and base stuff -->
 		<spring.boot.version>3.2.4</spring.boot.version>
+		<spring-framework.version>6.1.6</spring-framework.version>
 		<springdoc.version>1.6.14</springdoc.version>
 		<lombok.version>1.18.24</lombok.version>
 		<swagger-annotations.version>1.5.20</swagger-annotations.version>
@@ -176,18 +177,9 @@
 						<groupId>org.springframework.boot</groupId>
 						<artifactId>spring-boot-starter-tomcat</artifactId>
 					</exclusion>
-					<exclusion>
-							<groupId>org.springframework</groupId>
-							<artifactId>spring-web</artifactId>
-					</exclusion>
 				</exclusions>
 			</dependency>
 
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-web</artifactId>
-				<version>6.1.6</version>
-			</dependency>
 
 			<dependency>
 				<groupId>org.springframework.boot</groupId>

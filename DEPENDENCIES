@@ -117,18 +117,18 @@ maven/mavencentral/org.springframework.security/spring-security-oauth2-core/6.2.
 maven/mavencentral/org.springframework.security/spring-security-oauth2-jose/6.2.3, Apache-2.0, approved, #11893
 maven/mavencentral/org.springframework.security/spring-security-oauth2-resource-server/6.2.3, Apache-2.0, approved, #11920
 maven/mavencentral/org.springframework.security/spring-security-web/6.2.3, Apache-2.0, approved, #11911
-maven/mavencentral/org.springframework/spring-aop/6.1.5, Apache-2.0, approved, #11755
-maven/mavencentral/org.springframework/spring-aspects/6.1.5, Apache-2.0, approved, #11905
-maven/mavencentral/org.springframework/spring-beans/6.1.5, Apache-2.0, approved, #11754
-maven/mavencentral/org.springframework/spring-context/6.1.5, Apache-2.0, approved, #11753
-maven/mavencentral/org.springframework/spring-core/6.1.5, Apache-2.0 AND BSD-3-Clause, approved, #11750
-maven/mavencentral/org.springframework/spring-expression/6.1.5, Apache-2.0, approved, #11747
-maven/mavencentral/org.springframework/spring-jcl/6.1.5, Apache-2.0, approved, #11749
-maven/mavencentral/org.springframework/spring-jdbc/6.1.5, Apache-2.0, approved, #11897
-maven/mavencentral/org.springframework/spring-orm/6.1.5, Apache-2.0, approved, #11924
-maven/mavencentral/org.springframework/spring-tx/6.1.5, Apache-2.0, approved, #11901
+maven/mavencentral/org.springframework/spring-aop/6.1.6, Apache-2.0, approved, #11755
+maven/mavencentral/org.springframework/spring-aspects/6.1.6, Apache-2.0, approved, #11905
+maven/mavencentral/org.springframework/spring-beans/6.1.6, Apache-2.0, approved, #11754
+maven/mavencentral/org.springframework/spring-context/6.1.6, Apache-2.0, approved, #11753
+maven/mavencentral/org.springframework/spring-core/6.1.6, Apache-2.0 AND BSD-3-Clause, approved, #11750
+maven/mavencentral/org.springframework/spring-expression/6.1.6, Apache-2.0, approved, #11747
+maven/mavencentral/org.springframework/spring-jcl/6.1.6, Apache-2.0, approved, #11749
+maven/mavencentral/org.springframework/spring-jdbc/6.1.6, Apache-2.0, approved, #11897
+maven/mavencentral/org.springframework/spring-orm/6.1.6, Apache-2.0, approved, #11924
+maven/mavencentral/org.springframework/spring-tx/6.1.6, Apache-2.0, approved, #11901
 maven/mavencentral/org.springframework/spring-web/6.1.6, Apache-2.0, approved, #11748
-maven/mavencentral/org.springframework/spring-webmvc/6.1.5, Apache-2.0, approved, #11879
+maven/mavencentral/org.springframework/spring-webmvc/6.1.6, Apache-2.0, approved, #11879
 maven/mavencentral/org.webjars/swagger-ui/4.15.5, Apache-2.0 AND MIT, approved, #5921
 maven/mavencentral/org.webjars/webjars-locator-core/0.55, MIT, approved, clearlydefined
 maven/mavencentral/org.yaml/snakeyaml/2.0, Apache-2.0 AND (Apache-2.0 OR BSD-3-Clause OR EPL-1.0 OR GPL-2.0-or-later OR LGPL-2.1-or-later), approved, #7275
