@@ -151,8 +151,7 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
       Set<ShellIdentifier> filteredIdentifiers = filterSpecificAssetIdsByTenantId( shell.getIdentifiers(), visibilityCriteria );
       Set<Submodel> filteredSubmodels = shell.getSubmodels().stream()
             .filter( submodel -> submodel.getSemanticId().getKeys().stream()
-                  .anyMatch( key -> key.getType() == ReferenceKeyType.SUBMODEL
-                        && visibilityCriteria.visibleSemanticIds().contains( key.getValue() ) ) )
+                  .anyMatch( key -> visibilityCriteria.visibleSemanticIds().contains( key.getValue() ) ) )
             .collect( Collectors.toSet() );
       final Shell filtered;
       if ( visibilityCriteria.publicOnly() ) {

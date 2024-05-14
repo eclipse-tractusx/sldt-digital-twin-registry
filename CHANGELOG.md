@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.5.0-RC1
+### Added
+
+## fixed
+- Bugfix access rule management for submodelfilter (visibleSemanticIds): Remove condition on `semanticId.keys.type = submodel` because the `semanticId.keys.type` should be `GlobalReference`. This check is not needed.
+
 ## 0.4.3
 ### Added
 - Added GitHub action for publishing edc extension to maven central repository.
