@@ -73,7 +73,7 @@
 		<swagger-annotations.version>1.5.20</swagger-annotations.version>
 		<openapi-starter-webmvc-ui.version>2.0.2</openapi-starter-webmvc-ui.version>
 		<swagger-core-version>2.0.0</swagger-core-version>
-		<guava.version>32.1.1-jre</guava.version>
+		<guava.version>33.2.0-jre</guava.version>
 		<apache-commonse.version>1.10.0</apache-commonse.version>
 		<google.findbugs.version>3.0.2</google.findbugs.version>
 		<snakeyaml.version>2.0</snakeyaml.version>
