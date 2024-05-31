@@ -1,0 +1,59 @@
+[
+  {
+    "id": 1, "tid": "BPNL00000000000B", "targetTenant": "PUBLIC_READABLE",
+    "validFrom": "2020-01-02T03:04:05Z", "validTo": "4999-01-02T03:04:05Z",
+    "description": "ACME policy within set validity period",
+    "policyType": "AAS", "policy": {
+    "accessRules": [
+      { "attribute": "bpn", "operator": "eq", "value": "PUBLIC_READABLE" },
+      {
+        "attribute": "mandatorySpecificAssetIds", "operator": "includes",
+        "values": [
+          { "attribute": "manufacturerPartId", "operator": "eq", "value": "99991" },
+          { "attribute": "customerPartId", "operator": "eq", "value": "ACME001" }
+        ]
+      },
+      {
+        "attribute": "visibleSpecificAssetIdNames", "operator": "includes",
+        "values": [
+          { "attribute": "name", "operator": "eq", "value": "manufacturerPartId" },
+          { "attribute": "name", "operator": "eq", "value": "customerPartId" },
+          { "attribute": "name", "operator": "eq", "value": "partInstanceId" }
+        ]
+      },
+      {
+        "attribute": "visibleSemanticIds", "operator": "includes",
+        "values": [ { "attribute": "modelUrn", "operator": "eq", "value": "ProductCarbonFootprintv1.1.0" } ]
+      }
+    ]
+  }
+  },
+  {
+    "id": 2, "tid": "BPNL00000000000B", "targetTenant": "PUBLIC_READABLE",
+    "validFrom": "2020-01-02T03:04:05Z", "validTo": "4999-01-02T03:04:05Z",
+    "description": "ACME policy within set validity period",
+    "policyType": "AAS", "policy": {
+    "accessRules": [
+      { "attribute": "bpn", "operator": "eq", "value": "PUBLIC_READABLE" },
+      {
+        "attribute": "mandatorySpecificAssetIds", "operator": "includes",
+        "values": [
+          { "attribute": "manufacturerPartId", "operator": "eq", "value": "99991" },
+          { "attribute": "revisionNumber", "operator": "eq", "value": "01" }
+        ]
+      },
+      {
+        "attribute": "visibleSpecificAssetIdNames", "operator": "includes",
+        "values": [
+          { "attribute": "name", "operator": "eq", "value": "manufacturerPartId" },
+          { "attribute": "name", "operator": "eq", "value": "revisionNumber" }
+        ]
+      },
+      {
+        "attribute": "visibleSemanticIds", "operator": "includes",
+        "values": [ { "attribute": "modelUrn", "operator": "eq", "value": "ProductCarbonFootprintv1.1.0" } ]
+      }
+    ]
+  }
+  }
+]

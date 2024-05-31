@@ -217,7 +217,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
                      // Rule for BPN
                      TestUtil.PUBLIC_READABLE,
                      // Rule for mandatory specificAssetIds
-                     Map.of( keyPrefix + "BPID", "ignoreWildcard", "manufacturerPartId", keyPrefix + "wildcardAllowed" ),
+                     Map.of( "manufacturerPartId", keyPrefix + "wildcardAllowed" ),
                      // Rule for visible specificAssetIds
                      Set.of( "manufacturerPartId" ), Set.of( keyPrefix + "semanticId" ) ),
                TestUtil.createAccessRule(
@@ -418,7 +418,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
       public void testFindExternalShellIdsBySpecificAssetIdsWithTenantBasedVisibilityAndWildcardExpectSuccess() throws Exception {
          accessControlRuleRepository.saveAllAndFlush( List.of(
                TestUtil.createAccessRule( TestUtil.PUBLIC_READABLE,
-                     Map.of( keyPrefix + "bpId", "value_3", "manufacturerPartId", keyPrefix + "value_2" ),
+                     Map.of( "manufacturerPartId", keyPrefix + "value_2" ),
                      Set.of( "manufacturerPartId" ), Set.of( keyPrefix + "semanticId" ) ),
                TestUtil.createAccessRule( jwtTokenFactory.tenantTwo().getTenantId(),
                      Map.of( keyPrefix + "tenantTwo_tenantThree", "value_3", keyPrefix + "tenantTwo", "value_2_private" ),
