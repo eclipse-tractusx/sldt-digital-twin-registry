@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## fixed
 - Bugfix access rule management for submodelfilter (visibleSemanticIds): Remove condition on `semanticId.keys.type = submodel` because the `semanticId.keys.type` should be `GlobalReference`. This check is not needed.
+- Implemented mandatory changes in licensing and legal documentation
 
 ## 0.4.3
 ### Added
