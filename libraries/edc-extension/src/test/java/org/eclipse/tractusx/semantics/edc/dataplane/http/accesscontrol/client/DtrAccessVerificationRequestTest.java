@@ -22,12 +22,13 @@ package org.eclipse.tractusx.semantics.edc.dataplane.http.accesscontrol.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.eclipse.edc.json.JacksonTypeManager;
 import org.eclipse.edc.spi.types.TypeManager;
 import org.junit.jupiter.api.Test;
 
 class DtrAccessVerificationRequestTest {
 
-   private final TypeManager typeManager = new TypeManager();
+   private final TypeManager typeManager = new JacksonTypeManager();
 
    @Test
    void test_JsonDeserialization_ShouldGetBackOriginalRequest_WhenCalledWithSerializedValidData() {
