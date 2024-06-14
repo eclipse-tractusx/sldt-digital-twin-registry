@@ -99,4 +99,11 @@ public class AccessRulePolicy {
    private String getAccessRulePolicyValueStringFunction( final AccessRulePolicyValue idValue ) {
       return Optional.ofNullable( idValue ).map( AccessRulePolicyValue::value ).orElse( null );
    }
+
+   @JsonIgnore
+   public void removeVisibleSpecificAssetIdName( String name ) {
+      accessRules.stream()
+            .filter( accessRule -> accessRule.attribute().equals( VISIBLE_SPECIFIC_ASSET_ID_NAMES_RULE_NAME ) )
+            .forEach( accessRule -> accessRule.values().removeIf( id -> id.value().equals( name ) ) );
+   }
 }

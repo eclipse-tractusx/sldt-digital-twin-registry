@@ -49,10 +49,13 @@ public class SqlBackedAccessControlRuleService implements AccessControlRuleServi
    private static final String NO_MATCHING_RULES_ARE_FOUND = "No matching rules are found.";
    private final AccessControlRuleRepository repository;
    private final String bpnWildcard;
+   private final List<String> wildcardAllowedTypes;
 
-   public SqlBackedAccessControlRuleService( @NonNull AccessControlRuleRepository repository, @NonNull String bpnWildcard ) {
+   public SqlBackedAccessControlRuleService( @NonNull AccessControlRuleRepository repository, @NonNull String bpnWildcard,
+         @NonNull List<String> wildcardAllowedTypes ) {
       this.repository = repository;
       this.bpnWildcard = bpnWildcard;
+      this.wildcardAllowedTypes = wildcardAllowedTypes;
    }
 
    @Override
@@ -118,7 +121,7 @@ public class SqlBackedAccessControlRuleService implements AccessControlRuleServi
 
    private Stream<AccessRulePolicy> findPotentiallyMatchingAccessControlRules( String bpn ) throws DenyAccessException {
       try {
-         List<AccessRule> allByBpn = repository.findAllByBpnWithinValidityPeriod( bpn, bpnWildcard, Instant.now() );
+         List<AccessRule> allByBpn = findAllByBpn( bpn );
          if ( allByBpn == null || allByBpn.isEmpty() ) {
             throw new DenyAccessException( NO_MATCHING_RULES_ARE_FOUND );
          }
@@ -127,6 +130,20 @@ public class SqlBackedAccessControlRuleService implements AccessControlRuleServi
          log.error( "Failed to fetch rules for BPN: " + bpn, e.getMessage() );
          throw new DenyAccessException( NO_MATCHING_RULES_ARE_FOUND );
       }
+   }
+
+   private List<AccessRule> findAllByBpn( String bpn ) {
+      List<AccessRule> accessRules = repository.findAllByBpnWithinValidityPeriod( bpn, bpnWildcard, Instant.now() );
+
+      accessRules.stream()
+            .filter( accessRule -> bpnWildcard.equals( accessRule.getTargetTenant() ) )
+            .forEach( accessRule -> {
+               accessRule.getPolicy().getVisibleSpecificAssetIdNames().stream()
+                     .filter( value -> !wildcardAllowedTypes.contains( value ) )
+                     .forEach( value -> accessRule.getPolicy().removeVisibleSpecificAssetIdName( value ) );
+            } );
+
+      return accessRules;
    }
 
    private Set<AccessRulePolicy> findMatchingAccessControlRules( ShellVisibilityContext shellContext, String bpn ) throws DenyAccessException {

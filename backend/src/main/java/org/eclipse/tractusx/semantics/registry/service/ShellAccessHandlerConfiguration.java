@@ -33,7 +33,8 @@ public class ShellAccessHandlerConfiguration {
    @Bean
    public AccessControlRuleService accessControlRuleService(
          final AccessControlRuleRepository accessControlRuleRepository, final RegistryProperties registryProperties ) {
-      return new SqlBackedAccessControlRuleService( accessControlRuleRepository, registryProperties.getExternalSubjectIdWildcardPrefix() );
+      return new SqlBackedAccessControlRuleService( accessControlRuleRepository, registryProperties.getExternalSubjectIdWildcardPrefix(),
+            registryProperties.getExternalSubjectIdWildcardAllowedTypes() );
    }
 
    @Bean
