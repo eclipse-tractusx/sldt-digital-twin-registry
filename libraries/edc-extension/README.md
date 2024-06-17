@@ -40,6 +40,6 @@ The following table outlines the configuration settings for the `DTR Data Plane 
 
 ## Digital Twin Registry Compatibility
 
-| dtr-edc Extension version | Digital Twin Registry version |
-|---------------------------|-------------------------------|
-| 0.1.0-RC1                 | > 0.4.2                       |
+| dtr-edc Extension library version | Digital Twin Registry image version |
+|-----------------------------------|-------------------------------------|
+| 0.1.0-RC1                         | > 0.4.2                             |
