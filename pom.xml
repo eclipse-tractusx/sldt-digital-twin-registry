@@ -119,14 +119,6 @@
 		<sonar.java.source>17</sonar.java.source>
 	</properties>
 
-	<modules>
-		<module>backend</module>
-        <module>access-control-service-interface</module>
-        <module>access-control-service-sql-impl</module>
-        <module>libraries/edc-extension</module>
-        <!-- more modules are expected to come -->
-    </modules>
-
 	<dependencyManagement>
 		<dependencies>
 			<!-- Predefined potential dependencies and versions -->
@@ -526,6 +518,43 @@
 		</plugins>
 	</build>
 
+	<profiles>
+		<profile>
+			<id>release-to-central</id>
+			<modules>
+				<module>libraries/edc-extension</module>
+			</modules>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>default</id>
+			<modules>
+				<module>backend</module>
+				<module>access-control-service-interface</module>
+				<module>access-control-service-sql-impl</module>
+				<module>libraries/edc-extension</module>
+				<!-- more modules are expected to come -->
+			</modules>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+	</profiles>
+
 	<repositories>
 		<repository>
 			<id>Maven Central</id>
@@ -535,10 +564,13 @@
 	</repositories>
 
 	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
 		<repository>
-			<id>github</id>
-			<name>GitHub Packages</name>
-			<url>https://maven.pkg.github.com/eclipse-tractusx/sldt-digital-twin-registry</url>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
-  	</distributionManagement>
+	</distributionManagement>
 </project>
