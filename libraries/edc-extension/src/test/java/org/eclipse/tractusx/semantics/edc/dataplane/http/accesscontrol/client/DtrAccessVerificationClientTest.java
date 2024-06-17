@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.eclipse.edc.spi.http.EdcHttpClient;
+import org.eclipse.edc.http.spi.EdcHttpClient;
 import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.edc.spi.types.TypeManager;
 import org.eclipse.tractusx.semantics.edc.dataplane.http.accesscontrol.AccessControlServiceException;

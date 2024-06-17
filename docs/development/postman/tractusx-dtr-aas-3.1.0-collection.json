@@ -1,9 +1,8 @@
 {
 	"info": {
-		"_postman_id": "a55b763d-91cc-43e4-a3b9-615edab5dc52",
-		"name": "tractusx-dtr-aas-3.0.0 Copy",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "28393378"
+		"_postman_id": "93ec8210-a45b-4bae-9964-8bad1aaaa32e",
+		"name": "tractusx-dtr-aas-3.1.0",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
 	"item": [
 		{
@@ -16,7 +15,13 @@
 							"type": "noauth"
 						},
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Edc-Bpn",
+								"value": "{{EDC-BPN}}",
+								"type": "default"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n  \"idShort\": \"idShortExample\",\n  \"id\": \"e1eba3d7-91f0-4dac-a730-eaa1d35e035c-2\",  \n  \"description\": [\n    {\n      \"language\": \"de\",\n      \"text\": \"example text\"\n    }\n  ],\n  \"displayName\": [\n    {\n      \"language\": \"de\",\n      \"text\": \"this is an example description1\"\n    }\n  ],\n  \"specificAssetIds\": [\n    {\n      \"name\": \"manufacturePartId\",\n      \"value\": \"1234\"\n    },\n    {\n      \"name\": \"oen\",\n      \"value\": \"1239485\"\n    },\n    {\n      \"name\": \"serialnr\",\n      \"value\": \"12345\",\n      \"externalSubjectId\":{\n          \"type\": \"ExternalReference\",\n          \"keys\": [\n            {\n              \"type\": \"Property\",\n              \"value\": \"CONSUMER_BPN\"\n            }\n          ]\n        }\n    }\n  ],\n  \"submodelDescriptors\": [\n    {\n      \"endpoints\": [\n        {\n          \"interface\": \"interfaceNameExample\",\n          \"protocolInformation\": {\n            \"href\": \"endpointAddressExample\",\n            \"endpointProtocol\": \"endpointProtocolExample\",\n            \"endpointProtocolVersion\": [\n              \"e\"\n            ],\n            \"subprotocol\": \"5hg\",\n            \"subprotocolBody\":\"\",\n            \"subprotocolBodyEncoding\": \"subprotocolBodyExample\",\n            \"securityAttributes\": [\n              {\n                \"type\": \"NONE\",\n                \"key\": \"sec\",\n                \"value\": \"1\"\n              }\n            ]\n          }\n        }\n      ],\n      \"idShort\": \"idShortExample\",\n      \"id\": \"cd47615b-daf3-4036-8670-d2f89349d388-2\",\n      \"semanticId\": {\n        \"type\": \"ExternalReference\",\n        \"keys\": [\n          {\n            \"type\": \"Submodel\",\n            \"value\": \"urn:bamm:io.catenax.serial_part_typization:1.1.0#SerialPartTypization\"\n          }\n        ]\n      },\n      \"description\": [\n        {\n          \"language\": \"de\",\n          \"text\": \"hello text\"\n        },\n        {\n          \"language\": \"en\",\n          \"text\": \"hello s\"\n        }\n      ]\n    }\n  ]\n}",
@@ -26,17 +31,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{baseUrl}}/api/v3/shell-descriptors",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v3",
-								"shell-descriptors"
-							]
-						}
+						"url": "{{baseUrl}}/api/v3/shell-descriptors"
 					},
 					"response": []
 				},
@@ -50,7 +45,7 @@
 						"header": [
 							{
 								"key": "Edc-Bpn",
-								"value": "CONSUMER_BPN",
+								"value": "{{EDC-BPN}}",
 								"description": "BPN (This is normally send via EDC)",
 								"type": "default"
 							}
@@ -96,7 +91,7 @@
 						"header": [
 							{
 								"key": "Edc-Bpn",
-								"value": "",
+								"value": "{{EDC-BPN}}",
 								"description": "BPN (This is normally send via EDC)",
 								"type": "default"
 							}
@@ -130,7 +125,13 @@
 							"type": "noauth"
 						},
 						"method": "PUT",
-						"header": [],
+						"header": [
+							{
+								"key": "Edc-Bpn",
+								"value": "{{EDC-BPN}}",
+								"type": "default"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n  \"idShort\": \"idShortExample\",\n  \"id\": \"e1eba3d7-91f0-4dac-a730-eaa1d35e035c-2\",\n  \"description\": [\n    {\n      \"language\": \"de\",\n      \"text\": \"example text\"\n    }\n  ],\n  \"displayName\": [\n    {\n      \"language\": \"de\",\n      \"text\": \"this is an example description1\"\n    }\n  ],\n  \"endpoints\": [\n    {\n      \"interface\": \"interfaceNameExample\",\n      \"protocolInformation\": {\n        \"href\": \"endpointAddressExample\",\n        \"endpointProtocol\": \"endpointProtocolExample\",\n        \"endpointProtocolVersion\": [\n          \"e\"\n        ],\n        \"subprotocol\": \"subprotocolExample\",\n        \"subprotocolBody\": \"subprotocolBodyExample\",\n        \"subprotocolBodyEncoding\": \"subprotocolBodyExample\",\n        \"securityAttributes\": [\n          {\n            \"type\": \"NONE\"\n          }\n        ]\n      }\n    }\n  ],\n  \"specificAssetIds\": [\n    {\n      \"name\": \"manufacturePartId\",\n      \"value\": \"12345\",\n      \"externalSubjectId\":{\n          \"type\": \"ExternalReference\",\n          \"keys\": [\n            {\n              \"type\": \"Property\",\n              \"value\": \"CONSUMER_BPN\"\n            }\n          ]\n        }\n    },\n    {\n      \"name\": \"oen\",\n      \"value\": \"1239485\"\n    },\n    {\n      \"name\": \"serialnr\",\n      \"value\": \"1234\",\n      \"externalSubjectId\":{\n          \"type\": \"ExternalReference\",\n          \"keys\": [\n            {\n              \"type\": \"Property\",\n              \"value\": \"CONSUMER_BPN\"\n            }\n          ]\n        }\n    }\n  ],\n  \"submodelDescriptors\": [\n    {\n      \"endpoints\": [\n        {\n          \"interface\": \"interfaceNameExample\",\n          \"protocolInformation\": {\n            \"href\": \"endpointAddressExample\",\n            \"endpointProtocol\": \"endpointProtocolExample\",\n            \"endpointProtocolVersion\": [\n              \"e\"\n            ],\n            \"subprotocol\": \"5hg\",\n            \"subprotocolBody\":\"\",\n            \"subprotocolBodyEncoding\": \"subprotocolBodyExample\",\n            \"securityAttributes\": [\n              {\n                \"type\": \"NONE\"\n              }\n            ]\n          }\n        }\n      ],\n      \"idShort\": \"idShortExample\",\n      \"id\": \"cd47615b-daf3-4036-8670-d2f89349d388-2\",\n      \"semanticId\": {\n        \"type\": \"ExternalReference\",\n        \"keys\": [\n          {\n            \"type\": \"Submodel\",\n            \"value\": \"urn:bamm:io.catenax.serial_part_typization:1.1.0#SerialPartTypization\"\n          }\n        ]\n      },\n      \"description\": [\n        {\n          \"language\": \"de\",\n          \"text\": \"hello text\"\n        },\n        {\n          \"language\": \"en\",\n          \"text\": \"hello s\"\n        }\n      ]\n    }\n  ]\n}",
@@ -169,7 +170,13 @@
 							"type": "noauth"
 						},
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "Edc-Bpn",
+								"value": "{{EDC-BPN}}",
+								"type": "default"
+							}
+						],
 						"url": {
 							"raw": "{{baseUrl}}/api/v3/shell-descriptors/:aasIdentifier",
 							"host": [
@@ -199,7 +206,13 @@
 							"type": "noauth"
 						},
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Edc-Bpn",
+								"value": "{{EDC-BPN}}",
+								"type": "default"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n  \"endpoints\": [\n    {\n      \"interface\": \"interfaceNameExample\",\n      \"protocolInformation\": {\n        \"href\": \"endpointAddressExample\",\n        \"endpointProtocol\": \"endpointProtocolExample\",\n        \"endpointProtocolVersion\": [\n          \"e\"\n        ],\n        \"subprotocol\": \"subprotocolExample\",\n        \"subprotocolBody\": \"subprotocolBodyExample\",\n        \"subprotocolBodyEncoding\": \"subprotocolBodyExample\",\n        \"securityAttributes\": [\n          {\n            \"type\": \"NONE\"\n          }\n        ]\n      }\n    }\n  ],\n  \"idShort\": \"idShortExample\",\n  \"id\": \"341f63de-728a-4b6d-9c72-c0d9ba4f8c7d\",\n  \"semanticId\": {\n    \"type\": \"ExternalReference\",\n    \"keys\": [\n      {\n        \"type\": \"Submodel\",\n        \"value\": \"semanticIdExample\"\n      }\n    ]\n  },\n  \"description\": [\n    {\n      \"language\": \"de\",\n      \"text\": \"hello text\"\n    },\n    {\n      \"language\": \"en\",\n      \"text\": \"hello s\"\n    }\n  ]\n}",
@@ -242,7 +255,7 @@
 						"header": [
 							{
 								"key": "Edc-Bpn",
-								"value": "",
+								"value": "{{EDC-BPN}}",
 								"description": "BPN (This is normally send via EDC)",
 								"type": "default"
 							}
@@ -289,7 +302,13 @@
 							"type": "noauth"
 						},
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Edc-Bpn",
+								"value": "{{EDC-BPN}}",
+								"type": "default"
+							}
+						],
 						"url": {
 							"raw": "{{baseUrl}}/api/v3/shell-descriptors/:aasIdentifier/submodel-descriptors/:submodelIdentifier",
 							"host": [
@@ -326,7 +345,13 @@
 							"type": "noauth"
 						},
 						"method": "PUT",
-						"header": [],
+						"header": [
+							{
+								"key": "Edc-Bpn",
+								"value": "{{EDC-BPN}}",
+								"type": "default"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n  \"endpoints\": [\n    {\n      \"interface\": \"interfaceNameExample\",\n      \"protocolInformation\": {\n        \"href\": \"endpointAddressExample\",\n        \"endpointProtocol\": \"endpointProtocolExample\",\n        \"endpointProtocolVersion\": [\n          \"e\"\n        ],\n        \"subprotocol\": \"subprotocolExample\",\n        \"subprotocolBody\": \"subprotocolBodyExample\",\n        \"subprotocolBodyEncoding\": \"subprotocolBodyExample\",\n        \"securityAttributes\": [\n          {\n            \"type\": \"NONE\"\n          }\n        ]\n      }\n    }\n  ],\n  \"idShort\": \"idShortExample\",\n  \"id\": \"341f63de-728a-4b6d-9c72-c0d9ba4f8c7d\",\n  \"semanticId\": {\n    \"type\": \"ExternalReference\",\n    \"keys\": [\n      {\n        \"type\": \"Submodel\",\n        \"value\": \"semanticIdExample\"\n      }\n    ]\n  },\n  \"description\": [\n    {\n      \"language\": \"de\",\n      \"text\": \"hello text\"\n    },\n    {\n      \"language\": \"en\",\n      \"text\": \"hello s\"\n    }\n  ]\n}",
@@ -372,7 +397,13 @@
 							"type": "noauth"
 						},
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "Edc-Bpn",
+								"value": "{{EDC-BPN}}",
+								"type": "default"
+							}
+						],
 						"url": {
 							"raw": "{{baseUrl}}/api/v3/shell-descriptors/:aasIdentifier/submodel-descriptors/:submodelIdentifier",
 							"host": [
@@ -414,7 +445,7 @@
 						"header": [
 							{
 								"key": "Edc-Bpn",
-								"value": "",
+								"value": "{{EDC-BPN}}",
 								"description": "BPN (This is normally send via EDC)",
 								"type": "default"
 							}
@@ -457,7 +488,7 @@
 						"header": [
 							{
 								"key": "Edc-Bpn",
-								"value": "",
+								"value": "{{EDC-BPN}}",
 								"description": "BPN (This is normally send via EDC)",
 								"type": "default"
 							}
@@ -492,7 +523,7 @@
 						"header": [
 							{
 								"key": "Edc-Bpn",
-								"value": "",
+								"value": "{{EDC-BPN}}",
 								"description": "BPN (This is normally send via EDC)",
 								"type": "default"
 							}
@@ -536,7 +567,7 @@
 						"header": [
 							{
 								"key": "Edc-Bpn",
-								"value": "TENANT_ONE",
+								"value": "{{EDC-BPN}}",
 								"type": "text"
 							}
 						],

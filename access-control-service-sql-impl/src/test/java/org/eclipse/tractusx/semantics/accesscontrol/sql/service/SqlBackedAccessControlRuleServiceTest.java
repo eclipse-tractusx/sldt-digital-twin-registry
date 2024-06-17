@@ -69,6 +69,7 @@ class SqlBackedAccessControlRuleServiceTest {
    private static final String TRACEABILITYV_1_1_0 = "Traceability" + "v1.1.0";
    private static final String PRODUCT_CARBON_FOOTPRINTV_1_1_0 = "ProductCarbonFootprintv1.1.0";
    private SqlBackedAccessControlRuleService underTest;
+   private SqlBackedAccessControlRuleService publicReadableUnderTest;
 
    public static Stream<Arguments> matchingSpecificAssetIdFilterProvider() {
       return Stream.<Arguments> builder()
@@ -124,10 +125,40 @@ class SqlBackedAccessControlRuleServiceTest {
             .build();
    }
 
+   public static Stream<Arguments> matchingPublicReadableSpecificAssetIdVisibilityProvider() {
+      return Stream.<Arguments> builder()
+            .add( Arguments.of(
+                  Set.of( MANUFACTURER_PART_ID_99991, CUSTOMER_PART_ID_ACME001, PART_INSTANCE_ID_00001 ),
+                  BPNA,
+                  Set.of(PART_INSTANCE_ID),
+                  Map.of(
+                        MANUFACTURER_PART_ID_99991.name(), Set.of( MANUFACTURER_PART_ID_99991.value() ),
+                        CUSTOMER_PART_ID_ACME001.name(), Set.of( CUSTOMER_PART_ID_ACME001.value() )
+                  ),
+                  Set.of( PRODUCT_CARBON_FOOTPRINTV_1_1_0 ) ) )
+            .add( Arguments.of(
+                  Set.of( MANUFACTURER_PART_ID_99991, REVISION_NUMBER_01 ),
+                  BPNA,
+                  Set.of(),
+                  Map.of(
+                        MANUFACTURER_PART_ID_99991.name(), Set.of( MANUFACTURER_PART_ID_99991.value() )
+                  ),
+                  Set.of( PRODUCT_CARBON_FOOTPRINTV_1_1_0 ) ) )
+            .build();
+   }
+
    @BeforeEach
    void setUp() throws IOException {
+      AccessControlRuleRepository accessRulesRepository = setUpAccessRulesRepository( "/example-access-rules.json" );
+      AccessControlRuleRepository publicReadableAccessRulesRepository = setUpAccessRulesRepository( "/example-publicreadable-access-rules.json" );
+      underTest = new SqlBackedAccessControlRuleService( accessRulesRepository, "PUBLIC_READABLE", List.of() );
+      publicReadableUnderTest = new SqlBackedAccessControlRuleService( publicReadableAccessRulesRepository, "PUBLIC_READABLE",
+            List.of( "manufacturerPartId", "customerPartId", "partInstanceId" ) );
+   }
+
+   AccessControlRuleRepository setUpAccessRulesRepository( String accessRulesPath ) throws IOException {
       ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
-      final var file = new File( Objects.requireNonNull( getClass().getResource( "/example-access-rules.json" ) ).getFile() );
+      final var file = new File( Objects.requireNonNull( getClass().getResource( accessRulesPath ) ).getFile() );
       final List<AccessRule> allRules = objectMapper.readerForListOf( AccessRule.class ).readValue( file );
       final var rulesByBpn = allRules.stream()
             .filter( rule -> rule.getValidFrom() == null || rule.getValidFrom().isBefore( Instant.now() ) )
@@ -143,14 +174,13 @@ class SqlBackedAccessControlRuleServiceTest {
                      .flatMap( key -> rulesByBpn.getOrDefault( key, Collections.emptyList() ).stream() )
                      .toList();
             } );
-      underTest = new SqlBackedAccessControlRuleService( repository, "PUBLIC_READABLE" );
+      return repository;
    }
 
    @Test
    void testFilterValidSpecificAssetIdsForLookupWhenNoMatchingSpecificAssetIdsProvidedExpectException() {
       final var specificAssetIds = new HashSet<SpecificAssetId>();
       final var shellContexts = List.of( new ShellVisibilityContext( UUID.randomUUID().toString(), specificAssetIds ) );
-
       assertThatThrownBy( () -> underTest.filterValidSpecificAssetIdsForLookup( specificAssetIds, shellContexts, BPNB ) )
             .isInstanceOf( DenyAccessException.class );
    }
@@ -187,6 +217,20 @@ class SqlBackedAccessControlRuleServiceTest {
       ShellVisibilityContext shellContext = new ShellVisibilityContext( UUID.randomUUID().toString(), specificAssetIds );
 
       final var actual = underTest.fetchVisibilityCriteriaForShell( shellContext, bpn );
+
+      assertThat( actual.visibleSemanticIds() ).isEqualTo( expectedSemanticIds );
+      assertThat( actual.visibleSpecificAssetIdNamesRegardlessOfValues() ).isEqualTo( expectedSpecificAssetIdNamesRegardlessOfValues );
+      assertThat( actual.visibleSpecificAssetIdWhenMatchingValues() ).isEqualTo( expectedSpecificAssetIdWhenMatchingValues );
+   }
+
+   @ParameterizedTest
+   @MethodSource( "matchingPublicReadableSpecificAssetIdVisibilityProvider" )
+   void testFetchVisibilityCriteriaForShellWhenMatchingPublicReadableSpecificAssetIdsProvidedExpectFilteringList(
+         Set<SpecificAssetId> specificAssetIds, String bpn, Set<String> expectedSpecificAssetIdNamesRegardlessOfValues,
+         Map<String, Set<String>> expectedSpecificAssetIdWhenMatchingValues, Set<String> expectedSemanticIds ) throws DenyAccessException {
+      ShellVisibilityContext shellContext = new ShellVisibilityContext( UUID.randomUUID().toString(), specificAssetIds );
+
+      final var actual = publicReadableUnderTest.fetchVisibilityCriteriaForShell( shellContext, bpn );
 
       assertThat( actual.visibleSemanticIds() ).isEqualTo( expectedSemanticIds );
       assertThat( actual.visibleSpecificAssetIdNamesRegardlessOfValues() ).isEqualTo( expectedSpecificAssetIdNamesRegardlessOfValues );
