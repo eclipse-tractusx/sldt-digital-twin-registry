@@ -119,13 +119,13 @@
    <build>
       <resources>
          <resource>
-            <directory>${project.parent.basedir}</directory>
+            <directory>../..</directory>
             <includes>
                <include>LICENSE</include>
                <include>NOTICE.md</include>
                <include>DEPENDENCIES</include>
             </includes>
-            <targetPath>META-INF/</targetPath>
+            <targetPath>META-INF</targetPath>
          </resource>
          <resource>
             <directory>${project.basedir}/src/main/resources</directory>
@@ -154,37 +154,4 @@
          </plugin>
       </plugins>
    </build>
-
-   <profiles>
-      <profile>
-         <id>release-to-central</id>
-         <activation>
-            <activeByDefault>false</activeByDefault>
-         </activation>
-         <build>
-            <plugins>
-               <plugin>
-                  <groupId>org.apache.maven.plugins</groupId>
-                  <artifactId>maven-gpg-plugin</artifactId>
-               </plugin>
-               <plugin>
-                  <groupId>org.sonatype.plugins</groupId>
-                  <artifactId>nexus-staging-maven-plugin</artifactId>
-               </plugin>
-            </plugins>
-         </build>
-      </profile>
-   </profiles>
-
-   <distributionManagement>
-      <snapshotRepository>
-         <id>ossrh</id>
-         <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-      </snapshotRepository>
-      <repository>
-         <id>ossrh</id>
-         <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-      </repository>
-   </distributionManagement>
-
 </project>
