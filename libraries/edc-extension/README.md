@@ -38,4 +38,8 @@ The following table outlines the configuration settings for the `DTR Data Plane 
 | `oauth2.token.clientId`                                     | Configuration property suffix for the client ID used for OAUTH2 token requests to access DTR.            |
 | `oauth2.token.clientSecret.path`                            | Configuration property suffix for the path to find the client secret in vault for OAUTH2 token requests. |
 
+## Digital Twin Registry Compatibility
 
+| dtr-edc Extension version | Digital Twin Registry version |
+|---------------------------|-------------------------------|
+| 0.1.0-RC1                 | > 0.4.2                       |
