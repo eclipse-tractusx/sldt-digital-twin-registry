@@ -48,6 +48,11 @@ This project leverages the following third party content.
 
 See DEPENDENCIES file.
 
+## Helm Values
+Project contains helm values for different environments at /consortia/environments/
+Also, it contains the argocd app templates at consortia/argocd-app-templates/
+
+
 ## Cryptography
 
 Content may contain encryption software. The country in which you are currently
