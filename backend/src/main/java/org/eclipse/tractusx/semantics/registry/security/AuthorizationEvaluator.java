@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2024 Contributors to the Eclipse Foundation
+ * Copyright (c) 2024 Draexlmaier Group
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -22,15 +22,6 @@ package org.eclipse.tractusx.semantics.registry.security;
 
 import static org.eclipse.tractusx.semantics.registry.security.AuthorizationEvaluator.Roles.*;
 
-import java.util.Collection;
-import java.util.Map;
-
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * This class contains methods validating JWT tokens for correctness and ensuring that the JWT token contains a desired role.
  * The methods are meant to be used in Spring Security expressions for RBAC on API operations.
@@ -48,12 +39,11 @@ import lombok.extern.slf4j.Slf4j;
  * the token will be considered invalid. Invalid tokens result in 403.
  *
  */
-@Slf4j
-public class AuthorizationEvaluator {
+public abstract class AuthorizationEvaluator {
 
    private final String clientId;
 
-   public AuthorizationEvaluator( String clientId ) {
+   protected AuthorizationEvaluator( String clientId ) {
       this.clientId = clientId;
    }
 
@@ -85,34 +75,16 @@ public class AuthorizationEvaluator {
       return containsRole( ROLE_WRITE_ACCESS_RULES );
    }
 
-   private boolean containsRole( String role ) {
-      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-      if ( !(authentication instanceof JwtAuthenticationToken) ) {
-         return false;
-      }
+   protected abstract boolean containsRole( String role ) ;
 
-      JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) (authentication);
-      Map<String, Object> claims = jwtAuthenticationToken.getToken().getClaims();
-
-      Object resourceAccess = claims.get( "resource_access" );
-      if ( !(resourceAccess instanceof Map) ) {
-         return false;
-      }
-
-      Object resource = ((Map<String, Object>) resourceAccess).get( clientId );
-      if ( !(resource instanceof Map) ) {
-         return false;
-      }
-
-      Object roles = ((Map<String, Object>) resource).get( "roles" );
-      if ( !(roles instanceof Collection) ) {
-         return false;
-      }
-
-      Collection<String> rolesList = (Collection<String>) roles;
-      return rolesList.contains( role );
+   /**
+    * get the client id
+    * @return the client id
+    */
+   protected String getClientId() {
+	   return clientId;
    }
-
+   
    /**
     * Represents the roles defined for the registry.
     */

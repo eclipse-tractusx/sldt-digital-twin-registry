@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.eclipse.tractusx.semantics.registry.security.AuthorizationEvaluator;
 import org.springframework.security.core.GrantedAuthority;
@@ -158,10 +159,13 @@ public class JwtTokenFactory {
       }
 
       private RequestPostProcessor authenticationWithRoles( String tenantId, List<String> roles ) {
+    	 final String scopes = String.join(" ", roles.stream().map(p -> "dtwinreg/" + p).collect(Collectors.toList()));
+    	 
          Jwt jwt = Jwt.withTokenValue( "token" )
                .header( "alg", "none" )
                .claim( "sub", "user" )
                .claim( "resource_access", Map.of( publicClientId, Map.of( "roles", toJsonArray( roles ) ) ) )
+               .claim("scope", scopes)
                .build();
          Collection<GrantedAuthority> authorities = Collections.emptyList();
          return authentication( new JwtAuthenticationToken( jwt, authorities ) );

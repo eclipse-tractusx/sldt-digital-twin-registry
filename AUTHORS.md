@@ -16,5 +16,6 @@ The following people have contributed to this repository:
 * Aggarwal Sahil, Robert Bosch GmbH, sahil.aggarwal@de.bosch.com
 * Tunahan Cicek, Robert Bosch GmbH, tunahan.cicek@de.bosch.com
 * Istvan Zoltan Nagy, Robert Bosch GmbH, niy1fe@bosch.com
+* Anton Peissinger, Draexlmaier Group, anton.peissinger@draexlmaier.com
 
 Please add yourself to this list, if you contribute to the content.
