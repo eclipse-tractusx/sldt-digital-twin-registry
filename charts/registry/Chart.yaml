@@ -38,3 +38,4 @@ dependencies:
     name: keycloak
     version: 16.1.7
     condition: enableKeycloak
+	
