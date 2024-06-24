@@ -1,4 +1,5 @@
 /*******************************************************************************
+ * Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
  * Copyright (c) 2024 Contributors to the Eclipse Foundation
  * Copyright (c) 2024 Draexlmaier Group
  *
