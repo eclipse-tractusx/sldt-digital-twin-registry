@@ -22,12 +22,13 @@ package org.eclipse.tractusx.semantics;
 
 import java.util.List;
 
-import lombok.Data;
+import org.eclipse.tractusx.semantics.registry.security.OAuthSecurityConfig;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 
 @Data
@@ -64,13 +65,25 @@ public class RegistryProperties {
     @Data
     @NotNull
     public static class Idm {
-        /**
+		/**
+		 * The identityProvider that should be used. Allowed are keycloak or cognito
+		 */
+		@NotEmpty(message = "identityProvider must not be empty. Allowed is keycloak or cognito")
+		private String identityProvider = OAuthSecurityConfig.IdentityProvider.KEYCLOAK.name().toLowerCase();
+
+		/**
          * The public client id used for the redirect urls.
          */
         @NotEmpty(message = "public client id must not be empty")
         private String publicClientId;
 
-        /**
+		/**
+		 * The internal client id used for writing operations to registry. Used if
+		 * identity provider is cognito
+		 */
+		private String internalClientId;
+
+		/**
          * The owning tenant id to which this AAS Registry belongs to.
          */
         @NotEmpty(message = "owningTenantId must not be empty")

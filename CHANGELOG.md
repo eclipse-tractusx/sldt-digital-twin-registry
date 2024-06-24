@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.5.0-RC1
 ### Added
-
+- AWS Cognito support for authentication
 ## fixed
 - Bugfix access rule management for submodelfilter (visibleSemanticIds): Remove condition on `semanticId.keys.type = submodel` because the `semanticId.keys.type` should be `GlobalReference`. This check is not needed.
 - Implemented mandatory changes in licensing and legal documentation

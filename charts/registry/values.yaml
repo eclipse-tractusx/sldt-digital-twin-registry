@@ -47,6 +47,10 @@ registry:
   idpIssuerUri: ""
   idpClientId: default-client
   tenantId: default-tenant
+  # this field is necessary if cognito is used as identity provider instead of keycloak
+  idpInternalClientId: default-client
+  # this field configures the identity provider for the digital twin registry (keycloak or cognito)
+  identityProvider: keycloak
   externalSubjectIdWildcardPrefix: PUBLIC_READABLE
   externalSubjectIdWildcardAllowedTypes: manufacturerPartId,digitalTwinType
   useGranularAccessControl: "false"

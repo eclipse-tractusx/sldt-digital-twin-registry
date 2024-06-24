@@ -487,6 +487,12 @@ Depending on being a Data Provider or a Data Consumer there are different tokens
 #### Data Consumer
 1. needs an EDR token which is provided between the intercommunication between the EDCs.
 
+#### AWS Cognito as Identity Provider
+DTR can support Keycloak and AWS Cognito as an Identity Provider for all clients that want to access the registry. 
+Client must fetch a token and send it together with the request.
+Cognito behaves somehow different than Keycloak so some code modifications were necessary to use Cognito as an Identity Provider for DTR.
+Detailed information can be found [here](COGNITO.md)
+
 ### Authentication on behalf of a user
 The AAS Registry can be accessed on behalf of a user. The token has to be obtained via the OpenID Connect flow. The AAS Registry will validate these tokens.
 *Support contact*	tractusx-dev@eclipse.org
