@@ -1,0 +1,12 @@
+apiVersion: v2
+name: consumer-edc
+description: A Helm chart that allows to easily set up a decentral registry behind an EDC
+type: application
+version: 0.1.0
+appVersion: 0.1.0
+
+dependencies:
+  - name: tractusx-connector
+    condition: enabled
+    repository: https://eclipse-tractusx.github.io/charts/dev
+    version: 0.7.3

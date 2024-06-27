@@ -1,0 +1,62 @@
+digital-twin-registry:
+  enableKeycloak: true
+  enablePostgres: true
+  # Keylcloak configuration
+  keycloak:
+    type: NodePort
+    args: [ "kc.sh import --file /opt/keycloak/data/import/default-realm-import.json; kc.sh start-dev --hostname-strict=false --proxy=edge" ]
+    auth:
+      adminUser: <path:semantics/data/dtr#keycloak-admin-user>
+      adminPassword: <path:semantics/data/dtr#keycloak-admin-password>
+    extraVolumes:
+      - name: provider-dtr-digital-twin-registry-keycloak-configmap
+        configMap:
+          name: provider-dtr-digital-twin-registry-keycloak-configmap
+    extraVolumeMounts:
+      - mountPath: /opt/keycloak/data/import/default-realm-import.json
+        subPath: default-realm-import.json
+        name: provider-dtr-digital-twin-registry-keycloak-configmap
+    ingress:
+      enabled: true
+      hostname: <path:semantics/data/dtr#keycloak-hostname>
+      path: /
+      tls: true
+      annotations:
+        external-dns.alpha.kubernetes.io/hostname: <path:semantics/data/dtr#keycloak-hostname>
+        nginx.org/location-snippets: |
+          add_header X-Forwarded-Proto https;
+          add_header X-Forwarded-For <path:semantics/data/dtr#keycloak-hostname>;
+  # Postgres configuration
+  postgresql:
+    primary:
+      persistence:
+        enabled: true
+        size: 8Gi
+    service:
+      ports:
+        postgresql: 5432
+    auth:
+      username: <path:semantics/data/dtr#db-user>
+      password: <path:semantics/data/dtr#db-password>
+      database: <path:semantics/data/dtr#db-schema>
+  # DTR  configuration
+  registry:
+    host: <path:semantics/data/dtr#dtr-hostname>
+    authentication: true
+    idpIssuerUri: <path:semantics/data/dtr#idpIssuerUri>
+    idpClientId: <path:semantics/data/dtr#idpClientId>
+    tenantId: <path:semantics/data/dtr#tenantId>
+    useGranularAccessControl: "true"
+    ingress:
+      enabled: true
+      tls: true
+      urlPrefix: /dtr
+      className: nginx
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        nginx.ingress.kubernetes.io/rewrite-target: /$2
+        nginx.ingress.kubernetes.io/use-regex: "true"
+        nginx.ingress.kubernetes.io/enable-cors: "true"
+        nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+        nginx.ingress.kubernetes.io/x-forwarded-prefix: /dtr
+  
