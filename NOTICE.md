@@ -48,9 +48,9 @@ This project leverages the following third party content.
 
 See DEPENDENCIES file.
 
-## Helm Values
-Project contains helm values for different environments at /consortia/environments/
-Also, it contains the argocd app templates at consortia/argocd-app-templates/
+## Test Environments
+The project contains deployment configuration specific to hosted test environments needed for integration and end-to-end testing. 
+This configuration is maintained within the [environments](https://github.com/eclipse-tractusx/sldt-digital-twin-registry/environments) directory.
 
 
 ## Cryptography
