@@ -97,20 +97,10 @@ tractusx-connector:
         tls:
           enabled: true
   vault:
-    injector:
-      enabled: false
-    server:
-      authDelegator:
-        enabled: false
-      dev:
-        enabled: true
+    fullnameOverride: "vault"
     hashicorp:
       url: <path:semantics/data/provider-edc#vault-hashicorp-url>
       token: <path:semantics/data/provider-edc#vault-hashicorp-token>
-      timeout: 30
-      healthCheck:
-        enabled: true
-        standbyOk: true
       paths:
         secret:  <path:semantics/data/provider-edc#vault-hashicorp-secret-path>
         health: /v1/sys/health
