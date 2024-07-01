@@ -131,16 +131,17 @@ keycloak:
     adminPassword:
   service:
     type: ClusterIP
-  extraVolumes:
-    - name: init-script-vol
-      configMap:
-        name: init-script-vol
   # Mounting a keycloak realm configuration file
   fullnameOverride: registry-keycloak
+  # default configMap is keycloak.fullnameOverride-configmap
+  extraVolumes:
+    - name: registry-keycloak-configmap
+      configMap:
+        name: registry-keycloak-configmap
   extraVolumeMounts:
     - mountPath: /opt/keycloak/data/import/default-realm-import.json
       subPath: default-realm-import.json
-      name: init-script-vol
+      name: registry-keycloak-configmap
   # Using a pre-configured Keycloak with a default realm,
   # containing a test client and user with the necessary roles to
   # authorize requests to the digital twin registry.
