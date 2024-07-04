@@ -38,8 +38,60 @@ The following table outlines the configuration settings for the `DTR Data Plane 
 | `oauth2.token.clientId`                                     | Configuration property suffix for the client ID used for OAUTH2 token requests to access DTR.            |
 | `oauth2.token.clientSecret.path`                            | Configuration property suffix for the path to find the client secret in vault for OAUTH2 token requests. |
 
-## Digital Twin Registry Compatibility
+## Compatibility
 
-| dtr-edc Extension library version | Digital Twin Registry image version |
-|-----------------------------------|-------------------------------------|
-| 0.1.0-RC1                         | > 0.4.2                             |
+| dtr-edc Extension library version | Digital Twin Registry image version | EDC version |
+|-----------------------------------|-------------------------------------|-------------|
+| `0.1.0-RC1`                       | `> 0.4.2`                            | `0.7.X`     |
+
+## Using the DTR-EDC Access Control Extension
+
+To use the EDC extension, you need to build your own EDC Dataplane image. The EDC team provides a GitHub repository template for this purpose. You must fork or copy this repository. More details can be found at [this link](https://github.com/eclipse-tractusx/tractusx-edc-template).
+
+After forking the repository, navigate to the `runtimes/dataplane` folder and open the `build.gradle.kts` file. Here, you can integrate the DTR-EDC Access Control extension and build your own custom dataplane image.
+
+1. Add the following dependency to the dependencies block:
+
+```
+implementation ("org.eclipse.tractusx.digital_twin_registry:dtr-edc-access-control-extension:Version")
+```
+
+An example looks like:
+```
+dependencies {
+    implementation ("org.eclipse.tractusx.digital_twin_registry:dtr-edc-access-control-extension:0.1.0-RC3")
+    runtimeOnly(libs.tx.dataplane) {
+        // add module exclusions here as you need them, for example, to exclude the S3 Dataplane features
+        // exclude(group = "org.eclipse.edc", module="data-plane-aws-s3")
+    }
+}
+```
+
+2. After adding the dependency, build the Docker image. Execute the following command at the root level:
+```
+./gradlew dockerize
+```
+
+3. To configure the EDC Dataplane, you can provide the parameters mentioned above as environment variables.
+   An example in the`values.yaml` file of the tractusx-connector might look like this:
+```
+...
+tractusx-connector:
+...
+    dataplane:
+    ...
+      env:
+        EDC_GRANULAR_ACCESS_VERIFICATION_ERROR_ENDPOINT_PORT: 9054
+        EDC_GRANULAR_ACCESS_VERIFICATION_EDC_DATA_PLANE_BASEURL: http://local-edc-data-plane:9051/public/v2/
+        EDC_GRANULAR_ACCESS_VERIFICATION_DTR_NAMES: default
+        EDC_GRANULAR_ACCESS_VERIFICATION_DTR_CONFIG_DEFAULT_DTR_DECISION_CACHE_DURATION_MINUTES: 1
+        EDC_GRANULAR_ACCESS_VERIFICATION_DTR_CONFIG_DEFAULT_DTR_ACCESS_VERIFICATION_ENDPOINT_URL: http://baseurl-dtr/v2/api/v3/submodel-descriptor/authorized
+        EDC_GRANULAR_ACCESS_VERIFICATION_DTR_CONFIG_DEFAULT_ASPECT_MODEL_URL_PATTERN: http:\/\/baseurl-submodelserver\/pcf\/.*
+        EDC_GRANULAR_ACCESS_VERIFICATION_DTR_CONFIG_DEFAULT_OAUTH2_TOKEN_ENDPOINT_URL: http://baseurl-keycloak/iam/access-management/v1/tenants/00000000-0000-0000-0000-000000000000/openid-connect/token
+        EDC_GRANULAR_ACCESS_VERIFICATION_DTR_CONFIG_DEFAULT_OAUTH2_TOKEN_SCOPE: aud:local-edc-dtr
+        EDC_GRANULAR_ACCESS_VERIFICATION_DTR_CONFIG_DEFAULT_OAUTH2_TOKEN_CLIENTID: dtr_client
+        EDC_GRANULAR_ACCESS_VERIFICATION_DTR_CONFIG_DEFAULT_OAUTH2_TOKEN_CLIENTSECRET_PATH: dtrsecret
+    ...
+```
+
+4. This custom dataplane docker image can now be deployed.
