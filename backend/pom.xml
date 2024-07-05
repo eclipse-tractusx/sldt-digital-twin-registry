@@ -268,7 +268,6 @@
                 <directory>../</directory>
                 <includes>
                     <include>LICENSE</include>
-                    <include>LICENSE_non-code</include>
                     <include>NOTICE.md</include>
                     <include>DEPENDENCIES</include>
                 </includes>

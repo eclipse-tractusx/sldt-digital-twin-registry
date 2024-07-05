@@ -39,6 +39,8 @@ COPY --from=builder /build/backend/target/digital-twin-registry-backend*.jar app
 
 COPY backend/Dockerfile *legal /legal/
 
+COPY LICENSE NOTICE.md DEPENDENCIES SECURITY.md /legal/
+
 ENV JAVA_TOOL_OPTIONS "-Xms512m -Xmx2048m"
 EXPOSE 4243
 
