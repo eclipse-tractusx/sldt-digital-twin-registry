@@ -41,8 +41,8 @@ The following table outlines the configuration settings for the `DTR Data Plane 
 ## Compatibility
 
 | dtr-edc Extension library version | Digital Twin Registry image version | EDC version |
-|-----------------------------------|-------------------------------------|-------------|
-| `0.1.0-RC1`                       | `> 0.4.2`                            | `0.7.X`     |
+|-------------------------------|-------------------------------------|-------------|
+| `0.1.0`                       | `> 0.4.2`                            | `0.7.X`     |
 
 ## Using the DTR-EDC Access Control Extension
 
