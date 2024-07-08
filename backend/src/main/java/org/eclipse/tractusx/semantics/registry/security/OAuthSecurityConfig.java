@@ -91,6 +91,45 @@ public class OAuthSecurityConfig {
 
     @Bean
     public AuthorizationEvaluator authorizationEvaluator(RegistryProperties registryProperties){
-        return new AuthorizationEvaluator(registryProperties.getIdm().getPublicClientId());
+    	final IdentityProvider provider = IdentityProvider.getIdentityProvider(registryProperties.getIdm().getIdentityProvider());
+        return provider.createAuthorizationEvaluator(registryProperties.getIdm());
     }
+
+	/**
+	 * enum containing the possible identity providers for the DTR
+	 */
+	public enum IdentityProvider {
+
+		KEYCLOAK {
+			@Override
+			public AuthorizationEvaluator createAuthorizationEvaluator(RegistryProperties.Idm idmProperties) {
+				return new KeycloakAuthorizationEvaluator(idmProperties.getPublicClientId());
+			}
+		},
+
+		COGNITO {
+			@Override
+			public AuthorizationEvaluator createAuthorizationEvaluator(RegistryProperties.Idm idmProperties) {
+				return new CognitoAuthorizationEvaluator(idmProperties);
+			}
+		};
+
+		public abstract AuthorizationEvaluator createAuthorizationEvaluator(RegistryProperties.Idm idmProperties);
+
+		/**
+		 * tries to find the Identity Provider enum element based on a string, ignores
+		 * case!.
+		 *
+		 * @param key the key to search
+		 * @return the key as enum
+		 */
+		
+		public static IdentityProvider getIdentityProvider(final String identityProviderName) {
+			try {
+				return IdentityProvider.valueOf(identityProviderName.toUpperCase());
+			} catch (IllegalArgumentException e) {
+				throw new IllegalArgumentException("Unknown identityProvider: " + identityProviderName, e);
+			}
+		}
+	}
 }

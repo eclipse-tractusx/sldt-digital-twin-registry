@@ -62,19 +62,6 @@ jobs:
       - name: install dependencies
         working-directory: ./.github/actions/generate-dependencies-notice
         run: npm install
-      - name: baselayer-licenses
-        uses: philips-labs/tern-action@v1.1.0
-        with:
-          image: eclipse-temurin:17-jre-alpine
-          format: json
-          output: ./base-image-layers.json
-      - name: dependency-licenses
-        uses: ./.github/actions/generate-dependencies-notice
-        with:
-          version: ${{ github.ref_name }}
-          base-path: ${{ github.workspace }}
-          maven-deps-path: ./backend/maven.deps
-          base-image-layers-path: ./base-image-layers.json
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
