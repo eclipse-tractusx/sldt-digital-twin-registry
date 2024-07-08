@@ -86,6 +86,8 @@ jobs:
           image-ref: "tractusx/sldt-digital-twin-registry:latest"
           # ignore-unfixed: true
           hide-progress: false
+          exit-code: "1" # Trivy exits with code 1 if vulnerabilities are found, causing the workflow step to fail.
+          limit-severities-for-sarif: true
           format: "sarif"
           output: "trivy-results-registry.sarif"
           vuln-type: "os,library"
