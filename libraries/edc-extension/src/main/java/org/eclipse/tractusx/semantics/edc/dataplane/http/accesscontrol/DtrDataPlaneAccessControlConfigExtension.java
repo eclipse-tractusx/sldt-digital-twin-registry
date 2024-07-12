@@ -62,16 +62,16 @@ public class DtrDataPlaneAccessControlConfigExtension implements ServiceExtensio
    /**
     * Configuration property suffix for the client id we need to use for OAUTH2 token requests when we need to access DTR.
     */
-   public static final String OAUTH2_TOKEN_CLIENT_ID = "oauth2.token.clientId";
+   public static final String OAUTH2_TOKEN_CLIENT_ID = "oauth2.token.client.id";
 
    /**
     * Configuration property suffix for the path where we can find the client secret in vault for the OAUTH2 token requests when we need to access DTR.
     */
-   public static final String OAUTH2_TOKEN_CLIENT_SECRET_PATH = "oauth2.token.clientSecret.path";
+   public static final String OAUTH2_TOKEN_CLIENT_SECRET_PATH = "oauth2.token.client.secret.path";
 
    @Override
    public String name() {
-      return "DTR Data Plane Access Control Service";
+      return "DTR Data Plane Access Control Configuration extension";
    }
 
    @Override

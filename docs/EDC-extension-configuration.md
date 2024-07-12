@@ -211,9 +211,9 @@ edc.granular.access.verification.dtr.config.default.oauth2.token.endpoint.url=ht
 # Scope (audience) of the token we want to obtain
 edc.granular.access.verification.dtr.config.default.oauth2.token.scope=aud:dtr
 # OAuth2 client Id
-edc.granular.access.verification.dtr.config.default.oauth2.token.clientId=dtr_client
+edc.granular.access.verification.dtr.config.default.oauth2.token.client.id=dtr_client
 # The name (path) of the secret where the OAuth2 client secret is stored in the Vault
-edc.granular.access.verification.dtr.config.default.oauth2.token.clientSecret.path=dtrsecret
+edc.granular.access.verification.dtr.config.default.oauth2.token.client.secret.path=dtrsecret
 ```
 
 > [!NOTE]

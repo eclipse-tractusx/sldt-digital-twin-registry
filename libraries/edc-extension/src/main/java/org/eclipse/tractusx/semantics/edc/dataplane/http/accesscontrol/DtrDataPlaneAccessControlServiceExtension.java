@@ -55,7 +55,7 @@ public class DtrDataPlaneAccessControlServiceExtension implements ServiceExtensi
 
    @Override
    public String name() {
-      return "DTR Data Plane Access Control Service";
+      return "DTR Data Plane Access Control Service extension";
    }
 
    @Provider
