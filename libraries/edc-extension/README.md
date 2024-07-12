@@ -25,18 +25,18 @@ The goal of this edc extension is to enforce authorized access to submodel imple
 
 The following table outlines the configuration settings for the `DTR Data Plane Access Control Config` library.
 
-| Configuration Key                                   | Description                                                                                               |
-|-----------------------------------------------------|-----------------------------------------------------------------------------------------------------------|
+| Configuration Key                                         | Description                                                                                               |
+|-----------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|
 | `edc.granular.access.verification.edc.data.plane.baseUrl` | Contains the base URL of the EDC data plane endpoint where data plane requests are sent by end users.    |
-| `edc.granular.access.verification.dtr.names`             | Comma-separated list of DTR configuration names used as keys for DTR clients.                            |
+| `edc.granular.access.verification.dtr.names`              | Comma-separated list of DTR configuration names used as keys for DTR clients.                            |
 | `edc.granular.access.verification.dtr.config.`            | Prefix for individual DTR configurations.                                                                 |
-| `dtr.decision.cache.duration.minutes`                      | Configuration for the DTR decision cache duration in minutes. The cache is turned off if set to 0.       |
-| `aspect.model.url.pattern`                                  | Configuration property suffix for the pattern to recognize aspect model requests needing DTR control.    |
-| `dtr.access.verification.endpoint.url`                      | Configuration property suffix for the URL where DTR can be reached.                                      |
-| `oauth2.token.endpoint.url`                                 | Configuration property suffix for the URL where OAUTH2 tokens can be obtained for DTR requests.          |
-| `oauth2.token.scope`                                        | Configuration property suffix for the scope needed for OAUTH2 token requests to access DTR.              |
-| `oauth2.token.clientId`                                     | Configuration property suffix for the client ID used for OAUTH2 token requests to access DTR.            |
-| `oauth2.token.clientSecret.path`                            | Configuration property suffix for the path to find the client secret in vault for OAUTH2 token requests. |
+| `dtr.decision.cache.duration.minutes`                     | Configuration for the DTR decision cache duration in minutes. The cache is turned off if set to 0.       |
+| `aspect.model.url.pattern`                                | Configuration property suffix for the pattern to recognize aspect model requests needing DTR control.    |
+| `dtr.access.verification.endpoint.url`                    | Configuration property suffix for the URL where DTR can be reached.                                      |
+| `oauth2.token.endpoint.url`                               | Configuration property suffix for the URL where OAUTH2 tokens can be obtained for DTR requests.          |
+| `oauth2.token.scope`                                      | Configuration property suffix for the scope needed for OAUTH2 token requests to access DTR.              |
+| `oauth2.token.client.id`                                  | Configuration property suffix for the client ID used for OAUTH2 token requests to access DTR.            |
+| `oauth2.token.client.secret.path`                         | Configuration property suffix for the path to find the client secret in vault for OAUTH2 token requests. |
 
 ## Compatibility
 
