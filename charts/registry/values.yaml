@@ -99,6 +99,7 @@ registry:
   securityContext:
     runAsUser: 100
     allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
 
 postgresql:
   primary:
