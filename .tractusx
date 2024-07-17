@@ -20,7 +20,7 @@
 
 product: "Digital Twin Registry"
 leadingRepository: "https://github.com/eclipse-tractusx/sldt-digital-twin-registry"
-openApiSpecs: https://github.com/eclipse-tractusx/sldt-digital-twin-registry/backend/src/main/resources/static/aas-registry-openapi.yaml
+openApiSpecs: https://github.com/eclipse-tractusx/sldt-digital-twin-registry/blob/main/backend/src/main/resources/static/aas-registry-openapi.yaml
 repositories:
   - name: "sldt-digital-twin-registry"
     usage: "This is the repository which contains the source code for the SLDT digital twin registry"
