@@ -22,6 +22,7 @@ tractusx-connector:
     image:
       repository: <path:semantics/data/provider-edc#dataplane-image-repository>
       tag: <path:semantics/data/provider-edc#dataplane-image-tag>
+      pullPolicy: Always
     token:
       signer:
         privatekey_alias: <path:semantics/data/provider-edc#ec-private>
