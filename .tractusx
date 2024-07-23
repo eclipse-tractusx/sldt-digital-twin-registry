@@ -1,6 +1,6 @@
 ###############################################################
-# Copyright (c) 2021, 2023 Robert Bosch Manufacturing Solutions GmbH
-# Copyright (c) 2021, 2023 Contributors to the Eclipse Foundation
+# Copyright (c) 2021, 2024 Robert Bosch Manufacturing Solutions GmbH
+# Copyright (c) 2021, 2024 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -20,6 +20,7 @@
 
 product: "Digital Twin Registry"
 leadingRepository: "https://github.com/eclipse-tractusx/sldt-digital-twin-registry"
+openApiSpecs: https://github.com/eclipse-tractusx/sldt-digital-twin-registry/blob/main/backend/src/main/resources/static/aas-registry-openapi.yaml
 repositories:
   - name: "sldt-digital-twin-registry"
     usage: "This is the repository which contains the source code for the SLDT digital twin registry"

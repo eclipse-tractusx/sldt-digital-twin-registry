@@ -75,5 +75,11 @@ spec:
             {{- end }}
           resources:
 {{ .Values.registry.resources | toYaml | indent 12 }}
+          volumeMounts:
+            - mountPath: /tmp
+              name: empty-tmp
+      volumes:
+        - name: empty-tmp
+          emptyDir: {}
       imagePullSecrets:
 {{ .Values.registry.imagePullSecrets | toYaml | indent 8 }}
