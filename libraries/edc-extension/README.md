@@ -41,8 +41,10 @@ The following table outlines the configuration settings for the `DTR Data Plane 
 ## Compatibility
 
 | dtr-edc Extension library version | Digital Twin Registry image version | EDC version |
-|-------------------------------|-------------------------------------|-------------|
-| `0.1.0`                       | `> 0.4.2`                            | `0.7.X`     |
+|-----------------------------------|-------------------------------------|-------------|
+| `0.1.0`                           | `> 0.4.2`                            | `0.7.3`     |
+| `0.1.1`                           | `> 0.4.2`                            | `0.7.3`     |
+
 
 ## Using the DTR-EDC Access Control Extension
 
@@ -82,15 +84,15 @@ tractusx-connector:
     ...
       env:
         EDC_GRANULAR_ACCESS_VERIFICATION_ERROR_ENDPOINT_PORT: 9054
-        EDC_GRANULAR_ACCESS_VERIFICATION_EDC_DATA_PLANE_BASEURL: http://local-edc-data-plane:9051/public/v2/
+        EDC_GRANULAR_ACCESS_VERIFICATION_EDC_DATA_PLANE_BASE_URL: http://local-edc-data-plane:9051
         EDC_GRANULAR_ACCESS_VERIFICATION_DTR_NAMES: default
         EDC_GRANULAR_ACCESS_VERIFICATION_DTR_CONFIG_DEFAULT_DTR_DECISION_CACHE_DURATION_MINUTES: 1
         EDC_GRANULAR_ACCESS_VERIFICATION_DTR_CONFIG_DEFAULT_DTR_ACCESS_VERIFICATION_ENDPOINT_URL: http://baseurl-dtr/v2/api/v3/submodel-descriptor/authorized
         EDC_GRANULAR_ACCESS_VERIFICATION_DTR_CONFIG_DEFAULT_ASPECT_MODEL_URL_PATTERN: http:\/\/baseurl-submodelserver\/pcf\/.*
         EDC_GRANULAR_ACCESS_VERIFICATION_DTR_CONFIG_DEFAULT_OAUTH2_TOKEN_ENDPOINT_URL: http://baseurl-keycloak/iam/access-management/v1/tenants/00000000-0000-0000-0000-000000000000/openid-connect/token
-        EDC_GRANULAR_ACCESS_VERIFICATION_DTR_CONFIG_DEFAULT_OAUTH2_TOKEN_SCOPE: aud:local-edc-dtr
-        EDC_GRANULAR_ACCESS_VERIFICATION_DTR_CONFIG_DEFAULT_OAUTH2_TOKEN_CLIENTID: dtr_client
-        EDC_GRANULAR_ACCESS_VERIFICATION_DTR_CONFIG_DEFAULT_OAUTH2_TOKEN_CLIENTSECRET_PATH: dtrsecret
+        EDC_GRANULAR_ACCESS_VERIFICATION_DTR_CONFIG_DEFAULT_OAUTH2_TOKEN_SCOPE: openid
+        EDC_GRANULAR_ACCESS_VERIFICATION_DTR_CONFIG_DEFAULT_OAUTH2_TOKEN_CLIENT_ID: dtr_client
+        EDC_GRANULAR_ACCESS_VERIFICATION_DTR_CONFIG_DEFAULT_OAUTH2_TOKEN_CLIENT_SECRET_PATH: dtrsecret
     ...
 ```
 

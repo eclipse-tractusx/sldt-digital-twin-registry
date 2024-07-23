@@ -110,10 +110,12 @@ public class DtrAccessVerificationClient implements HttpAccessVerificationClient
    }
 
    private boolean callDtr( final RequestKey requestKey ) {
+      monitor.debug( "Check submodel-server access. DTR calling with requested URL: " + requestKey.requestedUrl() + " and BPN: " +requestKey.bpn() );
       final Request dtrRequest = getDtrRequest( requestKey );
       try ( Response response = httpClient.execute( dtrRequest ) ) {
          return response.isSuccessful();
       } catch ( final IOException exception ) {
+         monitor.debug( "Failed to execute DTR access with requested URL: " + requestKey.requestedUrl() + " and BPN: " +requestKey.bpn() );
          monitor.severe( "Failed to execute DTR access verification request.", exception );
          throw new AccessControlServiceException( exception );
       }

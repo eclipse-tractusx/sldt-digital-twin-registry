@@ -31,7 +31,7 @@ import org.eclipse.edc.spi.system.ServiceExtensionContext;
 public class DtrDataPlaneAccessControlConfigExtension implements ServiceExtension {
 
    @Setting( value = "Contains the base URL of the EDC data plane endpoint where the data plane requests are sent by the end users." )
-   public static final String EDC_DATA_PLANE_BASE_URL = "edc.granular.access.verification.edc.data.plane.baseUrl";
+   public static final String EDC_DATA_PLANE_BASE_URL = "edc.granular.access.verification.edc.data.plane.base.url";
    @Setting( value = "Comma separated list of DTR configuration names used as keys for DTR clients." )
    public static final String EDC_DTR_CONFIG_NAMES = "edc.granular.access.verification.dtr.names";
    /**
