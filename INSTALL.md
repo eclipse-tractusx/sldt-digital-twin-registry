@@ -54,14 +54,22 @@ The Helm Chart can be configured using the following parameters (incomplete list
 | `registry.externalSubjectIdWildcardAllowedTypes`    | List of allowed types that can be made visible to everyone.                                                                                                                                                                              | `manufacturerPartId,assetLifecyclePhase`    |
 
 ### PostgreSQL
-| Parameter       | Description | Default value       |
-| ---             | ---         | ---                 |
-| `postgresql.primary.persistence.size`     | Size of the `PersistentVolume` that persists the data  | `50Gi` |
-| `postgresql.auth.username`     | Username that is used to authenticate at the database | `catenax` |
-| `postgresql.auth.password`     | Password for authentication at the database  | `TFLIykCd4rUvSjbs` |
-| `postgresql.auth.database`     | Database name  | `registry` |
+| Parameter       | Description                                                                                                                   | Default value      |
+| ---             |-------------------------------------------------------------------------------------------------------------------------------|--------------------|
+| `postgresql.primary.persistence.size`     | Size of the `PersistentVolume` that persists the data                                                                         | `50Gi`             |
+| `postgresql.auth.username`     | Username that is used to authenticate at the database                                                                         | `default-user`     |
+| `postgresql.auth.password`     | Password for authentication at the database. If password is empty, the postgres pw will be generated random via postgres-init | ``                 |
+| `postgresql.auth.database`     | Database name                                                                                                                 | `default-database` |
 
 ### Prerequisites
 - Kubernetes 1.19+
 - Helm 3.2.0+
 - PV provisioner support in the underlying infrastructure
+
+### Required postgresql extensions
+The application requires the following postgresql-extensions to be installed in the postgres database:
+
+| PostgreSQL Extension | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+|----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| uuid-ossp            | Via Liquibase scripts, the uuid-ossp extension will be created if it does not exist. See [liquibase-script](https://github.com/eclipse-tractusx/sldt-digital-twin-registry/blob/main/backend/src/main/resources/db/changelog/db.changelog-extensions.yaml). <br/> In case of using Azure Database for PostgreSQL, the extension needs to be manually activated. <br/> More details can be found at [PostgreSQL extensions in Azure Database for PostgreSQL - Flexible Server](https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/concepts-extensions) |
+
