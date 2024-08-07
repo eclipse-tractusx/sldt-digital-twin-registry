@@ -40,7 +40,7 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.tractusx.semantics.RegistryProperties;
-import org.eclipse.tractusx.semantics.aas.registry.model.GetAllAssetAdministrationShellIdsByAssetLink200Response;
+import org.eclipse.tractusx.semantics.aas.registry.model.InlineResponse200;
 import org.eclipse.tractusx.semantics.aas.registry.model.PagedResultPagingMetadata;
 import org.eclipse.tractusx.semantics.aas.registry.model.SearchAllShellsByAssetLink200Response;
 import org.eclipse.tractusx.semantics.accesscontrol.api.exception.DenyAccessException;
@@ -271,7 +271,7 @@ public class ShellService {
    }
 
    @Transactional( readOnly = true )
-   public GetAllAssetAdministrationShellIdsByAssetLink200Response findExternalShellIdsByIdentifiersByExactMatch( Set<ShellIdentifier> shellIdentifiers,
+   public InlineResponse200 findExternalShellIdsByIdentifiersByExactMatch( Set<ShellIdentifier> shellIdentifiers,
          Integer pageSize, String cursor, String externalSubjectId ) {
 
       pageSize = getPageSize( pageSize );
@@ -286,12 +286,12 @@ public class ShellService {
 
          final var assetIdList = visibleAssetIds.stream().limit( pageSize ).toList();
          final String nextCursor = getCursorEncoded( visibleAssetIds, assetIdList );
-         final var response = new GetAllAssetAdministrationShellIdsByAssetLink200Response();
+         final var response = new InlineResponse200();
          response.setResult( assetIdList );
          response.setPagingMetadata( new PagedResultPagingMetadata().cursor( nextCursor ) );
          return response;
       } catch ( DenyAccessException e ) {
-         final var response = new GetAllAssetAdministrationShellIdsByAssetLink200Response();
+         final var response = new InlineResponse200();
          response.setResult( Collections.emptyList() );
          return response;
       }
