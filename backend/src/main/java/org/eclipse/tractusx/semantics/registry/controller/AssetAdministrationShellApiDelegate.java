@@ -32,9 +32,9 @@ import org.eclipse.tractusx.semantics.aas.registry.api.ShellDescriptorsApiDelega
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetKind;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetLink;
-import org.eclipse.tractusx.semantics.aas.registry.model.GetAllAssetAdministrationShellIdsByAssetLink200Response;
 import org.eclipse.tractusx.semantics.aas.registry.model.GetAssetAdministrationShellDescriptorsResult;
 import org.eclipse.tractusx.semantics.aas.registry.model.GetSubmodelDescriptorsResult;
+import org.eclipse.tractusx.semantics.aas.registry.model.InlineResponse200;
 import org.eclipse.tractusx.semantics.aas.registry.model.SearchAllShellsByAssetLink200Response;
 import org.eclipse.tractusx.semantics.aas.registry.model.ServiceDescription;
 import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
@@ -84,18 +84,17 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
 
     @Override
-    public ResponseEntity<Void> deleteAssetAdministrationShellDescriptorById( byte[]  aasIdentifier ) {
+    public ResponseEntity<Void> deleteAssetAdministrationShellDescriptorById( String  aasIdentifier ) {
         shellService.deleteShell( getDecodedId(aasIdentifier) );
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     @Override
-    public ResponseEntity<Void> deleteAllAssetLinksById(byte[] aasIdentifier) {
-
+    public ResponseEntity<Void> deleteAllAssetLinksById(String aasIdentifier) {
         shellService.deleteAllIdentifiers(getDecodedId(aasIdentifier));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     @Override
-    public ResponseEntity<Void> deleteSubmodelDescriptorByIdThroughSuperpath( byte[] aasIdentifier, byte[] submodelIdentifier, @RequestHeader String externalSubjectId ) {
+    public ResponseEntity<Void> deleteSubmodelDescriptorByIdThroughSuperpath( String aasIdentifier, String submodelIdentifier, @RequestHeader String externalSubjectId ) {
         shellService.deleteSubmodel(getDecodedId( aasIdentifier ), getDecodedId( submodelIdentifier ),getExternalSubjectIdOrEmpty( externalSubjectId ));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
@@ -110,7 +109,7 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
 
     @Override
-    public ResponseEntity<GetSubmodelDescriptorsResult> getAllSubmodelDescriptorsThroughSuperpath( byte[] aasIdentifier, Integer limit, String cursor, @RequestHeader String externalSubjectId  ) {
+    public ResponseEntity<GetSubmodelDescriptorsResult> getAllSubmodelDescriptorsThroughSuperpath( String aasIdentifier, Integer limit, String cursor, @RequestHeader String externalSubjectId  ) {
         Shell savedShell = shellService.findShellByExternalIdAndExternalSubjectId(getDecodedId( aasIdentifier ),getExternalSubjectIdOrEmpty(externalSubjectId));
         SubmodelCollectionDto dto = shellService.findAllSubmodel( limit,cursor, savedShell);
         GetSubmodelDescriptorsResult result= submodelMapper.toApiDto( dto );
@@ -118,14 +117,14 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
 
     @Override
-    public ResponseEntity<AssetAdministrationShellDescriptor> getAssetAdministrationShellDescriptorById( byte[] aasIdentifier, @RequestHeader String externalSubjectId ) {
+    public ResponseEntity<AssetAdministrationShellDescriptor> getAssetAdministrationShellDescriptorById( String aasIdentifier, @RequestHeader String externalSubjectId ) {
         String decodedAasIdentifier = getDecodedId( aasIdentifier );
         Shell saved = shellService.findShellByExternalIdAndExternalSubjectId(decodedAasIdentifier, getExternalSubjectIdOrEmpty(externalSubjectId));
            return new ResponseEntity<>(shellMapper.toApiDto(saved), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<SubmodelDescriptor> getSubmodelDescriptorByIdThroughSuperpath( byte[] aasIdentifier, byte[]  submodelIdentifier, @RequestHeader String externalSubjectId ) {
+    public ResponseEntity<SubmodelDescriptor> getSubmodelDescriptorByIdThroughSuperpath( String aasIdentifier, String submodelIdentifier, @RequestHeader String externalSubjectId ) {
         Submodel submodel = shellService.findSubmodelByExternalId(getDecodedId( aasIdentifier ), getDecodedId( submodelIdentifier ),getExternalSubjectIdOrEmpty( externalSubjectId ));
         return new ResponseEntity<>(submodelMapper.toApiDto(submodel), HttpStatus.OK);
     }
@@ -140,7 +139,7 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
 
     @Override
-    public ResponseEntity<SubmodelDescriptor> postSubmodelDescriptorThroughSuperpath( byte[] aasIdentifier, @RequestHeader String externalSubjectId, SubmodelDescriptor submodelDescriptor ) {
+    public ResponseEntity<SubmodelDescriptor> postSubmodelDescriptorThroughSuperpath( String aasIdentifier, SubmodelDescriptor submodelDescriptor, @RequestHeader String externalSubjectId ) {
         Submodel toBeSaved = submodelMapper.fromApiDto(submodelDescriptor);
         toBeSaved.setIdExternal( submodelDescriptor.getId() );
         shellService.mapSubmodel( Set.of(toBeSaved) );
@@ -149,7 +148,7 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
 
     @Override
-    public ResponseEntity<Void> putAssetAdministrationShellDescriptorById( byte[] aasIdentifier, AssetAdministrationShellDescriptor assetAdministrationShellDescriptor, @RequestHeader String externalSubjectId ) {
+    public ResponseEntity<Void> putAssetAdministrationShellDescriptorById( String aasIdentifier, AssetAdministrationShellDescriptor assetAdministrationShellDescriptor, @RequestHeader String externalSubjectId ) {
         Shell shell = shellMapper.fromApiDto( assetAdministrationShellDescriptor );
         Shell shellFromDb = shellService.findShellByExternalIdWithoutFiltering( getDecodedId( aasIdentifier ) );
         shellService.update( shell.withId( shellFromDb.getId() ).withIdExternal( getDecodedId( aasIdentifier ) ), getDecodedId( aasIdentifier ) );
@@ -157,18 +156,18 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
 
     @Override
-    public ResponseEntity<Void> putSubmodelDescriptorByIdThroughSuperpath( byte[] aasIdentifier, byte[] submodelIdentifier, @RequestHeader String externalSubjectId, SubmodelDescriptor submodelDescriptor ) {
+    public ResponseEntity<Void> putSubmodelDescriptorByIdThroughSuperpath( String aasIdentifier, String submodelIdentifier, SubmodelDescriptor submodelDescriptor, @RequestHeader String externalSubjectId ) {
         shellService.deleteSubmodel(getDecodedId( aasIdentifier ),  getDecodedId( submodelIdentifier ),getExternalSubjectIdOrEmpty( externalSubjectId ));
         submodelDescriptor.setId( getDecodedId( submodelIdentifier ));
-        postSubmodelDescriptorThroughSuperpath(aasIdentifier,externalSubjectId,submodelDescriptor);
+        postSubmodelDescriptorThroughSuperpath(aasIdentifier,submodelDescriptor,externalSubjectId );
         return new ResponseEntity<>( HttpStatus.NO_CONTENT );
     }
 
     @Override
-    public ResponseEntity<GetAllAssetAdministrationShellIdsByAssetLink200Response> getAllAssetAdministrationShellIdsByAssetLink(List<byte[]> assetIds,
+    public ResponseEntity<InlineResponse200> getAllAssetAdministrationShellIdsByAssetLink(List<String> assetIds,
     Integer limit, String cursor, @RequestHeader String externalSubjectId) {
         if (assetIds == null || assetIds.isEmpty()) {
-            return new ResponseEntity<>(new GetAllAssetAdministrationShellIdsByAssetLink200Response(), HttpStatus.OK);
+            return new ResponseEntity<>(new InlineResponse200(), HttpStatus.OK);
         }
 
         List<SpecificAssetId> listSpecificAssetId = assetIds.stream().map( this::decodeSAID).collect( Collectors.toList());
@@ -190,25 +189,25 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
         return new ResponseEntity<>( result, HttpStatus.OK );
     }
 
-    private SpecificAssetId decodeSAID(byte[] encodedId){
+    private SpecificAssetId decodeSAID(String encodedId){
         ObjectMapper mapper = new ObjectMapper();
         mapper.setSerializationInclusion( JsonInclude.Include.NON_NULL);
         try {
-            byte[] decodedBytes = Base64.getUrlDecoder().decode( encodedId );
-            return mapper.readValue(decodedBytes, SpecificAssetId.class );
+            String decodeString = new String(Base64.getUrlDecoder().decode( encodedId ));
+            return mapper.readValue(decodeString, SpecificAssetId.class );
         } catch (Exception e ) {
             throw new IllegalArgumentException("Incorrect Base64 encoded value provided as parameter");
         }
     }
 
     @Override
-    public ResponseEntity<List<SpecificAssetId>> getAllAssetLinksById(byte[] aasIdentifier,@RequestHeader String externalSubjectId) {
+    public ResponseEntity<List<SpecificAssetId>> getAllAssetLinksById(String aasIdentifier,@RequestHeader String externalSubjectId) {
             Set<ShellIdentifier> identifiers = shellService.findShellIdentifiersByExternalShellId(getDecodedId( aasIdentifier ),getExternalSubjectIdOrEmpty(externalSubjectId));
             return new ResponseEntity<>(shellMapper.toApiDto(identifiers), HttpStatus.OK);
         }
 
     @Override
-    public ResponseEntity<List<SpecificAssetId>> postAllAssetLinksById(byte[] aasIdentifier, List<SpecificAssetId> specificAssetId, @RequestHeader String externalSubjectId ) {
+    public ResponseEntity<List<SpecificAssetId>> postAllAssetLinksById(String aasIdentifier, List<SpecificAssetId> specificAssetId, @RequestHeader String externalSubjectId ) {
         Set<ShellIdentifier> shellIdentifiers = shellService.save(getDecodedId( aasIdentifier ), shellMapper.fromApiDto(specificAssetId),getExternalSubjectIdOrEmpty( externalSubjectId ));
         List<SpecificAssetId> list = shellMapper.toApiDto(shellIdentifiers);
         return new ResponseEntity<>(list, HttpStatus.CREATED);
@@ -218,7 +217,7 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
             return (null ==externalSubjectId) ? "" : externalSubjectId;
         }
 
-    private String getDecodedId( byte[] aasIdentifier ) {
+    private String getDecodedId( String aasIdentifier ) {
         try {
             byte[] decodedBytes = Base64.getUrlDecoder().decode( aasIdentifier );
             return new String( decodedBytes );
