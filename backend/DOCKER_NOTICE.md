@@ -3,7 +3,7 @@ This application provides container images for demonstrations purposes.
 
 DockerHub:  [Docker.io:tractusx-digital-twin-registry](https://hub.docker.com/r/tractusx/sldt-digital-twin-registry)
 
-The Docker images from version 0.3.3-M1 until the latest can be found on DockerHub, older versions have been published on GitHub Container Registry (GHCR): [catena-ng:digital-twin-registry](https://github.com/catenax-ng/product-semantics/pkgs/container/sldt-digital-twin-registry)
+The Docker images from version 0.3.3-M1 until the latest can be found on DockerHub.
 
 The Helm chart can be found at the GitHub repository at: [Releases](https://github.com/eclipse-tractusx/sldt-digital-twin-registry/releases) <br/>
 
