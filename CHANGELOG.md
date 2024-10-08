@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.6.0-RC1
+- Update API to AAS to v3.0.2_SSP-001 (Breaking changes)
+  - Changed type of aasIdentifier and submodelIdentifier from `byte[]` to `String`
+  - Changed patterns to `^([\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$`
+
 ## 0.5.0
 ### Added
 - AWS Cognito support for authentication
