@@ -43,10 +43,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Run Trivy vulnerability scanner in repo mode
-        uses: aquasecurity/trivy-action@0.18.0
+        uses: aquasecurity/trivy-action@0.24.0
         with:
           scan-type: "config"
           format: "sarif"
@@ -73,7 +73,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
       - uses: actions/setup-java@v3
         with:
@@ -84,7 +84,7 @@ jobs:
         run: mvn clean package
         
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.18.0
+        uses: aquasecurity/trivy-action@0.24.0
         with:
           image-ref: "tractusx/sldt-digital-twin-registry:latest"
           format: "sarif"
