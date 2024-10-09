@@ -26,7 +26,7 @@
 	<parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.4</version> <!-- need to be repeated in properties section for technical purposes -->
+        <version>3.3.4</version> <!-- need to be repeated in properties section for technical purposes -->
         <relativePath/> <!-- lookup parent from repository and not the filesystem -->
     </parent>
 
@@ -82,7 +82,7 @@
 
 		<!-- logging -->
 		<slf4j.version>2.0.7</slf4j.version>
-		<logback.version>1.4.14</logback.version>
+		<logback.version>1.5.8</logback.version>
 
 		<!-- json, xml, formats, ... -->
 		<jackson.version>2.13.1</jackson.version>
