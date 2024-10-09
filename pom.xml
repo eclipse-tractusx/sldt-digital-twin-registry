@@ -82,7 +82,7 @@
 
 		<!-- logging -->
 		<slf4j.version>2.0.7</slf4j.version>
-		<logback.version>1.4.14</logback.version>
+		<logback.version>1.5.8</logback.version>
 
 		<!-- json, xml, formats, ... -->
 		<jackson.version>2.13.1</jackson.version>
