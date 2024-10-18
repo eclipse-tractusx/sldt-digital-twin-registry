@@ -8,4 +8,4 @@ appVersion: 0.1.0
 dependencies:
   - name: digital-twin-registry
     repository: https://eclipse-tractusx.github.io/charts/dev
-    version: 0.5.2
+    version: 0.6.0
