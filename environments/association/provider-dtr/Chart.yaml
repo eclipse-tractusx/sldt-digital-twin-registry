@@ -7,5 +7,5 @@ appVersion: 0.1.0
 
 dependencies:
   - name: digital-twin-registry
-    repository: https://eclipse-tractusx.github.io/charts/dev
+    repository: https://eclipse-tractusx.github.io/sldt-digital-twin-registry
     version: 0.6.0
