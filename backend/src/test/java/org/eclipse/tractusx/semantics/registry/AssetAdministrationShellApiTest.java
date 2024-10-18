@@ -25,6 +25,7 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
@@ -32,6 +33,7 @@ import java.util.UUID;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetLink;
+import org.eclipse.tractusx.semantics.aas.registry.model.Endpoint;
 import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
 import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
@@ -86,7 +88,7 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
                )
                .andDo(MockMvcResultHandlers.print())
                .andExpect(status().isBadRequest())
-               .andExpect( jsonPath( "$.messages[0].text", is( "must match \"^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\x{00010000}-\\x{0010FFFF}]*$\"" ) ) );
+               .andExpect( jsonPath( "$.messages[0].text", is( "must match \"^([\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$\"" ) ) );
       }
 
       @Test
@@ -1152,12 +1154,8 @@ public class AssetAdministrationShellApiTest extends AbstractAssetAdministration
       removedAllShells();
       AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
 
-      SubmodelDescriptor submodelDescriptor = new SubmodelDescriptor();
-      //Setting duplicate id short
-      submodelDescriptor.setIdShort(shellPayload.getSubmodelDescriptors().get( 0 ).getIdShort());
-
-      //Adding duplicate submodel which contains duplicate idshort
-      shellPayload.getSubmodelDescriptors().add( submodelDescriptor);
+      //Duplicate submodel to simulate duplicate idshort
+      shellPayload.getSubmodelDescriptors().add( shellPayload.getSubmodelDescriptors().get( 0 ) );
 
 
       //When & Then
