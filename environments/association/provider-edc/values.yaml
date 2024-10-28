@@ -73,6 +73,7 @@ tractusx-connector:
     image:
       repository: <path:semantics/data/provider-edc#controlplane-image-repository>
       tag: <path:semantics/data/provider-edc#controlplane-image-tag>
+      pullPolicy: Always
     endpoints:
       # -- default api for health checks, should not be added to any ingress
       default:
