@@ -1,4 +1,4 @@
-# AWS Cognito as Identity Provider
+# Guideline to use AWS Cognito as Identity Provider
 DTR can support Keycloak and AWS Cognito as an Identity Provider for all clients that want to access the registry. 
 Client must fetch a token and send it together with the request.
 Cognito behaves somehow different than Keycloak so some code modifications were necessary to use Cognito as an Identity Provider for DTR.
