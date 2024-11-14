@@ -665,7 +665,13 @@
     } ],
     "defaultClientScopes" : [ "web-origins", "acr", "roles", "profile", "email" ],
     "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt" ]
-  } ],
+  },
+    {
+      "clientId": "default-client",
+      "name": "Default Client",
+      "enabled": true,
+      "protocol": "openid-connect"
+    }],
   "clientScopes" : [ {
     "id" : "3840299f-8159-4b24-ad99-d5f95c2cacac",
     "name" : "offline_access",
