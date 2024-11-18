@@ -1,4 +1,4 @@
-## Deploy using Helm and K8s
+# Deploy using Helm and K8s
 If you have a running Kubernetes cluster available, you can deploy the Registry using our Helm Chart, which is located under `charts/registry`.
 In case you don't have a running cluster, you can set up one by yourself locally, using [minikube](https://minikube.sigs.k8s.io/docs/start/).
 In the following, we will use a minikube cluster for reference.
@@ -27,10 +27,10 @@ For that to work, you need to append `/etc/hosts` by running `echo "$(minikube i
 For automated certificate generation, use and configure [cert-manager](https://cert-manager.io/).
 By default, authentication is activated, please adjust `registry.authentication` if needed
 
-## Parameters
+# Parameters
 The Helm Chart can be configured using the following parameters (incomplete list). For a full overview, please see the [values.yaml](./backend/deployment/registry/values.yaml).
 
-### Registry
+## Registry
 | Parameter       | Description                                                                                                                                                                                                                              | Default value                               |
 | ---             |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------|
 | `registry.image`     | The image of the Registry                                                                                                                                                                                                                | `registry:latest`                           |
@@ -53,7 +53,7 @@ The Helm Chart can be configured using the following parameters (incomplete list
 | `registry.externalSubjectIdWildcardPrefix`    | WildcardPrefix to make a specificAssetId visible for everyone.                                                                                                                                                                           | `PUBLIC_READABLE`                           |
 | `registry.externalSubjectIdWildcardAllowedTypes`    | List of allowed types that can be made visible to everyone.                                                                                                                                                                              | `manufacturerPartId,assetLifecyclePhase`    |
 
-### PostgreSQL
+## PostgreSQL
 | Parameter       | Description                                                                                                                   | Default value      |
 | ---             |-------------------------------------------------------------------------------------------------------------------------------|--------------------|
 | `postgresql.primary.persistence.size`     | Size of the `PersistentVolume` that persists the data                                                                         | `50Gi`             |
@@ -61,15 +61,17 @@ The Helm Chart can be configured using the following parameters (incomplete list
 | `postgresql.auth.password`     | Password for authentication at the database. If password is empty, the postgres pw will be generated random via postgres-init | ``                 |
 | `postgresql.auth.database`     | Database name                                                                                                                 | `default-database` |
 
-### Prerequisites
+## Prerequisites
 - Kubernetes 1.19+
 - Helm 3.2.0+
 - PV provisioner support in the underlying infrastructure
 
-### Required postgresql extensions
+## Required postgresql extensions
 The application requires the following postgresql-extensions to be installed in the postgres database:
 
 | PostgreSQL Extension | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 |----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | uuid-ossp            | Via Liquibase scripts, the uuid-ossp extension will be created if it does not exist. See [liquibase-script](https://github.com/eclipse-tractusx/sldt-digital-twin-registry/blob/main/backend/src/main/resources/db/changelog/db.changelog-extensions.yaml). <br/> In case of using Azure Database for PostgreSQL, the extension needs to be manually activated. <br/> More details can be found at [PostgreSQL extensions in Azure Database for PostgreSQL - Flexible Server](https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/concepts-extensions) |
+
+
 
