@@ -1,4 +1,4 @@
-# Digital Twin Registry Data Plane HTTP Access Control Eclipse Dataspace Connector extension
+# Guideline Digital Twin Registry Data Plane HTTP Access Control Eclipse Dataspace Connector extension
 
 ## 1 Introduction and goals
 
