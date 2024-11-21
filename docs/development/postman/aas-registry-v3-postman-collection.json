@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "93ec8210-a45b-4bae-9964-8bad1aaaa32e",
-		"name": "tractusx-dtr-aas-3.1.0",
+		"_postman_id": "6611c4d1-8e1a-4749-b848-fbc749e5567a",
+		"name": "aas-registry-v3",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
 	"item": [
@@ -18,13 +18,13 @@
 						"header": [
 							{
 								"key": "Edc-Bpn",
-								"value": "{{EDC-BPN}}",
+								"value": "{{edcBpn}}",
 								"type": "default"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"idShort\": \"idShortExample\",\n  \"id\": \"e1eba3d7-91f0-4dac-a730-eaa1d35e035c-2\",  \n  \"description\": [\n    {\n      \"language\": \"de\",\n      \"text\": \"example text\"\n    }\n  ],\n  \"displayName\": [\n    {\n      \"language\": \"de\",\n      \"text\": \"this is an example description1\"\n    }\n  ],\n  \"specificAssetIds\": [\n    {\n      \"name\": \"manufacturePartId\",\n      \"value\": \"1234\"\n    },\n    {\n      \"name\": \"oen\",\n      \"value\": \"1239485\"\n    },\n    {\n      \"name\": \"serialnr\",\n      \"value\": \"12345\",\n      \"externalSubjectId\":{\n          \"type\": \"ExternalReference\",\n          \"keys\": [\n            {\n              \"type\": \"Property\",\n              \"value\": \"CONSUMER_BPN\"\n            }\n          ]\n        }\n    }\n  ],\n  \"submodelDescriptors\": [\n    {\n      \"endpoints\": [\n        {\n          \"interface\": \"interfaceNameExample\",\n          \"protocolInformation\": {\n            \"href\": \"endpointAddressExample\",\n            \"endpointProtocol\": \"endpointProtocolExample\",\n            \"endpointProtocolVersion\": [\n              \"e\"\n            ],\n            \"subprotocol\": \"5hg\",\n            \"subprotocolBody\":\"\",\n            \"subprotocolBodyEncoding\": \"subprotocolBodyExample\",\n            \"securityAttributes\": [\n              {\n                \"type\": \"NONE\",\n                \"key\": \"sec\",\n                \"value\": \"1\"\n              }\n            ]\n          }\n        }\n      ],\n      \"idShort\": \"idShortExample\",\n      \"id\": \"cd47615b-daf3-4036-8670-d2f89349d388-2\",\n      \"semanticId\": {\n        \"type\": \"ExternalReference\",\n        \"keys\": [\n          {\n            \"type\": \"Submodel\",\n            \"value\": \"urn:bamm:io.catenax.serial_part_typization:1.1.0#SerialPartTypization\"\n          }\n        ]\n      },\n      \"description\": [\n        {\n          \"language\": \"de\",\n          \"text\": \"hello text\"\n        },\n        {\n          \"language\": \"en\",\n          \"text\": \"hello s\"\n        }\n      ]\n    }\n  ]\n}",
+							"raw": "{\n  \"idShort\": \"id-short\",\n  \"id\": \"c931c4ea-c552-470f-80a2-a4ea9e5364dc\",\n  \"description\": [\n    {\n      \"language\": \"en\",\n      \"text\": \"This is an example\"\n    }\n  ],\n  \"specificAssetIds\": [\n    {\n      \"name\": \"manufacturerPartId\",\n      \"value\": \"manufacturerId-1\"\n    }\n  ],\n  \"submodelDescriptors\": [\n    {\n      \"idShort\": \"bom-as-built\",\n      \"id\": \"d8b50cad-041a-4ec8-bd4b-3d79be00456b\",\n      \"endpoints\": [\n        {\n          \"interface\": \"bom as Built\",\n          \"protocolInformation\": {\n            \"href\": \"<edc-dataplane-url>/submodel/123/$value\",\n            \"endpointProtocol\": \"HTTP\",\n            \"endpointProtocolVersion\": [\n              \"1.1\"\n            ],\n            \"subprotocol\": \"\",\n            \"subprotocolBody\":\"assetId=1;<controlplane-url>\",\n            \"subprotocolBodyEncoding\": \"plain\",\n            \"securityAttributes\": [\n              {\n                \"type\": \"NONE\",\n                \"key\": \"NONE\",\n                \"value\": \"NONE\"\n              }\n            ]\n          }\n        }\n      ],\n      \"semanticId\": {\n        \"type\": \"ExternalReference\",\n        \"keys\": [\n          {\n            \"type\": \"Submodel\",\n            \"value\": \"urn:bamm:io.catenax.bom_as_specified:2.0.0#SingleLevelBomAsSpecified\"\n          }\n        ]\n      },\n      \"description\": [\n        {\n          \"language\": \"de\",\n          \"text\": \"submodel-descriptor für das Model bom_as_specified\"\n        },\n        {\n          \"language\": \"en\",\n          \"text\": \"submodel-descriptor forModel bom_as_specified\"\n        }\n      ]\n    }\n  ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -45,7 +45,7 @@
 						"header": [
 							{
 								"key": "Edc-Bpn",
-								"value": "{{EDC-BPN}}",
+								"value": "{{edcBpn}}",
 								"description": "BPN (This is normally send via EDC)",
 								"type": "default"
 							}
@@ -91,7 +91,7 @@
 						"header": [
 							{
 								"key": "Edc-Bpn",
-								"value": "{{EDC-BPN}}",
+								"value": "{{edcBpn}}",
 								"description": "BPN (This is normally send via EDC)",
 								"type": "default"
 							}
@@ -110,7 +110,7 @@
 							"variable": [
 								{
 									"key": "aasIdentifier",
-									"value": "ZTFlYmEzZDctOTFmMC00ZGFjLWE3MzAtZWFhMWQzNWUwMzVjLTI",
+									"value": "YzkzMWM0ZWEtYzU1Mi00NzBmLTgwYTItYTRlYTllNTM2NGRj",
 									"description": "aasIdentifier as UTF8-BASE64-URL-encoded"
 								}
 							]
@@ -128,13 +128,13 @@
 						"header": [
 							{
 								"key": "Edc-Bpn",
-								"value": "{{EDC-BPN}}",
+								"value": "{{edcBpn}}",
 								"type": "default"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"idShort\": \"idShortExample\",\n  \"id\": \"e1eba3d7-91f0-4dac-a730-eaa1d35e035c-2\",\n  \"description\": [\n    {\n      \"language\": \"de\",\n      \"text\": \"example text\"\n    }\n  ],\n  \"displayName\": [\n    {\n      \"language\": \"de\",\n      \"text\": \"this is an example description1\"\n    }\n  ],\n  \"endpoints\": [\n    {\n      \"interface\": \"interfaceNameExample\",\n      \"protocolInformation\": {\n        \"href\": \"endpointAddressExample\",\n        \"endpointProtocol\": \"endpointProtocolExample\",\n        \"endpointProtocolVersion\": [\n          \"e\"\n        ],\n        \"subprotocol\": \"subprotocolExample\",\n        \"subprotocolBody\": \"subprotocolBodyExample\",\n        \"subprotocolBodyEncoding\": \"subprotocolBodyExample\",\n        \"securityAttributes\": [\n          {\n            \"type\": \"NONE\"\n          }\n        ]\n      }\n    }\n  ],\n  \"specificAssetIds\": [\n    {\n      \"name\": \"manufacturePartId\",\n      \"value\": \"12345\",\n      \"externalSubjectId\":{\n          \"type\": \"ExternalReference\",\n          \"keys\": [\n            {\n              \"type\": \"Property\",\n              \"value\": \"CONSUMER_BPN\"\n            }\n          ]\n        }\n    },\n    {\n      \"name\": \"oen\",\n      \"value\": \"1239485\"\n    },\n    {\n      \"name\": \"serialnr\",\n      \"value\": \"1234\",\n      \"externalSubjectId\":{\n          \"type\": \"ExternalReference\",\n          \"keys\": [\n            {\n              \"type\": \"Property\",\n              \"value\": \"CONSUMER_BPN\"\n            }\n          ]\n        }\n    }\n  ],\n  \"submodelDescriptors\": [\n    {\n      \"endpoints\": [\n        {\n          \"interface\": \"interfaceNameExample\",\n          \"protocolInformation\": {\n            \"href\": \"endpointAddressExample\",\n            \"endpointProtocol\": \"endpointProtocolExample\",\n            \"endpointProtocolVersion\": [\n              \"e\"\n            ],\n            \"subprotocol\": \"5hg\",\n            \"subprotocolBody\":\"\",\n            \"subprotocolBodyEncoding\": \"subprotocolBodyExample\",\n            \"securityAttributes\": [\n              {\n                \"type\": \"NONE\"\n              }\n            ]\n          }\n        }\n      ],\n      \"idShort\": \"idShortExample\",\n      \"id\": \"cd47615b-daf3-4036-8670-d2f89349d388-2\",\n      \"semanticId\": {\n        \"type\": \"ExternalReference\",\n        \"keys\": [\n          {\n            \"type\": \"Submodel\",\n            \"value\": \"urn:bamm:io.catenax.serial_part_typization:1.1.0#SerialPartTypization\"\n          }\n        ]\n      },\n      \"description\": [\n        {\n          \"language\": \"de\",\n          \"text\": \"hello text\"\n        },\n        {\n          \"language\": \"en\",\n          \"text\": \"hello s\"\n        }\n      ]\n    }\n  ]\n}",
+							"raw": "{\n  \"idShort\": \"id-short-1\",\n  \"id\": \"c931c4ea-c552-470f-80a2-a4ea9e5364dc\",\n  \"description\": [\n    {\n      \"language\": \"en\",\n      \"text\": \"This is an example\"\n    }\n  ],\n  \"specificAssetIds\": [\n    {\n      \"name\": \"manufacturerPartId\",\n      \"value\": \"manufacturerId-1\"\n    }\n  ],\n  \"submodelDescriptors\": [\n    {\n      \"idShort\": \"bom-as-built\",\n      \"id\": \"d8b50cad-041a-4ec8-bd4b-3d79be00456b\",\n      \"endpoints\": [\n        {\n          \"interface\": \"bom as Built\",\n          \"protocolInformation\": {\n            \"href\": \"<edc-dataplane-url>/submodel/123/$value\",\n            \"endpointProtocol\": \"HTTP\",\n            \"endpointProtocolVersion\": [\n              \"1.1\"\n            ],\n            \"subprotocol\": \"\",\n            \"subprotocolBody\":\"assetId=1;<controlplane-url>\",\n            \"subprotocolBodyEncoding\": \"plain\",\n            \"securityAttributes\": [\n              {\n                \"type\": \"NONE\",\n                \"key\": \"NONE\",\n                \"value\": \"NONE\"\n              }\n            ]\n          }\n        }\n      ],\n      \"semanticId\": {\n        \"type\": \"ExternalReference\",\n        \"keys\": [\n          {\n            \"type\": \"Submodel\",\n            \"value\": \"urn:bamm:io.catenax.bom_as_specified:2.0.0#SingleLevelBomAsSpecified\"\n          }\n        ]\n      },\n      \"description\": [\n        {\n          \"language\": \"de\",\n          \"text\": \"submodel-descriptor für das Model bom_as_specified\"\n        },\n        {\n          \"language\": \"en\",\n          \"text\": \"submodel-descriptor forModel bom_as_specified\"\n        }\n      ]\n    }\n  ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -155,7 +155,7 @@
 							"variable": [
 								{
 									"key": "aasIdentifier",
-									"value": "ZTFlYmEzZDctOTFmMC00ZGFjLWE3MzAtZWFhMWQzNWUwMzVjLTI",
+									"value": "YzkzMWM0ZWEtYzU1Mi00NzBmLTgwYTItYTRlYTllNTM2NGRj",
 									"description": "aasIdentifier as UTF8-BASE64-URL-encoded"
 								}
 							]
@@ -173,7 +173,7 @@
 						"header": [
 							{
 								"key": "Edc-Bpn",
-								"value": "{{EDC-BPN}}",
+								"value": "{{edcBpn}}",
 								"type": "default"
 							}
 						],
@@ -191,7 +191,7 @@
 							"variable": [
 								{
 									"key": "aasIdentifier",
-									"value": "ZTFlYmEzZDctOTFmMC00ZGFjLWE3MzAtZWFhMWQzNWUwMzVjLTI",
+									"value": "YzkzMWM0ZWEtYzU1Mi00NzBmLTgwYTItYTRlYTllNTM2NGRj",
 									"description": "aasIdentifier as UTF8-BASE64-URL-encoded"
 								}
 							]
@@ -209,13 +209,13 @@
 						"header": [
 							{
 								"key": "Edc-Bpn",
-								"value": "{{EDC-BPN}}",
+								"value": "{{edcBpn}}",
 								"type": "default"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"endpoints\": [\n    {\n      \"interface\": \"interfaceNameExample\",\n      \"protocolInformation\": {\n        \"href\": \"endpointAddressExample\",\n        \"endpointProtocol\": \"endpointProtocolExample\",\n        \"endpointProtocolVersion\": [\n          \"e\"\n        ],\n        \"subprotocol\": \"subprotocolExample\",\n        \"subprotocolBody\": \"subprotocolBodyExample\",\n        \"subprotocolBodyEncoding\": \"subprotocolBodyExample\",\n        \"securityAttributes\": [\n          {\n            \"type\": \"NONE\"\n          }\n        ]\n      }\n    }\n  ],\n  \"idShort\": \"idShortExample\",\n  \"id\": \"341f63de-728a-4b6d-9c72-c0d9ba4f8c7d\",\n  \"semanticId\": {\n    \"type\": \"ExternalReference\",\n    \"keys\": [\n      {\n        \"type\": \"Submodel\",\n        \"value\": \"semanticIdExample\"\n      }\n    ]\n  },\n  \"description\": [\n    {\n      \"language\": \"de\",\n      \"text\": \"hello text\"\n    },\n    {\n      \"language\": \"en\",\n      \"text\": \"hello s\"\n    }\n  ]\n}",
+							"raw": "{\n  \"endpoints\": [\n    {\n      \"interface\": \"interfaceNameExample\",\n      \"protocolInformation\": {\n        \"href\": \"endpointAddressExample\",\n        \"endpointProtocol\": \"endpointProtocolExample\",\n        \"endpointProtocolVersion\": [\n          \"e\"\n        ],\n        \"subprotocol\": \"subprotocolExample\",\n        \"subprotocolBody\": \"subprotocolBodyExample\",\n        \"subprotocolBodyEncoding\": \"subprotocolBodyExample\",\n        \"securityAttributes\": [\n          {\n            \"type\": \"NONE\",\n            \"key\": \"NONE\",\n            \"value\": \"NONE\"\n          }\n        ]\n      }\n    }\n  ],\n  \"idShort\": \"idShortExample\",\n  \"id\": \"341f63de-728a-4b6d-9c72-c0d9ba4f8c7d\",\n  \"semanticId\": {\n    \"type\": \"ExternalReference\",\n    \"keys\": [\n      {\n        \"type\": \"Submodel\",\n        \"value\": \"semanticIdExample\"\n      }\n    ]\n  },\n  \"description\": [\n    {\n      \"language\": \"de\",\n      \"text\": \"hello text\"\n    },\n    {\n      \"language\": \"en\",\n      \"text\": \"hello s\"\n    }\n  ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -237,7 +237,7 @@
 							"variable": [
 								{
 									"key": "aasIdentifier",
-									"value": "ZTFlYmEzZDctOTFmMC00ZGFjLWE3MzAtZWFhMWQzNWUwMzVjLTI",
+									"value": "YzkzMWM0ZWEtYzU1Mi00NzBmLTgwYTItYTRlYTllNTM2NGRj",
 									"description": "aasIdentifier as UTF8-BASE64-URL-encoded"
 								}
 							]
@@ -255,7 +255,7 @@
 						"header": [
 							{
 								"key": "Edc-Bpn",
-								"value": "{{EDC-BPN}}",
+								"value": "{{edcBpn}}",
 								"description": "BPN (This is normally send via EDC)",
 								"type": "default"
 							}
@@ -287,7 +287,7 @@
 							"variable": [
 								{
 									"key": "aasIdentifier",
-									"value": "ZTFlYmEzZDctOTFmMC00ZGFjLWE3MzAtZWFhMWQzNWUwMzVjLTI",
+									"value": "YzkzMWM0ZWEtYzU1Mi00NzBmLTgwYTItYTRlYTllNTM2NGRj",
 									"description": "aasIdentifier as UTF8-BASE64-URL-encoded"
 								}
 							]
@@ -305,7 +305,7 @@
 						"header": [
 							{
 								"key": "Edc-Bpn",
-								"value": "{{EDC-BPN}}",
+								"value": "{{edcBpn}}",
 								"type": "default"
 							}
 						],
@@ -325,12 +325,12 @@
 							"variable": [
 								{
 									"key": "aasIdentifier",
-									"value": "ZTFlYmEzZDctOTFmMC00ZGFjLWE3MzAtZWFhMWQzNWUwMzVjLTI",
+									"value": "YzkzMWM0ZWEtYzU1Mi00NzBmLTgwYTItYTRlYTllNTM2NGRj",
 									"description": "aasIdentifier as UTF8-BASE64-URL-encoded"
 								},
 								{
 									"key": "submodelIdentifier",
-									"value": "Y2Q0NzYxNWItZGFmMy00MDM2LTg2NzAtZDJmODkzNDlkMzg4LTI=",
+									"value": "MzQxZjYzZGUtNzI4YS00YjZkLTljNzItYzBkOWJhNGY4Yzdk",
 									"description": "submodelIdentifier as UTF8-BASE64-URL-encoded"
 								}
 							]
@@ -348,13 +348,13 @@
 						"header": [
 							{
 								"key": "Edc-Bpn",
-								"value": "{{EDC-BPN}}",
+								"value": "{{edcBpn}}",
 								"type": "default"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"endpoints\": [\n    {\n      \"interface\": \"interfaceNameExample\",\n      \"protocolInformation\": {\n        \"href\": \"endpointAddressExample\",\n        \"endpointProtocol\": \"endpointProtocolExample\",\n        \"endpointProtocolVersion\": [\n          \"e\"\n        ],\n        \"subprotocol\": \"subprotocolExample\",\n        \"subprotocolBody\": \"subprotocolBodyExample\",\n        \"subprotocolBodyEncoding\": \"subprotocolBodyExample\",\n        \"securityAttributes\": [\n          {\n            \"type\": \"NONE\"\n          }\n        ]\n      }\n    }\n  ],\n  \"idShort\": \"idShortExample\",\n  \"id\": \"341f63de-728a-4b6d-9c72-c0d9ba4f8c7d\",\n  \"semanticId\": {\n    \"type\": \"ExternalReference\",\n    \"keys\": [\n      {\n        \"type\": \"Submodel\",\n        \"value\": \"semanticIdExample\"\n      }\n    ]\n  },\n  \"description\": [\n    {\n      \"language\": \"de\",\n      \"text\": \"hello text\"\n    },\n    {\n      \"language\": \"en\",\n      \"text\": \"hello s\"\n    }\n  ]\n}",
+							"raw": "{\n  \"endpoints\": [\n    {\n      \"interface\": \"interfaceNameExample\",\n      \"protocolInformation\": {\n        \"href\": \"endpointAddressExample\",\n        \"endpointProtocol\": \"endpointProtocolExample\",\n        \"endpointProtocolVersion\": [\n          \"e\"\n        ],\n        \"subprotocol\": \"subprotocolExample\",\n        \"subprotocolBody\": \"subprotocolBodyExample\",\n        \"subprotocolBodyEncoding\": \"subprotocolBodyExample\",\n        \"securityAttributes\": [\n          {\n            \"type\": \"NONE\",\n            \"key\": \"NONE\",\n            \"value\": \"NONE\"\n          }\n        ]\n      }\n    }\n  ],\n  \"idShort\": \"idShortExample\",\n  \"id\": \"341f63de-728a-4b6d-9c72-c0d9ba4f8c7d\",\n  \"semanticId\": {\n    \"type\": \"ExternalReference\",\n    \"keys\": [\n      {\n        \"type\": \"Submodel\",\n        \"value\": \"semanticIdExample\"\n      }\n    ]\n  },\n  \"description\": [\n    {\n      \"language\": \"de\",\n      \"text\": \"hello text\"\n    },\n    {\n      \"language\": \"en\",\n      \"text\": \"hello s\"\n    }\n  ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -377,12 +377,12 @@
 							"variable": [
 								{
 									"key": "aasIdentifier",
-									"value": "ZTFlYmEzZDctOTFmMC00ZGFjLWE3MzAtZWFhMWQzNWUwMzVjLTI",
+									"value": "YzkzMWM0ZWEtYzU1Mi00NzBmLTgwYTItYTRlYTllNTM2NGRj",
 									"description": "aasIdentifier as UTF8-BASE64-URL-encoded"
 								},
 								{
 									"key": "submodelIdentifier",
-									"value": "Y2Q0NzYxNWItZGFmMy00MDM2LTg2NzAtZDJmODkzNDlkMzg4LTI=",
+									"value": "MzQxZjYzZGUtNzI4YS00YjZkLTljNzItYzBkOWJhNGY4Yzdk",
 									"description": "submodelIdentifier as UTF8-BASE64-URL-encoded"
 								}
 							]
@@ -400,7 +400,7 @@
 						"header": [
 							{
 								"key": "Edc-Bpn",
-								"value": "{{EDC-BPN}}",
+								"value": "{{edcBpn}}",
 								"type": "default"
 							}
 						],
@@ -420,12 +420,12 @@
 							"variable": [
 								{
 									"key": "aasIdentifier",
-									"value": "ZTFlYmEzZDctOTFmMC00ZGFjLWE3MzAtZWFhMWQzNWUwMzVjLTI",
+									"value": "YzkzMWM0ZWEtYzU1Mi00NzBmLTgwYTItYTRlYTllNTM2NGRj",
 									"description": "aasIdentifier as UTF8-BASE64-URL-encoded"
 								},
 								{
 									"key": "submodelIdentifier",
-									"value": "Y2Q0NzYxNWItZGFmMy00MDM2LTg2NzAtZDJmODkzNDlkMzg4LTI=",
+									"value": "MzQxZjYzZGUtNzI4YS00YjZkLTljNzItYzBkOWJhNGY4Yzdk",
 									"description": "submodelIdentifier as UTF8-BASE64-URL-encoded"
 								}
 							]
@@ -445,13 +445,13 @@
 						"header": [
 							{
 								"key": "Edc-Bpn",
-								"value": "{{EDC-BPN}}",
+								"value": "{{edcBpn}}",
 								"description": "BPN (This is normally send via EDC)",
 								"type": "default"
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/v3/lookup/shells?assetIds=[{\"name\":\"oen\",\"value\":\"1239485\"},{\"name\":\"manufacturePartId\",\"value\":\"1234\"}]",
+							"raw": "{{baseUrl}}/api/v3/lookup/shells?assetIds=eyJuYW1lIjoibWFudWZhY3R1cmVyUGFydElkIiwidmFsdWUiOiJtYW51ZmFjdHVyZXJJZC0xIn0=",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -474,7 +474,8 @@
 								},
 								{
 									"key": "assetIds",
-									"value": "[{\"name\":\"oen\",\"value\":\"1239485\"},{\"name\":\"manufacturePartId\",\"value\":\"1234\"}]"
+									"value": "eyJuYW1lIjoibWFudWZhY3R1cmVyUGFydElkIiwidmFsdWUiOiJtYW51ZmFjdHVyZXJJZC0xIn0=",
+									"description": "{\"name\":\"manufacturerPartId\",\"value\":\"manufacturerId-1\"}"
 								}
 							]
 						}
@@ -488,7 +489,7 @@
 						"header": [
 							{
 								"key": "Edc-Bpn",
-								"value": "{{EDC-BPN}}",
+								"value": "{{edcBpn}}",
 								"description": "BPN (This is normally send via EDC)",
 								"type": "default"
 							}
@@ -508,7 +509,7 @@
 							"variable": [
 								{
 									"key": "aasIdentifier",
-									"value": "ZTFlYmEzZDctOTFmMC00ZGFjLWE3MzAtZWFhMWQzNWUwMzVjLTI",
+									"value": "YzkzMWM0ZWEtYzU1Mi00NzBmLTgwYTItYTRlYTllNTM2NGRj",
 									"description": "aasIdentifier as UTF8-BASE64-URL-encoded"
 								}
 							]
@@ -523,14 +524,14 @@
 						"header": [
 							{
 								"key": "Edc-Bpn",
-								"value": "{{EDC-BPN}}",
+								"value": "{{edcBpn}}",
 								"description": "BPN (This is normally send via EDC)",
 								"type": "default"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n    {\n      \"name\": \"oen\",\n      \"value\": \"1239485\"\n    }\n  ]",
+							"raw": "[\n    {\n      \"name\": \"oen\",\n      \"value\": \"1239485\"\n    }\n]",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -552,7 +553,7 @@
 							"variable": [
 								{
 									"key": "aasIdentifier",
-									"value": "ZTFlYmEzZDctOTFmMC00ZGFjLWE3MzAtZWFhMWQzNWUwMzVjLTI",
+									"value": "YzkzMWM0ZWEtYzU1Mi00NzBmLTgwYTItYTRlYTllNTM2NGRj",
 									"description": "aasIdentifier as UTF8-BASE64-URL-encoded"
 								}
 							]
@@ -567,13 +568,13 @@
 						"header": [
 							{
 								"key": "Edc-Bpn",
-								"value": "{{EDC-BPN}}",
+								"value": "{{edcBpn}}",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n    {\n      \"name\": \"manufacturePartId\",\n      \"value\": \"1234\"\n    },\n    {\n      \"name\": \"oen\",\n      \"value\": \"1239485\"\n    },\n    {\n      \"name\": \"serialnr\",\n      \"value\": \"12345\"\n    }\n]   ",
+							"raw": "[\n    {\n      \"name\": \"manufacturerPartId\",\n      \"value\": \"manufacturerId-1\"\n    }\n]",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -633,7 +634,12 @@
 	"variable": [
 		{
 			"key": "baseUrl",
-			"value": "",
+			"value": "http://localhost:4243",
+			"type": "default"
+		},
+		{
+			"key": "edcBpn",
+			"value": "TENANT_ONE",
 			"type": "default"
 		}
 	]
