@@ -1,0 +1,10 @@
+{
+  "status": 200,
+  "content": true,
+  "assertions": [
+    {
+      "jsonPath": "$.displayName[0].language",
+      "equals": "fr"
+    }
+  ]
+}

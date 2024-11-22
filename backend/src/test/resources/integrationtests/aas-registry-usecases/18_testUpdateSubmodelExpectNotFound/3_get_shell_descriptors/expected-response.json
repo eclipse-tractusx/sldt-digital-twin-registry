@@ -1,0 +1,64 @@
+{
+  "status": 200,
+  "content": true,
+  "assertions": [],
+  "expectedPayload": {
+    "description":[
+
+    ],
+    "displayName":[
+
+    ],
+    "idShort":"nsS5XwJpBh",
+    "id":"0edb5e4c-5b85-4c02-a960-14373ff801c0",
+    "specificAssetIds":[
+      {
+        "name":"identifier1KeyExample",
+        "value":"identifier1ValueExample"
+      },
+      {
+        "name":"identifier2KeyExample",
+        "value":"identifier2ValueExample"
+      }
+    ],
+    "submodelDescriptors":[
+      {
+        "idShort":"IZ2rbLff6P",
+        "id":"8fd94b80-3d0d-494e-aaab-1623a30dc3ed",
+        "endpoints":[
+          {
+            "interface":"interfaceNameExample",
+            "protocolInformation":{
+              "href":"http://endpoint-address",
+              "endpointProtocol":"endpointProtocolExample",
+              "endpointProtocolVersion":[
+                "1.1"
+              ],
+              "subprotocol":"",
+              "subprotocolBody":"subprotocolBodyExample",
+              "subprotocolBodyEncoding":"subprotocolBodyExample",
+              "securityAttributes":[
+                {
+                  "type":"NONE",
+                  "key":"Security Attribute key",
+                  "value":"Security Attribute value"
+                }
+              ]
+            }
+          }
+        ],
+        "semanticId":{
+          "type":"ExternalReference",
+          "keys":[
+            {
+              "type":"Submodel",
+              "value":"semanticIdExample"
+            }
+          ]
+        },
+        "description":[],
+        "displayName":[]
+      }
+    ]
+  }
+}

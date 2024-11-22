@@ -1,0 +1,33 @@
+{
+  "status": 200,
+  "content": true,
+  "assertions": [],
+  "expectedPayload": {
+    "description":[
+
+    ],
+    "displayName":[
+
+    ],
+    "idShort":"nHZ0ep2GHB",
+    "id":"13a81c5b-e0ae-4c07-b449-6cee2efa7afe",
+    "specificAssetIds":[
+      {
+        "name":"identifier1KeyExample",
+        "value":"identifier1ValueExample"
+      },
+      {
+        "name":"identifier2KeyExample",
+        "value":"identifier2ValueExample"
+      },
+      {
+        "name":"key1",
+        "value":"value1"
+      },
+      {
+        "name":"key2",
+        "value":"value2"
+      }
+    ]
+  }
+}

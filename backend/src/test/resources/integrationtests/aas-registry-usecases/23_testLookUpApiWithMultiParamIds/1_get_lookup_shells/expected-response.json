@@ -1,0 +1,9 @@
+{
+  "status": 200,
+  "content": true,
+  "assertions": [],
+  "expectedPayload": {
+    "paging_metadata": {},
+    "result": []
+  }
+}

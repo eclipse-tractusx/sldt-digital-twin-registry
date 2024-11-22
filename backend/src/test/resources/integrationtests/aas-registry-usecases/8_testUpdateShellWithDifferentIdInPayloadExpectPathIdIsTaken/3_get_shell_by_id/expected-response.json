@@ -1,0 +1,14 @@
+{
+  "status": 200,
+  "content": true,
+  "assertions": [
+    {
+      "jsonPath": "$.id",
+      "equals": "662bb8ff-0843-42d3-abce-2224ad5dfreA"
+    },
+    {
+      "jsonPath": "$.submodelDescriptors[0].idShort",
+      "equals": "ChangeSubmodelIdShort"
+    }
+  ]
+}

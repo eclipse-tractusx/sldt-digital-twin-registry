@@ -1,0 +1,15 @@
+{
+  "status": 200,
+  "content": true,
+  "assertions": [
+    {
+      "jsonPath": "$.submodelDescriptors",
+      "hasSize": 1
+    },
+    {
+      "jsonPath": "$.submodelDescriptors[*].id",
+      "hasItem": "574e43bc-5c14-449a-afec-bd82d029573f"
+    }
+  ],
+  "expectedPayload": null
+}

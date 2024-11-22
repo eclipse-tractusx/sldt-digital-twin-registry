@@ -1,0 +1,11 @@
+{
+  "url": "/api/v3/lookup/shells/bm90ZXhpc3RpbmdzaGVsbA==",
+  "tenant": "TENANT_ONE",
+  "method": "POST",
+  "body": [
+    {
+      "name":"key1",
+      "value":"value1"
+    }
+  ]
+}

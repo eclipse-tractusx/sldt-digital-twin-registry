@@ -1,0 +1,11 @@
+{
+  "url":"/api/v3/lookup/shellsByAssetLink?limit=1",
+  "tenant": "TENANT_ONE",
+  "method":"POST",
+  "body":[
+    {
+      "name": "id1-25",
+      "value": "value1-25"
+    }
+  ]
+}
