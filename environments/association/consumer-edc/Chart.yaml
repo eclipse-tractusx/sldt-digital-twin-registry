@@ -9,4 +9,4 @@ dependencies:
   - name: tractusx-connector
     condition: enabled
     repository: https://eclipse-tractusx.github.io/charts/dev
-    version: 0.8.0-rc6
+    version: 0.8.0
