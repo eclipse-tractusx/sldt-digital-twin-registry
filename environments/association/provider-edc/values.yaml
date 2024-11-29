@@ -148,3 +148,9 @@ tractusx-connector:
       requests:
         cpu: 50m
         memory: 120mi
+simple-data-backend:
+  enabled: true
+  image:
+    tag: "main"
+  ingress:
+    enabled: false

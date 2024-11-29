@@ -10,3 +10,7 @@ dependencies:
     condition: enabled
     repository: https://eclipse-tractusx.github.io/charts/dev
     version: 0.8.0-rc4
+  - name: simple-data-backend
+    repository: https://eclipse-tractusx.github.io/charts/dev
+    version: 0.1.0
+    condition: simple-data-backend.enabled
