@@ -154,11 +154,18 @@ simple-data-backend:
     tag: "main"
   ingress:
     enabled: true
-    hostname: <path:semantics/data/provider-edc#simple-data-backend-url>
+    ingressClassName: ""
     annotations:
+      # uncomment the following line for tls
+      kubernetes.io/ingress.class: addon-http-application-routing
+      # nginx.ingress.kubernetes.io/proxy-body-size: 50m
       cert-manager.io/cluster-issuer: letsencrypt-prod
-      nginx.ingress.kubernetes.io/use-regex: "true"
-      nginx.ingress.kubernetes.io/enable-cors: "true"
-      nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
-    certManager:
-      clusterIssuer: letsencrypt-prod
+    hosts:
+      - host: <path:semantics/data/provider-edc#simple-data-backend-url>
+        paths:
+          - path: "/"
+            pathType: "ImplementationSpecific"
+    tls:
+      - secretName: "submodelserver.tx.test-tls"
+        hosts:
+          - <path:semantics/data/provider-edc#simple-data-backend-url>
