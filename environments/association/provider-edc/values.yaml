@@ -152,7 +152,7 @@ simple-data-backend:
   enabled: true
   image:
     tag: "main"
-  ingresses:
+  ingress:
     enabled: true
     hostname: <path:semantics/data/provider-edc#simple-data-backend-url>
     annotations:
