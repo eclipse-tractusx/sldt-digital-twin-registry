@@ -154,7 +154,7 @@ simple-data-backend:
     tag: "main"
   ingress:
     enabled: true
-    ingressClassName: ""
+    ingressClassName: nginx
     annotations:
       kubernetes.io/ingress.class: addon-http-application-routing
       cert-manager.io/cluster-issuer: letsencrypt-prod
@@ -162,7 +162,7 @@ simple-data-backend:
       - host: <path:semantics/data/provider-edc#simple-data-backend-url>
         paths:
           - path: "/"
-            pathType: "ImplementationSpecific"
+            pathType: "Prefix"
     tls:
       - secretName: "submodelserver.tx.test-tls"
         hosts:
