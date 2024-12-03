@@ -166,7 +166,3 @@ simple-data-backend:
         paths:
           - path: "/sub"
             pathType: "Prefix"
-    tls:
-      - secretName: "submodelserver.tx.test-tls"
-        hosts:
-          - <path:semantics/data/provider-edc#simple-data-backend-url>
