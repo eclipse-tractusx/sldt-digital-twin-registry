@@ -156,8 +156,11 @@ simple-data-backend:
     enabled: true
     ingressClassName: nginx
     annotations:
-      kubernetes.io/ingress.class: addon-http-application-routing
       cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/rewrite-target: /$2
+      nginx.ingress.kubernetes.io/use-regex: "true"
+      nginx.ingress.kubernetes.io/enable-cors: "true"
+      nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
     hosts:
       - host: <path:semantics/data/provider-edc#simple-data-backend-url>
         paths:
