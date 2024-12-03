@@ -154,11 +154,9 @@ simple-data-backend:
     tag: "main"
   ingress:
     enabled: true
-    ingressClassName: ""
+    ingressClassName: nginx
     annotations:
-      # uncomment the following line for tls
       kubernetes.io/ingress.class: addon-http-application-routing
-      # nginx.ingress.kubernetes.io/proxy-body-size: 50m
       cert-manager.io/cluster-issuer: letsencrypt-prod
     hosts:
       - host: <path:semantics/data/provider-edc#simple-data-backend-url>
