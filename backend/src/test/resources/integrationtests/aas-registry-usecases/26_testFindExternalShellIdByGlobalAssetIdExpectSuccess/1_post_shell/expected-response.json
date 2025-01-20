@@ -1,0 +1,13 @@
+{
+  "status": 201,
+  "content": true,
+  "assertions": [],
+  "expectedPayload": {
+    "description":[],
+    "displayName":[],
+    "globalAssetId": "ea83b370-522a-4bbd-b451-fbe15a77706d",
+    "idShort":"KfI9Rcfvvy",
+    "id":"804cae7d-8a5f-436c-a78f-f312c30159dd",
+    "specificAssetIds":[]
+  }
+}

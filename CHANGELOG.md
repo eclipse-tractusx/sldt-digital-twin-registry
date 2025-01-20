@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.7.0
 ### Added
+- Add dynamic integration tests
 ## fixed
 - Bugfix: [Updated AccessRule Not Applied: Old BPN Retains Access, New BPN Denied](https://github.com/eclipse-tractusx/sldt-digital-twin-registry/issues/489)
 

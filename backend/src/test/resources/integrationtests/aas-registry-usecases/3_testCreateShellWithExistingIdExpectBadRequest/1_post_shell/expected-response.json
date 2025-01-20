@@ -1,0 +1,10 @@
+{
+  "status": 400,
+  "content": true,
+  "assertions": [
+    {
+      "jsonPath": "$.messages[0].text",
+      "equals": "An AssetAdministrationShell for the given identification does already exists."
+    }
+  ]
+}

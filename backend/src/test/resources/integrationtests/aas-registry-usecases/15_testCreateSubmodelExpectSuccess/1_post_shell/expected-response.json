@@ -1,0 +1,21 @@
+{
+  "status": 201,
+  "content": true,
+  "assertions": [],
+  "expectedPayload": {
+    "description":[],
+    "displayName":[],
+    "idShort":"IFvhtUByCk",
+    "id":"dad18a5f-0c2e-4841-9aeb-a3ee7110bd3b",
+    "specificAssetIds":[
+      {
+        "name":"identifier1KeyExample",
+        "value":"identifier1ValueExample"
+      },
+      {
+        "name":"identifier2KeyExample",
+        "value":"identifier2ValueExample"
+      }
+    ]
+  }
+}

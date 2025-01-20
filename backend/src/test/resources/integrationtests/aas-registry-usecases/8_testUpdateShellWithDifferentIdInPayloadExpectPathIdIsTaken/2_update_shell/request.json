@@ -1,0 +1,60 @@
+{
+  "url": "/api/v3/shell-descriptors/NjYyYmI4ZmYtMDg0My00MmQzLWFiY2UtMjIyNGFkNWRmcmVB",
+  "tenant": "TENANT_ONE",
+  "method": "PUT",
+  "body": {
+    "description":[],
+    "displayName":[],
+    "idShort":"newIdShortInUpdateRequest",
+    "id":"newShellIdShouldIgnore",
+    "specificAssetIds":[
+      {
+        "name":"identifier1KeyExample",
+        "value":"identifier1ValueExample"
+      },
+      {
+        "name":"identifier2KeyExample",
+        "value":"identifier2ValueExample"
+      }
+    ],
+    "submodelDescriptors":[
+      {
+        "idShort":"ChangeSubmodelIdShort",
+        "id":"ba616af0-9d3c-4620-a2eb-428b3fbfDsga",
+        "endpoints":[
+          {
+            "interface":"interfaceNameExample",
+            "protocolInformation":{
+              "href":"http://endpoint-address",
+              "endpointProtocol":"endpointProtocolExample",
+              "endpointProtocolVersion":[
+                "1.1"
+              ],
+              "subprotocol":"",
+              "subprotocolBody":"subprotocolBodyExample",
+              "subprotocolBodyEncoding":"subprotocolBodyExample",
+              "securityAttributes":[
+                {
+                  "type":"NONE",
+                  "key":"Security Attribute key",
+                  "value":"Security Attribute value"
+                }
+              ]
+            }
+          }
+        ],
+        "semanticId":{
+          "type":"ExternalReference",
+          "keys":[
+            {
+              "type":"Submodel",
+              "value":"semanticIdExample"
+            }
+          ]
+        },
+        "description":[],
+        "displayName":[]
+      }
+    ]
+  }
+}

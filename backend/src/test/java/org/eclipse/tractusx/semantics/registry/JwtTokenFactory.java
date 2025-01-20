@@ -54,6 +54,19 @@ public class JwtTokenFactory {
       this.tenantThree = new Tenant( publicClientId, TENANT_THREE );
    }
 
+   public Tenant getTenant(String tenant)  {
+     switch ( tenant ) {
+     case TENANT_ONE:
+        return tenantOne;
+     case TENANT_TWO:
+        return tenantTwo;
+     case TENANT_THREE:
+        return tenantThree;
+     default:
+        return null;
+     }
+   };
+
    public RequestPostProcessor allRoles() {
       return tenantOne.allRoles();
    }

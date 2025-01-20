@@ -1,0 +1,160 @@
+{
+  "url": "/api/v3/shell-descriptors",
+  "tenant": "TENANT_ONE",
+  "method": "POST",
+  "body": {
+    "description":[
+      {
+        "language":"de",
+        "text":"hello text"
+      },
+      {
+        "language":"en",
+        "text":"hello s"
+      }
+    ],
+    "displayName":[
+      {
+        "language":"de",
+        "text":"this is an example description1"
+      }
+    ],
+    "assetKind":"Instance",
+    "assetType":"AssetType",
+    "globalAssetId":"globalAssetId example",
+    "idShort":"NDfECad2wf",
+    "id":"662bb8ff-0843-42d3-abce-2224ad5d6dh4",
+    "specificAssetIds":[
+      {
+        "semanticId":{
+          "type":"ModelReference",
+          "keys":[
+            {
+              "type":"AssetAdministrationShell",
+              "value":"specificAssetIdReference key"
+            }
+          ]
+        },
+        "supplementalSemanticIds":[
+          {
+            "type":"ExternalReference",
+            "keys":[
+              {
+                "type":"BasicEventElement",
+                "value":"assetIdKey value"
+              }
+            ]
+          }
+        ],
+        "name":"identifier1KeyExample",
+        "value":"identifier1ValueExample",
+        "externalSubjectId":{
+          "type":"ExternalReference",
+          "keys":[
+            {
+              "type":"AssetAdministrationShell",
+              "value":"ExternalSubject key value"
+            }
+          ]
+        }
+      },
+      {
+        "semanticId":{
+          "type":"ModelReference",
+          "keys":[
+            {
+              "type":"AssetAdministrationShell",
+              "value":"specificAssetIdReference key"
+            }
+          ]
+        },
+        "supplementalSemanticIds":[
+          {
+            "type":"ExternalReference",
+            "keys":[
+              {
+                "type":"BasicEventElement",
+                "value":"assetIdKey value"
+              }
+            ]
+          }
+        ],
+        "name":"identifier2KeyExample",
+        "value":"identifier2ValueExample",
+        "externalSubjectId":{
+          "type":"ExternalReference",
+          "keys":[
+            {
+              "type":"AssetAdministrationShell",
+              "value":"ExternalSubject key value"
+            }
+          ]
+        }
+      }
+    ],
+    "submodelDescriptors":[
+      {
+        "endpoints":[
+          {
+            "interface":"interfaceNameExample",
+            "protocolInformation":{
+              "href":"http://endpoint-address",
+              "endpointProtocol":"endpointProtocolExample",
+              "endpointProtocolVersion":[
+                "e"
+              ],
+              "subprotocol":"subprotocolExample",
+              "subprotocolBody":"subprotocolBodyExample",
+              "subprotocolBodyEncoding":"subprotocolBodyExample",
+              "securityAttributes":[
+                {
+                  "type":"NONE",
+                  "key":"Security Attribute key",
+                  "value":"Security Attribute value"
+                }
+              ]
+            }
+          }
+        ],
+        "idShort":"R1hWkFp3GA",
+        "id":"ba616af0-9d3c-4620-a2eb-428b3fbfsf31",
+        "semanticId":{
+          "type":"ExternalReference",
+          "keys":[
+            {
+              "type":"Submodel",
+              "value":"semanticIdExample"
+            }
+          ]
+        },
+        "supplementalSemanticId":[
+          {
+            "type":"ExternalReference",
+            "keys":[
+              {
+                "type":"Submodel",
+                "value":"supplementalsemanticIdExample value"
+              }
+            ]
+          }
+        ],
+        "description":[
+          {
+            "language":"de",
+            "text":"hello text"
+          },
+          {
+            "language":"en",
+            "text":"hello s"
+          }
+        ],
+        "displayName":[
+          {
+            "language":"de",
+            "text":"this is an example description1"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "url":"/api/v3/shell-descriptors/NjcyYjU1OGYtMmY5Mi00OTk0LWEzZDMtZjljNGYxMTIwZWYz/submodel-descriptors",
+  "tenant": "TENANT_ONE",
+  "method":"POST",
+  "body": {
+    "idShort":"CgtP2OAGSt",
+    "id":"1745689f-fed6-4f17-9c41-18c75b777ebc",
+    "endpoints":[
+      {
+        "interface":"interfaceNameExample",
+        "protocolInformation":{
+          "href":"http://endpoint-address",
+          "endpointProtocol":"endpointProtocolExample",
+          "endpointProtocolVersion":[
+            "1.1"
+          ],
+          "subprotocol":"",
+          "subprotocolBody":"subprotocolBodyExample",
+          "subprotocolBodyEncoding":"subprotocolBodyExample",
+          "securityAttributes":[
+            {
+              "type":"NONE",
+              "key":"Security Attribute key",
+              "value":"Security Attribute value"
+            }
+          ]
+        }
+      }
+    ],
+    "semanticId":{
+      "type":"ExternalReference",
+      "keys":[
+        {
+          "type":"Submodel",
+          "value":"semanticIdExample"
+        }
+      ]
+    },
+    "description":[],
+    "displayName":[]
+  }
+}

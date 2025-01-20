@@ -1,0 +1,51 @@
+{
+  "url": "/api/v3/shell-descriptors",
+  "tenant": "TENANT_ONE",
+  "method": "POST",
+  "body": {
+    "description":[],
+    "displayName":[],
+    "idShort":"CYFlZalx6j",
+    "id":"9dd90727-09a8-4788-9c50-332f6e5465f9",
+    "specificAssetIds":[],
+    "submodelDescriptors":[
+      {
+        "idShort": null,
+        "id":"89afe357-2804-4ada-add6-e0d52921384b",
+        "endpoints":[
+          {
+            "interface":"interfaceNameExample",
+            "protocolInformation":{
+              "href":"http://endpoint-address",
+              "endpointProtocol":"endpointProtocolExample",
+              "endpointProtocolVersion":[
+                "1.1"
+              ],
+              "subprotocol":"",
+              "subprotocolBody":"subprotocolBodyExample",
+              "subprotocolBodyEncoding":"subprotocolBodyExample",
+              "securityAttributes":[
+                {
+                  "type":"NONE",
+                  "key":"Security Attribute key",
+                  "value":"Security Attribute value"
+                }
+              ]
+            }
+          }
+        ],
+        "semanticId":{
+          "type":"ExternalReference",
+          "keys":[
+            {
+              "type":"Submodel",
+              "value":"semanticIdExample"
+            }
+          ]
+        },
+        "description":[],
+        "displayName":[]
+      }
+    ]
+  }
+}

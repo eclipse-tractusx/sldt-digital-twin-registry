@@ -1,0 +1,21 @@
+{
+  "url": "/api/v3/shell-descriptors",
+  "tenant": "TENANT_ONE",
+  "method": "POST",
+  "body": {
+    "description":[],
+    "displayName":[],
+    "idShort":"a60a9297",
+    "id":"a60a9297-ff06-45b4-b4c7-fb7ea05a60e2",
+    "specificAssetIds":[
+      {
+        "name":"WMI",
+        "value":"identifier1ValueExample"
+      },
+      {
+        "name":"WMI",
+        "value":"identifier2ValueExample"
+      }
+    ]
+  }
+}
