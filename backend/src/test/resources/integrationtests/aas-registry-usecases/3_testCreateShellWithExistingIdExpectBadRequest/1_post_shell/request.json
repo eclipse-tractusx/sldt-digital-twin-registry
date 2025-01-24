@@ -22,8 +22,8 @@
     "assetKind":"Instance",
     "assetType":"AssetType",
     "globalAssetId":"globalAssetId example",
-    "idShort":"Ndy9Ca6jdf",
-    "id":"662bb8ff-0843-42d3-abce-2224ad5d6f7e",
+    "idShort":"Ndy9Ca6asw",
+    "id":"662bb8ff-0843-42d3-abce-2224ad5ddskl3",
     "specificAssetIds":[
       {
         "semanticId":{
@@ -90,70 +90,6 @@
             }
           ]
         }
-      }
-    ],
-    "submodelDescriptors":[
-      {
-        "endpoints":[
-          {
-            "interface":"interfaceNameExample",
-            "protocolInformation":{
-              "href":"http://endpoint-address",
-              "endpointProtocol":"endpointProtocolExample",
-              "endpointProtocolVersion":[
-                "e"
-              ],
-              "subprotocol":"subprotocolExample",
-              "subprotocolBody":"subprotocolBodyExample",
-              "subprotocolBodyEncoding":"subprotocolBodyExample",
-              "securityAttributes":[
-                {
-                  "type":"NONE",
-                  "key":"Security Attribute key",
-                  "value":"Security Attribute value"
-                }
-              ]
-            }
-          }
-        ],
-        "idShort":"R1hWbvXIcV",
-        "id":"ba616af0-9d3c-4620-a2eb-428b3fbf4d41",
-        "semanticId":{
-          "type":"ExternalReference",
-          "keys":[
-            {
-              "type":"Submodel",
-              "value":"semanticIdExample"
-            }
-          ]
-        },
-        "supplementalSemanticId":[
-          {
-            "type":"ExternalReference",
-            "keys":[
-              {
-                "type":"Submodel",
-                "value":"supplementalsemanticIdExample value"
-              }
-            ]
-          }
-        ],
-        "description":[
-          {
-            "language":"de",
-            "text":"hello text"
-          },
-          {
-            "language":"en",
-            "text":"hello s"
-          }
-        ],
-        "displayName":[
-          {
-            "language":"de",
-            "text":"this is an example description1"
-          }
-        ]
       }
     ]
   }
