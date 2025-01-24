@@ -102,7 +102,7 @@ This could look:
         "@vocab": "https://w3id.org/edc/v0.0.1/ns/",
         "cx-common": "https://w3id.org/catenax/ontology/common#",
         "cx-taxo": "https://w3id.org/catenax/taxonomy#",
-        "dct": "https://purl.org/dc/terms/"
+        "dct": "http://purl.org/dc/terms/"
       },
       "@id": "urn:name:digital-twin-registry",
       "properties": {
