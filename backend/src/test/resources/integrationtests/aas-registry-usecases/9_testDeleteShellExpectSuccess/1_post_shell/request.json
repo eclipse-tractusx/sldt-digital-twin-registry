@@ -1,0 +1,21 @@
+{
+  "url":"/api/v3/shell-descriptors",
+  "tenant": "TENANT_ONE",
+  "method":"POST",
+  "body":{
+    "description":[],
+    "displayName":[],
+    "idShort":"NDfESdWas3",
+    "id":"34d4428e-953c-48b4-9ae2-15b69cf0cacd",
+    "specificAssetIds":[
+      {
+        "name":"identifier1KeyExample",
+        "value":"identifier1ValueExample"
+      },
+      {
+        "name":"identifier2KeyExample",
+        "value":"identifier2ValueExample"
+      }
+    ]
+  }
+}

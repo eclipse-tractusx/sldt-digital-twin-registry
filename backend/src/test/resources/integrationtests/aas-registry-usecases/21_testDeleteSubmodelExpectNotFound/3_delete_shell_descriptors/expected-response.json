@@ -1,0 +1,9 @@
+{
+  "status": 404,
+  "content": true,
+  "assertions": [{
+    "jsonPath": "$.messages[0].text",
+    "equals": "Submodel for identifier e0e19658-ae95-437c-a89c-f9b76d987fd5 not found."
+  }],
+  "expectedPayload": null
+}

@@ -1,0 +1,11 @@
+{
+  "status": 200,
+  "content": true,
+  "assertions": [
+    {
+    "jsonPath": "$.profiles[0]",
+    "equals": "https://admin-shell.io/aas/API/3/0/AssetAdministrationShellRegistryServiceSpecification/SSP-001"
+    }
+  ],
+  "expectedPayload": null
+}

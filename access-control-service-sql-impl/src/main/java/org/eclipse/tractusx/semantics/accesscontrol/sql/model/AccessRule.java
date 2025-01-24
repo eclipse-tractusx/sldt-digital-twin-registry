@@ -66,7 +66,7 @@ public class AccessRule {
 
    @NotNull( groups = { OnCreate.class, OnUpdate.class } )
    @NotBlank( groups = { OnCreate.class, OnUpdate.class } )
-   @Column( name = "TARGET_TENANT", nullable = false, updatable = false, length = 36 )
+   @Column( name = "TARGET_TENANT", nullable = false, length = 36 )
    private String targetTenant;
 
    @NotNull( groups = { OnCreate.class, OnUpdate.class } )

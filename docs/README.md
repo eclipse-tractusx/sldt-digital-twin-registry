@@ -21,9 +21,9 @@
 # Introduction
 Following documentation is available:
 
-| Documentation                                                              | Purpose                                                             |
-|----------------------------------------------------------------------------|---------------------------------------------------------------------|
-| [Arc42](architecture/)                                                     | Architecture documentation for the discovery finder.                |
-| [Guideline to use aws-cognito](guideline-aws-cognito-configuration.md)     | Documentation to use aws cognito as identity provider               |
-| [Guideline to use edc-extension](guideline-edc-extension-configuration.md) | Documentation to build and use the edc extension for access control |
-| [Development](development/)                                                | Useful collections for development                                  |
+| Documentation                                                              | Purpose                                                                   |
+|----------------------------------------------------------------------------|---------------------------------------------------------------------------|
+| [Arc42](architecture/)                                                     | Architecture documentation for the discovery finder.                      |
+| [Guideline to use aws-cognito](guideline-aws-cognito-configuration.md)     | Documentation to use aws cognito as identity provider                     |
+| [Guideline to use edc-extension](guideline-edc-extension-configuration.md) | Documentation to build and use the edc extension for access control       |
+| [Development](development/)                                                | Useful collections for development like postman/insomnia collections etc. |

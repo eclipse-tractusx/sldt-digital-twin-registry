@@ -1,0 +1,19 @@
+{
+  "status": 200,
+  "content": true,
+  "assertions": [
+    {
+      "jsonPath": "$.paging_metadata",
+      "isEmpty": true
+    },
+    {
+      "jsonPath": "$.result",
+      "hasSize": 1
+    },
+    {
+      "jsonPath": "$.result",
+      "hasItem": "eb321464-a81f-4d4c-a7af-f6ca79bcab5b"
+    }
+  ],
+  "expectedPayload": null
+}

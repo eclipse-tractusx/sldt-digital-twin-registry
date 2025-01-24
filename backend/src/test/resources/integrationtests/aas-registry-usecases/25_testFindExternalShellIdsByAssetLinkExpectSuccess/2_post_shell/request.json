@@ -1,0 +1,21 @@
+{
+  "url":"/api/v3/shell-descriptors",
+  "tenant": "TENANT_ONE",
+  "method":"POST",
+  "body": {
+    "description":[],
+    "displayName":[],
+    "idShort":"mQc8uRgfA9",
+    "id":"a8df7bb0-9ddf-4791-989d-539bb6862322",
+    "specificAssetIds":[
+      {
+        "name":"id1-25",
+        "value":"value1-25"
+      },
+      {
+        "name":"id2-25",
+        "value":"value2-25"
+      }
+    ]
+  }
+}

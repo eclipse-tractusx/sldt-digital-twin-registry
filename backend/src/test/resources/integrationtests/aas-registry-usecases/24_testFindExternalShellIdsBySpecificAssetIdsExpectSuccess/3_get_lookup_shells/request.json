@@ -1,0 +1,6 @@
+{
+  "url":"/api/v3/lookup/shells?limit=1&assetIds=eyJuYW1lIjoiaWQxIiwidmFsdWUiOiJ2YWx1ZTEifQ==",
+  "tenant": "TENANT_ONE",
+  "method":"GET",
+  "body":null
+}

@@ -1,0 +1,11 @@
+{
+  "url":"/api/v3/lookup/shellsByAssetLink",
+  "tenant": "TENANT_ONE",
+  "method":"POST",
+  "body":[
+    {
+      "name": "globalAssetId",
+      "value": "e556db2f-2248-40b4-b994-baf6d98d8f0d"
+    }
+  ]
+}

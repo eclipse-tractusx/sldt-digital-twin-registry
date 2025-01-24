@@ -1,0 +1,6 @@
+{
+  "url":"/api/v3/lookup/shells?assetIds=%7B%20invalid%20%7D",
+  "tenant": "TENANT_ONE",
+  "method":"GET",
+  "body":null
+}

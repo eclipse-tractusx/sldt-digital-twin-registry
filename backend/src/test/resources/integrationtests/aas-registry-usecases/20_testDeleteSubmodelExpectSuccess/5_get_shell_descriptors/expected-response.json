@@ -1,0 +1,11 @@
+{
+  "status": 200,
+  "content": true,
+  "assertions": [
+    {
+      "jsonPath": "$.submodelDescriptors",
+      "hasSize": 0
+    }
+  ],
+  "expectedPayload": null
+}
