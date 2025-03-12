@@ -37,8 +37,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.aas.registry.model.InlineResponse200;
 import org.eclipse.tractusx.semantics.aas.registry.model.PagedResultPagingMetadata;
@@ -114,41 +112,7 @@ public class ShellService {
          throw new DuplicateKeyException( "An AssetAdministrationShell for the given identification does already exists." );
       }
 
-      validateIdShort( shell );
-
       return shellRepository.save( shell );
-   }
-
-   /**
-    * Checks IdShort in shell level against DB & validate duplicate IdShort values in Submodels
-    * @param shell
-    */
-   private void validateIdShort( Shell shell ) {
-      //Check uniqueness of IdShort in shell level
-      Optional.ofNullable( shell.getIdShort() ).map( shellRepository::existsByIdShort ).filter( BooleanUtils::isTrue )
-            .ifPresent( aBoolean -> {
-               throw new DuplicateKeyException( "An AssetAdministrationShell for the given IdShort already exists." );
-            } );
-
-      checkForDuplicateIdShortWithInSubModels( shell );
-   }
-
-   private void checkForDuplicateIdShortWithInSubModels( Shell shell ) {
-      //Check uniqueness of IdShort in Sub-model level
-      List<String> idShortList = Optional.of( shell ).map( Shell::getSubmodels ).stream()
-            .flatMap( Collection::stream )
-            .map( Submodel::getIdShort )
-            .filter( StringUtils::isNotBlank )
-            .map( String::toLowerCase )
-            .toList();
-
-      boolean isDuplicateIdShortPresent = Optional.of( idShortList ).filter( idShorts -> idShortList.stream().distinct().count() != idShorts.size() )
-            .isPresent();
-
-      if ( isDuplicateIdShortPresent ) {
-         throw new DuplicateKeyException( DUPLICATE_SUBMODEL_ID_SHORT_EXCEPTION );
-      }
-
    }
 
    public void mapShellCollection( Shell shell ) {
