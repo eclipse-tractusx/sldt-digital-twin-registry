@@ -32,7 +32,7 @@ info:
     url: https://creativecommons.org/licenses/by/4.0/
   version: V3.0.2_SSP-001
 security:
-  - bearerAuth: [ ]
+  - bearerAuth: []
 servers:
   - url: "{protocol}://{host_name}:{port}/api/{version_prefix}"
     variables:
@@ -1049,7 +1049,7 @@ components:
       required:
         - id
       type: object
-      example: { "id": "https://example.org/aas/motor","endpoints": [ { "protocolInformation": { "href": "https://localhost:1234/api/v3.0/aas","endpointProtocol": "HTTP","endpointProtocolVersion": [ "1.1" ] },"interface": "AAS-3.0" },{ "protocolInformation": { "href": "opc.tcp://localhost:4840" },"interface": "AAS-3.0" },{ "protocolInformation": { "href": "https://localhost:5678","endpointProtocol": "HTTP","endpointProtocolVersion": [ "1.1" ],"subprotocol": "OPC UA Basic SOAP","subprotocolBody": "ns=2;s=MyAAS","subprotocolBodyEncoding": "application/soap+xml" },"interface": "AAS-3.0" } ] }
+      example: {"id":"https://example.org/aas/motor","endpoints":[{"protocolInformation":{"href":"https://localhost:1234/api/v3.0/aas","endpointProtocol":"HTTP","endpointProtocolVersion":["1.1"]},"interface":"AAS-3.0"},{"protocolInformation":{"href":"opc.tcp://localhost:4840"},"interface":"AAS-3.0"},{"protocolInformation":{"href":"https://localhost:5678","endpointProtocol":"HTTP","endpointProtocolVersion":["1.1"],"subprotocol":"OPC UA Basic SOAP","subprotocolBody":"ns=2;s=MyAAS","subprotocolBodyEncoding":"application/soap+xml"},"interface":"AAS-3.0"}]}
       allOf:
         - $ref: '#/components/schemas/Descriptor'
         - properties:
@@ -1107,7 +1107,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Extension'
-      example: { "endpoints": [ { "protocolInformation": { "href": "https://localhost:1234/api/v3.0/aas","endpointProtocolVersion": [ "1.1" ] },"interface": "AAS-3.0" },{ "protocolInformation": { "href": "opc.tcp://localhost:4840" },"interface": "AAS-3.0" },{ "protocolInformation": { "href": "https://localhost:5678","endpointProtocolVersion": [ "1.1" ],"subprotocol": "OPC UA Basic SOAP","subprotocolBody": "ns=2;s=MyAAS","subprotocolBodyEncoding": "application/soap+xml" },"interface": "AAS-3.0" } ] }
+      example: {"endpoints":[{"protocolInformation":{"href":"https://localhost:1234/api/v3.0/aas","endpointProtocolVersion":["1.1"]},"interface":"AAS-3.0"},{"protocolInformation":{"href":"opc.tcp://localhost:4840"},"interface":"AAS-3.0"},{"protocolInformation":{"href":"https://localhost:5678","endpointProtocolVersion":["1.1"],"subprotocol":"OPC UA Basic SOAP","subprotocolBody":"ns=2;s=MyAAS","subprotocolBodyEncoding":"application/soap+xml"},"interface":"AAS-3.0"}]}
     LangStringTextType:
       allOf:
         - $ref: '#/components/schemas/AbstractLangString'
@@ -1469,7 +1469,7 @@ components:
     Endpoint:
       required:
         - interface
-        # - protocolInformation
+       # - protocolInformation
       type: object
       properties:
         interface:
@@ -1566,7 +1566,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Reference'
-      example: { "id": "https://admin-shell.io/zvei/nameplate/1/0/Nameplate","endpoints": [ { "protocolInformation": { "href": "https://localhost:1234/api/v3.0/submodel","endpointProtocol": "HTTP","endpointProtocolVersion": [ "1.1" ] },"interface": "AAS-3.0" },{ "protocolInformation": { "href": "opc.tcp://localhost:4840" },"interface": "AAS-3.0" },{ "protocolInformation": { "href": "https://localhost:5678","endpointProtocol": "HTTP","endpointProtocolVersion": [ "1.1" ],"subprotocol": "OPC UA Basic SOAP","subprotocolBody": "ns=2;s=MyAAS","subprotocolBodyEncoding": "application/soap+xml" },"interface": "AAS-3.0" } ] }
+      example: {"id":"https://admin-shell.io/zvei/nameplate/1/0/Nameplate","endpoints":[{"protocolInformation":{"href":"https://localhost:1234/api/v3.0/submodel","endpointProtocol":"HTTP","endpointProtocolVersion":["1.1"]},"interface":"AAS-3.0"},{"protocolInformation":{"href":"opc.tcp://localhost:4840"},"interface":"AAS-3.0"},{"protocolInformation":{"href":"https://localhost:5678","endpointProtocol":"HTTP","endpointProtocolVersion":["1.1"],"subprotocol":"OPC UA Basic SOAP","subprotocolBody":"ns=2;s=MyAAS","subprotocolBodyEncoding":"application/soap+xml"},"interface":"AAS-3.0"}]}
       allOf:
         - $ref: '#/components/schemas/Descriptor'
     Result:
@@ -1636,9 +1636,9 @@ components:
               - https://admin-shell.io/aas/API/3/0/SubmodelRepositoryServiceSpecification/SSP-003
               - https://admin-shell.io/aas/API/3/0/SubmodelRepositoryServiceSpecification/SSP-004
               - https://admin-shell.io/aas/API/3/0/ConceptDescriptionServiceSpecification/SSP-001
-            example: [ "https://admin-shell.io/aas/API/3/0/AssetAdministrationShellServiceSpecification/SSP-001","https://admin-shell.io/aas/API/3/0/AssetAdministrationShellServiceSpecification/SSP-002","https://admin-shell.io/aas/API/3/0/SubmodelServiceSpecification/SSP-001","https://admin-shell.io/aas/API/3/0/SubmodelServiceSpecification/SSP-002","https://admin-shell.io/aas/API/3/0/SubmodelServiceSpecification/SSP-003","https://admin-shell.io/aas/API/3/0/AasxFileServerServiceSpecification/SSP-001","https://admin-shell.io/aas/API/3/0/AssetAdministrationShellRegistryServiceSpecification/SSP-001","https://admin-shell.io/aas/API/3/0/AssetAdministrationShellRegistryServiceSpecification/SSP-002","https://admin-shell.io/aas/API/3/0/SubmodelRegistryServiceSpecification/SSP-001","https://admin-shell.io/aas/API/3/0/SubmodelRegistryServiceSpecification/SSP-002","https://admin-shell.io/aas/API/3/0/DiscoveryServiceSpecification/SSP-001","https://admin-shell.io/aas/API/3/0/AssetAdministrationShellRepositoryServiceSpecification/SSP-001","https://admin-shell.io/aas/API/3/0/AssetAdministrationShellRepositoryServiceSpecification/SSP-002","https://admin-shell.io/aas/API/3/0/SubmodelRepositoryServiceSpecification/SSP-001","https://admin-shell.io/aas/API/3/0/SubmodelRepositoryServiceSpecification/SSP-002","https://admin-shell.io/aas/API/3/0/SubmodelRepositoryServiceSpecification/SSP-003","https://admin-shell.io/aas/API/3/0/SubmodelRepositoryServiceSpecification/SSP-004","https://admin-shell.io/aas/API/3/0/ConceptDescriptionServiceSpecification/SSP-001" ]
+            example: ["https://admin-shell.io/aas/API/3/0/AssetAdministrationShellServiceSpecification/SSP-001","https://admin-shell.io/aas/API/3/0/AssetAdministrationShellServiceSpecification/SSP-002","https://admin-shell.io/aas/API/3/0/SubmodelServiceSpecification/SSP-001","https://admin-shell.io/aas/API/3/0/SubmodelServiceSpecification/SSP-002","https://admin-shell.io/aas/API/3/0/SubmodelServiceSpecification/SSP-003","https://admin-shell.io/aas/API/3/0/AasxFileServerServiceSpecification/SSP-001","https://admin-shell.io/aas/API/3/0/AssetAdministrationShellRegistryServiceSpecification/SSP-001","https://admin-shell.io/aas/API/3/0/AssetAdministrationShellRegistryServiceSpecification/SSP-002","https://admin-shell.io/aas/API/3/0/SubmodelRegistryServiceSpecification/SSP-001","https://admin-shell.io/aas/API/3/0/SubmodelRegistryServiceSpecification/SSP-002","https://admin-shell.io/aas/API/3/0/DiscoveryServiceSpecification/SSP-001","https://admin-shell.io/aas/API/3/0/AssetAdministrationShellRepositoryServiceSpecification/SSP-001","https://admin-shell.io/aas/API/3/0/AssetAdministrationShellRepositoryServiceSpecification/SSP-002","https://admin-shell.io/aas/API/3/0/SubmodelRepositoryServiceSpecification/SSP-001","https://admin-shell.io/aas/API/3/0/SubmodelRepositoryServiceSpecification/SSP-002","https://admin-shell.io/aas/API/3/0/SubmodelRepositoryServiceSpecification/SSP-003","https://admin-shell.io/aas/API/3/0/SubmodelRepositoryServiceSpecification/SSP-004","https://admin-shell.io/aas/API/3/0/ConceptDescriptionServiceSpecification/SSP-001"]
       description: "The Description object enables servers to present their capabilities to the clients, in particular which profiles they implement. At least one defined profile is required. Additional, proprietary attributes might be included. Nevertheless, the server must not expect that a regular client understands them."
-      example: { "profiles": [ "https://admin-shell.io/aas/API/3/0/AssetAdministrationShellRegistryServiceSpecification/SSP-002","https://admin-shell.io/aas/API/3/0/SubmodelRegistryServiceSpecification/SSP-002" ] }
+      example: {"profiles": ["https://admin-shell.io/aas/API/3/0/AssetAdministrationShellRegistryServiceSpecification/SSP-002","https://admin-shell.io/aas/API/3/0/SubmodelRegistryServiceSpecification/SSP-002"]}
     PagedResult_paging_metadata:
       type: object
       properties:
@@ -1843,5 +1843,5 @@ components:
     lookup-shells-by-aas-identifier-response:
       value:
         [
-          "882fc530-b69b-4707-95f6-5dbc5e9baaa8"
+            "882fc530-b69b-4707-95f6-5dbc5e9baaa8"
         ]
