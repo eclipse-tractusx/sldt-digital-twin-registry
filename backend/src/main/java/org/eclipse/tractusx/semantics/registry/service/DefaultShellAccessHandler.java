@@ -121,11 +121,11 @@ public class DefaultShellAccessHandler implements ShellAccessHandler {
          if ( identifier.getExternalSubjectId() != null ) {
             final Set<ShellIdentifierExternalSubjectReferenceKey> optionalReferenceKey =
                   identifier.getExternalSubjectId().getKeys().stream().filter( shellIdentifierExternalSubjectReferenceKey ->
-                              // Match if externalSubjectId = tenantId
+                        // Match if externalSubjectId = tenantId
                               shellIdentifierExternalSubjectReferenceKey.getValue().equals( tenantId )
-                                    // or match if externalSubjectId = externalSubjectIdWildcardPrefix and key of identifier (for example manufacturerPartId) is allowing wildcard.
-                                    || (shellIdentifierExternalSubjectReferenceKey.getValue().equals( externalSubjectIdWildcardPrefix )
-                                    && externalSubjectIdWildcardAllowedTypes.contains( identifier.getKey() )) )
+                        // or match if externalSubjectId = externalSubjectIdWildcardPrefix and key of identifier (for example manufacturerPartId) is allowing wildcard.
+                              || (shellIdentifierExternalSubjectReferenceKey.getValue().equals( externalSubjectIdWildcardPrefix )
+                                  && externalSubjectIdWildcardAllowedTypes.contains( identifier.getKey() )) )
                         .collect( Collectors.toSet() );
             if ( !optionalReferenceKey.isEmpty() ) {
                identifier.getExternalSubjectId().setKeys( optionalReferenceKey );
