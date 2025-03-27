@@ -20,8 +20,7 @@
 
 package org.eclipse.tractusx.semantics.registry.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+import java.time.OffsetDateTime;
 import java.util.Base64;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +29,8 @@ import java.util.stream.IntStream;
 
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
+import org.eclipse.tractusx.semantics.aas.registry.model.InlineResponse200;
+import org.eclipse.tractusx.semantics.aas.registry.model.PagedResultPagingMetadata;
 import org.eclipse.tractusx.semantics.registry.TestUtil;
 import org.eclipse.tractusx.semantics.registry.mapper.ShellMapper;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
@@ -61,12 +62,83 @@ class LegacyShellServiceTest {
 
    @Test
    void testsLookupWithNoMatchingRecordsExpectEmptyListAndNoCursor() {
-      String specificAssetIdName = keyPrefix + "key";
-      String specificAssetIdValue = "value";
-      Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
+      final String specificAssetIdName = keyPrefix + "key";
+      final String specificAssetIdValue = "value";
+      final Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
 
       final var actual = shellService.findExternalShellIdsByIdentifiersByExactMatch(
-            criteria, null, null, TENANT_TWO );
+            criteria, null, null, TENANT_TWO, null );
+
+      assertThat( actual ).isNotNull();
+      assertThat( actual.getResult() ).isNotNull().isEmpty();
+      assertThat( actual.getPagingMetadata() ).isNotNull();
+      assertThat( actual.getPagingMetadata().getCursor() ).isNull();
+   }
+
+   @Test
+   void testsLookupWithLessThanAPageOfMatchingRecordsExpectPartialListAndNoCursorAndValidCreatedDate() {
+      final String specificAssetIdName = keyPrefix + "key";
+      final String specificAssetIdValue = "value";
+      final Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
+      final String id = UUID.randomUUID().toString();
+      createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue );
+
+      final var actual = shellService.findExternalShellIdsByIdentifiersByExactMatch(
+            criteria, 5, null, TENANT_TWO, OffsetDateTime.parse( "2025-03-24T00:00:00.000000Z" ) );
+
+      assertThat( actual ).isNotNull();
+      assertThat( actual.getResult() ).isNotNull().hasSize( 1 ).contains( id );
+      assertThat( actual.getPagingMetadata() ).isNotNull();
+      assertThat( actual.getPagingMetadata().getCursor() ).isNull();
+   }
+
+   @Test
+   void testsLookupWithThreePagesOfMatchingRecordsRequestingSecondPageExpectFullListAndCursorAndValidCreatedDate() {
+      final String specificAssetIdName = keyPrefix + "key";
+      final String specificAssetIdValue = "value";
+      final Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
+      final int pageSize = 5;
+      final int totalItems = pageSize * 3;
+      final List<String> expectedIds = IntStream.range( 0, totalItems )
+            .mapToObj( i -> UUID.randomUUID().toString() )
+            .toList();
+      expectedIds.forEach( id -> createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue ) );
+
+      final var actual = shellService.findExternalShellIdsByIdentifiersByExactMatch(
+            criteria, pageSize, toCursor( expectedIds, pageSize - 1 ), TENANT_TWO, OffsetDateTime.parse( "2025-03-24T00:00:00.000000Z" ) );
+
+      final var actualWithPageLimitOne = shellService.findExternalShellIdsByIdentifiersByExactMatch(
+            criteria, 1, null, TENANT_TWO, OffsetDateTime.parse( "2025-03-24T00:00:00.000000Z" ) );
+
+      assertThat( actualWithPageLimitOne ).isNotNull().extracting( InlineResponse200::getPagingMetadata ).extracting( PagedResultPagingMetadata::getCursor )
+            .isNotNull();
+      assertThat( actualWithPageLimitOne ).isNotNull().extracting( InlineResponse200::getResult ).isNotNull().extracting( List::size ).isEqualTo( 1 );
+
+      final var actualWithCursor = shellService.findExternalShellIdsByIdentifiersByExactMatch(
+            criteria, 1, actualWithPageLimitOne.getPagingMetadata().getCursor(), TENANT_TWO, OffsetDateTime.parse( "2025-03-24T00:00:00.000000Z" ) );
+
+      assertThat( actualWithCursor ).isNotNull().extracting( InlineResponse200::getPagingMetadata ).extracting( PagedResultPagingMetadata::getCursor )
+            .isNotNull();
+      assertThat( actualWithCursor ).isNotNull().extracting( InlineResponse200::getResult ).isNotNull().extracting( List::size ).isEqualTo( 1 );
+
+      assertThat( actual ).isNotNull();
+      assertThat( actual.getResult() ).isNotNull().hasSize( pageSize ).containsAll( expectedIds.subList( pageSize, pageSize * 2 ) );
+      assertThat( actual.getPagingMetadata() ).isNotNull();
+      assertThat( actual.getPagingMetadata().getCursor() ).isNotNull()
+            .isEqualTo( toCursor( expectedIds, pageSize * 2 - 1 ) );
+
+   }
+
+   @Test
+   void testsLookupWithLessThanAPageOfMatchingRecordsExpectPartialListAndNoCursorAndInValidCreatedDate() {
+      final String specificAssetIdName = keyPrefix + "key";
+      final String specificAssetIdValue = "value";
+      final Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
+      final String id = UUID.randomUUID().toString();
+      createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue );
+
+      final var actual = shellService.findExternalShellIdsByIdentifiersByExactMatch(
+            criteria, 5, null, TENANT_TWO, OffsetDateTime.parse( "2225-03-24T00:00:00.000000Z" ) );
 
       assertThat( actual ).isNotNull();
       assertThat( actual.getResult() ).isNotNull().isEmpty();
@@ -76,10 +148,10 @@ class LegacyShellServiceTest {
 
    @Test
    void testsLookupWithLessThanAPageOfMatchingRecordsExpectPartialListAndNoCursor() {
-      String specificAssetIdName = keyPrefix + "key";
-      String specificAssetIdValue = "value";
-      Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
-      String id = UUID.randomUUID().toString();
+      final String specificAssetIdName = keyPrefix + "key";
+      final String specificAssetIdValue = "value";
+      final Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
+      final String id = UUID.randomUUID().toString();
       createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue );
 
       final var actual = shellService.findExternalShellIdsByIdentifiersByExactMatch(
@@ -93,10 +165,10 @@ class LegacyShellServiceTest {
 
    @Test
    void testsLookupWithExactlyOnePageOfMatchingRecordsExpectFullListAndNoCursor() {
-      String specificAssetIdName = keyPrefix + "key";
-      String specificAssetIdValue = "value";
-      Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
-      List<String> expectedIds = IntStream.rangeClosed( 0, 4 )
+      final String specificAssetIdName = keyPrefix + "key";
+      final String specificAssetIdValue = "value";
+      final Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
+      final List<String> expectedIds = IntStream.rangeClosed( 0, 4 )
             .mapToObj( i -> UUID.randomUUID().toString() )
             .toList();
       expectedIds.forEach( id -> createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue ) );
@@ -112,12 +184,12 @@ class LegacyShellServiceTest {
 
    @Test
    void testsLookupWithOneMoreThanOnePageOfMatchingRecordsExpectFullListAndCursor() {
-      String specificAssetIdName = keyPrefix + "key";
-      String specificAssetIdValue = "value";
-      Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
-      int pageSize = 5;
-      int totalItems = pageSize + 1;
-      List<String> expectedIds = IntStream.range( 0, totalItems )
+      final String specificAssetIdName = keyPrefix + "key";
+      final String specificAssetIdValue = "value";
+      final Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
+      final int pageSize = 5;
+      final int totalItems = pageSize + 1;
+      final List<String> expectedIds = IntStream.range( 0, totalItems )
             .mapToObj( i -> UUID.randomUUID().toString() )
             .toList();
       expectedIds.forEach( id -> createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue ) );
@@ -134,12 +206,12 @@ class LegacyShellServiceTest {
 
    @Test
    void testsLookupWithTwoPagesOfMatchingRecordsExpectFullListAndCursor() {
-      String specificAssetIdName = keyPrefix + "key";
-      String specificAssetIdValue = "value";
-      Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
-      int pageSize = 5;
-      int totalItems = pageSize + pageSize;
-      List<String> expectedIds = IntStream.range( 0, totalItems )
+      final String specificAssetIdName = keyPrefix + "key";
+      final String specificAssetIdValue = "value";
+      final Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
+      final int pageSize = 5;
+      final int totalItems = pageSize + pageSize;
+      final List<String> expectedIds = IntStream.range( 0, totalItems )
             .mapToObj( i -> UUID.randomUUID().toString() )
             .toList();
       expectedIds.forEach( id -> createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue ) );
@@ -156,18 +228,18 @@ class LegacyShellServiceTest {
 
    @Test
    void testsLookupWithThreePagesOfMatchingRecordsRequestingSecondPageExpectFullListAndCursor() {
-      String specificAssetIdName = keyPrefix + "key";
-      String specificAssetIdValue = "value";
-      Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
-      int pageSize = 5;
-      int totalItems = pageSize * 3;
-      List<String> expectedIds = IntStream.range( 0, totalItems )
+      final String specificAssetIdName = keyPrefix + "key";
+      final String specificAssetIdValue = "value";
+      final Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
+      final int pageSize = 5;
+      final int totalItems = pageSize * 3;
+      final List<String> expectedIds = IntStream.range( 0, totalItems )
             .mapToObj( i -> UUID.randomUUID().toString() )
             .toList();
       expectedIds.forEach( id -> createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue ) );
 
       final var actual = shellService.findExternalShellIdsByIdentifiersByExactMatch(
-            criteria, pageSize, toCursor( expectedIds, pageSize - 1 ), TENANT_TWO );
+            criteria, pageSize, toCursor( expectedIds, pageSize - 1 ), TENANT_TWO, null );
 
       assertThat( actual ).isNotNull();
       assertThat( actual.getResult() ).isNotNull().hasSize( pageSize ).containsAll( expectedIds.subList( pageSize, pageSize * 2 ) );
@@ -178,12 +250,12 @@ class LegacyShellServiceTest {
 
    @Test
    void testsLookupWithThreePagesOfMatchingRecordsRequestingPageOfOnlyLastItemExpectSingleItemAndNoCursor() {
-      String specificAssetIdName = keyPrefix + "key";
-      String specificAssetIdValue = "value";
-      Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
-      int pageSize = 5;
-      int totalItems = pageSize * 3;
-      List<String> expectedIds = IntStream.range( 0, totalItems )
+      final String specificAssetIdName = keyPrefix + "key";
+      final String specificAssetIdValue = "value";
+      final Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
+      final int pageSize = 5;
+      final int totalItems = pageSize * 3;
+      final List<String> expectedIds = IntStream.range( 0, totalItems )
             .mapToObj( i -> UUID.randomUUID().toString() )
             .toList();
       expectedIds.forEach( id -> createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue ) );
@@ -197,18 +269,19 @@ class LegacyShellServiceTest {
       assertThat( actual.getPagingMetadata().getCursor() ).isNull();
    }
 
-   private String toCursor( List<String> expectedIds, int indexOfLastVisibleId ) {
+   private String toCursor( final List<String> expectedIds, final int indexOfLastVisibleId ) {
       return new String( Base64.getUrlEncoder().encode( expectedIds.get( indexOfLastVisibleId ).getBytes() ) );
    }
 
-   private void createShellWithIdAndSpecificAssetIds( String id, String specificAssetIdName, String specificAssetIdValue ) {
-      AssetAdministrationShellDescriptor shellDescriptor = TestUtil.createCompleteAasDescriptor();
+   private void createShellWithIdAndSpecificAssetIds( final String id, final String specificAssetIdName, final String specificAssetIdValue ) {
+      final AssetAdministrationShellDescriptor shellDescriptor = TestUtil.createCompleteAasDescriptor();
       shellDescriptor.setId( id );
       shellDescriptor.setSpecificAssetIds( List.of( TestUtil.createSpecificAssetId( specificAssetIdName, specificAssetIdValue, List.of( TENANT_TWO ) ) ) );
-      Shell shell = shellMapper.fromApiDto( shellDescriptor );
+      final Shell shell = shellMapper.fromApiDto( shellDescriptor );
       shellService.mapShellCollection( shell );
-      if ( !shell.getSubmodels().isEmpty() )
+      if ( !shell.getSubmodels().isEmpty() ) {
          shellService.mapSubmodel( shell.getSubmodels() );
+      }
       shellService.save( shell );
    }
 }

@@ -20,11 +20,27 @@
 
 package org.eclipse.tractusx.semantics.registry.mapper;
 
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
-import org.eclipse.tractusx.semantics.aas.registry.model.*;
+
+import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
+import org.eclipse.tractusx.semantics.aas.registry.model.AssetLink;
+import org.eclipse.tractusx.semantics.aas.registry.model.GetAssetAdministrationShellDescriptorsResult;
+import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
+import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
+import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
-import org.eclipse.tractusx.semantics.registry.model.*;
+import org.eclipse.tractusx.semantics.registry.model.Shell;
+import org.eclipse.tractusx.semantics.registry.model.ShellDescription;
+import org.eclipse.tractusx.semantics.registry.model.ShellDisplayName;
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierExternalSubjectReference;
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierSemanticReference;
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierSupplemSemanticReference;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.InjectionStrategy;
@@ -34,87 +50,95 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.Mappings;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-
-@Mapper(uses = {SubmodelMapper.class}, componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR ,nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE )
+@Mapper( uses = {
+      SubmodelMapper.class }, componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE )
 public interface ShellMapper {
-    @Mappings({
-          @Mapping(target = "idExternal", source = "id"),
-          @Mapping(target = "identifiers", source = "specificAssetIds"),
-          @Mapping(target = "descriptions", source = "description"),
-          @Mapping(target = "submodels", source = "submodelDescriptors"),
-          @Mapping(target = "shellType", source = "assetType"),
-          @Mapping(target = "shellKind", source = "assetKind"),
-          @Mapping(target = "id", ignore = true),
-          @Mapping(target = "displayNames", source = "displayName"),
-    })
-    Shell fromApiDto(AssetAdministrationShellDescriptor apiDto);
+   @Mappings( {
+         @Mapping( target = "idExternal", source = "id" ),
+         @Mapping( target = "identifiers", source = "specificAssetIds" ),
+         @Mapping( target = "descriptions", source = "description" ),
+         @Mapping( target = "submodels", source = "submodelDescriptors" ),
+         @Mapping( target = "shellType", source = "assetType" ),
+         @Mapping( target = "shellKind", source = "assetKind" ),
+         @Mapping( target = "id", ignore = true ),
+         @Mapping( target = "displayNames", source = "displayName" ),
+   } )
+   Shell fromApiDto( AssetAdministrationShellDescriptor apiDto );
 
-    ShellDescription mapShellDescription (LangStringTextType description);
+   default Instant map( final OffsetDateTime value ) {
+      return Optional.ofNullable( value ).map( OffsetDateTime::toInstant ).orElse( null );
+   }
 
-   ShellDisplayName mapShellDisplayName (LangStringTextType displayName);
+   default OffsetDateTime map( final Instant value ) {
+      return Optional.ofNullable( value ).map( instant -> instant.atOffset( ZoneId.systemDefault().getRules().getOffset( instant ) ) ).orElse( null );
+   }
 
-    @Mappings({
-          @Mapping(target = "key", source = "name"),
-          @Mapping(target = "supplementalSemanticIds", source = "supplementalSemanticIds"),
-          @Mapping(target = "semanticId", source = "semanticId"),
-          @Mapping(target = "externalSubjectId", source = "externalSubjectId"),
-    })
-    ShellIdentifier fromApiDto(SpecificAssetId apiDto);
+   ShellDescription mapShellDescription( LangStringTextType description );
 
-   @Mappings({
-         @Mapping(target = "key", source = "name"),
-   })
-   ShellIdentifier fromApiDto(AssetLink apiDto);
+   ShellDisplayName mapShellDisplayName( LangStringTextType displayName );
 
-   Set<ShellIdentifier> fromAssetLinkApiDto(List<AssetLink> apiDto);
+   @Mappings( {
+         @Mapping( target = "key", source = "name" ),
+         @Mapping( target = "supplementalSemanticIds", source = "supplementalSemanticIds" ),
+         @Mapping( target = "semanticId", source = "semanticId" ),
+         @Mapping( target = "externalSubjectId", source = "externalSubjectId" ),
+   } )
+   ShellIdentifier fromApiDto( SpecificAssetId apiDto );
 
-   ShellIdentifierSupplemSemanticReference maptoShellIdentifierSupplemSemanticReference ( Reference supplementalSemanticId );
+   @Mappings( {
+         @Mapping( target = "key", source = "name" ),
+   } )
+   ShellIdentifier fromApiDto( AssetLink apiDto );
 
-   ShellIdentifierSemanticReference maptoShellIdentifierSemanticReference ( Reference semanticId );
+   Set<ShellIdentifier> fromAssetLinkApiDto( List<AssetLink> apiDto );
 
-   ShellIdentifierExternalSubjectReference maptoShellIdentifierExternalSubjectReference ( Reference externalSubjectId );
+   ShellIdentifierSupplemSemanticReference maptoShellIdentifierSupplemSemanticReference( Reference supplementalSemanticId );
 
-    Set<ShellIdentifier> fromApiDto(List<SpecificAssetId> apiDto);
+   ShellIdentifierSemanticReference maptoShellIdentifierSemanticReference( Reference semanticId );
 
-    @Mappings({
-          @Mapping(target = "name", source = "key"),
-    })
-    SpecificAssetId fromDtoApi(ShellIdentifier apiDto);
+   ShellIdentifierExternalSubjectReference maptoShellIdentifierExternalSubjectReference( Reference externalSubjectId );
 
-    @Mappings({
-         @Mapping(source = "idExternal", target = "id"),
-         @Mapping(source = "identifiers", target = "specificAssetIds"),
-         @Mapping(source = "descriptions", target = "description"),
-         @Mapping(source = "submodels", target = "submodelDescriptors"),
-         @Mapping(source = "displayNames", target = "displayName"),
-    })
-    @InheritInverseConfiguration
-    AssetAdministrationShellDescriptor toApiDto(Shell shell);
+   Set<ShellIdentifier> fromApiDto( List<SpecificAssetId> apiDto );
 
-   LangStringTextType mapAssetDescription (ShellDescription description);
+   @Mappings( {
+         @Mapping( target = "name", source = "key" ),
+   } )
+   SpecificAssetId fromDtoApi( ShellIdentifier apiDto );
 
-   LangStringTextType mapAssetDisplayName (ShellDisplayName shellDisplayName);
+   @Mappings( {
+         @Mapping( source = "idExternal", target = "id" ),
+         @Mapping( source = "identifiers", target = "specificAssetIds" ),
+         @Mapping( source = "descriptions", target = "description" ),
+         @Mapping( source = "submodels", target = "submodelDescriptors" ),
+         @Mapping( source = "displayNames", target = "displayName" ),
+   } )
+   @InheritInverseConfiguration
+   AssetAdministrationShellDescriptor toApiDto( Shell shell );
 
-    @Mappings({
-          @Mapping(source = "items", target = "result"),
-          @Mapping(source = "cursor", target = "pagingMetadata.cursor"),
-    })
-   GetAssetAdministrationShellDescriptorsResult toApiDto( ShellCollectionDto shell);
+   LangStringTextType mapAssetDescription( ShellDescription description );
 
-   List<SpecificAssetId> toApiDto(Set<ShellIdentifier> shell);
+   LangStringTextType mapAssetDisplayName( ShellDisplayName shellDisplayName );
 
-    @AfterMapping
-    default Shell convertGlobalAssetIdToShellIdentifier(AssetAdministrationShellDescriptor apiDto, @MappingTarget Shell shell){
-        return ShellMapperCustomization.globalAssetIdToShellIdentifier(apiDto, shell);
-    }
+   @Mappings( {
+         @Mapping( source = "items", target = "result" ),
+         @Mapping( source = "cursor", target = "pagingMetadata.cursor" ),
+   } )
+   GetAssetAdministrationShellDescriptorsResult toApiDto( ShellCollectionDto shell );
 
-    @AfterMapping
-    default void convertShellIdentifierToGlobalAssetId(Shell shell, @MappingTarget AssetAdministrationShellDescriptor apiDto){
-        ShellMapperCustomization.shellIdentifierToGlobalAssetId(shell, apiDto);
-    }
+   List<SpecificAssetId> toApiDto( Set<ShellIdentifier> shell );
 
    @AfterMapping
-   default void removeGlobalAssetIdFromIdentifiers(@MappingTarget List<SpecificAssetId> apiDto){
-      ShellMapperCustomization.removeGlobalAssetIdIdentifier(apiDto);
+   default Shell convertGlobalAssetIdToShellIdentifier( final AssetAdministrationShellDescriptor apiDto, @MappingTarget final Shell shell ) {
+      return ShellMapperCustomization.globalAssetIdToShellIdentifier( apiDto, shell );
+   }
+
+   @AfterMapping
+   default void convertShellIdentifierToGlobalAssetId( final Shell shell, @MappingTarget final AssetAdministrationShellDescriptor apiDto ) {
+      ShellMapperCustomization.shellIdentifierToGlobalAssetId( shell, apiDto );
+   }
+
+   @AfterMapping
+   default void removeGlobalAssetIdFromIdentifiers( @MappingTarget final List<SpecificAssetId> apiDto ) {
+      ShellMapperCustomization.removeGlobalAssetIdIdentifier( apiDto );
    }
 }

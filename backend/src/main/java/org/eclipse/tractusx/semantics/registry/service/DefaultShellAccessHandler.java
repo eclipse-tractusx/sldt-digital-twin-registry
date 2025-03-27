@@ -20,6 +20,7 @@
 
 package org.eclipse.tractusx.semantics.registry.service;
 
+import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,16 +43,17 @@ public class DefaultShellAccessHandler implements ShellAccessHandler {
    private final String externalSubjectIdWildcardPrefix;
    private final List<String> externalSubjectIdWildcardAllowedTypes;
 
-   public DefaultShellAccessHandler( RegistryProperties registryProperties ) {
-      this.owningTenantId = registryProperties.getIdm().getOwningTenantId();
-      this.externalSubjectIdWildcardPrefix = registryProperties.getExternalSubjectIdWildcardPrefix();
-      this.externalSubjectIdWildcardAllowedTypes = registryProperties.getExternalSubjectIdWildcardAllowedTypes();
+   public DefaultShellAccessHandler( final RegistryProperties registryProperties ) {
+      owningTenantId = registryProperties.getIdm().getOwningTenantId();
+      externalSubjectIdWildcardPrefix = registryProperties.getExternalSubjectIdWildcardPrefix();
+      externalSubjectIdWildcardAllowedTypes = registryProperties.getExternalSubjectIdWildcardAllowedTypes();
    }
 
    @Override
-   public Specification<Shell> shellFilterSpecification( String sortFieldName, ShellCursor cursor, String externalSubjectId ) {
+   public Specification<Shell> shellFilterSpecification( final String sortFieldName, final ShellCursor cursor, final String externalSubjectId,
+         final OffsetDateTime createdAfter ) {
       return new ShellSpecification<>( sortFieldName, cursor, externalSubjectId, owningTenantId, externalSubjectIdWildcardPrefix,
-            externalSubjectIdWildcardAllowedTypes );
+            externalSubjectIdWildcardAllowedTypes, createdAfter );
    }
 
    /**
@@ -67,13 +69,13 @@ public class DefaultShellAccessHandler implements ShellAccessHandler {
    //Could map to null if the shell should not be visible at all
    @Override
    @Nullable
-   public Shell filterShellProperties( Shell shell, String externalSubjectId ) {
+   public Shell filterShellProperties( final Shell shell, final String externalSubjectId ) {
       if ( externalSubjectId.equals( owningTenantId ) ) {
          return shell;
       }
 
-      Set<ShellIdentifier> filteredIdentifiers = filterSpecificAssetIdsByTenantId( shell.getIdentifiers(), externalSubjectId );
-      boolean hasOnlyPublicAccess = filteredIdentifiers.stream().noneMatch( shellIdentifier -> {
+      final Set<ShellIdentifier> filteredIdentifiers = filterSpecificAssetIdsByTenantId( shell.getIdentifiers(), externalSubjectId );
+      final boolean hasOnlyPublicAccess = filteredIdentifiers.stream().noneMatch( shellIdentifier -> {
                if ( shellIdentifier.getExternalSubjectId() == null ) {
                   return false;
                }
@@ -84,7 +86,7 @@ public class DefaultShellAccessHandler implements ShellAccessHandler {
       if ( hasOnlyPublicAccess ) {
          // Filter out globalAssetId from specificAssetId. TODO: implement to save globalAssetId in separate database column
          // GlobalAssetId is set via mapper. In case of only read access, no globalAssetId should be shown.
-         Set<ShellIdentifier> filteredIdentifiersWithNoGlobalAssetId = filteredIdentifiers.stream().filter(
+         final Set<ShellIdentifier> filteredIdentifiersWithNoGlobalAssetId = filteredIdentifiers.stream().filter(
                      shellIdentifier -> !shellIdentifier.getKey().equals( ShellIdentifier.GLOBAL_ASSET_ID_KEY ) )
                .collect( Collectors.toSet() );
          return new Shell()
@@ -98,32 +100,32 @@ public class DefaultShellAccessHandler implements ShellAccessHandler {
    }
 
    @Override
-   public List<Shell> filterListOfShellProperties( List<Shell> shells, String externalSubjectId ) {
+   public List<Shell> filterListOfShellProperties( final List<Shell> shells, final String externalSubjectId ) {
       return shells.stream()
             .map( shell -> filterShellProperties( shell, externalSubjectId ) )
             .toList();
    }
 
-   private Set<ShellIdentifier> filterSpecificAssetIdsByTenantId( Set<ShellIdentifier> shellIdentifiers, String tenantId ) {
+   private Set<ShellIdentifier> filterSpecificAssetIdsByTenantId( final Set<ShellIdentifier> shellIdentifiers, final String tenantId ) {
       // the owning tenant should always see all identifiers
       if ( tenantId.equals( owningTenantId ) ) {
          return shellIdentifiers;
       }
 
-      Set<ShellIdentifier> externalSubjectIdSet = new HashSet<>();
-      for ( ShellIdentifier identifier : shellIdentifiers ) {
+      final Set<ShellIdentifier> externalSubjectIdSet = new HashSet<>();
+      for ( final ShellIdentifier identifier : shellIdentifiers ) {
          // Check if specificAssetId is globalAssetId -> TODO: implement to save globalAssetId in separate database column
          if ( identifier.getKey().equals( ShellIdentifier.GLOBAL_ASSET_ID_KEY ) ) {
             externalSubjectIdSet.add( identifier );
          }
          if ( identifier.getExternalSubjectId() != null ) {
-            Set<ShellIdentifierExternalSubjectReferenceKey> optionalReferenceKey =
+            final Set<ShellIdentifierExternalSubjectReferenceKey> optionalReferenceKey =
                   identifier.getExternalSubjectId().getKeys().stream().filter( shellIdentifierExternalSubjectReferenceKey ->
-                        // Match if externalSubjectId = tenantId
+                              // Match if externalSubjectId = tenantId
                               shellIdentifierExternalSubjectReferenceKey.getValue().equals( tenantId )
-                        // or match if externalSubjectId = externalSubjectIdWildcardPrefix and key of identifier (for example manufacturerPartId) is allowing wildcard.
-                              || (shellIdentifierExternalSubjectReferenceKey.getValue().equals( externalSubjectIdWildcardPrefix )
-                                  && externalSubjectIdWildcardAllowedTypes.contains( identifier.getKey() )) )
+                                    // or match if externalSubjectId = externalSubjectIdWildcardPrefix and key of identifier (for example manufacturerPartId) is allowing wildcard.
+                                    || (shellIdentifierExternalSubjectReferenceKey.getValue().equals( externalSubjectIdWildcardPrefix )
+                                    && externalSubjectIdWildcardAllowedTypes.contains( identifier.getKey() )) )
                         .collect( Collectors.toSet() );
             if ( !optionalReferenceKey.isEmpty() ) {
                identifier.getExternalSubjectId().setKeys( optionalReferenceKey );

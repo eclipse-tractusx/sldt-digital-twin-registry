@@ -46,42 +46,70 @@ class GranularShellServiceTest extends LegacyShellServiceTest {
    @Autowired
    private AccessControlRuleRepository accessControlRuleRepository;
 
+   @Override
    @Test
    void testsLookupWithNoMatchingRecordsExpectEmptyListAndNoCursor() {
       createRule();
       super.testsLookupWithNoMatchingRecordsExpectEmptyListAndNoCursor();
    }
 
+   @Override
+   @Test
+   void testsLookupWithLessThanAPageOfMatchingRecordsExpectPartialListAndNoCursorAndValidCreatedDate() {
+      createRule();
+      super.testsLookupWithLessThanAPageOfMatchingRecordsExpectPartialListAndNoCursorAndValidCreatedDate();
+   }
+
+   @Override
+   @Test
+   void testsLookupWithLessThanAPageOfMatchingRecordsExpectPartialListAndNoCursorAndInValidCreatedDate() {
+      createRule();
+      super.testsLookupWithLessThanAPageOfMatchingRecordsExpectPartialListAndNoCursorAndInValidCreatedDate();
+   }
+
+   @Override
+   @Test
+   void testsLookupWithThreePagesOfMatchingRecordsRequestingSecondPageExpectFullListAndCursorAndValidCreatedDate() {
+      createRule();
+      super.testsLookupWithThreePagesOfMatchingRecordsRequestingSecondPageExpectFullListAndCursorAndValidCreatedDate();
+   }
+
+   @Override
    @Test
    void testsLookupWithLessThanAPageOfMatchingRecordsExpectPartialListAndNoCursor() {
       createRule();
       super.testsLookupWithLessThanAPageOfMatchingRecordsExpectPartialListAndNoCursor();
    }
 
+   @Override
    @Test
    void testsLookupWithExactlyOnePageOfMatchingRecordsExpectFullListAndNoCursor() {
       createRule();
       super.testsLookupWithExactlyOnePageOfMatchingRecordsExpectFullListAndNoCursor();
    }
 
+   @Override
    @Test
    void testsLookupWithOneMoreThanOnePageOfMatchingRecordsExpectFullListAndCursor() {
       createRule();
       super.testsLookupWithOneMoreThanOnePageOfMatchingRecordsExpectFullListAndCursor();
    }
 
+   @Override
    @Test
    void testsLookupWithTwoPagesOfMatchingRecordsExpectFullListAndCursor() {
       createRule();
       super.testsLookupWithTwoPagesOfMatchingRecordsExpectFullListAndCursor();
    }
 
+   @Override
    @Test
    void testsLookupWithThreePagesOfMatchingRecordsRequestingSecondPageExpectFullListAndCursor() {
       createRule();
       super.testsLookupWithThreePagesOfMatchingRecordsRequestingSecondPageExpectFullListAndCursor();
    }
 
+   @Override
    @Test
    void testsLookupWithThreePagesOfMatchingRecordsRequestingPageOfOnlyLastItemExpectSingleItemAndNoCursor() {
       createRule();
@@ -89,9 +117,9 @@ class GranularShellServiceTest extends LegacyShellServiceTest {
    }
 
    private void createRule() {
-      String specificAssetIdName = keyPrefix + "key";
-      String specificAssetIdValue = "value";
-      AccessRulePolicy policy = new AccessRulePolicy();
+      final String specificAssetIdName = keyPrefix + "key";
+      final String specificAssetIdValue = "value";
+      final AccessRulePolicy policy = new AccessRulePolicy();
       policy.setAccessRules( Set.of(
             new AccessRulePolicyValue( AccessRulePolicy.BPN_RULE_NAME, PolicyOperator.EQUALS, TENANT_TWO, null ),
             new AccessRulePolicyValue( AccessRulePolicy.MANDATORY_SPECIFIC_ASSET_IDS_RULE_NAME, PolicyOperator.INCLUDES, null, Set.of(
@@ -102,7 +130,7 @@ class GranularShellServiceTest extends LegacyShellServiceTest {
             ) ),
             new AccessRulePolicyValue( AccessRulePolicy.VISIBLE_SEMANTIC_IDS_RULE_NAME, PolicyOperator.INCLUDES, null, Set.of() )
       ) );
-      AccessRule accessRule = new AccessRule();
+      final AccessRule accessRule = new AccessRule();
       accessRule.setPolicyType( AccessRule.PolicyType.AAS );
       accessRule.setTid( TENANT_ONE );
       accessRule.setTargetTenant( TENANT_TWO );
