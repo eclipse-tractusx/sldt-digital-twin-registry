@@ -21,7 +21,9 @@
 package org.eclipse.tractusx.semantics.registry.utils;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.eclipse.tractusx.semantics.registry.model.Shell;
@@ -46,6 +48,7 @@ public class ShellSpecification<T> implements Specification<T> {
    private final String owningTenantId;
    private final String publicWildcardPrefix;
    private final List<String> publicWildcardAllowedTypes;
+   private final OffsetDateTime createdAfter;
 
    @Override
    public Predicate toPredicate( Root<T> root, CriteriaQuery<?> cq, CriteriaBuilder criteriaBuilder ) {
@@ -54,7 +57,7 @@ public class ShellSpecification<T> implements Specification<T> {
 
    private Predicate applyFilter( Root<T> root, CriteriaQuery<?> cq, CriteriaBuilder criteriaBuilder ) {
       if ( root.toString().contains( "Shell" ) ) {
-         Instant searchValue = shellCursor.getShellSearchCursor();
+         final Instant searchValue = getCreatedDate();
          cq.orderBy( criteriaBuilder.asc( criteriaBuilder.coalesce( root.get( sortFieldName ), Instant.now() ) ) );
 
          if ( owningTenantId.equals( tenantId ) ) {
@@ -69,6 +72,20 @@ public class ShellSpecification<T> implements Specification<T> {
          return criteriaBuilder.greaterThan( root.get( sortFieldName ), searchValue );
       }
    }
+   
+   /**
+       * Retrieves the created date for filtering purposes.
+       *
+       * @return the created date as an Instant. If the cursor has not been received,
+       *         it returns the createdAfter date if it is present,
+       *         otherwise it returns the shell search cursor date.
+       */
+      private Instant getCreatedDate() {
+         return shellCursor.hasCursorReceived() ?
+               shellCursor.getShellSearchCursor() :
+               Optional.ofNullable( createdAfter ).map( OffsetDateTime::toInstant ).orElseGet( shellCursor::getShellSearchCursor );
+   
+      }
 
    private Predicate getAllShellsPredicate( Root<T> root, CriteriaQuery<?> cq, CriteriaBuilder criteriaBuilder, Instant searchValue ) {
       // Join Shell -> ShellIdentifier
