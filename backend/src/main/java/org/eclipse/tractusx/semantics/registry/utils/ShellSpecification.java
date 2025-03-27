@@ -21,9 +21,7 @@
 package org.eclipse.tractusx.semantics.registry.utils;
 
 import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.eclipse.tractusx.semantics.registry.model.Shell;
@@ -48,16 +46,15 @@ public class ShellSpecification<T> implements Specification<T> {
    private final String owningTenantId;
    private final String publicWildcardPrefix;
    private final List<String> publicWildcardAllowedTypes;
-   private final OffsetDateTime createdAfter;
 
    @Override
-   public Predicate toPredicate( final Root<T> root, final CriteriaQuery<?> cq, final CriteriaBuilder criteriaBuilder ) {
+   public Predicate toPredicate( Root<T> root, CriteriaQuery<?> cq, CriteriaBuilder criteriaBuilder ) {
       return applyFilter( root, cq, criteriaBuilder );
    }
 
-   private Predicate applyFilter( final Root<T> root, final CriteriaQuery<?> cq, final CriteriaBuilder criteriaBuilder ) {
+   private Predicate applyFilter( Root<T> root, CriteriaQuery<?> cq, CriteriaBuilder criteriaBuilder ) {
       if ( root.toString().contains( "Shell" ) ) {
-         final Instant searchValue = getCreatedDate();
+         Instant searchValue = shellCursor.getShellSearchCursor();
          cq.orderBy( criteriaBuilder.asc( criteriaBuilder.coalesce( root.get( sortFieldName ), Instant.now() ) ) );
 
          if ( owningTenantId.equals( tenantId ) ) {
@@ -66,34 +63,19 @@ public class ShellSpecification<T> implements Specification<T> {
 
          return getAllShellsPredicate( root, cq, criteriaBuilder, searchValue );
       } else {
-         final UUID searchValue = shellCursor.getSubmodelSearchCursor();
+         UUID searchValue = shellCursor.getSubmodelSearchCursor();
          cq.orderBy( criteriaBuilder.asc( criteriaBuilder.coalesce( root.get( sortFieldName ),
                UUID.fromString( "00000000-0000-0000-0000-000000000000" ) ) ) );
          return criteriaBuilder.greaterThan( root.get( sortFieldName ), searchValue );
       }
    }
 
-   /**
-    * Retrieves the created date for filtering purposes.
-    *
-    * @return the created date as an Instant. If the cursor has not been received,
-    *         it returns the createdAfter date if it is present,
-    *         otherwise it returns the shell search cursor date.
-    */
-   private Instant getCreatedDate() {
-      return shellCursor.hasCursorReceived() ?
-            shellCursor.getShellSearchCursor() :
-            Optional.ofNullable( createdAfter ).map( OffsetDateTime::toInstant ).orElseGet( shellCursor::getShellSearchCursor );
-
-   }
-
-   private Predicate getAllShellsPredicate( final Root<T> root, final CriteriaQuery<?> cq, final CriteriaBuilder criteriaBuilder, final Instant searchValue ) {
+   private Predicate getAllShellsPredicate( Root<T> root, CriteriaQuery<?> cq, CriteriaBuilder criteriaBuilder, Instant searchValue ) {
       // Join Shell -> ShellIdentifier
-      final String t = Shell.Fields.identifiers;
-      final Join<Shell, ShellIdentifier> shellIdentifierShellJoin = root.join( Shell.Fields.identifiers );
+      String t = Shell.Fields.identifiers;
+      Join<Shell,ShellIdentifier > shellIdentifierShellJoin = root.join( Shell.Fields.identifiers );
       // join ShellIdentifier -> ShellIdentifierExternalSubjectReference -> ShellIdentifierExternalSubjectReferenceKey
-      final Join<ShellIdentifierExternalSubjectReference, ShellIdentifierExternalSubjectReferenceKey> referenceKeyJoin = shellIdentifierShellJoin.join(
-            ShellIdentifier.Fields.externalSubjectId ).join( ShellIdentifierExternalSubjectReference.Fields.keys );
+      Join<ShellIdentifierExternalSubjectReference,ShellIdentifierExternalSubjectReferenceKey> referenceKeyJoin = shellIdentifierShellJoin.join( ShellIdentifier.Fields.externalSubjectId ).join( ShellIdentifierExternalSubjectReference.Fields.keys );
 
       return criteriaBuilder.and(
             criteriaBuilder.or(
