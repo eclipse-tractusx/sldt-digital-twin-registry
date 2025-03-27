@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.IntStream;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
@@ -155,7 +156,7 @@ class LegacyShellServiceTest {
       createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue );
 
       final var actual = shellService.findExternalShellIdsByIdentifiersByExactMatch(
-            criteria, 5, null, TENANT_TWO );
+            criteria, 5, null, TENANT_TWO, null );
 
       assertThat( actual ).isNotNull();
       assertThat( actual.getResult() ).isNotNull().hasSize( 1 ).contains( id );
@@ -174,7 +175,7 @@ class LegacyShellServiceTest {
       expectedIds.forEach( id -> createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue ) );
 
       final var actual = shellService.findExternalShellIdsByIdentifiersByExactMatch(
-            criteria, 5, null, TENANT_TWO );
+            criteria, 5, null, TENANT_TWO, null );
 
       assertThat( actual ).isNotNull();
       assertThat( actual.getResult() ).isNotNull().hasSize( expectedIds.size() ).containsAll( expectedIds );
@@ -195,7 +196,7 @@ class LegacyShellServiceTest {
       expectedIds.forEach( id -> createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue ) );
 
       final var actual = shellService.findExternalShellIdsByIdentifiersByExactMatch(
-            criteria, pageSize, null, TENANT_TWO );
+            criteria, pageSize, null, TENANT_TWO, null );
 
       assertThat( actual ).isNotNull();
       assertThat( actual.getResult() ).isNotNull().hasSize( pageSize ).containsAll( expectedIds.subList( 0, pageSize ) );
@@ -217,7 +218,7 @@ class LegacyShellServiceTest {
       expectedIds.forEach( id -> createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue ) );
 
       final var actual = shellService.findExternalShellIdsByIdentifiersByExactMatch(
-            criteria, pageSize, null, TENANT_TWO );
+            criteria, pageSize, null, TENANT_TWO, null );
 
       assertThat( actual ).isNotNull();
       assertThat( actual.getResult() ).isNotNull().hasSize( pageSize ).containsAll( expectedIds.subList( 0, pageSize ) );
@@ -261,7 +262,7 @@ class LegacyShellServiceTest {
       expectedIds.forEach( id -> createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue ) );
 
       final var actual = shellService.findExternalShellIdsByIdentifiersByExactMatch(
-            criteria, pageSize, toCursor( expectedIds, pageSize * 3 - 2 ), TENANT_TWO );
+            criteria, pageSize, toCursor( expectedIds, pageSize * 3 - 2 ), TENANT_TWO, null );
 
       assertThat( actual ).isNotNull();
       assertThat( actual.getResult() ).isNotNull().hasSize( 1 ).containsAll( expectedIds.subList( pageSize * 3 - 1, pageSize * 3 ) );

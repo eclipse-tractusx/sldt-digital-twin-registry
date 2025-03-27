@@ -208,7 +208,7 @@ public class ShellService {
       pageSize = getPageSize( pageSize );
 
       final ShellCursor cursor = new ShellCursor( pageSize, cursorVal );
-      final var specification = new ShellSpecification<Submodel>( SORT_FIELD_NAME_SUBMODEL, cursor, null, null, null, null );
+      final var specification = new ShellSpecification<Submodel>( SORT_FIELD_NAME_SUBMODEL, cursor, null, null, null, null, null );
       final Page<Submodel> shellPage = submodelRepository.findAll( Specification.allOf( hasShellFkId( assetID ).and( specification ) ),
             ofSize( cursor.getRecordSize() ) );
 
