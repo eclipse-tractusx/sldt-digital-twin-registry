@@ -53,7 +53,7 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
    private final AccessControlRuleService accessControlRuleService;
 
    public GranularShellAccessHandler( final RegistryProperties registryProperties, final AccessControlRuleService accessControlRuleService ) {
-      owningTenantId = registryProperties.getIdm().getOwningTenantId();
+      this.owningTenantId = registryProperties.getIdm().getOwningTenantId();
       this.accessControlRuleService = accessControlRuleService;
    }
 
@@ -87,10 +87,10 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
    }
 
    @Override
-   public List<String> filterToVisibleShellIdsForLookup( final Set<SpecificAssetId> userQuery, final List<ShellIdentifierMinimal> shellIdentifiers,
-         final String externalSubjectId )
+   public List<String> filterToVisibleShellIdsForLookup( Set<SpecificAssetId> userQuery, List<ShellIdentifierMinimal> shellIdentifiers,
+         String externalSubjectId )
          throws DenyAccessException {
-      final List<String> idsInTheExistingOrder = shellIdentifiers.stream()
+      List<String> idsInTheExistingOrder = shellIdentifiers.stream()
             .map( ShellIdentifierMinimal::shellId )
             .distinct()
             .toList();
@@ -98,13 +98,13 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
          return idsInTheExistingOrder;
       }
 
-      final List<ShellVisibilityContext> shellContexts = shellIdentifiers.stream()
+      List<ShellVisibilityContext> shellContexts = shellIdentifiers.stream()
             .collect( Collectors.groupingBy( ShellIdentifierMinimal::shellId ) ).entrySet().stream()
             .map( entry -> new ShellVisibilityContext( entry.getKey(), entry.getValue().stream()
                   .map( shellIdentifier -> new SpecificAssetId( shellIdentifier.namespace(), shellIdentifier.identifier() ) )
                   .collect( Collectors.toSet() ) ) )
             .toList();
-      final List<String> allVisible = accessControlRuleService.filterValidSpecificAssetIdsForLookup( userQuery, shellContexts, externalSubjectId );
+      List<String> allVisible = accessControlRuleService.filterValidSpecificAssetIdsForLookup( userQuery, shellContexts, externalSubjectId );
       return idsInTheExistingOrder.stream()
             .filter( allVisible::contains )
             .toList();
@@ -123,16 +123,16 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
     */
    @Override
    @Nullable
-   public Shell filterShellProperties( final Shell shell, final String externalSubjectId ) {
+   public Shell filterShellProperties( Shell shell, String externalSubjectId ) {
       if ( owningTenantId.equals( externalSubjectId ) ) {
          return shell;
       }
 
       try {
-         final ShellVisibilityContext shellContext = toShellVisibilityContext( shell );
-         final ShellVisibilityCriteria visibilityCriteria = accessControlRuleService.fetchVisibilityCriteriaForShell( shellContext, externalSubjectId );
+         ShellVisibilityContext shellContext = toShellVisibilityContext( shell );
+         ShellVisibilityCriteria visibilityCriteria = accessControlRuleService.fetchVisibilityCriteriaForShell( shellContext, externalSubjectId );
          return filterShellContents( shell, visibilityCriteria );
-      } catch ( final DenyAccessException e ) {
+      } catch ( DenyAccessException e ) {
          if ( log.isDebugEnabled() ) {
             log.debug( "Filtering out shell: {} for externalSubjectId: {} as access is denied.", shell.getId(), externalSubjectId );
          }
@@ -141,7 +141,7 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
    }
 
    @Override
-   public List<Shell> filterListOfShellProperties( final List<Shell> shells, final String externalSubjectId ) {
+   public List<Shell> filterListOfShellProperties( List<Shell> shells, String externalSubjectId ) {
       if ( owningTenantId.equals( externalSubjectId ) ) {
          return shells;
       }
@@ -159,12 +159,12 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
             .toList();
    }
 
-   private Shell filterShellContents( final Shell shell, final ShellVisibilityCriteria visibilityCriteria ) {
+   private Shell filterShellContents( Shell shell, ShellVisibilityCriteria visibilityCriteria ) {
       if ( visibilityCriteria == null ) {
          return null;
       }
-      final Set<ShellIdentifier> filteredIdentifiers = filterSpecificAssetIdsByTenantId( shell.getIdentifiers(), visibilityCriteria );
-      final Set<Submodel> filteredSubmodels = shell.getSubmodels().stream()
+      Set<ShellIdentifier> filteredIdentifiers = filterSpecificAssetIdsByTenantId( shell.getIdentifiers(), visibilityCriteria );
+      Set<Submodel> filteredSubmodels = shell.getSubmodels().stream()
             .filter( submodel -> submodel.getSemanticId().getKeys().stream()
                   .anyMatch( key -> visibilityCriteria.visibleSemanticIds().contains( key.getValue() ) ) )
             .collect( Collectors.toSet() );
@@ -172,7 +172,7 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
       if ( visibilityCriteria.publicOnly() ) {
          // Filter out globalAssetId from specificAssetId. TODO: implement to save globalAssetId in separate database column
          // GlobalAssetId is set via mapper. In case of only read access, no globalAssetId should be shown.
-         final Set<ShellIdentifier> filteredIdentifiersWithNoGlobalAssetId = filteredIdentifiers.stream().filter(
+         Set<ShellIdentifier> filteredIdentifiersWithNoGlobalAssetId = filteredIdentifiers.stream().filter(
                      shellIdentifier -> !shellIdentifier.getKey().equals( ShellIdentifier.GLOBAL_ASSET_ID_KEY ) )
                .collect( Collectors.toSet() );
          filtered = new Shell()
@@ -187,15 +187,14 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
       return filtered;
    }
 
-   private ShellVisibilityContext toShellVisibilityContext( final Shell shell ) {
-      final Set<SpecificAssetId> specificAssetIds = shell.getIdentifiers().stream()
+   private ShellVisibilityContext toShellVisibilityContext( Shell shell ) {
+      Set<SpecificAssetId> specificAssetIds = shell.getIdentifiers().stream()
             .map( id -> new SpecificAssetId( id.getKey(), id.getValue() ) )
             .collect( Collectors.toSet() );
       return new ShellVisibilityContext( shell.getIdExternal(), specificAssetIds );
    }
 
-   private Set<ShellIdentifier> filterSpecificAssetIdsByTenantId( final Set<ShellIdentifier> shellIdentifiers,
-         final ShellVisibilityCriteria visibilityCriteria ) {
+   private Set<ShellIdentifier> filterSpecificAssetIdsByTenantId( Set<ShellIdentifier> shellIdentifiers, ShellVisibilityCriteria visibilityCriteria ) {
       //noinspection SimplifyStreamApiCallChains
       return shellIdentifiers.stream()
             .filter( identifier -> isSisSpecificAssetIdVisible( identifier, visibilityCriteria ) )
@@ -208,9 +207,9 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
             .collect( Collectors.toSet() );
    }
 
-   private boolean isSisSpecificAssetIdVisible( final ShellIdentifier identifier, final ShellVisibilityCriteria shellVisibilityCriteria ) {
-      final Set<String> visibleSpecificAssetIdNamesRegardlessOfValues = shellVisibilityCriteria.visibleSpecificAssetIdNamesRegardlessOfValues();
-      final Map<String, Set<String>> visibleSpecificAssetIdWhenMatchingValues = shellVisibilityCriteria.visibleSpecificAssetIdWhenMatchingValues();
+   private boolean isSisSpecificAssetIdVisible( ShellIdentifier identifier, ShellVisibilityCriteria shellVisibilityCriteria ) {
+      Set<String> visibleSpecificAssetIdNamesRegardlessOfValues = shellVisibilityCriteria.visibleSpecificAssetIdNamesRegardlessOfValues();
+      Map<String, Set<String>> visibleSpecificAssetIdWhenMatchingValues = shellVisibilityCriteria.visibleSpecificAssetIdWhenMatchingValues();
       return identifier.getKey().equals( ShellIdentifier.GLOBAL_ASSET_ID_KEY )
             || visibleSpecificAssetIdNamesRegardlessOfValues.contains( identifier.getKey() )
             || visibleSpecificAssetIdWhenMatchingValues.getOrDefault( identifier.getKey(), Set.of() ).contains( identifier.getValue() );
