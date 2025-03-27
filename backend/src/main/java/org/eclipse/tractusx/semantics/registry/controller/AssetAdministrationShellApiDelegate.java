@@ -224,8 +224,8 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
    }
 
    @Override
-   public ResponseEntity<List<SpecificAssetId>> postAllAssetLinksById(
-         final String aasIdentifier, final List<SpecificAssetId> specificAssetId, @RequestHeader final String externalSubjectId ) {
+   public ResponseEntity<List<SpecificAssetId>> postAllAssetLinksById( final String aasIdentifier, final List<SpecificAssetId> specificAssetId,
+         @RequestHeader final String externalSubjectId ) {
       final Set<ShellIdentifier> shellIdentifiers = shellService.save( getDecodedId( aasIdentifier ), shellMapper.fromApiDto( specificAssetId ),
             getExternalSubjectIdOrEmpty( externalSubjectId ) );
       final List<SpecificAssetId> list = shellMapper.toApiDto( shellIdentifiers );
