@@ -43,10 +43,10 @@ public class DefaultShellAccessHandler implements ShellAccessHandler {
    private final String externalSubjectIdWildcardPrefix;
    private final List<String> externalSubjectIdWildcardAllowedTypes;
 
-   public DefaultShellAccessHandler( final RegistryProperties registryProperties ) {
-      owningTenantId = registryProperties.getIdm().getOwningTenantId();
-      externalSubjectIdWildcardPrefix = registryProperties.getExternalSubjectIdWildcardPrefix();
-      externalSubjectIdWildcardAllowedTypes = registryProperties.getExternalSubjectIdWildcardAllowedTypes();
+   public DefaultShellAccessHandler( RegistryProperties registryProperties ) {
+      this.owningTenantId = registryProperties.getIdm().getOwningTenantId();
+      this.externalSubjectIdWildcardPrefix = registryProperties.getExternalSubjectIdWildcardPrefix();
+      this.externalSubjectIdWildcardAllowedTypes = registryProperties.getExternalSubjectIdWildcardAllowedTypes();
    }
 
    @Override
@@ -69,13 +69,13 @@ public class DefaultShellAccessHandler implements ShellAccessHandler {
    //Could map to null if the shell should not be visible at all
    @Override
    @Nullable
-   public Shell filterShellProperties( final Shell shell, final String externalSubjectId ) {
+   public Shell filterShellProperties( Shell shell, String externalSubjectId ) {
       if ( externalSubjectId.equals( owningTenantId ) ) {
          return shell;
       }
 
-      final Set<ShellIdentifier> filteredIdentifiers = filterSpecificAssetIdsByTenantId( shell.getIdentifiers(), externalSubjectId );
-      final boolean hasOnlyPublicAccess = filteredIdentifiers.stream().noneMatch( shellIdentifier -> {
+      Set<ShellIdentifier> filteredIdentifiers = filterSpecificAssetIdsByTenantId( shell.getIdentifiers(), externalSubjectId );
+      boolean hasOnlyPublicAccess = filteredIdentifiers.stream().noneMatch( shellIdentifier -> {
                if ( shellIdentifier.getExternalSubjectId() == null ) {
                   return false;
                }
@@ -86,7 +86,7 @@ public class DefaultShellAccessHandler implements ShellAccessHandler {
       if ( hasOnlyPublicAccess ) {
          // Filter out globalAssetId from specificAssetId. TODO: implement to save globalAssetId in separate database column
          // GlobalAssetId is set via mapper. In case of only read access, no globalAssetId should be shown.
-         final Set<ShellIdentifier> filteredIdentifiersWithNoGlobalAssetId = filteredIdentifiers.stream().filter(
+         Set<ShellIdentifier> filteredIdentifiersWithNoGlobalAssetId = filteredIdentifiers.stream().filter(
                      shellIdentifier -> !shellIdentifier.getKey().equals( ShellIdentifier.GLOBAL_ASSET_ID_KEY ) )
                .collect( Collectors.toSet() );
          return new Shell()
@@ -100,26 +100,26 @@ public class DefaultShellAccessHandler implements ShellAccessHandler {
    }
 
    @Override
-   public List<Shell> filterListOfShellProperties( final List<Shell> shells, final String externalSubjectId ) {
+   public List<Shell> filterListOfShellProperties( List<Shell> shells, String externalSubjectId ) {
       return shells.stream()
             .map( shell -> filterShellProperties( shell, externalSubjectId ) )
             .toList();
    }
 
-   private Set<ShellIdentifier> filterSpecificAssetIdsByTenantId( final Set<ShellIdentifier> shellIdentifiers, final String tenantId ) {
+   private Set<ShellIdentifier> filterSpecificAssetIdsByTenantId( Set<ShellIdentifier> shellIdentifiers, String tenantId ) {
       // the owning tenant should always see all identifiers
       if ( tenantId.equals( owningTenantId ) ) {
          return shellIdentifiers;
       }
 
-      final Set<ShellIdentifier> externalSubjectIdSet = new HashSet<>();
-      for ( final ShellIdentifier identifier : shellIdentifiers ) {
+      Set<ShellIdentifier> externalSubjectIdSet = new HashSet<>();
+      for ( ShellIdentifier identifier : shellIdentifiers ) {
          // Check if specificAssetId is globalAssetId -> TODO: implement to save globalAssetId in separate database column
          if ( identifier.getKey().equals( ShellIdentifier.GLOBAL_ASSET_ID_KEY ) ) {
             externalSubjectIdSet.add( identifier );
          }
          if ( identifier.getExternalSubjectId() != null ) {
-            final Set<ShellIdentifierExternalSubjectReferenceKey> optionalReferenceKey =
+            Set<ShellIdentifierExternalSubjectReferenceKey> optionalReferenceKey =
                   identifier.getExternalSubjectId().getKeys().stream().filter( shellIdentifierExternalSubjectReferenceKey ->
                         // Match if externalSubjectId = tenantId
                               shellIdentifierExternalSubjectReferenceKey.getValue().equals( tenantId )
