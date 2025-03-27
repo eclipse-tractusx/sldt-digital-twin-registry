@@ -208,7 +208,7 @@ public class ShellService {
       pageSize = getPageSize( pageSize );
 
       final ShellCursor cursor = new ShellCursor( pageSize, cursorVal );
-      final var specification = new ShellSpecification<Submodel>( SORT_FIELD_NAME_SUBMODEL, cursor, null, null, null, null, null );
+      final var specification = new ShellSpecification<Submodel>( SORT_FIELD_NAME_SUBMODEL, cursor, null, null, null, null );
       final Page<Submodel> shellPage = submodelRepository.findAll( Specification.allOf( hasShellFkId( assetID ).and( specification ) ),
             ofSize( cursor.getRecordSize() ) );
 
@@ -297,9 +297,9 @@ public class ShellService {
       final var fetchSize = pageSize + 1;
       final Instant cutoffDate = getCreatedDate( cursorValue, isCursorAvailable, createdAfter );
       final List<String> keyValueCombinations = toKeyValueCombinations( shellIdentifiers );
-      return shellIdentifierRepository.findExternalShellIdsByIdentifiersByExactMatch( keyValueCombinations, keyValueCombinations.size(), externalSubjectId,
-            externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes, owningTenantId, ShellIdentifier.GLOBAL_ASSET_ID_KEY, cutoffDate,
-            cursorValue, fetchSize );
+      return shellIdentifierRepository.findExternalShellIdsByIdentifiersByExactMatch( keyValueCombinations,
+            keyValueCombinations.size(), externalSubjectId, externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes, owningTenantId,
+            ShellIdentifier.GLOBAL_ASSET_ID_KEY, cutoffDate, cursorValue, fetchSize );
    }
 
    /**
@@ -322,7 +322,8 @@ public class ShellService {
 
    private List<String> fetchAPageOfAasIdsUsingGranularAccessControl( final Set<ShellIdentifier> shellIdentifiers, final String externalSubjectId,
          final String cursorValue, final int pageSize, final boolean isCursorAvailable, final OffsetDateTime createdAfter ) throws DenyAccessException {
-      final Set<SpecificAssetId> userQuery = shellIdentifiers.stream().map( id -> new SpecificAssetId( id.getKey(), id.getValue() ) )
+      final Set<SpecificAssetId> userQuery = shellIdentifiers.stream()
+            .map( id -> new SpecificAssetId( id.getKey(), id.getValue() ) )
             .collect( Collectors.toSet() );
       final List<String> keyValueCombinations = toKeyValueCombinations( shellIdentifiers );
       final var fetchSize = granularAccessControlFetchSize;
@@ -331,8 +332,8 @@ public class ShellService {
       final List<String> visibleAssetIds = new ArrayList<>();
       while ( visibleAssetIds.size() < pageSize + 1 ) {
          final Instant currentCutoffDate = getCreatedDate( currentCursorValue, isCursorAvailable, createdAfter );
-         final List<UUID> shellIds = shellIdentifierRepository.findAPageOfShellIdsBySpecificAssetIds( keyValueCombinations, keyValueCombinations.size(),
-               currentCutoffDate, currentCursorValue, PageRequest.ofSize( fetchSize ) );
+         final List<UUID> shellIds = shellIdentifierRepository.findAPageOfShellIdsBySpecificAssetIds(
+               keyValueCombinations, keyValueCombinations.size(), currentCutoffDate, currentCursorValue, PageRequest.ofSize( fetchSize ) );
          if ( shellIds.isEmpty() ) {
             break;
          }
