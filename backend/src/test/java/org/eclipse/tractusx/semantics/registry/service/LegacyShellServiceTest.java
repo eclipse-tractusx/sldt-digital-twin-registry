@@ -214,23 +214,9 @@ class LegacyShellServiceTest {
       shellService.save( shell );
    }
    
+   
    @Test
-      void testsLookupWithNoMatchingRecordsExpectEmptyListAndNoCursor() {
-         final String specificAssetIdName = keyPrefix + "key";
-         final String specificAssetIdValue = "value";
-         final Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
-   
-         final var actual = shellService.findExternalShellIdsByIdentifiersByExactMatch(
-               criteria, null, null, TENANT_TWO, null );
-   
-         assertThat( actual ).isNotNull();
-         assertThat( actual.getResult() ).isNotNull().isEmpty();
-         assertThat( actual.getPagingMetadata() ).isNotNull();
-         assertThat( actual.getPagingMetadata().getCursor() ).isNull();
-      }
-   
-      @Test
-      void testsLookupWithLessThanAPageOfMatchingRecordsExpectPartialListAndNoCursorAndValidCreatedDate() {
+   void testsLookupWithLessThanAPageOfMatchingRecordsExpectPartialListAndNoCursorAndValidCreatedDate() {
          final String specificAssetIdName = keyPrefix + "key";
          final String specificAssetIdValue = "value";
          final Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
@@ -246,8 +232,8 @@ class LegacyShellServiceTest {
          assertThat( actual.getPagingMetadata().getCursor() ).isNull();
       }
    
-      @Test
-      void testsLookupWithThreePagesOfMatchingRecordsRequestingSecondPageExpectFullListAndCursorAndValidCreatedDate() {
+   @Test
+   void testsLookupWithThreePagesOfMatchingRecordsRequestingSecondPageExpectFullListAndCursorAndValidCreatedDate() {
          final String specificAssetIdName = keyPrefix + "key";
          final String specificAssetIdValue = "value";
          final Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
@@ -282,4 +268,21 @@ class LegacyShellServiceTest {
                .isEqualTo( toCursor( expectedIds, pageSize * 2 - 1 ) );
    
       }
+	  
+   @Test
+   void testsLookupWithLessThanAPageOfMatchingRecordsExpectPartialListAndNoCursorAndInValidCreatedDate() {
+      final String specificAssetIdName = keyPrefix + "key";
+      final String specificAssetIdValue = "value";
+      final Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
+      final String id = UUID.randomUUID().toString();
+      createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue );
+
+      final var actual = shellService.findExternalShellIdsByIdentifiersByExactMatch(
+            criteria, 5, null, TENANT_TWO, OffsetDateTime.parse( "2225-03-24T00:00:00.000000Z" ) );
+
+      assertThat( actual ).isNotNull();
+      assertThat( actual.getResult() ).isNotNull().isEmpty();
+      assertThat( actual.getPagingMetadata() ).isNotNull();
+      assertThat( actual.getPagingMetadata().getCursor() ).isNull();
+   }  
 }
