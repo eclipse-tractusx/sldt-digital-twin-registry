@@ -53,6 +53,23 @@ class GranularShellServiceTest extends LegacyShellServiceTest {
    }
 
    @Test
+   void testsLookupWithLessThanAPageOfMatchingRecordsExpectPartialListAndNoCursorAndValidCreatedDate() {
+      createRule();
+      super.testsLookupWithLessThanAPageOfMatchingRecordsExpectPartialListAndNoCursorAndValidCreatedDate();
+   }
+
+   @Test
+   void testsLookupWithLessThanAPageOfMatchingRecordsExpectPartialListAndNoCursorAndInValidCreatedDate() {
+      createRule();
+      super.testsLookupWithLessThanAPageOfMatchingRecordsExpectPartialListAndNoCursorAndInValidCreatedDate();
+   }
+
+   @Test
+   void testsLookupWithThreePagesOfMatchingRecordsRequestingSecondPageExpectFullListAndCursorAndValidCreatedDate() {
+      createRule();
+      super.testsLookupWithThreePagesOfMatchingRecordsRequestingSecondPageExpectFullListAndCursorAndValidCreatedDate();
+   }
+
    void testsLookupWithLessThanAPageOfMatchingRecordsExpectPartialListAndNoCursor() {
       createRule();
       super.testsLookupWithLessThanAPageOfMatchingRecordsExpectPartialListAndNoCursor();

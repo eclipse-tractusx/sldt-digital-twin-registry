@@ -1,0 +1,11 @@
+{
+  "status": 200,
+  "content": true,
+  "assertions": [
+    {
+      "jsonPath": "$.result[0].createdDate",
+      "exists": false
+    }
+  ],
+  "expectedPayload": null
+}
