@@ -1,5 +1,6 @@
 ################################################################################
 # Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
+# Copyright (c) 2025 Fraunhofer-Gesellschaft zur Foerderung der angewandten Forschung e.V. (represented by Fraunhofer ISST)
 # Copyright (c) 2021 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
@@ -75,9 +76,28 @@ registry:
     user: default-user
     password:
   ingress:
-    enabled: false
-    tls: false
+    enabled: true
+    tls:
+      ## enable tls, default false
+      enabled: true
+      ## reuse secret in namespace with given name, default "registry-certificate-secret"
+      secretName: registry-certificate-secret
+    ## use a urlPrefix to define a path of pathType "Prefix" with regex. Result is a path "/semantics/registry(/|$)(.*)"
     urlPrefix: /semantics/registry
+    ## specify rules on your own, if the pathType Prefix + Regex runs into issues with your ClusterIssuer has a "strict-validate-path-type" check. -host.http.paths[0].path must at least be set. Then pathType "ImplementationSpecfic" is used with common service name and port. Multiple paths may be specified
+    rules: []
+#    #Minimum sample
+#      - host:
+#        http:
+#          paths:
+#            - path: /semantics/registry
+#              pathType:
+#              backend:
+#                service:
+#                  name:
+#                  port:
+#                    number:
+
     className: nginx
     annotations: {}
       # Add annotations for the ingress, e.g.:
