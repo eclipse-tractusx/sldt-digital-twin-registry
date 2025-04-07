@@ -35,6 +35,8 @@ spec:
     - hosts:
         - {{ .Values.registry.host }}
       secretName: {{ .Values.registry.ingress.tls.secretName | default "registry-certificate-secret" }}
+  {{- else }}
+    []  # Ensures tls is an empty list when not enabled
   {{- end }}
   {{- if .Values.registry.ingress.urlPrefix }}
   rules:
