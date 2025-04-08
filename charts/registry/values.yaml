@@ -84,13 +84,13 @@ registry:
       secretName: registry-certificate-secret
     ## use a urlPrefix to define a path of pathType "Prefix" with regex. Result is a path "/semantics/registry(/|$)(.*)"
     urlPrefix: /semantics/registry
-    ## specify rules on your own, if the pathType Prefix + Regex runs into issues with your ClusterIssuer has a "strict-validate-path-type" check. -host.http.paths[0].path must at least be set. Then pathType "ImplementationSpecfic" is used with common service name and port. Multiple paths may be specified
-    rules: []
-#    #Minimum sample
+    ## specify rules on your own, if the pathType Prefix + Regex runs into issues with your ClusterIssuer has a "strict-validate-path-type" check. -host.http.paths[0].path must at least be set. Then pathType "ImplementationSpecific" is used with common service name and port. Multiple paths may be specified
+    rules: [ ]
+    #Minimum sample
 #      - host:
 #        http:
 #          paths:
-#            - path: /semantics/registry
+#            - path: /
 #              pathType:
 #              backend:
 #                service:
