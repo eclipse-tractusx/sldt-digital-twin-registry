@@ -66,6 +66,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.ImmutableSet;
 
+import jakarta.persistence.criteria.Fetch;
+import jakarta.persistence.criteria.JoinType;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -167,12 +169,58 @@ public class ShellService {
       return doFindShellByExternalIdWithoutFiltering( externalShellId );
    }
 
+   /**
+    * Creates a JPA Specification for fetching all associations of the Shell entity.
+    * This method is used to define a query that fetches all related entities of a Shell,
+    * including identifiers, descriptions, display names, submodels, and their nested associations.
+    *
+    * The specification ensures that:
+    * - Fetching is only applied to entity queries (not count queries).
+    * - The query result is distinct to avoid duplicate records.
+    * - Nested associations are fetched using LEFT JOINs to include all related data.
+    *
+    * @return Specification<Shell> A JPA Specification for fetching all associations of the Shell entity.
+    */
+   public static Specification<Shell> withAllAssociations() {
+       return (root, query, criteriaBuilder) -> {
+           // Only apply fetching for entity queries, not for count queries
+           if (query.getResultType() != Long.class && query.getResultType() != long.class) {
+               // Set distinct to true to avoid duplicates
+               query.distinct(true);
+
+               // Root level fetches
+               Fetch<Shell, ?> identifiersFetch = root.fetch("identifiers", JoinType.LEFT);
+               root.fetch("descriptions", JoinType.LEFT);
+               root.fetch("displayNames", JoinType.LEFT);
+               Fetch<Shell, ?> submodelsFetch = root.fetch("submodels", JoinType.LEFT);
+
+               // Second level fetches for identifiers
+               identifiersFetch.fetch("externalSubjectId", JoinType.LEFT);
+               identifiersFetch.fetch("semanticId", JoinType.LEFT);
+               identifiersFetch.fetch("supplementalSemanticIds", JoinType.LEFT);
+
+               // Second level fetches for submodels
+               Fetch<?, ?> semanticIdFetch = submodelsFetch.fetch("semanticId", JoinType.LEFT);
+               submodelsFetch.fetch("submodelSupplemSemanticIds", JoinType.LEFT);
+               submodelsFetch.fetch("displayNames", JoinType.LEFT);
+               submodelsFetch.fetch("descriptions", JoinType.LEFT);
+               Fetch<?, ?> endpointsFetch = submodelsFetch.fetch("endpoints", JoinType.LEFT);
+
+               // Third level fetches
+               semanticIdFetch.fetch("keys", JoinType.LEFT);
+               endpointsFetch.fetch("submodelSecurityAttribute", JoinType.LEFT);
+           }
+           return criteriaBuilder.conjunction();
+       };
+   }
+
    @Transactional( readOnly = true )
    public ShellCollectionDto findAllShells( Integer pageSize, String cursorVal, String externalSubjectId ) {
 
       pageSize = getPageSize( pageSize );
       ShellCursor cursor = new ShellCursor( pageSize, cursorVal );
-      var specification = shellAccessHandler.shellFilterSpecification( SORT_FIELD_NAME_SHELL, cursor, externalSubjectId );
+      var specification = shellAccessHandler.shellFilterSpecification(SORT_FIELD_NAME_SHELL, cursor, externalSubjectId)
+          .and(withAllAssociations());
       final var foundList = new ArrayList<Shell>();
       //fetch 1 more item to make sure there is a visible item for the next page
       while ( foundList.size() < pageSize + 1 ) {

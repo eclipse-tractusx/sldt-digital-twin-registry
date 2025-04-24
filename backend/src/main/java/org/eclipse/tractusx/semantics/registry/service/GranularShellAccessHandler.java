@@ -66,7 +66,6 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
    public Specification<Shell> shellFilterSpecification( String sortFieldName, ShellCursor cursor, String externalSubjectId ) {
       return ( root, query, criteriaBuilder ) -> {
          Instant searchValue = cursor.getShellSearchCursor();
-         query.orderBy( criteriaBuilder.asc( criteriaBuilder.coalesce( root.get( sortFieldName ), Instant.now() ) ) );
          return criteriaBuilder.greaterThan( root.get( sortFieldName ), searchValue );
       };
    }

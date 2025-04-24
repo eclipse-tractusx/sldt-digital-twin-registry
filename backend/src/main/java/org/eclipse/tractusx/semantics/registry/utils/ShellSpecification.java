@@ -55,7 +55,6 @@ public class ShellSpecification<T> implements Specification<T> {
    private Predicate applyFilter( Root<T> root, CriteriaQuery<?> cq, CriteriaBuilder criteriaBuilder ) {
       if ( root.toString().contains( "Shell" ) ) {
          Instant searchValue = shellCursor.getShellSearchCursor();
-         cq.orderBy( criteriaBuilder.asc( criteriaBuilder.coalesce( root.get( sortFieldName ), Instant.now() ) ) );
 
          if ( owningTenantId.equals( tenantId ) ) {
             return criteriaBuilder.greaterThan( root.get( sortFieldName ), searchValue );

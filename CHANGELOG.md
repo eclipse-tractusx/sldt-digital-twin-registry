@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 ## fixed
 - Bugfix: removed uniqueness check for idShort validation while shell creation
+- Bugfix: High number of SELECT statements during pagination
 
 ## 0.7.0
 ### Added
