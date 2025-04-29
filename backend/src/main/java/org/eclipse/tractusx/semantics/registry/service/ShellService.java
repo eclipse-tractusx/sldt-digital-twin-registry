@@ -303,21 +303,32 @@ public class ShellService {
    }
 
    /**
-    * Retrieves the created date based on the cursor value and availability of the cursor.
-    * If the cursor is not available, it uses the provided createdAfter date or fetches the created date from the repository.
+    * Retrieves the created date based on the cursor value and the availability of the cursor.
     *
-    * @param cursorValue the value of the cursor
-    * @param isCursorAvailable flag indicating if the cursor is available
-    * @param createdAfter the date after which the entities were created
-    * @return the created date as an Instant
+    * <p>This method determines the created date to be used in queries. If the cursor is available,
+    * it fetches the created date from the repository using the cursor value. If the cursor is not
+    * available and the cursor value matches the default external ID, it uses the provided
+    * `createdAfter` date or fetches the created date from the repository. Otherwise, it defaults
+    * to the minimum SQL datetime.</p>
+    *
+    * @param cursorValue the value of the cursor, used to identify the entity
+    * @param isCursorAvailable a flag indicating whether the cursor is available
+    * @param createdAfter the date after which entities were created, used as a fallback
+    * @return the created date as an {@link Instant}
     */
    private Instant getCreatedDate( final String cursorValue, final boolean isCursorAvailable, final OffsetDateTime createdAfter ) {
-      return isCursorAvailable ?
-            // If cursor is available, fetch created date from repository
-            shellRepository.getCreatedDateByIdExternal( cursorValue ).orElse( MINIMUM_SQL_DATETIME ) :
-            // If cursor is not available, use createdAfter date or fetch from repository
-            Optional.ofNullable( createdAfter ).map( OffsetDateTime::toInstant )
-                  .orElseGet( () -> shellRepository.getCreatedDateByIdExternal( cursorValue ).orElse( MINIMUM_SQL_DATETIME ) );
+      if ( isCursorAvailable ) {
+         // Fetch the created date from the repository using the cursor value
+         return shellRepository.getCreatedDateByIdExternal( cursorValue ).orElse( MINIMUM_SQL_DATETIME );
+      }
+      if ( cursorValue.equalsIgnoreCase( DEFAULT_EXTERNAL_ID ) ) {
+         // Use the provided createdAfter date or fetch from the repository as a fallback
+         return Optional.ofNullable( createdAfter )
+               .map( OffsetDateTime::toInstant )
+               .orElseGet( () -> shellRepository.getCreatedDateByIdExternal( cursorValue ).orElse( MINIMUM_SQL_DATETIME ) );
+      }
+      // Default case: fetch the created date from the repository or use the minimum SQL datetime
+      return shellRepository.getCreatedDateByIdExternal( cursorValue ).orElse( MINIMUM_SQL_DATETIME );
    }
 
    private List<String> fetchAPageOfAasIdsUsingGranularAccessControl( final Set<ShellIdentifier> shellIdentifiers, final String externalSubjectId,
