@@ -1,6 +1,7 @@
 {{- if .Values.registry.ingress.enabled }}
 ################################################################################
 # Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
+# Copyright (c) 2025 Fraunhofer-Gesellschaft zur Foerderung der angewandten Forschung e.V. (represented by Fraunhofer ISST)
 # Copyright (c) 2021 Contributors to the Eclipse Foundation
 #
 # See the NOTICE file(s) distributed with this work for additional
@@ -29,12 +30,15 @@ metadata:
     {{- include "dtr.labels" . | nindent 4 }}
 spec:
   ingressClassName: {{ .Values.registry.ingress.className }}
-  {{- if .Values.registry.ingress.tls }}
+  {{- if .Values.registry.ingress.tls.enabled }}
   tls:
     - hosts:
         - {{ .Values.registry.host }}
-      secretName: registry-certificate-secret
+      secretName: {{ .Values.registry.ingress.tls.secretName | default "registry-certificate-secret" }}
+  {{- else }}
+    []  # Ensures tls is an empty list when not enabled
   {{- end }}
+  {{- if .Values.registry.ingress.urlPrefix }}
   rules:
     - host: {{ .Values.registry.host }}
       http:
@@ -46,4 +50,21 @@ spec:
                 name: {{ include "dtr.fullname" . }}
                 port:
                   number: {{ .Values.registry.service.port }}
+  {{- else }}
+  rules:
+    {{- range .Values.registry.ingress.rules }}
+    - host: {{ .host | default $.Values.registry.host }}
+      http:
+        paths:
+          {{- range .http.paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType | default "ImplementationSpecific" }}
+            backend:
+              service:
+                name: {{ include "dtr.fullname" $ }}
+                port:
+                  number: {{ $.Values.registry.service.port }}
+          {{- end }}
+    {{- end}}
+  {{- end}}
 {{- end}}
