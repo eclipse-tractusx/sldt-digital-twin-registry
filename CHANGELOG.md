@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.7.1
 ### Added
+- Filtering shells based on timestamp
 ## fixed
 - Bugfix: removed uniqueness check for idShort validation while shell creation
 

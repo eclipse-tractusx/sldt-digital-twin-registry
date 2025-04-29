@@ -20,6 +20,7 @@
 
 package org.eclipse.tractusx.semantics.registry.service;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -38,10 +39,10 @@ public interface ShellAccessHandler {
 
    List<Shell> filterListOfShellProperties( List<Shell> shells, String externalSubjectId );
 
-   Specification<Shell> shellFilterSpecification( String sortFieldName, ShellCursor cursor, String externalSubjectId );
+   Specification<Shell> shellFilterSpecification( String sortFieldName, ShellCursor cursor, String externalSubjectId, OffsetDateTime createdAfter );
 
-   default List<String> filterToVisibleShellIdsForLookup( Set<SpecificAssetId> userQuery, List<ShellIdentifierMinimal> shellIdentifiers,
-         String externalSubjectId )
+   default List<String> filterToVisibleShellIdsForLookup( final Set<SpecificAssetId> userQuery, final List<ShellIdentifierMinimal> shellIdentifiers,
+         final String externalSubjectId )
          throws DenyAccessException {
       throw new UnsupportedOperationException( "Only supported in case of granular access control." );
    }
