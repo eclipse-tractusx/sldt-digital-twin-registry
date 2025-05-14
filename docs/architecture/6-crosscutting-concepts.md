@@ -10,17 +10,20 @@ The corresponding openapi file can be found here: [AAS OPENAPI](../../backend/sr
 
 #### Search by created after
 
-The Asset Administration Shell (AAS) API now features a timestamp-based search feature for shell-descriptors and lookup shells functionality. 
+The Asset Administration Shell (AAS) API is enhanced by a timestamp-based search feature for shell-descriptors and lookup shells functionality.
 This enhancement allows filtering of AAS Descriptors by their creation date using the new query parameter,`createdAfter`.
 The parameter will be optional and the format of the timestamp is `RFC3339` and looks like `YYYY-MM-DDTHH:MM:SSZ`. 
 This feature is planned for future integration into the Industrial Digital Twin Association (IDTA) specification.
+
+Please refer the [github issue] 
+(https://github.com/orgs/eclipse-tractusx/projects/40/views/7?pane=issue&itemId=88990986&issue=eclipse-tractusx%7Csldt-digital-twin-registry%7C495)
 
 * `GET /shell-descriptors?createdAfter=2025-05-01T00:00:00Z`
 * `GET /lookup/shells?createdAfter=2025-05-01T00:00:00Z`
 
 ##### Extend Shell
 
-A new parameter `createdDate` will be added to the shell object and will be returned.
+A new parameter `createdDate` will be added to the shell object at the time of creation and will be returned.
 
 ```json
 {
