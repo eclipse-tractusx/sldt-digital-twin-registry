@@ -8,6 +8,32 @@ The overall concept can be found under **2 Architecture and constraints**.
 The Digital Twin Registry has implemented Asset Administration Shell specification in version 3.0.
 The corresponding openapi file can be found here: [AAS OPENAPI](../../backend/src/main/resources/static/aas-registry-openapi.yaml)
 
+#### Search by created after
+
+The Asset Administration Shell (AAS) API now features a timestamp-based search feature for shell-descriptors and lookup shells functionality. 
+This enhancement allows filtering of AAS Descriptors by their creation date using the new query parameter,`createdAfter`.
+The parameter will be optional and the format of the timestamp is `RFC3339` and looks like `YYYY-MM-DDTHH:MM:SSZ`. 
+This feature is planned for future integration into the Industrial Digital Twin Association (IDTA) specification.
+
+* `GET /shell-descriptors?createdAfter=2025-05-01T00:00:00Z`
+* `GET /lookup/shells?createdAfter=2025-05-01T00:00:00Z`
+
+##### Extend Shell
+
+A new parameter `createdDate` will be added to the shell object and will be returned.
+
+```json
+{
+  ...
+  "id": "123",
+  "idShort": "model-b1",
+  "specificAssetIds": [],
+  "createdDate": "2021-01-01T00:00:00Z",
+  ...
+}
+
+```
+
 ### Uniqueness
 The following table contains the identifier fields and whether they are globally unique, unique for an
 AAS Descriptor or not unique at all.
