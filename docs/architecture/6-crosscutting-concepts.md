@@ -15,8 +15,7 @@ This enhancement allows filtering of AAS Descriptors by their creation date usin
 The parameter will be optional and the format of the timestamp is `RFC3339` and looks like `YYYY-MM-DDTHH:MM:SSZ`. 
 This feature is planned for future integration into the Industrial Digital Twin Association (IDTA) specification.
 
-[github issue] 
-(https://github.com/orgs/eclipse-tractusx/projects/40/views/7?pane=issue&itemId=88990986&issue=eclipse-tractusx%7Csldt-digital-twin-registry%7C495)
+[github issue](https://github.com/orgs/eclipse-tractusx/projects/40/views/7?pane=issue&itemId=88990986&issue=eclipse-tractusx%7Csldt-digital-twin-registry%7C495)
 
 * `GET /shell-descriptors?createdAfter=2025-05-01T00:00:00Z`
 * `GET /lookup/shells?createdAfter=2025-05-01T00:00:00Z`
