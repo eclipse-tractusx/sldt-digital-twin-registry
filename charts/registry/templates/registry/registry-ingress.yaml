@@ -40,7 +40,7 @@ spec:
       http:
         paths:
           - path: {{printf "%s(/|$)(.*)" .Values.registry.ingress.urlPrefix }}
-            pathType: Prefix
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: {{ include "dtr.fullname" . }}
