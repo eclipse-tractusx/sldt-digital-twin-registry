@@ -39,7 +39,7 @@ spec:
     - host: {{ .Values.registry.host }}
       http:
         paths:
-          - path: {{printf "%s(/|$)(.*)" .Values.registry.ingress.urlPrefix }}
+          - path:  /dtr/.*
             pathType: ImplementationSpecific
             backend:
               service:
