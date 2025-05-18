@@ -24,7 +24,7 @@ kind: Ingress
 metadata:
   name: {{ include "dtr.fullname" . }}
   annotations:
-{{ .Values.registry.ingress.annotations | toYaml | indent 4 }}
+{{ .Values.digital-twin-registry.registry.ingress.annotations | toYaml | indent 4 }}
   labels:
     {{- include "dtr.labels" . | nindent 4 }}
 spec:
