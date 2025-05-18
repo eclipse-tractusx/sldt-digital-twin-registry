@@ -52,6 +52,7 @@ digital-twin-registry:
       tls: 
         enabled: true
       className: nginx
+      urlPrefix: /dtr
       rules:
         - host:
           http:
