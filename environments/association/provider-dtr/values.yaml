@@ -70,4 +70,3 @@ digital-twin-registry:
                     name: {{ include "dtr.fullname" . }}
                     port:
                       number: {{ .Values.registry.service.port }}
-  
