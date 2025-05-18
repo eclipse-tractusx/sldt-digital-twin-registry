@@ -29,21 +29,41 @@ metadata:
     {{- include "dtr.labels" . | nindent 4 }}
 spec:
   ingressClassName: {{ .Values.registry.ingress.className }}
-  {{- if .Values.registry.ingress.tls }}
+  {{- if .Values.digital-twin-registry.registry.ingress.tls.enabled }}
   tls:
     - hosts:
         - {{ .Values.registry.host }}
       secretName: registry-certificate-secret
+  {{- else }}
+    []  # Ensures tls is an empty list when not enabled
   {{- end }}
+  {{- if .Values.digital-twin-registry.registry.ingress.urlPrefix }}
   rules:
     - host: {{ .Values.registry.host }}
       http:
         paths:
-          - path:  /dtr/.*
-            pathType: ImplementationSpecific
+          - path: {{printf "%s(/|$)(.*)" .Values.digital-twin-registry.registry.ingress.urlPrefix }}
+            pathType: Prefix
             backend:
               service:
                 name: {{ include "dtr.fullname" . }}
                 port:
                   number: {{ .Values.registry.service.port }}
+    {{- else }}
+  rules:
+    {{- range .Values.digital-twin-registry.registry.ingress.rules }}
+    - host: {{ .host | default $.Values.registry.host }}
+      http:
+        paths:
+          {{- range .http.paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType | default "ImplementationSpecific" }}
+            backend:
+              service:
+                name: {{ include "dtr.fullname" $ }}
+                port:
+                  number: {{ $.Values.registry.service.port }}
+          {{- end }}
+    {{- end}}
+  {{- end}}
 {{- end}}
