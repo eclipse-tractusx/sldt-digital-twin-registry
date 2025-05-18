@@ -60,8 +60,13 @@ digital-twin-registry:
         nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
         nginx.ingress.kubernetes.io/x-forwarded-prefix: /dtr
       rules:
-      - host: semantics-dec-registry.int.catena-x.net
-        http:
-          paths:
-            - path: /dtr/.*
-              pathType: ImplementationSpecific
+        - host: semantics-dec-registry.int.catena-x.net
+          http:
+            paths:
+              - path: /dtr/.*
+                pathType: ImplementationSpecific
+                backend:
+                  service:
+                    name: provider-dtr-digital-twin-registry
+                    port: 
+                      number: 8080
