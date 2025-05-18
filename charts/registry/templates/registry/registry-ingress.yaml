@@ -52,12 +52,12 @@ spec:
     {{- else }}
   rules:
     {{- range .Values.digital-twin-registry.registry.ingress.rules }}
-    - host: {{ .host | default $.Values.registry.host }}
+    - host: {{ .host | default $.Values.digital-twin-registry.registry.host }}
       http:
         paths:
           {{- range .http.paths }}
-          - path: {{ .path }}
-            pathType: {{ .pathType | default "ImplementationSpecific" }}
+          - path: /dtr
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: {{ include "dtr.fullname" $ }}
