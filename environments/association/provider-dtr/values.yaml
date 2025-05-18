@@ -51,6 +51,7 @@ digital-twin-registry:
       enabled: "true"
       tls: "true"
       className: nginx
+      urlPrefix: /dtr/.*
       rules:
         - host: semantics-dec-registry.int.catena-x.net
           http:
