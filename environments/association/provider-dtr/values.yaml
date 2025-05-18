@@ -50,7 +50,6 @@ digital-twin-registry:
     ingress:
       enabled: true
       tls: true
-      urlPrefix: /dtr
       className: nginx
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-prod
