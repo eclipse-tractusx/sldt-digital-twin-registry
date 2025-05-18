@@ -65,8 +65,3 @@ digital-twin-registry:
             paths:
               - path: /dtr(/|$)(.*)
                 pathType: ImplementationSpecific
-                backend:
-                  service:
-                    name: {{ include "dtr.fullname" . }}
-                    port:
-                      number: {{ .Values.registry.service.port }}
