@@ -59,4 +59,15 @@ digital-twin-registry:
         # nginx.ingress.kubernetes.io/enable-cors: "true"
         # nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
         # nginx.ingress.kubernetes.io/x-forwarded-prefix: /dtr
+      rules:
+        - host: {{ .Values.registry.host }}
+          http:
+            paths:
+              - path: {{printf "%s(/|$)(.*)" .Values.registry.ingress.urlPrefix }}
+                pathType: ImplementationSpecific
+                backend:
+                  service:
+                    name: {{ include "dtr.fullname" . }}
+                    port:
+                      number: {{ .Values.registry.service.port }}
   
