@@ -48,24 +48,16 @@ digital-twin-registry:
     tenantId: <path:semantics/data/dtr#tenantId>
     useGranularAccessControl: "false"
     ingress:
-      enabled: "true"
-      tls: "true"
+      enabled: true
+      tls: 
+        enabled: true
       className: nginx
-      rules:
-        - host: semantics-dec-registry.int.catena-x.net
-          http:
-            paths:
-              - path: /dtr/.*
-                pathType: ImplementationSpecific
-                backend:
-                  service:
-                    name: provider-dtr-digital-twin-registry
-                    port: 
-                      number: 8080
+      urlPrefix: /dtr
+      rules: {}
       annotations: {}
-        # cert-manager.io/cluster-issuer: letsencrypt-prod
-        # nginx.ingress.kubernetes.io/rewrite-target: /$2
-        # nginx.ingress.kubernetes.io/use-regex: "true"
-        # nginx.ingress.kubernetes.io/enable-cors: "true"
-        # nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
-        # nginx.ingress.kubernetes.io/x-forwarded-prefix: /dtr
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        nginx.ingress.kubernetes.io/rewrite-target: /$2
+        nginx.ingress.kubernetes.io/use-regex: "true"
+        nginx.ingress.kubernetes.io/enable-cors: "true"
+        nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+        nginx.ingress.kubernetes.io/x-forwarded-prefix: /dtr
