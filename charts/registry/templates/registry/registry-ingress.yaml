@@ -28,27 +28,26 @@ metadata:
   labels:
     {{- include "dtr.labels" . | nindent 4 }}
 spec:
-  ingressClassName: {{ .Values.registry.ingress.className }}
+  ingressClassName: {{ .Values.digital-twin-registry.registry.ingress.className }}
   {{- if .Values.digital-twin-registry.registry.ingress.tls.enabled }}
   tls:
     - hosts:
-        - {{ .Values.registry.host }}
-      secretName: registry-certificate-secret
+        - {{ .Values.digital-twin-registry.registry.host }}
   {{- else }}
     []  # Ensures tls is an empty list when not enabled
   {{- end }}
   {{- if .Values.digital-twin-registry.registry.ingress.urlPrefix }}
   rules:
-    - host: {{ .Values.registry.host }}
+    - host: {{ .Values.digital-twin-registry.registry.host }}
       http:
         paths:
-          - path: {{printf "%s(/|$)(.*)" .Values.digital-twin-registry.registry.ingress.urlPrefix }}
-            pathType: Prefix
+          - path: /dtr
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: {{ include "dtr.fullname" . }}
                 port:
-                  number: {{ .Values.registry.service.port }}
+                  number: 8080
     {{- else }}
   rules:
     {{- range .Values.digital-twin-registry.registry.ingress.rules }}
@@ -62,7 +61,7 @@ spec:
               service:
                 name: {{ include "dtr.fullname" $ }}
                 port:
-                  number: {{ $.Values.registry.service.port }}
+                  number: 8080
           {{- end }}
     {{- end}}
   {{- end}}
