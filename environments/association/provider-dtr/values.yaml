@@ -61,7 +61,7 @@ digital-twin-registry:
               - path: /dtr
                 backend:
                   service:
-                    name: registry
+                    name: provider-dtr-digital-twin-registry
                     port:
                       number: 8080
       annotations: 
