@@ -53,7 +53,7 @@ digital-twin-registry:
         enabled: true
         secretName: registry-certificate-secret
       className: nginx
-      # urlPrefix: "/dtr"
+      urlPrefix: ""
       rules:
         - host:
           http:
