@@ -21,7 +21,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "dtr.fullname" . }}
+  name: provider-dtr-digital-twin-registry
   annotations:
 {{ .Values.digital-twin-registry.registry.ingress.annotations | toYaml | indent 4 }}
   labels:
@@ -44,7 +44,7 @@ spec:
             pathType: ImplementationSpecific
             backend:
               service:
-                name: {{ include "dtr.fullname" . }}
+                name: provider-dtr-digital-twin-registry
                 port:
                   number: 8080
     {{- else }}
@@ -58,7 +58,7 @@ spec:
             pathType: ImplementationSpecific
             backend:
               service:
-                name: {{ include "dtr.fullname" $ }}
+                name: provider-dtr-digital-twin-registry
                 port:
                   number: 8080
           {{- end }}
