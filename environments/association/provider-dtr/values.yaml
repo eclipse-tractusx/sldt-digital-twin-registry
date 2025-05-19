@@ -51,6 +51,7 @@ digital-twin-registry:
       enabled: true
       tls: 
         enabled: true
+        secretName: registry-certificate-secret
       className: nginx
       urlPrefix: ""
       rules:
