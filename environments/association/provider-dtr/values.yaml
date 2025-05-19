@@ -1,4 +1,4 @@
-digital-twin-registry:
+registry:
   enableKeycloak: true
   enablePostgres: true
   # Keylcloak configuration
