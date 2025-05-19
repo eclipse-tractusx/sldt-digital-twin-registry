@@ -40,13 +40,13 @@ spec:
     - host: {{ .Values.registry.host }}
       http:
         paths:
-          - path: /dtr
-            pathType: ImplementationSpecific
+          - path: {{printf "%s(/|$)(.*)" .Values.registry.ingress.urlPrefix }}
+            pathType: Prefix
             backend:
               service:
                 name: {{ include "dtr.fullname" . }}
                 port:
-                  number: 8080
+                  number: {{ $.Values.registry.service.port }}
     {{- else }}
   rules:
     {{- range .Values.registry.ingress.rules }}
@@ -54,13 +54,13 @@ spec:
       http:
         paths:
           {{- range .http.paths }}
-          - path: /dtr
+          - path: {{ .path }}
             pathType: ImplementationSpecific
             backend:
               service:
                 name: {{ include "dtr.fullname" . }}
                 port:
-                  number: 8080
+                  number: {{ $.Values.registry.service.port }}
           {{- end }}
     {{- end}}
   {{- end}}
