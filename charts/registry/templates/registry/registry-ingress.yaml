@@ -1,4 +1,4 @@
-{{- if .Values.registry.ingress.enabled }}
+{{- if .Values.digital-twin-registry.registry.ingress.enabled }}
 ################################################################################
 # Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
 # Copyright (c) 2021 Contributors to the Eclipse Foundation
@@ -24,21 +24,21 @@ kind: Ingress
 metadata:
   name: {{ include "dtr.fullname" . }}
   annotations:
-{{ .Values.registry.registry.ingress.annotations | toYaml | indent 4 }}
+{{ .Values.digital-twin-registry.registry.ingress.annotations | toYaml | indent 4 }}
   labels:
     {{- include "dtr.labels" . | nindent 4 }}
 spec:
-  ingressClassName: {{ .Values.registry.registry.ingress.className }}
-  {{- if .Values.registry.registry.ingress.tls.enabled }}
+  ingressClassName: {{ .Values.digital-twin-registry.registry.ingress.className }}
+  {{- if .Values.digital-twin-registry.registry.ingress.tls.enabled }}
   tls:
     - hosts:
-        - {{ .Values.registry.registry.host }}
+        - {{ .Values.digital-twin-registry.registry.host }}
   {{- else }}
     []  # Ensures tls is an empty list when not enabled
   {{- end }}
-  {{- if .Values.registry.registry.ingress.urlPrefix }}
+  {{- if .Values.digital-twin-registry.registry.ingress.urlPrefix }}
   rules:
-    - host: {{ .Values.registry.registry.host }}
+    - host: {{ .Values.digital-twin-registry.registry.host }}
       http:
         paths:
           - path: /dtr
@@ -50,7 +50,7 @@ spec:
                   number: 8080
     {{- else }}
   rules:
-    {{- range .Values.registry.registry.ingress.rules }}
+    {{- range .Values.digital-twin-registry.registry.ingress.rules }}
     - host: {{ .host | default $.Values.registry.registry.host }}
       http:
         paths:
