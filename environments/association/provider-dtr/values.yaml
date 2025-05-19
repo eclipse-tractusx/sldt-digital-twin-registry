@@ -59,6 +59,12 @@ digital-twin-registry:
           http:
             paths:
               - path: /dtr
+                pathType:
+                backend:
+                  service:
+                    name: registry
+                    port:
+                      number: 8080
       annotations: 
         kubernetes.io/ingress.class: nginx
         cert-manager.io/cluster-issuer: "letsencrypt-prod"
