@@ -9,13 +9,13 @@ digital-twin-registry:
       adminUser: <path:semantics/data/dtr#keycloak-admin-user>
       adminPassword: <path:semantics/data/dtr#keycloak-admin-password>
     extraVolumes:
-      - name: provider-dtr-digital-twin-registry-keycloak-configmap
+      - name: registry-keycloak-configmap
         configMap:
-          name: provider-dtr-digital-twin-registry-keycloak-configmap
+          name: registry-keycloak-configmap
     extraVolumeMounts:
       - mountPath: /opt/keycloak/data/import/default-realm-import.json
         subPath: default-realm-import.json
-        name: provider-dtr-digital-twin-registry-keycloak-configmap
+        name: registry-keycloak-configmap
     ingress:
       enabled: true
       hostname: <path:semantics/data/dtr#keycloak-hostname>
