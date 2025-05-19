@@ -61,7 +61,7 @@ digital-twin-registry:
               - path: /dtr
                 backend:
                   service:
-                    name: {{ include "dtr.fullname" . }}
+                    name: registry
                     port:
                       number: 8080
       annotations: 
