@@ -11,7 +11,7 @@ digital-twin-registry:
     extraVolumes:
       - name: provider-dtr-digital-twin-registry-keycloak-configmap
         configMap:
-          name: registry-keycloak-configmap
+          name: provider-dtr-digital-twin-registry-keycloak-configmap
     extraVolumeMounts:
       - mountPath: /opt/keycloak/data/import/default-realm-import.json
         subPath: default-realm-import.json
