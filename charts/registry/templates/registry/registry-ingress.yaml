@@ -1,3 +1,4 @@
+{{- if .Values.registry.ingress.enabled }}
 ################################################################################
 # Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
 # Copyright (c) 2021 Contributors to the Eclipse Foundation
@@ -32,6 +33,7 @@ spec:
   tls:
     - hosts:
         - {{ .Values.registry.host }}
+      secretName: {{ .Values.registry.ingress.tls.secretName | default "registry-certificate-secret" }}
   {{- else }}
     []  # Ensures tls is an empty list when not enabled
   {{- end }}
