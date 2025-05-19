@@ -52,7 +52,7 @@ spec:
     {{- else }}
   rules:
     {{- range .Values.registry.ingress.rules }}
-    - host: {{ .host | default $.Values.registry.registry.host }}
+    - host: {{ .host | default $.Values.registry.host }}
       http:
         paths:
           {{- range .http.paths }}
