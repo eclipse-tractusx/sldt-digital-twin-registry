@@ -51,7 +51,6 @@ digital-twin-registry:
       enabled: true
       tls: 
         enabled: true
-        secretName: registry-certificate-secret
       className: nginx
       urlPrefix: ""
       rules:
@@ -59,7 +58,7 @@ digital-twin-registry:
           http:
             paths:
               - path: /dtr
-      annotations: 
+      annotations:
         cert-manager.io/cluster-issuer: letsencrypt-prod
         nginx.ingress.kubernetes.io/rewrite-target: /$2
         nginx.ingress.kubernetes.io/use-regex: "true"
