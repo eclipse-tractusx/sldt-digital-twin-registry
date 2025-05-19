@@ -23,21 +23,21 @@ kind: Ingress
 metadata:
   name: {{ include "dtr.fullname" . }}
   annotations:
-{{ .Values.digital-twin-registry.registry.ingress.annotations | toYaml | indent 4 }}
+{{ .Values.registry.ingress.annotations | toYaml | indent 4 }}
   labels:
     {{- include "dtr.labels" . | nindent 4 }}
 spec:
-  ingressClassName: {{ .Values.digital-twin-registry.registry.ingress.className }}
-  {{- if .Values.digital-twin-registry.registry.ingress.tls.enabled }}
+  ingressClassName: {{ .Values.registry.ingress.className }}
+  {{- if .Values.registry.ingress.tls.enabled }}
   tls:
     - hosts:
-        - {{ .Values.digital-twin-registry.registry.host }}
+        - {{ .Values.registry.host }}
   {{- else }}
     []  # Ensures tls is an empty list when not enabled
   {{- end }}
-  {{- if .Values.digital-twin-registry.registry.ingress.urlPrefix }}
+  {{- if .Values.registry.ingress.urlPrefix }}
   rules:
-    - host: {{ .Values.digital-twin-registry.registry.host }}
+    - host: {{ .Values.registry.host }}
       http:
         paths:
           - path: /dtr
@@ -49,7 +49,7 @@ spec:
                   number: 8080
     {{- else }}
   rules:
-    {{- range .Values.digital-twin-registry.registry.ingress.rules }}
+    {{- range .Values.registry.ingress.rules }}
     - host: {{ .host | default $.Values.registry.registry.host }}
       http:
         paths:
