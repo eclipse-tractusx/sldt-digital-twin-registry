@@ -24,7 +24,7 @@ IDTA github issues -
 
 ##### Extend Shell
 
-A new parameter `createdDate` will be added to the shell object at the time of creation and will be returned.
+A new parameter `createdAt` will be added to the shell object at the time of creation and will be returned.
 
 ```json
 {
@@ -32,7 +32,7 @@ A new parameter `createdDate` will be added to the shell object at the time of c
   "id": "123",
   "idShort": "model-b1",
   "specificAssetIds": [],
-  "createdDate": "2021-01-01T00:00:00Z",
+  "createdAt": "2021-01-01T00:00:00Z",
   ...
 }
 

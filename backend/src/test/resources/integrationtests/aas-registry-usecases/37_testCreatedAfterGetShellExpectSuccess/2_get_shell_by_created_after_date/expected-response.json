@@ -4,7 +4,7 @@
   "assertions": [
     {
       "jsonPath": "$.result[0].createdAt",
-      "exists": false
+      "exists": true
     }
   ],
   "expectedPayload": null

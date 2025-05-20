@@ -99,6 +99,7 @@ public interface ShellMapper {
          @Mapping(source = "descriptions", target = "description"),
          @Mapping(source = "submodels", target = "submodelDescriptors"),
          @Mapping(source = "displayNames", target = "displayName"),
+		 @Mapping( source = "createdDate", target = "createdAt" ),
     })
     @InheritInverseConfiguration
     AssetAdministrationShellDescriptor toApiDto(Shell shell);
