@@ -42,7 +42,7 @@ digital-twin-registry:
   # DTR  configuration
   registry:
     host: <path:semantics/data/dtr#dtr-hostname>
-    authentication: false
+    authentication: true
     idpIssuerUri: <path:semantics/data/dtr#idpIssuerUri>
     idpClientId: <path:semantics/data/dtr#idpClientId>
     tenantId: <path:semantics/data/dtr#tenantId>
