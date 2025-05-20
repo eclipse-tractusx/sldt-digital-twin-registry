@@ -57,7 +57,7 @@ digital-twin-registry:
         - host:
           http:
             paths:
-              - path: /dtr
+              - path: /dtr(/|$)(.*)
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-prod
         nginx.ingress.kubernetes.io/rewrite-target: /$2
