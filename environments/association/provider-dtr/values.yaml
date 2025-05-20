@@ -64,4 +64,4 @@ digital-twin-registry:
         nginx.ingress.kubernetes.io/use-regex: "true"
         nginx.ingress.kubernetes.io/enable-cors: "true"
         # nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
-        # nginx.ingress.kubernetes.io/x-forwarded-prefix: /dtr
+        nginx.ingress.kubernetes.io/x-forwarded-prefix: /dtr
