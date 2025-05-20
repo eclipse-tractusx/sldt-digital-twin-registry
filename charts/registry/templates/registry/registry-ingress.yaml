@@ -48,7 +48,7 @@ spec:
               service:
                 name: {{ include "dtr.fullname" . }}
                 port:
-                  number: {{ $.Values.registry.service.port }}
+                  number: {{ .Values.registry.service.port }}
     {{- else }}
   rules:
     {{- range .Values.registry.ingress.rules }}
@@ -60,7 +60,7 @@ spec:
             pathType: ImplementationSpecific
             backend:
               service:
-                name: {{ include "dtr.fullname" . }}
+                name: {{ include "dtr.fullname" $ }}
                 port:
                   number: {{ $.Values.registry.service.port }}
           {{- end }}
