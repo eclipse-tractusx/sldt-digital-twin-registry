@@ -4,12 +4,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.8.1
+### Added
+### Fixed
+- Bugfix: High number of SELECT statements during pagination
+
+## 0.8.0
+### Added
+Release version for 0.8.0
+### Fixed
+
+## 0.8.0-RC1
+### Added
+### Changed
+### Fixed
+- fixed security issue spring-security-crypto. upgraded to 6.3.8
+- fixed security issue spring-boot version. upgraded to 3.3.11
+
 ## 0.7.1
 ### Added
-## fixed
+### Changed
+- Allow to not use prefix ingress (ImplementationSpecific)
+- CI: exclude charts/registry/README.md from trufflehog
+### Fixed
 - Bugfix: removed uniqueness check for idShort validation while shell creation
 - Bugfix: passthrough ingress tls secret
-- Bugfix: High number of SELECT statements during pagination
 
 ## 0.7.0
 ### Added
