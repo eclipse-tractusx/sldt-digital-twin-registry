@@ -37,10 +37,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.aas.registry.model.InlineResponse200;
 import org.eclipse.tractusx.semantics.aas.registry.model.PagedResultPagingMetadata;
 import org.eclipse.tractusx.semantics.aas.registry.model.SearchAllShellsByAssetLink200Response;
+import org.eclipse.tractusx.semantics.accesscontrol.api.AccessControlRuleService;
 import org.eclipse.tractusx.semantics.accesscontrol.api.exception.DenyAccessException;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.registry.dto.BatchResultDto;
@@ -68,6 +70,7 @@ import com.google.common.collect.ImmutableSet;
 
 import jakarta.persistence.criteria.Fetch;
 import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -92,12 +95,15 @@ public class ShellService {
    private final String externalSubjectIdWildcardPrefix;
    private final List<String> externalSubjectIdWildcardAllowedTypes;
    private final int granularAccessControlFetchSize;
+   private final boolean isGranularAccessControlEnabled;
+   private final AccessControlRuleService accessControlRuleService;
 
    public ShellService( ShellRepository shellRepository,
          ShellIdentifierRepository shellIdentifierRepository,
          SubmodelRepository submodelRepository,
          RegistryProperties registryProperties,
-         ShellAccessHandler shellAccessHandler ) {
+         ShellAccessHandler shellAccessHandler,
+         AccessControlRuleService accessControlRuleService) {
       this.shellRepository = shellRepository;
       this.shellIdentifierRepository = shellIdentifierRepository;
       this.submodelRepository = submodelRepository;
@@ -106,6 +112,8 @@ public class ShellService {
       this.externalSubjectIdWildcardPrefix = registryProperties.getExternalSubjectIdWildcardPrefix();
       this.externalSubjectIdWildcardAllowedTypes = registryProperties.getExternalSubjectIdWildcardAllowedTypes();
       this.granularAccessControlFetchSize = Optional.ofNullable( registryProperties.getGranularAccessControlFetchSize() ).orElse( DEFAULT_FETCH_SIZE );
+      this.isGranularAccessControlEnabled = registryProperties.getUseGranularAccessControl();
+      this.accessControlRuleService = accessControlRuleService;
    }
 
    @Transactional
@@ -184,7 +192,7 @@ public class ShellService {
    public static Specification<Shell> withAllAssociations() {
        return (root, query, criteriaBuilder) -> {
            // Only apply fetching for entity queries, not for count queries
-           if (query.getResultType() != Long.class && query.getResultType() != long.class) {
+           if (query != null && query.getResultType() != Long.class && query.getResultType() != long.class) {
                // Set distinct to true to avoid duplicates
                query.distinct(true);
 
@@ -219,12 +227,25 @@ public class ShellService {
 
       pageSize = getPageSize( pageSize );
       ShellCursor cursor = new ShellCursor( pageSize, cursorVal );
-      var specification = shellAccessHandler.shellFilterSpecification(SORT_FIELD_NAME_SHELL, cursor, externalSubjectId)
-          .and(withAllAssociations());
+      var specification = shellAccessHandler.shellFilterSpecification(SORT_FIELD_NAME_SHELL, cursor, externalSubjectId);
       final var foundList = new ArrayList<Shell>();
       //fetch 1 more item to make sure there is a visible item for the next page
       while ( foundList.size() < pageSize + 1 ) {
-         Page<Shell> currentPage = shellRepository.findAll( specification, ofSize( granularAccessControlFetchSize ) );
+         specification = setMandatorySpecificIdsAndValues( externalSubjectId, specification );
+
+         var shellList = shellRepository.findAll(specification, ofSize( granularAccessControlFetchSize ));
+         var shellIdList = shellList.stream().map( Shell::getId ).toList();
+
+         if ( CollectionUtils.isEmpty( shellIdList)) {
+              break;
+         }
+         // Add shellIds filter to the existing specification
+         // This code snippet modifies an existing JPA Specification by adding a filter condition.
+         // The filter ensures that only entities with an "id" attribute matching one of the IDs in the `shellIdList` are included in the query results.
+         specification = specification.and((root, query, criteriaBuilder) ->
+             root.get("id").in(shellIdList));
+
+         Page<Shell> currentPage = shellRepository.findAll( specification.and(withAllAssociations()), ofSize( granularAccessControlFetchSize ) );
          List<Shell> shells = shellAccessHandler.filterListOfShellProperties( currentPage.stream().toList(), externalSubjectId );
          shells.stream()
                .limit( (long) pageSize + 1 - foundList.size() )
@@ -248,6 +269,58 @@ public class ShellService {
             .items( resultList )
             .cursor( nextCursor )
             .build();
+   }
+
+   /**
+    * Adds mandatory specific asset ID filters to the given JPA Specification.
+    *
+    * This method modifies the provided Specification to include filtering conditions
+    * based on specific asset IDs and their values. It ensures that only entities
+    * matching the specified criteria are included in the query results.
+    *
+    * The filtering is applied only if granular access control is enabled and the
+    * `externalSubjectId` does not match the owning tenant ID.
+    *
+    * @param externalSubjectId The external subject ID of the user making the request.
+    * @param specification The existing JPA Specification to be modified.
+    * @return Specification<Shell> The modified Specification with additional filtering conditions.
+    */
+   private Specification<Shell> setMandatorySpecificIdsAndValues(String externalSubjectId, Specification<Shell> specification) {
+    if(isGranularAccessControlEnabled && !owningTenantId.equals( externalSubjectId )) {
+       var specificAssetIdNameAndNameSet =  accessControlRuleService.findAllByBpnWithinValidityPeriod(externalSubjectId,Instant.now());
+
+            // Add filtering by specific asset IDs to the specification
+           specification = specification.and((root, query, criteriaBuilder) -> {
+               // Skip if there are no identifiers to filter by
+               if (specificAssetIdNameAndNameSet == null || specificAssetIdNameAndNameSet.isEmpty()) {
+                   return criteriaBuilder.conjunction(); // always true
+               }
+
+               // Ensure distinct results to avoid duplicates
+               Optional.ofNullable( query ).ifPresent( queryDetails -> queryDetails.distinct(true));
+
+               // Join Shell with ShellIdentifier entities
+               var identifierJoin = root.join("identifiers", JoinType.LEFT);
+
+               // Create predicates for each key-value pair
+               var predicates =  specificAssetIdNameAndNameSet.entrySet().stream().filter( stringSetEntry -> CollectionUtils.isNotEmpty( stringSetEntry.getValue() ))
+               .map( stringSetEntry -> {
+                  Predicate keyPredicate = criteriaBuilder.equal(identifierJoin.get("key"), stringSetEntry.getKey());
+                  Predicate valuePredicate = identifierJoin.get("value").in(stringSetEntry.getValue());
+                  return criteriaBuilder.and(keyPredicate, valuePredicate);
+               }).toList();
+
+               // If no valid predicates were created, return always true
+               if (CollectionUtils.isEmpty( predicates )) {
+                   return criteriaBuilder.conjunction();
+               }
+
+               // Return OR of all key-value pair predicates (shell matches if it has ANY of the pairs)
+               return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
+           });
+
+      }
+    return specification;
    }
 
    @Transactional( readOnly = true )
