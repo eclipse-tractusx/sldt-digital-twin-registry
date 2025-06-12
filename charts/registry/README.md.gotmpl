@@ -1,0 +1,65 @@
+{{ template "chart.header" . }}
+
+{{ template "chart.deprecationWarning" . }}
+
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.homepageLine" . }}
+
+{{ template "chart.maintainersSection" . }}
+
+{{ template "chart.sourcesSection" . }}
+
+{{ template "chart.requirementsSection" . }}
+
+## Prerequisites
+
+- Kubernetes 1.19+
+- Helm 3.2.0+
+- PV provisioner support in the underlying infrastructure
+
+## Install
+
+To install the chart with the release name `registry`:
+
+```shell
+$ helm repo add tractusx-dev https://eclipse-tractusx.github.io/charts/dev
+$ helm install registry tractusx-dev/registry
+```
+To install the helm chart into your cluster with your values:
+
+```shell
+$ helm install -f your-values.yaml registry tractusx-dev/registry
+```
+
+To use the helm chart as a dependency:
+
+```yaml
+dependencies:
+  - name: registry
+    repository: https://eclipse-tractusx.github.io/charts/dev
+    version: YOUR_VERSION
+```
+
+To install the local version in the namespace _semantics_:
+
+```shell
+
+helm dependency update .
+
+helm install registry -n semantics . --create-namespace
+```
+
+{{ template "chart.valuesSection" . }}
+
+{{ template "helm-docs.versionFooter" . }}
+
+## NOTICE
+
+This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
+
+- SPDX-License-Identifier: Apache-2.0
+- SPDX-FileCopyrightText: 2021 Contributors to the Eclipse Foundation
+- Source URL: https://github.com/eclipse-tractusx/sldt-digital-twin-registry
