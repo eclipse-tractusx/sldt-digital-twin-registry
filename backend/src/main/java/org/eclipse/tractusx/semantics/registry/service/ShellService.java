@@ -27,7 +27,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -420,15 +419,6 @@ public class ShellService {
       Shell shellFromDb = doFindShellByExternalIdWithoutFiltering( externalShellId );
       submodel.setShellId( shellFromDb );
 
-      //uniqueness on shellId and idShort
-      boolean isIdShortPresent = Optional.of( shellFromDb ).map( Shell::getSubmodels ).stream().flatMap( Collection::stream )
-            .map( Submodel::getIdShort )
-            .anyMatch(
-                  idShort -> idShort.equalsIgnoreCase( submodel.getIdShort() ) ); // check whether the input sub-model.idShort exists in DB
-
-      if ( isIdShortPresent ) {// Throw exception if sub-model.idShort exists in DB
-         throw new DuplicateKeyException( DUPLICATE_SUBMODEL_ID_SHORT_EXCEPTION );
-      }
       return saveSubmodel( submodel );
    }
 
