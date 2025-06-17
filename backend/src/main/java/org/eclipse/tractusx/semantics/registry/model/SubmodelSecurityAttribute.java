@@ -22,6 +22,8 @@ package org.eclipse.tractusx.semantics.registry.model;
 
 import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.github.f4b6a3.uuid.UuidCreator;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,10 +35,8 @@ import lombok.*;
 @AllArgsConstructor
 @With
 public class SubmodelSecurityAttribute {
-   @GeneratedValue( strategy = GenerationType.IDENTITY )
    @Id
-   @Column( name = "id" )
-   UUID id;
+   private UUID id = UuidCreator.getTimeOrderedEpoch();
    private SubmodelSecurityType type;
    @Column(name = "attribute_key")
    private String key;

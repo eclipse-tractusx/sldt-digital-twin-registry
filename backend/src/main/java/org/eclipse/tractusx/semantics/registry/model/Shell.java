@@ -21,15 +21,31 @@
 package org.eclipse.tractusx.semantics.registry.model;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import jakarta.persistence.*;
-import lombok.*;
+import com.github.f4b6a3.uuid.UuidCreator;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.With;
 import lombok.experimental.FieldNameConstants;
 
 @Entity
@@ -47,9 +63,7 @@ import lombok.experimental.FieldNameConstants;
 public class Shell {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private UUID id;
-
+	private UUID id = UuidCreator.getTimeOrderedEpoch();
     @Column(name = "id_external", nullable = false)
     private String idExternal;
 
