@@ -72,7 +72,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ShellService {
 
    public static final String DUPLICATE_SUBMODEL_EXCEPTION = "An AssetAdministrationSubmodel for the given identification does already exists.";
-   public static final String DUPLICATE_SUBMODEL_ID_SHORT_EXCEPTION = "An AssetAdministration Submodel for the given IdShort does already exists.";
    private static final String SORT_FIELD_NAME_SHELL = "createdDate";
    private static final String SORT_FIELD_NAME_SUBMODEL = "id";
    private static final String DEFAULT_EXTERNAL_ID = "00000000-0000-0000-0000-000000000000";
