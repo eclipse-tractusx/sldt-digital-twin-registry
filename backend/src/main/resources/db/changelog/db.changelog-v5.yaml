@@ -19,42 +19,27 @@
 ################################################################################
 
 databaseChangeLog:
-  - property:
-      name: uuid_type
-      value: uuid
-      dbms: postgresql, h2
-  - property:
-      name: clob_type
-      value: CLOB
-      dbms: h2
-  - property:
-      name: clob_type
-      value: TEXT
-      dbms: postgresql
-  - property:
-      name: uuid_function
-      value: uuid_generate_v4()
-      dbms: postgresql
-  - property:
-      name: uuid_function
-      value: random_uuid()
-      dbms: h2
-
-  - include:
-      file: db.changelog-extensions.yaml
-      relativeToChangelogFile: true
-  - include:
-      file: db.changelog-v1.yaml
-      relativeToChangelogFile: true
-  - include:
-      file: db.changelog-v2.yaml
-      relativeToChangelogFile: true
-  - include:
-      file: db.changelog-v3.yaml
-      relativeToChangelogFile: true
-  - include:
-      file: db.changelog-v4.yaml
-      relativeToChangelogFile: true
-  - include:
-      file: db.changelog-v5.yaml
-      relativeToChangelogFile: true
+  - changeSet:
+      id: 16072025-01
+      author: rajsh
+      changes:
+        - modifyDataType:
+            tableName: SHELL
+            columnName: SHELL_TYPE
+            newDataType: NVARCHAR(2048)
+        - modifyDataType:
+            tableName: SHELL_IDENTIFIER
+            columnName: IDENTIFIER
+            newDataType: NVARCHAR(2048)
+        - modifyDataType:
+            tableName: SHELL
+            columnName: ID_EXTERNAL
+            newDataType: NVARCHAR(2048)
+        - modifyDataType:
+            tableName: SHELL_IDENTIFIER_SEMANTIC_REFERENCE_KEY
+            columnName: REF_KEY_VALUE
+            newDataType: NVARCHAR(2048)
+        - modifyDataType:
+            tableName: SUBMODEL
+            columnName: ID_EXTERNAL
+            newDataType: NVARCHAR(2048)

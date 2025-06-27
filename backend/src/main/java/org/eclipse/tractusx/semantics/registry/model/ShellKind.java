@@ -23,6 +23,7 @@ package org.eclipse.tractusx.semantics.registry.model;
 public enum ShellKind {
    INSTANCE( "Instance" ),
    NOTAPPLICABLE( "NotApplicable" ),
+   ROLE( "Role" ),
    TYPE( "Type" );
    private String value;
    ShellKind( String value ) {

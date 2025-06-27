@@ -87,7 +87,7 @@ paths:
           description: The Asset's type (UTF8-BASE64-URL-encoded)
           required: false
           schema:
-            maxLength: 2000
+            maxLength: 2048
             minLength: 1
             pattern: "^([\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
             type: string
@@ -243,7 +243,7 @@ paths:
     put:
       tags:
         - Asset Administration Shell Registry API
-      summary: Updates an existing Asset Administration Shell Descriptor
+      summary: Creates or updates an existing Asset Administration Shell Descriptor
       operationId: PutAssetAdministrationShellDescriptorById
       parameters:
         - name: aasIdentifier
@@ -263,6 +263,17 @@ paths:
               $ref: '#/components/schemas/AssetAdministrationShellDescriptor'
         required: true
       responses:
+        "201":
+          description: Asset Administration Shell Descriptor created successfully
+          headers:
+            Location:
+              description: URL of the newly created resource
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetAdministrationShellDescriptor'
         "204":
           description: Asset Administration Shell Descriptor updated successfully
         "400":
@@ -273,12 +284,6 @@ paths:
                 $ref: '#/components/schemas/Result'
         "403":
           description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Result'
-        "404":
-          description: Not Found
           content:
             application/json:
               schema:
@@ -548,7 +553,7 @@ paths:
     put:
       tags:
         - Asset Administration Shell Registry API
-      summary: Updates an existing Submodel Descriptor
+      summary: Creates or updates an existing Submodel Descriptor
       operationId: PutSubmodelDescriptorByIdThroughSuperpath
       parameters:
         - name: aasIdentifier
@@ -576,6 +581,17 @@ paths:
               $ref: '#/components/schemas/SubmodelDescriptor'
         required: true
       responses:
+        "201":
+          description: Submodel Descriptor created successfully
+          headers:
+            Location:
+              description: URL of the newly created resource
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmodelDescriptor'
         "204":
           description: Submodel Descriptor updated successfully
         "400":
@@ -586,12 +602,6 @@ paths:
                 $ref: '#/components/schemas/Result'
         "403":
           description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Result'
-        "404":
-          description: Not Found
           content:
             application/json:
               schema:
@@ -667,7 +677,7 @@ paths:
       tags:
         - Description API
       summary: Returns the self-describing information of a network resource (ServiceDescription)
-      operationId: GetDescription
+      operationId: GetSelfDescription
       responses:
         "200":
           description: Requested Description
@@ -695,6 +705,7 @@ paths:
         - Asset Administration Shell Basic Discovery API
       summary: Returns a list of Asset Administration Shell ids linked to specific Asset identifiers
       operationId: GetAllAssetAdministrationShellIdsByAssetLink
+      deprecated: true
       parameters:
         - name: assetIds
           in: query
@@ -740,9 +751,9 @@ paths:
   /lookup/shellsByAssetLink:
     post:
       tags:
-        - Registry and Discovery Interface
-      summary: Returns a list of Asset Administration Shell ids linked to specific Asset identifiers
-      operationId: SearchAllShellsByAssetLink
+        - Asset Administration Shell Basic Discovery API
+      summary: Returns a list of Asset Administration Shell IDs linked to specific asset identifiers or the global asset ID
+      operationId: SearchAllAssetAdministrationShellIdsByAssetLink
       x-semanticIds:
         - https://admin-shell.io/aas/API/SearchAllAssetAdministrationShellIdsByAssetLink/3/1
       parameters:
@@ -761,7 +772,7 @@ paths:
             type: string
         - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       requestBody:
-        description: Asset identifier key-value-pairs
+        description: A list of specific asset identifiers. Search for the global asset ID is supported by setting "name"  to "globalAssetId" (see Constraint AASd-116).
         content:
           application/json:
             schema:
@@ -1016,6 +1027,7 @@ components:
       enum:
         - Instance
         - NotApplicable
+        - Role
         - Type
     GetAssetAdministrationShellDescriptorsResult:
       allOf:
@@ -1027,6 +1039,8 @@ components:
               items:
                 $ref: '#/components/schemas/AssetAdministrationShellDescriptor'
     PagedResult:
+      required:
+        - paging_metadata
       type: object
       properties:
         paging_metadata:
@@ -1044,7 +1058,7 @@ components:
             assetKind:
               $ref: '#/components/schemas/AssetKind'
             assetType:
-              maxLength: 2000
+              maxLength: 2048
               minLength: 1
               pattern: "^([\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
               type: string
@@ -1054,15 +1068,16 @@ components:
               items:
                 $ref: '#/components/schemas/Endpoint'
             globalAssetId:
-              maxLength: 2000
+              maxLength: 2048
               minLength: 1
               pattern: "^([\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
               type: string
             idShort:
               maxLength: 128
               type: string
+              minLength: 1
             id:
-              maxLength: 2000
+              maxLength: 2048
               minLength: 1
               pattern: "^([\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
               type: string
@@ -1109,7 +1124,7 @@ components:
           pattern: "^(([a-zA-Z]{2,3}(-[a-zA-Z]{3}(-[a-zA-Z]{3}){0,2})?|[a-zA-Z]{4}|[a-zA-Z]{5,8})(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-(([a-zA-Z0-9]){5,8}|[0-9]([a-zA-Z0-9]){3}))*(-[0-9A-WY-Za-wy-z](-([a-zA-Z0-9]){2,8})+)*(-[xX](-([a-zA-Z0-9]){1,8})+)?|[xX](-([a-zA-Z0-9]){1,8})+|((en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)|(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang)))$"
           type: string
         text:
-          minLength: 0
+          minLength: 1
           pattern: "^([\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
           type: string
     LangStringNameType:
@@ -1179,7 +1194,7 @@ components:
         type:
           $ref: '#/components/schemas/KeyTypes'
         value:
-          maxLength: 2000
+          maxLength: 2048
           minLength: 1
           pattern: "^([\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
           type: string
@@ -1264,7 +1279,7 @@ components:
             creator:
               $ref: '#/components/schemas/Reference'
             templateId:
-              maxLength: 2000
+              maxLength: 2048
               minLength: 1
               pattern: "^([\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
               type: string
@@ -1333,7 +1348,7 @@ components:
             valueList:
               $ref: '#/components/schemas/ValueList'
             value:
-              maxLength: 2000
+              maxLength: 2048
               minLength: 1
               pattern: "^([\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
               type: string
@@ -1427,7 +1442,7 @@ components:
       type: object
       properties:
         value:
-          maxLength: 2000
+          maxLength: 2048
           minLength: 1
           pattern: "^([\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
           type: string
@@ -1452,7 +1467,7 @@ components:
     Endpoint:
       required:
         - interface
-       # - protocolInformation
+        - protocolInformation
       type: object
       properties:
         interface:
@@ -1480,7 +1495,7 @@ components:
           maxLength: 128
           type: string
         subprotocolBody:
-          maxLength: 128
+          maxLength: 2048
           type: string
         subprotocolBodyEncoding:
           maxLength: 128
@@ -1500,7 +1515,7 @@ components:
         value:
           type: string
           minLength: 1
-          maxLength: 2000
+          maxLength: 2048
           pattern: "^([\\t\\n\\r -\ud7ff\ue000-\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
     SpecificAssetId:
       allOf:
@@ -1515,7 +1530,7 @@ components:
               pattern: "^([\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
               type: string
             value:
-              maxLength: 2000
+              maxLength: 2048
               minLength: 1
               pattern: "^([\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
               type: string
@@ -1537,8 +1552,9 @@ components:
         idShort:
           maxLength: 128
           type: string
+          minLength: 1
         id:
-          maxLength: 2000
+          maxLength: 2048
           minLength: 1
           pattern: "^([\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
           type: string
@@ -1733,7 +1749,7 @@ components:
       description: The Asset's type (UTF8-BASE64-URL-encoded)
       required: false
       schema:
-        maxLength: 2000
+        maxLength: 2048
         minLength: 1
         pattern: "^([\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
         type: string
