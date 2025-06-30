@@ -28,7 +28,7 @@ import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRulePolicy;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.policy.AccessRulePolicyValue;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.policy.PolicyOperator;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.repository.AccessControlRuleRepository;
-import org.junit.jupiter.api.Test;
+import org.eclipse.tractusx.semantics.registry.repository.ShellIdentifierRepository;import org.eclipse.tractusx.semantics.registry.repository.ShellRepository;import org.eclipse.tractusx.semantics.registry.repository.SubmodelRepository;import org.junit.jupiter.api.BeforeEach;import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -45,6 +45,23 @@ class GranularShellServiceTest extends LegacyShellServiceTest {
 
    @Autowired
    private AccessControlRuleRepository accessControlRuleRepository;
+
+   @Autowired
+   private ShellRepository shellRepository;
+
+   @Autowired
+   private ShellIdentifierRepository shellIdentifierRepository;
+
+   @Autowired
+   private SubmodelRepository submodelRepository;
+
+   @BeforeEach
+   void setUp() {
+      shellRepository.deleteAll();
+      shellIdentifierRepository.deleteAll();
+      shellIdentifierRepository.deleteAll();
+      accessControlRuleRepository.deleteAll();
+     }
 
    @Test
    void testsLookupWithNoMatchingRecordsExpectEmptyListAndNoCursor() {
