@@ -1,0 +1,51 @@
+{
+  "url": "/api/v3/shell-descriptors",
+  "tenant": "TENANT_ONE",
+  "method": "POST",
+  "body": {
+    "description":[],
+    "displayName":[],
+    "idShort":null,
+    "id":"237c2f3c-4b08-4057-957d-25f58c8737ce",
+    "specificAssetIds":[],
+    "submodelDescriptors":[
+      {
+        "idShort": null,
+        "id":"87a3e328-55bb-40c7-915e-a43aa788b1aa",
+        "endpoints":[
+          {
+            "interface":"interfaceNameExample",
+            "protocolInformation":{
+              "href":"http://endpoint-address",
+              "endpointProtocol":"endpointProtocolExample",
+              "endpointProtocolVersion":[
+                "1.1"
+              ],
+              "subprotocol":"",
+              "subprotocolBody":"id=9b0608e1-db04-45e4-9193-eac9b1faffbf-b8fbd162-4af9-4bb0-82a7-4aba8c4e66fd-42588fa3-5484-445a-944a-18504f7da4a1-a67c9aa5-81bb-4164-8eab-3298f64d3189-f97d226b-a3df-4836-b122-59fb3d241cf7-9b0608e1-db04-45e4-9193-eac9b1faffbf-b8fbd162-4af9-4bb0-82a7-4aba8c4e66fd-42588fa3-5484-445a-944a-18504f7da4a1-a67c9aa5-81bb-4164-8eab-3298f64d3189-f97d226b-a3df-4836-b122-59fb3d241cf79b0608e1-db04-45e4-9193-eac9b1faffbf-b8fbd162-4af9-4bb0-82a7-4aba8c4e66fd-42588fa3-5484-445a-944a-18504f7da4a1-a67c9aa5-81bb-4164-8eab-3298f64d3189-f97d226b-a3df-4836-b122-59fb3d241cf79b0608e1-db04-45e4-9193-eac9b1faffbf-b8fbd162-4af9-4bb0-82a7-4aba8c4e66fd-42588fa3-5484-445a-944a-18504f7da4a1-a67c9aa5-81bb-4164-8eab-3298f64d3189-f97d226b-a3df-4836-b122-59fb3d241cf7-9b0608e1-db04-45e4-9193-eac9b1faffbf-b8fbd162-4af9-4bb0-82a7-4aba8c4e66fd-42588fa3-5484-445a-944a-18504f7da4a1-a67c9aa5-81bb-4164-8eab-3298f64d3189-f97d226b-a3df-4836-b122-59fb3d241cf7-9b0608e1-db04-45e4-9193-eac9b1faffbf-b8fbd162-4af9-4bb0-82a7-4aba8c4e66fd-42588fa3-5484-445a-944a-18504f7da4a1-a67c9aa5-81bb-4164-8eab-3298f64d3189-f97d226b-a3df-4836-b122-59fb3d241cf79b0608e1-db04-45e4-9193-eac9b1faffbf-b8fbd162-4af9-4bb0-82a7-4aba8c4e66fd-42588fa3-5484-445a-944a-18504f7da4a1-a67c9aa5-81bb-4164-8eab-3298f64d3189-f97d226b-a3df-4836-b122-59fb3d241cf79b0608e1-db04-45e4-9193-eac9b1faffbf-b8fbd162-4af9-4bb0-82a7-4aba8c4e66fd-42588fa3-5484-445a-944a-18504f7da4a1-a67c9aa5-81bb-4164-8eab-3298f64d3189-f97d226b-a3df-4836-b122-59fb3d241cf7-9b0608e1-db04-45e4-9193-eac9b1faffbf-b8fbd162-4af9-4bb0-82a7-4aba8c4e66fd-42588fa3-5484-445a-944a-18504f7da4a1-a67c9aa5-81bb-4164-8eab-3298f64d3189-f97d226b-a3df-4836-b122-59fb3d241cf7-9b0608e1-db04-45e4-9193-eac9b1faffbf-b8fbd162-4af9-4bb0-82a7-4aba8c4e66fd-42588fa3-5484-445a-944a-18504f7da4a1-a67c9aa5-81bb-4164-8eab-3298f64d3189-f97d226b-a3df-4836-b122-59fb3d241cf79b0608e1-db04-45e4-9193-eac9b1faffbf-b8fbd162-4af9-4bb0-82a7-4aba8c4e66fd-42588fa3-5484-445a-944a-18504f7da4a1-a67c9aa5-81bb-4164-8eab-3298f64d3189-f97d226b-a3df-4836-b122-59fb3d241cf79b0608e1-db04-45e4-9193-eac9b1faffbf-b8fbd162-4af9-4bb0-82a7-4aba8c4e66fd-42588fa3-5484-445a-944a-18504f7da4a1-a67c9aa5-81bb-4164-8eab-3298f64d3189-f97d226b-a3df-4836-b122-59fb3d241cf7-9b0608e1-db04-45e4-9193-eac9b1faffbf-b8fbd162-4af9-4bb0-82a7-4aba8c4e66fd-42588fa3-5484-445a-944a-18504f7da4a1-a67c9aa5-81bb-4164-8eab-3298f64d3189-f97d226b-a3df-4836-b122-59fb3d241cf7-9b0608e1-db04-45e4-9193-eac9b1faffbf-b8fbd162-4af9-4bb0-82a7-4aba8c4e66fd-42588fa3-5484-445a-944a-18504f7da4a1-a67c9aa5-81bb-4164-8eab-3298f64d3189-f97d226b-a3df-4836-b122-59fb3d241cf79b0608e1-db04-45e4-9193-eac9b1faffbf-b8fbd162-4af9-4bb0-82a7-4aba8c4e66fd-42588fa3-5484-445a-944a-18504f7da4a1-a67c9aa5-81bb-4164-8eab-3298f64d3189-f97d226b-a3df-4836-b122-59fb3d241cf79b0608e1-db04-45e4-9193-eac9b1faffbf-b8fbd162-4af9-4bb0-82a7-4aba8c4e66fd-42588fa3-5484-445a-944a-18504f7da4a1-a67c9aa5-81bb-4164-8eab-3298f64d3189-f97d226b-a3df-4836-b122-59fb3d241cf7-9b0608e1-db04-45e4-9193-eac9b1faffbf-b8fbd162-4af9-4bb0-82a7-4aba8c4e66fd-42588fa3-5484-445a-944a-18504f7da4a1-a67c9aa5-81bb-4164-8eab-3298f64d3189-f97d226b-a3df-4836-b122-59fb3d241cf7-9b0608e1-db04-45e4-9193-eac9b1faffbf-b8fbd162-4af9-4bb0-82a7-4aba8c4e66fd-42588fa3-5484-445a-944a-18504f7da4a1-a67c9aa5-81bb-4164-8eab-3298f64d3189-f97d226b-a3df-4836-b122-59fb3d241cf79b0608e1-db04-45e4-9193-eac9b1faffbf-b8fbd162-4af9-4bb0-82a7-4aba8c4e66fd-42588fa3-5484-445a-944a-18504f7da4a1-a67c9aa5-81bb-4164-8eab-3298f64d3189-f97d226b-a3df-4836-b122-59fb3d241cf79b0608e1-db04-45e4-9193-eac9b1faffbf-b8fbd162-4af9-4bb0-82a7-4aba8c4e66fd-42588fa3-5484-445a-944a-18504f7da4a1-a67c9aa5-81bb-4164-8eab-3298f64d3189-f97d226b-a3df-4836-b122-59fb3d241cf7;dspEndpoint=https://my-edc-for-catena-x-use-case.product-name.environment.edcaas-company.com/api/v1/dsp",
+              "subprotocolBodyEncoding":"subprotocolBodyExample",
+              "securityAttributes":[
+                {
+                  "type":"NONE",
+                  "key":"Security Attribute key",
+                  "value":"Security Attribute value"
+                }
+              ]
+            }
+          }
+        ],
+        "semanticId":{
+          "type":"ExternalReference",
+          "keys":[
+            {
+              "type":"Submodel",
+              "value":"semanticIdExample"
+            }
+          ]
+        },
+        "description":[],
+        "displayName":[]
+      }
+    ]
+  }
+}
