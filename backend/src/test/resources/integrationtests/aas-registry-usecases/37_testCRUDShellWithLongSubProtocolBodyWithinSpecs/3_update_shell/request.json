@@ -1,0 +1,51 @@
+{
+  "url": "/api/v3/shell-descriptors/MjM3YzJmM2MtNGIwOC00MDU3LTk1N2QtMjVmNThjODczN2Nl",
+  "tenant": "TENANT_ONE",
+  "method": "PUT",
+  "body": {
+    "description":[],
+    "displayName":[],
+    "idShort":null,
+    "id":"237c2f3c-4b08-4057-957d-25f58c8737ce",
+    "specificAssetIds":[],
+    "submodelDescriptors":[
+      {
+        "idShort": null,
+        "id":"87a3e328-55bb-40c7-915e-a43aa788b1aa",
+        "endpoints":[
+          {
+            "interface":"interfaceNameExample",
+            "protocolInformation":{
+              "href":"http://endpoint-address",
+              "endpointProtocol":"endpointProtocolExample",
+              "endpointProtocolVersion":[
+                "1.1"
+              ],
+              "subprotocol":"",
+              "subprotocolBody":"id=87a3e328-55bb-40c7-915e-a43aa788b1aa;dspEndpoint=https://my-edc-for-catena-x-use-case.product-name.environment.edcaas-company.com/api/v1/dsp",
+              "subprotocolBodyEncoding":"subprotocolBodyExample",
+              "securityAttributes":[
+                {
+                  "type":"NONE",
+                  "key":"Security Attribute key",
+                  "value":"Security Attribute value"
+                }
+              ]
+            }
+          }
+        ],
+        "semanticId":{
+          "type":"ExternalReference",
+          "keys":[
+            {
+              "type":"Submodel",
+              "value":"semanticIdExample"
+            }
+          ]
+        },
+        "description":[],
+        "displayName":[]
+      }
+    ]
+  }
+}
