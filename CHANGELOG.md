@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Filtering shells based on timestamp
 ## fixed
 
+## 0.8.1 
+### Added
+### Changed
+### Fixed
+ - Restore IDTA conformity and reinstate max length of subprotocolBody to 2048
+
 ## 0.8.0
 ### Added
 Release version for 0.8.0
