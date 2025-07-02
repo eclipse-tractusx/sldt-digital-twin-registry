@@ -36,6 +36,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.aas.registry.model.InlineResponse200;
 import org.eclipse.tractusx.semantics.aas.registry.model.PagedResultPagingMetadata;
@@ -166,11 +167,11 @@ public class ShellService {
    }
 
    @Transactional( readOnly = true )
-   public ShellCollectionDto findAllShells( Integer pageSize, String cursorVal, String externalSubjectId ) {
+   public ShellCollectionDto findAllShells( Integer pageSize, final String cursorVal, final String externalSubjectId, final OffsetDateTime createdAfter ) {
 
       pageSize = getPageSize( pageSize );
       ShellCursor cursor = new ShellCursor( pageSize, cursorVal );
-      var specification = shellAccessHandler.shellFilterSpecification( SORT_FIELD_NAME_SHELL, cursor, externalSubjectId );
+      var specification = shellAccessHandler.shellFilterSpecification( SORT_FIELD_NAME_SHELL, cursor, externalSubjectId, createdAfter );
       final var foundList = new ArrayList<Shell>();
       //fetch 1 more item to make sure there is a visible item for the next page
       while ( foundList.size() < pageSize + 1 ) {
@@ -184,7 +185,7 @@ public class ShellService {
          }
          ShellCursor shellCursor = new ShellCursor( pageSize,
                cursor.getEncodedCursorShell( lastItemOf( currentPage.getContent() ).getCreatedDate(), currentPage.hasNext() ) );
-         specification = shellAccessHandler.shellFilterSpecification( SORT_FIELD_NAME_SHELL, shellCursor, externalSubjectId );
+         specification = shellAccessHandler.shellFilterSpecification( SORT_FIELD_NAME_SHELL, shellCursor, externalSubjectId, createdAfter );
       }
       String nextCursor = null;
 
@@ -205,7 +206,7 @@ public class ShellService {
       pageSize = getPageSize( pageSize );
 
       ShellCursor cursor = new ShellCursor( pageSize, cursorVal );
-      var specification = new ShellSpecification<Submodel>( SORT_FIELD_NAME_SUBMODEL, cursor, null, null, null, null );
+      var specification = new ShellSpecification<Submodel>( SORT_FIELD_NAME_SUBMODEL, cursor, null, null, null, null,null );
       Page<Submodel> shellPage = submodelRepository.findAll( Specification.allOf( hasShellFkId( assetID ).and( specification ) ),
             ofSize( cursor.getRecordSize() ) );
 
@@ -228,22 +229,25 @@ public class ShellService {
       return pageSize == null ? MAXIMUM_RECORDS : pageSize;
    }
 
-   private Specification<Submodel> hasShellFkId( Shell shellId ) {
+   private Specification<Submodel> hasShellFkId( final Shell shellId ) {
       return ( root, cq, cb ) -> cb.equal( root.get( "shellId" ), shellId );
    }
 
    @Transactional( readOnly = true )
-   public InlineResponse200 findExternalShellIdsByIdentifiersByExactMatch( Set<ShellIdentifier> shellIdentifiers,
-         Integer pageSize, String cursor, String externalSubjectId ) {
+   public InlineResponse200 findExternalShellIdsByIdentifiersByExactMatch( final Set<ShellIdentifier> shellIdentifiers, Integer pageSize, final String cursor,
+         final String externalSubjectId, final OffsetDateTime createdAfter ) {
 
       pageSize = getPageSize( pageSize );
+      final boolean isCursorAvailable = StringUtils.isNotBlank( cursor );
       final String cursorValue = getCursorDecoded( cursor ).orElse( DEFAULT_EXTERNAL_ID );
       try {
          final List<String> visibleAssetIds;
          if ( shellAccessHandler.supportsGranularAccessControl() ) {
-            visibleAssetIds = fetchAPageOfAasIdsUsingGranularAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize );
+            visibleAssetIds = fetchAPageOfAasIdsUsingGranularAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize, isCursorAvailable,
+                  createdAfter );
          } else {
-            visibleAssetIds = fetchAPageOfAasIdsUsingLegacyAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize );
+            visibleAssetIds = fetchAPageOfAasIdsUsingLegacyAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize, isCursorAvailable,
+                  createdAfter );
          }
 
          final var assetIdList = visibleAssetIds.stream().limit( pageSize ).toList();
@@ -268,9 +272,9 @@ public class ShellService {
       try {
          final List<String> visibleAssetIds;
          if ( shellAccessHandler.supportsGranularAccessControl() ) {
-            visibleAssetIds = fetchAPageOfAasIdsUsingGranularAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize );
+            visibleAssetIds = fetchAPageOfAasIdsUsingGranularAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize, false, null );
          } else {
-            visibleAssetIds = fetchAPageOfAasIdsUsingLegacyAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize );
+            visibleAssetIds = fetchAPageOfAasIdsUsingLegacyAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize, false, null );
          }
 
          final var assetIdList = visibleAssetIds.stream().limit( pageSize ).toList();
@@ -286,21 +290,48 @@ public class ShellService {
       }
    }
 
-   private List<String> fetchAPageOfAasIdsUsingLegacyAccessControl(
-         Set<ShellIdentifier> shellIdentifiers, String externalSubjectId, String cursorValue, int pageSize ) {
+   private List<String> fetchAPageOfAasIdsUsingLegacyAccessControl( final Set<ShellIdentifier> shellIdentifiers, final String externalSubjectId,
+         final String cursorValue, final int pageSize, final boolean isCursorAvailable, final OffsetDateTime createdAfter ) {
       final var fetchSize = pageSize + 1;
-      final Instant cutoffDate = shellRepository.getCreatedDateByIdExternal( cursorValue )
-            .orElse( MINIMUM_SQL_DATETIME );
+      final Instant cutoffDate = getCreatedDate( cursorValue, isCursorAvailable, createdAfter );
       List<String> keyValueCombinations = toKeyValueCombinations( shellIdentifiers );
       return shellIdentifierRepository.findExternalShellIdsByIdentifiersByExactMatch( keyValueCombinations,
             keyValueCombinations.size(), externalSubjectId, externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes, owningTenantId,
             ShellIdentifier.GLOBAL_ASSET_ID_KEY, cutoffDate, cursorValue, fetchSize );
    }
 
-   private List<String> fetchAPageOfAasIdsUsingGranularAccessControl(
-         Set<ShellIdentifier> shellIdentifiers, String externalSubjectId, String cursorValue, int pageSize )
-         throws DenyAccessException {
-      Set<SpecificAssetId> userQuery = shellIdentifiers.stream()
+   /**
+    * Retrieves the created date based on the cursor value and the availability of the cursor.
+    *
+    * <p>This method determines the created date to be used in queries. If the cursor is available,
+    * it fetches the created date from the repository using the cursor value. If the cursor is not
+    * available and the cursor value matches the default external ID, it uses the provided
+    * `createdAfter` date or fetches the created date from the repository. Otherwise, it defaults
+    * to the minimum SQL datetime.</p>
+    *
+    * @param cursorValue the value of the cursor, used to identify the entity
+    * @param isCursorAvailable a flag indicating whether the cursor is available
+    * @param createdAfter the date after which entities were created, used as a fallback
+    * @return the created date as an {@link Instant}
+    */
+   private Instant getCreatedDate( final String cursorValue, final boolean isCursorAvailable, final OffsetDateTime createdAfter ) {
+      if ( isCursorAvailable ) {
+         // Fetch the created date from the repository using the cursor value
+         return shellRepository.getCreatedDateByIdExternal( cursorValue ).orElse( MINIMUM_SQL_DATETIME );
+      }
+      if ( cursorValue.equalsIgnoreCase( DEFAULT_EXTERNAL_ID ) ) {
+         // Use the provided createdAfter date or fetch from the repository as a fallback
+         return Optional.ofNullable( createdAfter )
+               .map( OffsetDateTime::toInstant )
+               .orElseGet( () -> shellRepository.getCreatedDateByIdExternal( cursorValue ).orElse( MINIMUM_SQL_DATETIME ) );
+      }
+      // Default case: fetch the created date from the repository or use the minimum SQL datetime
+      return shellRepository.getCreatedDateByIdExternal( cursorValue ).orElse( MINIMUM_SQL_DATETIME );
+   }
+
+   private List<String> fetchAPageOfAasIdsUsingGranularAccessControl( final Set<ShellIdentifier> shellIdentifiers, final String externalSubjectId,
+         final String cursorValue, final int pageSize, final boolean isCursorAvailable, final OffsetDateTime createdAfter ) throws DenyAccessException {
+      final Set<SpecificAssetId> userQuery = shellIdentifiers.stream()
             .map( id -> new SpecificAssetId( id.getKey(), id.getValue() ) )
             .collect( Collectors.toSet() );
       List<String> keyValueCombinations = toKeyValueCombinations( shellIdentifiers );
@@ -309,8 +340,7 @@ public class ShellService {
       String currentCursorValue = cursorValue;
       final List<String> visibleAssetIds = new ArrayList<>();
       while ( visibleAssetIds.size() < pageSize + 1 ) {
-         final Instant currentCutoffDate = shellRepository.getCreatedDateByIdExternal( currentCursorValue )
-               .orElse( MINIMUM_SQL_DATETIME );
+         final Instant currentCutoffDate = getCreatedDate( currentCursorValue, isCursorAvailable, createdAfter );
          List<UUID> shellIds = shellIdentifierRepository.findAPageOfShellIdsBySpecificAssetIds(
                keyValueCombinations, keyValueCombinations.size(), currentCutoffDate, currentCursorValue, PageRequest.ofSize( fetchSize ) );
          if ( shellIds.isEmpty() ) {
@@ -324,7 +354,7 @@ public class ShellService {
                .forEach( visibleAssetIds::add );
          currentCursorValue = lastItemOf( queryResults ).shellId();
       }
-      return visibleAssetIds;
+      return visibleAssetIds.stream().distinct().toList();
    }
 
    @Transactional( readOnly = true )

@@ -21,6 +21,7 @@
 package org.eclipse.tractusx.semantics.registry.service;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,6 @@ import org.eclipse.tractusx.semantics.accesscontrol.api.exception.DenyAccessExce
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.ShellVisibilityContext;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.ShellVisibilityCriteria;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.SpecificAssetId;
-import org.eclipse.tractusx.semantics.registry.model.ReferenceKeyType;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
 import org.eclipse.tractusx.semantics.registry.model.Submodel;
@@ -62,10 +62,25 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
       return true;
    }
 
+   /**
+    * Retrieves the created date for filtering purposes.
+    *
+    * @return the created date as an Instant. If the cursor has not been received,
+    *         it returns the createdAfter date if it is present,
+    *         otherwise it returns the shell search cursor date.
+    */
+   private Instant getCreatedDate( final ShellCursor cursor, final OffsetDateTime createdAfter ) {
+      return cursor.hasCursorReceived() ?
+            cursor.getShellSearchCursor() :
+            Optional.ofNullable( createdAfter ).map( OffsetDateTime::toInstant ).orElseGet( cursor::getShellSearchCursor );
+
+   }
+
    @Override
-   public Specification<Shell> shellFilterSpecification( String sortFieldName, ShellCursor cursor, String externalSubjectId ) {
+   public Specification<Shell> shellFilterSpecification( final String sortFieldName, final ShellCursor cursor, final String externalSubjectId,
+         final OffsetDateTime createdAfter ) {
       return ( root, query, criteriaBuilder ) -> {
-         Instant searchValue = cursor.getShellSearchCursor();
+         final Instant searchValue = getCreatedDate( cursor, createdAfter );
          query.orderBy( criteriaBuilder.asc( criteriaBuilder.coalesce( root.get( sortFieldName ), Instant.now() ) ) );
          return criteriaBuilder.greaterThan( root.get( sortFieldName ), searchValue );
       };
