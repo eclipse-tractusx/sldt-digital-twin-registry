@@ -4,16 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.8.2
-### Added
-### Fixed
-- Bugfix: High number of SELECT statements during pagination
-
 ## 0.8.1 
 ### Added
 ### Changed
 ### Fixed
  - Restore IDTA conformity and reinstate max length of subprotocolBody to 2048
+ - High number of SELECT statements during pagination
 
 ## 0.8.0
 ### Added
