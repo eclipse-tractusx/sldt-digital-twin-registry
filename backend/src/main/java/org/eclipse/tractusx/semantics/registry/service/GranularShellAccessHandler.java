@@ -21,6 +21,7 @@
 package org.eclipse.tractusx.semantics.registry.service;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -61,10 +62,25 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
       return true;
    }
 
+   /**
+    * Retrieves the created date for filtering purposes.
+    *
+    * @return the created date as an Instant. If the cursor has not been received,
+    *         it returns the createdAfter date if it is present,
+    *         otherwise it returns the shell search cursor date.
+    */
+   private Instant getCreatedDate( final ShellCursor cursor, final OffsetDateTime createdAfter ) {
+      return cursor.hasCursorReceived() ?
+            cursor.getShellSearchCursor() :
+            Optional.ofNullable( createdAfter ).map( OffsetDateTime::toInstant ).orElseGet( cursor::getShellSearchCursor );
+
+   }
+
    @Override
-   public Specification<Shell> shellFilterSpecification( String sortFieldName, ShellCursor cursor, String externalSubjectId ) {
+   public Specification<Shell> shellFilterSpecification( final String sortFieldName, final ShellCursor cursor, final String externalSubjectId,
+         final OffsetDateTime createdAfter ) {
       return ( root, query, criteriaBuilder ) -> {
-         Instant searchValue = cursor.getShellSearchCursor();
+         final Instant searchValue = getCreatedDate( cursor, createdAfter );
          return criteriaBuilder.greaterThan( root.get( sortFieldName ), searchValue );
       };
    }

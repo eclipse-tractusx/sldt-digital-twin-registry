@@ -20,7 +20,11 @@
 
 package org.eclipse.tractusx.semantics.registry.mapper;
 
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.eclipse.tractusx.semantics.aas.registry.model.*;
 import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
@@ -48,6 +52,14 @@ public interface ShellMapper {
           @Mapping(target = "displayNames", source = "displayName"),
     })
     Shell fromApiDto(AssetAdministrationShellDescriptor apiDto);
+
+    default Instant map( final OffsetDateTime value ) {
+          return Optional.ofNullable( value ).map( OffsetDateTime::toInstant ).orElse( null );
+       }
+
+    default OffsetDateTime map( final Instant value ) {
+          return Optional.ofNullable( value ).map( instant -> instant.atOffset( ZoneId.systemDefault().getRules().getOffset( instant ) ) ).orElse( null );
+       }
 
     ShellDescription mapShellDescription (LangStringTextType description);
 
@@ -87,6 +99,7 @@ public interface ShellMapper {
          @Mapping(source = "descriptions", target = "description"),
          @Mapping(source = "submodels", target = "submodelDescriptors"),
          @Mapping(source = "displayNames", target = "displayName"),
+		 @Mapping( source = "createdDate", target = "createdAt" ),
     })
     @InheritInverseConfiguration
     AssetAdministrationShellDescriptor toApiDto(Shell shell);
