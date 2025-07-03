@@ -20,6 +20,7 @@
 
 package org.eclipse.tractusx.semantics.registry.controller;
 
+import java.time.OffsetDateTime;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
@@ -103,8 +104,8 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
 
     @Override
     public ResponseEntity<GetAssetAdministrationShellDescriptorsResult> getAllAssetAdministrationShellDescriptors( Integer limit, String cursor,
-          AssetKind assetKind, String assetType, @RequestHeader String externalSubjectId ) {
-        ShellCollectionDto dto =  shellService.findAllShells(limit, cursor,getExternalSubjectIdOrEmpty(externalSubjectId));
+          AssetKind assetKind, String assetType, @RequestHeader String externalSubjectId, final OffsetDateTime createdAfter ) {
+        ShellCollectionDto dto =  shellService.findAllShells(limit, cursor,getExternalSubjectIdOrEmpty(externalSubjectId), createdAfter);
         GetAssetAdministrationShellDescriptorsResult result = shellMapper.toApiDto(dto);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -184,14 +185,14 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
 
     @Override
     public ResponseEntity<InlineResponse200> getAllAssetAdministrationShellIdsByAssetLink(List<String> assetIds,
-    Integer limit, String cursor, @RequestHeader String externalSubjectId) {
+    Integer limit, String cursor, final OffsetDateTime createdAfter,@RequestHeader String externalSubjectId) {
         if (assetIds == null || assetIds.isEmpty()) {
             return new ResponseEntity<>(new InlineResponse200(), HttpStatus.OK);
         }
 
         List<SpecificAssetId> listSpecificAssetId = assetIds.stream().map( this::decodeSAID).collect( Collectors.toList());
         final var result  = shellService.findExternalShellIdsByIdentifiersByExactMatch(
-              shellMapper.fromApiDto(listSpecificAssetId), limit, cursor,getExternalSubjectIdOrEmpty(externalSubjectId));
+              shellMapper.fromApiDto(listSpecificAssetId), limit, cursor,getExternalSubjectIdOrEmpty(externalSubjectId), createdAfter);
        return new ResponseEntity<>( result, HttpStatus.OK );
     }
 

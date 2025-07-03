@@ -93,6 +93,13 @@ paths:
             pattern: "^([\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
             type: string
         - $ref: '#/components/parameters/ExternalSubjectIdHeader'
+        - name: createdAfter
+          in: query
+          description: Allows consumers to filter results based on the timestamp of a shell's creation.The parameter will be optional and the format of the timestamp is 'RFC3339' and looks like YYYY-MM-DDTHH:MM:SSZ
+          required: false
+          schema:
+            type: string
+            format: date-time
       responses:
         "200":
           description: Requested Asset Administration Shell Descriptors
@@ -732,6 +739,13 @@ paths:
           required: false
           schema:
             type: string
+        - name: createdAfter
+          in: query
+          description: Allows consumers to filter results based on the timestamp of a shell's creation.The parameter will be optional and the format of the timestamp is 'RFC3339' and looks like YYYY-MM-DDTHH:MM:SSZ
+          required: false
+          schema:
+            type: string
+            format: date-time
         - $ref: '#/components/parameters/ExternalSubjectIdHeader'
       responses:
         "200":
@@ -1091,6 +1105,9 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/SubmodelDescriptor'
+            createdAt:
+              type: string
+              format: date-time
     Descriptor:
       type: object
       properties:

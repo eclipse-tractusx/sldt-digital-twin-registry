@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2024 Robert Bosch Manufacturing Solutions GmbH and others
- * Copyright (c) 2024 Contributors to the Eclipse Foundation
+ * Copyright (c) 2025 Robert Bosch Manufacturing Solutions GmbH and others
+ * Copyright (c) 2025 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -170,5 +170,24 @@ public class SqlBackedAccessControlRuleService implements AccessControlRuleServi
    private Stream<SpecificAssetId> keepVisibleSpecificAssetIdNamesWithValueRestrictions( AccessRulePolicy accessRulePolicy ) {
       return accessRulePolicy.getMandatorySpecificAssetIds().stream()
             .filter( mandatory -> accessRulePolicy.getVisibleSpecificAssetIdNames().contains( mandatory.name() ) );
+   }
+
+   /**
+    * Retrieves all mandatory specific asset ID name-value pairs for a given BPN (Business Partner Number)
+    * within the validity period.
+    *
+    * This method queries the repository to find all access rules associated with the specified BPN
+    * and maps their mandatory specific asset IDs into a grouped structure of names and corresponding values.
+    *
+    * @param bpn The Business Partner Number for which the mandatory specific asset IDs are to be retrieved.
+    * @param instant The timestamp representing the current time to filter access rules within their validity period.
+    * @return A map where the keys are specific asset ID names and the values are sets of corresponding specific asset ID values.
+    */
+   public Map<String,Set<String>> findAllByBpnWithinValidityPeriod( String bpn, Instant instant ){
+         return repository.findAllByBpnWithinValidityPeriod( bpn, bpnWildcard, instant ).stream()
+         .map(AccessRule::getPolicy )
+         .map(AccessRulePolicy::getMandatorySpecificAssetIds)
+         .flatMap(Collection::stream)
+         .collect( Collectors.groupingBy(SpecificAssetId::name, Collectors.mapping(SpecificAssetId::value, Collectors.toSet())));
    }
 }

@@ -8,6 +8,36 @@ The overall concept can be found under **2 Architecture and constraints**.
 The Digital Twin Registry has implemented Asset Administration Shell specification in version 3.0.
 The corresponding openapi file can be found here: [AAS OPENAPI](../../backend/src/main/resources/static/aas-registry-openapi.yaml)
 
+#### Search by created after
+
+The Asset Administration Shell (AAS) API is enhanced by a timestamp-based search feature for shell-descriptors and lookup shells functionality.
+This enhancement allows filtering of AAS Descriptors by their creation date using the new query parameter,`createdAfter`.
+The parameter will be optional and the format of the timestamp is `RFC3339` and looks like `YYYY-MM-DDTHH:MM:SSZ`. 
+This feature is planned for future integration into the Industrial Digital Twin Association (IDTA) specification.
+
+IDTA github issues - 
+[Add creationDate to AssetAdministrationShellDescriptor AND createdAfter Query parameter to /shell-descriptors && /lookup/shells](https://github.com/orgs/eclipse-tractusx/projects/40/views/7?pane=issue&itemId=88990986&issue=eclipse-tractusx%7Csldt-digital-twin-registry%7C495) and 
+[AdministrativeInformation: add createdAt and updatedAt attributes](https://github.com/orgs/eclipse-tractusx/projects/40/views/7?pane=issue&itemId=88990986&issue=eclipse-tractusx%7Csldt-digital-twin-registry%7C495)
+
+* `GET /shell-descriptors?createdAfter=2025-05-01T00:00:00Z`
+* `GET /lookup/shells?createdAfter=2025-05-01T00:00:00Z`
+
+##### Extend Shell
+
+A new parameter `createdAt` will be added to the shell object at the time of creation and will be returned.
+
+```json
+{
+  ...
+  "id": "123",
+  "idShort": "model-b1",
+  "specificAssetIds": [],
+  "createdAt": "2021-01-01T00:00:00Z",
+  ...
+}
+
+```
+
 ### Uniqueness
 The following table contains the identifier fields and whether they are globally unique, unique for an
 AAS Descriptor or not unique at all.
