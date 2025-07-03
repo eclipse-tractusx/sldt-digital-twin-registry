@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2024 Robert Bosch Manufacturing Solutions GmbH and others
- * Copyright (c) 2024 Contributors to the Eclipse Foundation
+ * Copyright (c) 2025 Robert Bosch Manufacturing Solutions GmbH and others
+ * Copyright (c) 2025 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -20,6 +20,7 @@
 
 package org.eclipse.tractusx.semantics.accesscontrol.api;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,5 +38,7 @@ public interface AccessControlRuleService {
    ShellVisibilityCriteria fetchVisibilityCriteriaForShell( ShellVisibilityContext shellContext, String bpn ) throws DenyAccessException;
 
    Map<String, ShellVisibilityCriteria> fetchVisibilityCriteriaForShells( List<ShellVisibilityContext> shellContexts, String bpn );
+
+   Map<String,Set<String>> findAllByBpnWithinValidityPeriod( String bpn, Instant now );
 
 }
