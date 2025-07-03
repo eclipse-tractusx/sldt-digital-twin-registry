@@ -42,7 +42,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.aas.registry.model.InlineResponse200;
 import org.eclipse.tractusx.semantics.aas.registry.model.PagedResultPagingMetadata;
-import org.eclipse.tractusx.semantics.aas.registry.model.SearchAllShellsByAssetLink200Response;
 import org.eclipse.tractusx.semantics.accesscontrol.api.AccessControlRuleService;
 import org.eclipse.tractusx.semantics.aas.registry.model.SearchAllAssetAdministrationShellIdsByAssetLink200Response;
 import org.eclipse.tractusx.semantics.accesscontrol.api.exception.DenyAccessException;
