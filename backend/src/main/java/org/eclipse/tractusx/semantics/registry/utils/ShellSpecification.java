@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2025 Robert Bosch Manufacturing Solutions GmbH and others
+ * Copyright (c) 2025 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -58,7 +58,6 @@ public class ShellSpecification<T> implements Specification<T> {
    private Predicate applyFilter( Root<T> root, CriteriaQuery<?> cq, CriteriaBuilder criteriaBuilder ) {
       if ( root.toString().contains( "Shell" ) ) {
          final Instant searchValue = getCreatedDate();
-         cq.orderBy( criteriaBuilder.asc( criteriaBuilder.coalesce( root.get( sortFieldName ), Instant.now() ) ) );
 
          if ( owningTenantId.equals( tenantId ) ) {
             return criteriaBuilder.greaterThan( root.get( sortFieldName ), searchValue );
@@ -72,7 +71,7 @@ public class ShellSpecification<T> implements Specification<T> {
          return criteriaBuilder.greaterThan( root.get( sortFieldName ), searchValue );
       }
    }
-   
+
    /**
        * Retrieves the created date for filtering purposes.
        *
@@ -84,7 +83,7 @@ public class ShellSpecification<T> implements Specification<T> {
          return shellCursor.hasCursorReceived() ?
                shellCursor.getShellSearchCursor() :
                Optional.ofNullable( createdAfter ).map( OffsetDateTime::toInstant ).orElseGet( shellCursor::getShellSearchCursor );
-   
+
       }
 
    private Predicate getAllShellsPredicate( Root<T> root, CriteriaQuery<?> cq, CriteriaBuilder criteriaBuilder, Instant searchValue ) {
