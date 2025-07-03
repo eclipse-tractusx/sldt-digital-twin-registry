@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2025 Robert Bosch Manufacturing Solutions GmbH and others
+ * Copyright (c) 2025 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -28,6 +28,10 @@ import java.util.UUID;
 
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.projection.ShellMinimal;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -146,4 +150,7 @@ public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecific
 
    @Query("SELECT s.createdDate FROM Shell s WHERE s.idExternal = :idExternal")
    Optional<Instant> getCreatedDateByIdExternal( String idExternal );
+
+   @EntityGraph(attributePaths = {"id"})
+   Page<Shell> findAll(Specification<Shell> spec, Pageable pageable);
 }

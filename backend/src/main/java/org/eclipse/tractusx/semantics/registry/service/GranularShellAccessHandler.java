@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2024 Robert Bosch Manufacturing Solutions GmbH and others
- * Copyright (c) 2024 Contributors to the Eclipse Foundation
+ * Copyright (c) 2025 Robert Bosch Manufacturing Solutions GmbH and others
+ * Copyright (c) 2025 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -81,7 +81,6 @@ public class GranularShellAccessHandler implements ShellAccessHandler {
          final OffsetDateTime createdAfter ) {
       return ( root, query, criteriaBuilder ) -> {
          final Instant searchValue = getCreatedDate( cursor, createdAfter );
-         query.orderBy( criteriaBuilder.asc( criteriaBuilder.coalesce( root.get( sortFieldName ), Instant.now() ) ) );
          return criteriaBuilder.greaterThan( root.get( sortFieldName ), searchValue );
       };
    }

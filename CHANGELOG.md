@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 ### Fixed
  - Restore IDTA conformity and reinstate max length of subprotocolBody to 2048
+ - High number of SELECT statements during pagination
 
 ## 0.8.0
 ### Added
