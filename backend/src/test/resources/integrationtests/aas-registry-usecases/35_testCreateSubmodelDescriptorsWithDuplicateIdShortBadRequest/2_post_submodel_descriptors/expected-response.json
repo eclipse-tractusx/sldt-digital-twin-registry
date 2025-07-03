@@ -1,9 +1,0 @@
-{
-  "status": 400,
-  "content": true,
-  "assertions": [{
-    "jsonPath": "$.messages[0].text",
-    "equals": "An AssetAdministration Submodel for the given IdShort does already exists."
-  }],
-  "expectedPayload": null
-}

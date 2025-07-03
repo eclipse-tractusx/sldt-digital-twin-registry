@@ -1,0 +1,42 @@
+{
+  "status": 201,
+  "content": true,
+  "assertions": [],
+  "expectedPayload": {
+    "endpoints": [
+      {
+        "interface": "interfaceNameExample",
+        "protocolInformation": {
+          "href": "http://endpoint-address",
+          "endpointProtocol": "endpointProtocolExample",
+          "endpointProtocolVersion": [
+            "1.1"
+          ],
+          "subprotocol": "",
+          "subprotocolBody": "subprotocolBodyExample",
+          "subprotocolBodyEncoding": "subprotocolBodyExample",
+          "securityAttributes": [
+            {
+              "type": "NONE",
+              "key": "Security Attribute key",
+              "value": "Security Attribute value"
+            }
+          ]
+        }
+      }
+    ],
+    "idShort": "CgtP2OAGSt",
+    "id": "1745689f-fed6-4f17-9c41-18c75b777ebc",
+    "semanticId": {
+      "type": "ExternalReference",
+      "keys": [
+        {
+          "type": "Submodel",
+          "value": "semanticIdExample"
+        }
+      ]
+    },
+    "description": [],
+    "displayName": []
+  }
+}
