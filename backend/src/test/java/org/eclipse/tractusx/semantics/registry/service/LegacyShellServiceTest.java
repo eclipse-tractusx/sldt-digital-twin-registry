@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2024 Robert Bosch Manufacturing Solutions GmbH and others
- * Copyright (c) 2024 Contributors to the Eclipse Foundation
+ * Copyright (c) 2025 Robert Bosch Manufacturing Solutions GmbH and others
+ * Copyright (c) 2025 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -36,7 +36,7 @@ import org.eclipse.tractusx.semantics.registry.TestUtil;
 import org.eclipse.tractusx.semantics.registry.mapper.ShellMapper;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
-import org.eclipse.tractusx.semantics.registry.repository.ShellIdentifierRepository;import org.eclipse.tractusx.semantics.registry.repository.ShellRepository;import org.eclipse.tractusx.semantics.registry.repository.SubmodelRepository;import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -56,21 +56,9 @@ class LegacyShellServiceTest {
    private ShellMapper shellMapper;
    protected String keyPrefix;
 
-   @Autowired
-   private ShellRepository shellRepository;
-
-   @Autowired
-   private ShellIdentifierRepository shellIdentifierRepository;
-
-   @Autowired
-   private SubmodelRepository submodelRepository;
-
    @BeforeEach
    void setUp() {
       keyPrefix = UUID.randomUUID().toString();
-      shellRepository.deleteAll();
-      shellIdentifierRepository.deleteAll();
-      shellIdentifierRepository.deleteAll();
    }
 
    @Test
@@ -140,10 +128,10 @@ class LegacyShellServiceTest {
             criteria, pageSize, null, TENANT_TWO, null );
 
       assertThat( actual ).isNotNull();
-      assertThat( actual.getResult() ).isNotNull().hasSize( pageSize );
-      assertThat( expectedIds ).containsAll( actual.getResult() );
+      assertThat( actual.getResult() ).isNotNull().hasSize( pageSize ).containsAll( expectedIds.subList( 0, pageSize ) );
       assertThat( actual.getPagingMetadata() ).isNotNull();
-      assertThat( actual.getPagingMetadata().getCursor() ).isNotNull();
+      assertThat( actual.getPagingMetadata().getCursor() ).isNotNull()
+                  .isEqualTo( toCursor( expectedIds, pageSize - 1 ) );
    }
 
    @Test
@@ -206,8 +194,7 @@ class LegacyShellServiceTest {
             criteria, pageSize, toCursor( expectedIds, pageSize * 3 - 2 ), TENANT_TWO, null );
 
       assertThat( actual ).isNotNull();
-      assertThat( actual.getResult() ).isNotNull().hasSize( 1 );
-      assertThat( expectedIds ).containsAll( actual.getResult()  );
+      assertThat( actual.getResult() ).isNotNull().hasSize( 1 ).containsAll( expectedIds.subList( pageSize * 3 - 1, pageSize * 3 ) );
       assertThat( actual.getPagingMetadata() ).isNotNull();
       assertThat( actual.getPagingMetadata().getCursor() ).isNull();
    }
