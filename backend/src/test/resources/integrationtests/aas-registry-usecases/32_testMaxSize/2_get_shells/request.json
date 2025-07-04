@@ -1,0 +1,6 @@
+{
+  "url": "/api/v3/shell-descriptors",
+  "tenant": "TENANT_ONE",
+  "method": "GET",
+  "body": null
+}

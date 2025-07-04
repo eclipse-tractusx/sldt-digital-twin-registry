@@ -1,0 +1,163 @@
+{
+  "url": "/api/v3/shell-descriptors",
+  "tenant": "TENANT_ONE",
+  "method": "POST",
+  "body": {
+    "administration": {
+      "templateId":"templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId templateId tasasdaemplateId templateId templateId templateId templateId t"
+    },
+    "description":[
+      {
+        "language":"de",
+        "text":"hello text"
+      },
+      {
+        "language":"en",
+        "text":"hello s"
+      }
+    ],
+    "displayName":[
+      {
+        "language":"de",
+        "text":"this is an example description1"
+      }
+    ],
+    "assetKind":"Instance",
+    "assetType":"SampleAssetType",
+    "globalAssetId":"globalAssetId",
+    "idShort":"Ndy9Ca6jdf",
+    "id":"11550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550-550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550-550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716",
+    "specificAssetIds":[
+      {
+        "semanticId":{
+          "type":"ModelReference",
+          "keys":[
+            {
+              "type":"AssetAdministrationShell",
+              "value":"specificAssetIdReference"
+            }
+          ]
+        },
+        "supplementalSemanticIds":[
+          {
+            "type":"ExternalReference",
+            "keys":[
+              {
+                "type":"BasicEventElement",
+                "value":"assetIdKey value"
+              }
+            ]
+          }
+        ],
+        "name":"identifier1KeyExample",
+        "value":"identifier1ValueExample",
+        "externalSubjectId":{
+          "type":"ExternalReference",
+          "keys":[
+            {
+              "type":"AssetAdministrationShell",
+              "value":"ExternalSubject key value"
+            }
+          ]
+        }
+      },
+      {
+        "semanticId":{
+          "type":"ModelReference",
+          "keys":[
+            {
+              "type":"AssetAdministrationShell",
+              "value":"specificAssetIdReference key"
+            }
+          ]
+        },
+        "supplementalSemanticIds":[
+          {
+            "type":"ExternalReference",
+            "keys":[
+              {
+                "type":"BasicEventElement",
+                "value":"assetIdKey value"
+              }
+            ]
+          }
+        ],
+        "name":"identifier2KeyExample",
+        "value":"identifier2ValueExample identifier2ValueExample identifier2ValueExample  identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample \nidentifier2ValueExample identifier2ValueExample identifier2ValueExample  identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample \nidentifier2ValueExample identifier2ValueExample identifier2ValueExample  identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample  identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample \nidentifier2ValueExample identifier2ValueExample identifier2ValueExample  identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample \nidentifier2ValueExample identifier2ValueExample identifier2ValueExample  identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample  identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample \nidentifier2ValueExample identifier2ValueExample identifier2ValueExample  identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample \nidentifier2ValueExample identifier2ValueExample identifier2ValueExample  identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample  identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2Value",
+        "externalSubjectId":{
+          "type":"ExternalReference",
+          "keys":[
+            {
+              "type":"AssetAdministrationShell",
+              "value":"ExternalSubject key value"
+            }
+          ]
+        }
+      }
+    ],
+    "submodelDescriptors":[
+      {
+        "endpoints":[
+          {
+            "interface":"interfaceNameExample",
+            "protocolInformation":{
+              "href":"http://endpoint-address",
+              "endpointProtocol":"endpointProtocolExample",
+              "endpointProtocolVersion":[
+                "e"
+              ],
+              "subprotocol":"subprotocolExample",
+              "subprotocolBody":"subprotocolBodyExample",
+              "subprotocolBodyEncoding":"subprotocolBodyExample",
+              "securityAttributes":[
+                {
+                  "type":"NONE",
+                  "key":"Security Attribute key",
+                  "value":"Security Attribute value"
+                }
+              ]
+            }
+          }
+        ],
+        "idShort":"R1hWbvXIcV",
+        "id":"550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550-550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550-550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a716-446655440000550e8400-e29b-41d4-a7167",
+        "semanticId":{
+          "type":"ExternalReference",
+          "keys":[
+            {
+              "type":"Submodel",
+              "value":"semanticIdExample"
+            }
+          ]
+        },
+        "supplementalSemanticId":[
+          {
+            "type":"ExternalReference",
+            "keys":[
+              {
+                "type":"Submodel",
+                "value":"supplementalsemanticIdExample value"
+              }
+            ]
+          }
+        ],
+        "description":[
+          {
+            "language":"de",
+            "text":"hello text"
+          },
+          {
+            "language":"en",
+            "text":"hello s"
+          }
+        ],
+        "displayName":[
+          {
+            "language":"de",
+            "text":"this is an example description1"
+          }
+        ]
+      }
+    ]
+  }
+}

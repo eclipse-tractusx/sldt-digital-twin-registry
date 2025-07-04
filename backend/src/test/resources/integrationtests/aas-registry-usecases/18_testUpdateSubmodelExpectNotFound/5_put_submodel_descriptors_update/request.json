@@ -1,0 +1,37 @@
+{
+  "url":"/api/v3/shell-descriptors/MGVkYjVlNGMtNWI4NS00YzAyLWE5NjAtMTQzNzNmZjgwMWMw/submodel-descriptors/NTg4MDgwMzMtNzgwMy00NmJkLTkwMDQtZjA3OWViZmZjNGY4",
+  "tenant": "TENANT_ONE",
+  "method":"PUT",
+  "body": {
+    "endpoints" : [ {
+      "interface" : "interfaceNameExampleUpdate",
+      "protocolInformation" : {
+        "href" : "http://endpoint-address",
+        "endpointProtocol" : "endpointProtocolExample",
+        "endpointProtocolVersion" : [ "1.1" ],
+        "subprotocol" : "",
+        "subprotocolBody" : "subprotocolBodyExample",
+        "subprotocolBodyEncoding" : "subprotocolBodyExample",
+        "securityAttributes" : [ {
+          "type" : "NONE",
+          "key" : "Security Attribute key",
+          "value" : "Security Attribute value"
+        } ]
+      }
+    } ],
+    "idShort" : "IZ2rbLff6z",
+    "id" : "58808033-7803-46bd-9004-f079ebffc4f8",
+    "semanticId" : {
+      "type" : "ExternalReference",
+      "keys" : [ {
+        "type" : "Submodel",
+        "value" : "semanticIdExample"
+      } ]
+    },
+    "description" : [ {
+      "language" : "cn",
+      "text" : "chinese"
+    } ],
+    "displayName" : [ ]
+  }
+}

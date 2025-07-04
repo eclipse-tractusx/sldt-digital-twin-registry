@@ -1,0 +1,12 @@
+{
+  "url": "/api/v3/lookup/shellsByAssetLink",
+  "tenant": "TENANT_ONE",
+  "method": "POST",
+  "body":
+     [
+      {
+        "name": "identifier2KeyExample",
+        "value": "identifier2ValueExample identifier2ValueExample identifier2ValueExample  identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample \nidentifier2ValueExample identifier2ValueExample identifier2ValueExample  identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample \nidentifier2ValueExample identifier2ValueExample identifier2ValueExample  identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample  identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample \nidentifier2ValueExample identifier2ValueExample identifier2ValueExample  identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample \nidentifier2ValueExample identifier2ValueExample identifier2ValueExample  identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample  identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample \nidentifier2ValueExample identifier2ValueExample identifier2ValueExample  identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample \nidentifier2ValueExample identifier2ValueExample identifier2ValueExample  identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2ValueExample  identifier2ValueExample identifier2ValueExample identifier2ValueExample identifier2Value"
+      }
+    ]
+}
