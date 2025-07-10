@@ -45,19 +45,19 @@ public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecific
    boolean existsByIdShort( @Param( "idShort" ) String idShort );
 
    @Query( value = """
-      SELECT s.* -- Use s.* for native queries if you need all columns for the entity mapping
+      SELECT s.*
       FROM SHELL s
       WHERE
          s.id_external = :idExternal
          AND (
             :tenantId = :owningTenantId
             OR EXISTS (
-               SELECT 1 -- We only care about existence, so SELECT 1 is standard
+               SELECT 1
                FROM SHELL_IDENTIFIER si
                JOIN SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE sies ON si.id = sies.FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID
                JOIN SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY sider ON sies.id = sider.FK_SI_EXTERNAL_SUBJECT_REFERENCE_ID
                WHERE
-                  si.fk_shell_id = s.id -- Correlated subquery part
+                  si.fk_shell_id = s.id
                   AND (
                      sider.ref_key_value = :tenantId
                      OR ( sider.ref_key_value = :publicWildcardPrefix AND si.namespace IN (:publicWildcardAllowedTypes) )
@@ -105,7 +105,7 @@ public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecific
                      )
                )
             )
-         GROUP BY s.id_external, s.id -- Group by s.id_external AND s.id to ensure correct count per shell
+         GROUP BY s.id_external, s.id
          HAVING COUNT(DISTINCT CONCAT(si.namespace, si.identifier)) = :keyValueCombinationsSize
          """, nativeQuery = true )
    List<String> findExternalShellIdsByIdentifiersByAnyMatch( @Param( "keyValueCombinations" ) List<String> keyValueCombinations,
