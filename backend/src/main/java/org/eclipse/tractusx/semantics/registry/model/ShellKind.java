@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2023 Robert Bosch Manufacturing Solutions GmbH and others
- * Copyright (c) 2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2025 Robert Bosch Manufacturing Solutions GmbH and others
+ * Copyright (c) 2025 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -23,7 +23,8 @@ package org.eclipse.tractusx.semantics.registry.model;
 public enum ShellKind {
    INSTANCE( "Instance" ),
    NOTAPPLICABLE( "NotApplicable" ),
-   TYPE( "Type" );
+   TYPE( "Type" ),
+   ROLE( "Role" );
    private String value;
    ShellKind( String value ) {
       this.value = value;

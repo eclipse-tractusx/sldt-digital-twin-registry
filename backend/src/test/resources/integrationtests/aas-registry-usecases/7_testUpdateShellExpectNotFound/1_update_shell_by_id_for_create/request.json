@@ -1,5 +1,5 @@
 {
-  "url": "/api/v3/shell-descriptors/c2hlbGxJZHRoYXRkb2Vzbm90ZXhpc3Rz",
+  "url": "/api/v3/shell-descriptors/NjYyYmI4ZmYtMDg0My00MmQzLWFiY2UtMjIyMWFkNWQ2ZGg0",
   "tenant": "TENANT_ONE",
   "method": "PUT",
   "body": {
@@ -23,7 +23,7 @@
     "assetType":"AssetType",
     "globalAssetId":"globalAssetId example",
     "idShort":"NDfECad2wf",
-    "id":"662bb8ff-0843-42d3-abce-2224ad5d6dh4",
+    "id":"662bb8ff-0843-42d3-abce-2221ad5d6dh4",
     "specificAssetIds":[
       {
         "semanticId":{
@@ -80,7 +80,7 @@
           }
         ],
         "name":"identifier2KeyExample",
-        "value":"identifier2ValueExample",
+        "value":"identifier2ValueExampleTo",
         "externalSubjectId":{
           "type":"ExternalReference",
           "keys":[
@@ -117,7 +117,7 @@
           }
         ],
         "idShort":"R1hWkFp3GA",
-        "id":"ba616af0-9d3c-4620-a2eb-428b3fbfsf31",
+        "id":"ba616af0-9d3c-4620-a2eb-428b3fbfsh31",
         "semanticId":{
           "type":"ExternalReference",
           "keys":[

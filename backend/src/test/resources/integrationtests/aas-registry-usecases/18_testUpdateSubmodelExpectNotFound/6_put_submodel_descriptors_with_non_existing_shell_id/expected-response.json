@@ -1,0 +1,11 @@
+{
+  "status": 404,
+  "content": true,
+  "assertions": [
+    {
+      "jsonPath": "$.messages[0].text",
+      "equals": "Shell for identifier 1jdb5e4c-5b85-4c02-a960-14373ff801c0 not found"
+    }
+  ],
+  "expectedPayload": null
+}
