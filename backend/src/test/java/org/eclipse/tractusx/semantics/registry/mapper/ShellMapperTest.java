@@ -20,18 +20,18 @@
 
 package org.eclipse.tractusx.semantics.registry.mapper;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.tuple;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
+import com.github.f4b6a3.uuid.UuidCreator;
 import org.assertj.core.groups.Tuple;
 import org.eclipse.tractusx.semantics.aas.registry.model.*;
 import org.eclipse.tractusx.semantics.registry.model.*;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
 public class ShellMapperTest {
 
@@ -165,72 +165,72 @@ public class ShellMapperTest {
 
         //ShellIdentifierExternalSubjectReference -> ExternalSubjectID
         ShellIdentifierExternalSubjectReferenceKey externalSubjectReferenceKey =
-              new ShellIdentifierExternalSubjectReferenceKey(UUID.randomUUID(),ReferenceKeyType.ASSETADMINISTRATIONSHELL, "specificExternalSubjectId",null );
+              new ShellIdentifierExternalSubjectReferenceKey(UuidCreator.getTimeOrderedEpoch(),ReferenceKeyType.ASSETADMINISTRATIONSHELL, "specificExternalSubjectId",null );
 
-        ShellIdentifierExternalSubjectReference externalSubjectReference = new ShellIdentifierExternalSubjectReference(UUID.randomUUID(),
+        ShellIdentifierExternalSubjectReference externalSubjectReference = new ShellIdentifierExternalSubjectReference(UuidCreator.getTimeOrderedEpoch(),
               ReferenceType.MODELREFERENCE,
               Set.of(externalSubjectReferenceKey),
               null);
 
         ShellIdentifierSemanticReferenceKey identifierSemanticReferenceKey =
-              new ShellIdentifierSemanticReferenceKey(UUID.randomUUID(), ReferenceKeyType.SUBMODEL, "semanticReferenceId",null);
+              new ShellIdentifierSemanticReferenceKey(UuidCreator.getTimeOrderedEpoch(), ReferenceKeyType.SUBMODEL, "semanticReferenceId",null);
 
         ShellIdentifierSemanticReference identifierSemanticReference = new ShellIdentifierSemanticReference(
-              UUID.randomUUID(),
+              UuidCreator.getTimeOrderedEpoch(),
               ReferenceType.MODELREFERENCE,
               Set.of(identifierSemanticReferenceKey),
               null
         );
 
         ShellIdentifierSupplemSemanticReferenceKey shellIdentifierSupplemSemanticReferenceKey =
-              new ShellIdentifierSupplemSemanticReferenceKey(UUID.randomUUID(),
+              new ShellIdentifierSupplemSemanticReferenceKey(UuidCreator.getTimeOrderedEpoch(),
                     ReferenceKeyType.ASSETADMINISTRATIONSHELL,
                     "supplemental semantic reference key",null);
 
         ShellIdentifierSupplemSemanticReference shellIdentifierSupplemSemanticReference = new ShellIdentifierSupplemSemanticReference(
-              UUID.randomUUID(),
+              UuidCreator.getTimeOrderedEpoch(),
               ReferenceType.EXTERNALREFERENCE,
               Set.of(shellIdentifierSupplemSemanticReferenceKey),
               null );
-        ShellIdentifier shellIdentifier1 = new ShellIdentifier( UUID.randomUUID(), "key1", "value1", externalSubjectReference, null, identifierSemanticReference , Set.of(shellIdentifierSupplemSemanticReference));
-        ShellIdentifier shellIdentifier2 = new ShellIdentifier( UUID.randomUUID(), "key1", "value2", externalSubjectReference,
+        ShellIdentifier shellIdentifier1 = new ShellIdentifier( UuidCreator.getTimeOrderedEpoch(), "key1", "value1", externalSubjectReference, null, identifierSemanticReference , Set.of(shellIdentifierSupplemSemanticReference));
+        ShellIdentifier shellIdentifier2 = new ShellIdentifier( UuidCreator.getTimeOrderedEpoch(), "key1", "value2", externalSubjectReference,
               null, identifierSemanticReference , Set.of(shellIdentifierSupplemSemanticReference));
 
-        ShellIdentifier shellIdentifier3 = new ShellIdentifier( UUID.randomUUID(), ShellIdentifier.GLOBAL_ASSET_ID_KEY, "exampleGlobalAssetId", null, null, identifierSemanticReference, Set.of(shellIdentifierSupplemSemanticReference));
+        ShellIdentifier shellIdentifier3 = new ShellIdentifier( UuidCreator.getTimeOrderedEpoch(), ShellIdentifier.GLOBAL_ASSET_ID_KEY, "exampleGlobalAssetId", null, null, identifierSemanticReference, Set.of(shellIdentifierSupplemSemanticReference));
 
         Set<ShellIdentifier> shellIdentifiers = Set.of(shellIdentifier1, shellIdentifier2, shellIdentifier3);
 
-        ShellDescription shellDescription1 = new ShellDescription(UUID.randomUUID(), "en", "example description1",null);
-        ShellDescription shellDescription2 = new ShellDescription(UUID.randomUUID(), "de", "exampleDescription2",null);
+        ShellDescription shellDescription1 = new ShellDescription(UuidCreator.getTimeOrderedEpoch(), "en", "example description1",null);
+        ShellDescription shellDescription2 = new ShellDescription(UuidCreator.getTimeOrderedEpoch(), "de", "exampleDescription2",null);
 
         Set<ShellDescription> shellDescriptions = Set.of(shellDescription1, shellDescription2);
 
-        SubmodelDisplayName submodelDisplayName = new SubmodelDisplayName( UUID.randomUUID(), "de", "Submodel display name",null );
-        SubmodelSecurityAttribute submodelSecurityAttribute = new SubmodelSecurityAttribute( UUID.randomUUID(), SubmodelSecurityType.W3C_DID, "submodel security attribute key", "submodel security attribute value",null );
+        SubmodelDisplayName submodelDisplayName = new SubmodelDisplayName( UuidCreator.getTimeOrderedEpoch(), "de", "Submodel display name",null );
+        SubmodelSecurityAttribute submodelSecurityAttribute = new SubmodelSecurityAttribute( UuidCreator.getTimeOrderedEpoch(), SubmodelSecurityType.W3C_DID, "submodel security attribute key", "submodel security attribute value",null );
 
         SubmodelSemanticIdReferenceKey submodelSemanticIdReferenceKey =
-              new SubmodelSemanticIdReferenceKey(UUID.randomUUID(),ReferenceKeyType.SUBMODEL,"submodelSemanticIdReferenceKey value",null );
+              new SubmodelSemanticIdReferenceKey(UuidCreator.getTimeOrderedEpoch(),ReferenceKeyType.SUBMODEL,"submodelSemanticIdReferenceKey value",null );
 
-        SubmodelSemanticIdReference submodelSemanticIdReference = new SubmodelSemanticIdReference( UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(submodelSemanticIdReferenceKey), null);
+        SubmodelSemanticIdReference submodelSemanticIdReference = new SubmodelSemanticIdReference( UuidCreator.getTimeOrderedEpoch(), ReferenceType.EXTERNALREFERENCE, Set.of(submodelSemanticIdReferenceKey), null);
 
         SubmodelSupplemSemanticIdReferenceKey submodelSupplemSemanticIdReferenceKey =
-              new SubmodelSupplemSemanticIdReferenceKey(UUID.randomUUID(),ReferenceKeyType.SUBMODEL,"SubmodelSupplemSemanticIdReferenceKey value",null );
+              new SubmodelSupplemSemanticIdReferenceKey(UuidCreator.getTimeOrderedEpoch(),ReferenceKeyType.SUBMODEL,"SubmodelSupplemSemanticIdReferenceKey value",null );
 
 
-        SubmodelSupplemSemanticIdReference submodelSupplemSemanticIdReference = new SubmodelSupplemSemanticIdReference( UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(submodelSupplemSemanticIdReferenceKey),
+        SubmodelSupplemSemanticIdReference submodelSupplemSemanticIdReference = new SubmodelSupplemSemanticIdReference( UuidCreator.getTimeOrderedEpoch(), ReferenceType.EXTERNALREFERENCE, Set.of(submodelSupplemSemanticIdReferenceKey),
               null);
-                Submodel submodel = new Submodel(UUID.randomUUID(), "submodelIdExternal", "submodelIdShort", submodelSemanticIdReference,
-                Set.of(new SubmodelDescription(UUID.randomUUID(), "en", "example submodel description",null)),
-                Set.of(new SubmodelEndpoint(UUID.randomUUID(), "interfaceExample",
+                Submodel submodel = new Submodel(UuidCreator.getTimeOrderedEpoch(), "submodelIdExternal", "submodelIdShort", submodelSemanticIdReference,
+                Set.of(new SubmodelDescription(UuidCreator.getTimeOrderedEpoch(), "en", "example submodel description",null)),
+                Set.of(new SubmodelEndpoint(UuidCreator.getTimeOrderedEpoch(), "interfaceExample",
                         "endpointAddressExample", "endpointProtocolExample",
                         "endpointProtocolVersionExample", "subProtocolExample"
                         , "subProtocolBodyExample", "subProtocolEncodingExample",
                       Set.of(submodelSecurityAttribute),null
                 )), null, Set.of(submodelDisplayName), Set.of(submodelSupplemSemanticIdReference) );
 
-        ShellDisplayName shellDisplayName = new ShellDisplayName( UUID.randomUUID(), "de", "Display name",null );
+        ShellDisplayName shellDisplayName = new ShellDisplayName( UuidCreator.getTimeOrderedEpoch(), "de", "Display name",null );
 
-         return new Shell(UUID.randomUUID(), "idExternalExample", "idShortExample",
+         return new Shell(UuidCreator.getTimeOrderedEpoch(), "idExternalExample", "idShortExample",
               shellIdentifiers, shellDescriptions, Set.of(submodel),Set.of(shellDisplayName), null,null, ShellKind.INSTANCE, "shellType");
     }
 
