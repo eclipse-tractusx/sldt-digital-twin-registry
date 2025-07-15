@@ -27,7 +27,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -79,7 +78,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ShellService {
 
    public static final String DUPLICATE_SUBMODEL_EXCEPTION = "An AssetAdministrationSubmodel for the given identification does already exists.";
-   public static final String DUPLICATE_SUBMODEL_ID_SHORT_EXCEPTION = "An AssetAdministration Submodel for the given IdShort does already exists.";
    private static final String SORT_FIELD_NAME_SHELL = "createdDate";
    private static final String SORT_FIELD_NAME_SUBMODEL = "id";
    private static final String DEFAULT_EXTERNAL_ID = "00000000-0000-0000-0000-000000000000";
@@ -571,15 +569,6 @@ public class ShellService {
       Shell shellFromDb = doFindShellByExternalIdWithoutFiltering( externalShellId );
       submodel.setShellId( shellFromDb );
 
-      //uniqueness on shellId and idShort
-      boolean isIdShortPresent = Optional.of( shellFromDb ).map( Shell::getSubmodels ).stream().flatMap( Collection::stream )
-            .map( Submodel::getIdShort )
-            .anyMatch(
-                  idShort -> idShort.equalsIgnoreCase( submodel.getIdShort() ) ); // check whether the input sub-model.idShort exists in DB
-
-      if ( isIdShortPresent ) {// Throw exception if sub-model.idShort exists in DB
-         throw new DuplicateKeyException( DUPLICATE_SUBMODEL_ID_SHORT_EXCEPTION );
-      }
       return saveSubmodel( submodel );
    }
 
