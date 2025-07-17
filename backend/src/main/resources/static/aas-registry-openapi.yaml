@@ -614,6 +614,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Result'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Result'
         "500":
           description: Internal Server Error
           content:
