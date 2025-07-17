@@ -27,6 +27,8 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.github.f4b6a3.uuid.UuidCreator;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -40,9 +42,7 @@ import lombok.*;
 @JsonIdentityInfo( generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class SubmodelSupplemSemanticIdReference {
    @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
-   @Column(name="id")
-   UUID id;
+   private UUID id = UuidCreator.getTimeOrderedEpoch();
 
    ReferenceType type;
 
