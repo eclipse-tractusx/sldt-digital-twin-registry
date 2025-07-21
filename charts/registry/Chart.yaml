@@ -27,7 +27,7 @@ sources:
 
 type: application
 version: 0.8.1
-appVersion: 0.8.1-helm-test
+appVersion: 0.8.1
 
 dependencies:
   - repository: https://charts.bitnami.com/bitnami
