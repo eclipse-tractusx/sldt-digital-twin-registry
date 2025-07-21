@@ -101,7 +101,8 @@ stages:
           "name":"PartInstanceID",
           "value":"24975539203422"
         }]
-        submodelDescriptors: []
+        submodelDescriptors: [],
+        createdAt: !anything
 
   - name: Update shell descriptor by id
     request:
