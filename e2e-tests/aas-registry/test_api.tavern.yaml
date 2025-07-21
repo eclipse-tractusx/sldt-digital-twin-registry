@@ -150,4 +150,3 @@ stages:
         Edc-Bpn: "{edc_bpn:s}"
     response:
       status_code: 204
-
