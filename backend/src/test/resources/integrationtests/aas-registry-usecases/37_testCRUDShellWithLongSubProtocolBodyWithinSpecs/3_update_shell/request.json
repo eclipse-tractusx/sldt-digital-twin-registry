@@ -1,26 +1,17 @@
 {
-  "status": 201,
-  "content": true,
-  "assertions": [],
-  "expectedPayload": {
+  "url": "/api/v3/shell-descriptors/MjM3YzJmM2MtNGIwOC00MDU3LTk1N2QtMjVmNThjODczN2Nl",
+  "tenant": "TENANT_ONE",
+  "method": "PUT",
+  "body": {
     "description":[],
     "displayName":[],
-    "idShort":"623Sm0sFia",
-    "id":"ad2503a6-9309-4d29-9d1b-ae9a7884c67f",
-    "specificAssetIds":[
+    "idShort":null,
+    "id":"237c2f3c-4b08-4057-957d-25f58c8737ce",
+    "specificAssetIds":[],
+    "submodelDescriptors":[
       {
-        "name":"identifier1KeyExample",
-        "value":"identifier1ValueExample"
-      },
-      {
-        "name":"identifier2KeyExample",
-        "value":"identifier2ValueExample"
-      }
-    ],
-    "submodelDescriptors": [
-      {
-        "idShort":"KdlMzDfb5r",
-        "id":"3284eb08-1093-41fa-8c05-226c7e2dc83a",
+        "idShort": null,
+        "id":"87a3e328-55bb-40c7-915e-a43aa788b1aa",
         "endpoints":[
           {
             "interface":"interfaceNameExample",
@@ -31,7 +22,7 @@
                 "1.1"
               ],
               "subprotocol":"",
-              "subprotocolBody":"subprotocolBodyExample",
+              "subprotocolBody":"id=87a3e328-55bb-40c7-915e-a43aa788b1aa;dspEndpoint=https://my-edc-for-catena-x-use-case.product-name.environment.edcaas-company.com/api/v1/dsp",
               "subprotocolBodyEncoding":"subprotocolBodyExample",
               "securityAttributes":[
                 {
@@ -55,7 +46,6 @@
         "description":[],
         "displayName":[]
       }
-
     ]
   }
 }

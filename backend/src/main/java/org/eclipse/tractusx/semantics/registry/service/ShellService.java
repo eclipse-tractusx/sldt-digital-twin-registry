@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2025 Robert Bosch Manufacturing Solutions GmbH and others
+ * Copyright (c) 2025 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -27,7 +27,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -37,10 +36,13 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.aas.registry.model.InlineResponse200;
 import org.eclipse.tractusx.semantics.aas.registry.model.PagedResultPagingMetadata;
 import org.eclipse.tractusx.semantics.aas.registry.model.SearchAllShellsByAssetLink200Response;
+import org.eclipse.tractusx.semantics.accesscontrol.api.AccessControlRuleService;
 import org.eclipse.tractusx.semantics.accesscontrol.api.exception.DenyAccessException;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.registry.dto.BatchResultDto;
@@ -66,6 +68,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.ImmutableSet;
 
+import jakarta.persistence.criteria.Fetch;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -73,7 +78,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ShellService {
 
    public static final String DUPLICATE_SUBMODEL_EXCEPTION = "An AssetAdministrationSubmodel for the given identification does already exists.";
-   public static final String DUPLICATE_SUBMODEL_ID_SHORT_EXCEPTION = "An AssetAdministration Submodel for the given IdShort does already exists.";
    private static final String SORT_FIELD_NAME_SHELL = "createdDate";
    private static final String SORT_FIELD_NAME_SUBMODEL = "id";
    private static final String DEFAULT_EXTERNAL_ID = "00000000-0000-0000-0000-000000000000";
@@ -90,12 +94,15 @@ public class ShellService {
    private final String externalSubjectIdWildcardPrefix;
    private final List<String> externalSubjectIdWildcardAllowedTypes;
    private final int granularAccessControlFetchSize;
+   private final boolean isGranularAccessControlEnabled;
+   private final AccessControlRuleService accessControlRuleService;
 
    public ShellService( ShellRepository shellRepository,
          ShellIdentifierRepository shellIdentifierRepository,
          SubmodelRepository submodelRepository,
          RegistryProperties registryProperties,
-         ShellAccessHandler shellAccessHandler ) {
+         ShellAccessHandler shellAccessHandler,
+         AccessControlRuleService accessControlRuleService) {
       this.shellRepository = shellRepository;
       this.shellIdentifierRepository = shellIdentifierRepository;
       this.submodelRepository = submodelRepository;
@@ -104,6 +111,8 @@ public class ShellService {
       this.externalSubjectIdWildcardPrefix = registryProperties.getExternalSubjectIdWildcardPrefix();
       this.externalSubjectIdWildcardAllowedTypes = registryProperties.getExternalSubjectIdWildcardAllowedTypes();
       this.granularAccessControlFetchSize = Optional.ofNullable( registryProperties.getGranularAccessControlFetchSize() ).orElse( DEFAULT_FETCH_SIZE );
+      this.isGranularAccessControlEnabled = registryProperties.getUseGranularAccessControl();
+      this.accessControlRuleService = accessControlRuleService;
    }
 
    @Transactional
@@ -167,16 +176,75 @@ public class ShellService {
       return doFindShellByExternalIdWithoutFiltering( externalShellId );
    }
 
+   /**
+    * Creates a JPA Specification for fetching all associations of the Shell entity.
+    * This method is used to define a query that fetches all related entities of a Shell,
+    * including identifiers, descriptions, display names, submodels, and their nested associations.
+    *
+    * The specification ensures that:
+    * - Fetching is only applied to entity queries (not count queries).
+    * - The query result is distinct to avoid duplicate records.
+    * - Nested associations are fetched using LEFT JOINs to include all related data.
+    *
+    * @return Specification<Shell> A JPA Specification for fetching all associations of the Shell entity.
+    */
+   public static Specification<Shell> withAllAssociations() {
+       return (root, query, criteriaBuilder) -> {
+           // Only apply fetching for entity queries, not for count queries
+           if (query != null && query.getResultType() != Long.class && query.getResultType() != long.class) {
+               // Set distinct to true to avoid duplicates
+               query.distinct(true);
+
+               // Root level fetches
+               Fetch<Shell, ?> identifiersFetch = root.fetch("identifiers", JoinType.LEFT);
+               root.fetch("descriptions", JoinType.LEFT);
+               root.fetch("displayNames", JoinType.LEFT);
+               Fetch<Shell, ?> submodelsFetch = root.fetch("submodels", JoinType.LEFT);
+
+               // Second level fetches for identifiers
+               identifiersFetch.fetch("externalSubjectId", JoinType.LEFT);
+               identifiersFetch.fetch("semanticId", JoinType.LEFT);
+               identifiersFetch.fetch("supplementalSemanticIds", JoinType.LEFT);
+
+               // Second level fetches for submodels
+               Fetch<?, ?> semanticIdFetch = submodelsFetch.fetch("semanticId", JoinType.LEFT);
+               submodelsFetch.fetch("submodelSupplemSemanticIds", JoinType.LEFT);
+               submodelsFetch.fetch("displayNames", JoinType.LEFT);
+               submodelsFetch.fetch("descriptions", JoinType.LEFT);
+               Fetch<?, ?> endpointsFetch = submodelsFetch.fetch("endpoints", JoinType.LEFT);
+
+               // Third level fetches
+               semanticIdFetch.fetch("keys", JoinType.LEFT);
+               endpointsFetch.fetch("submodelSecurityAttribute", JoinType.LEFT);
+           }
+           return criteriaBuilder.conjunction();
+       };
+   }
+
    @Transactional( readOnly = true )
-   public ShellCollectionDto findAllShells( Integer pageSize, String cursorVal, String externalSubjectId ) {
+   public ShellCollectionDto findAllShells( Integer pageSize, final String cursorVal, final String externalSubjectId, final OffsetDateTime createdAfter ) {
 
       pageSize = getPageSize( pageSize );
       ShellCursor cursor = new ShellCursor( pageSize, cursorVal );
-      var specification = shellAccessHandler.shellFilterSpecification( SORT_FIELD_NAME_SHELL, cursor, externalSubjectId );
+      var specification = shellAccessHandler.shellFilterSpecification( SORT_FIELD_NAME_SHELL, cursor, externalSubjectId, createdAfter );
       final var foundList = new ArrayList<Shell>();
       //fetch 1 more item to make sure there is a visible item for the next page
       while ( foundList.size() < pageSize + 1 ) {
-         Page<Shell> currentPage = shellRepository.findAll( specification, ofSize( granularAccessControlFetchSize ) );
+         specification = setMandatorySpecificIdsAndValues( externalSubjectId, specification );
+
+         var shellList = shellRepository.findAll(specification, ofSize( granularAccessControlFetchSize ));
+         var shellIdList = shellList.stream().map( Shell::getId ).toList();
+
+         if ( CollectionUtils.isEmpty( shellIdList)) {
+              break;
+         }
+         // Add shellIds filter to the existing specification
+         // This code snippet modifies an existing JPA Specification by adding a filter condition.
+         // The filter ensures that only entities with an "id" attribute matching one of the IDs in the `shellIdList` are included in the query results.
+         specification = specification.and((root, query, criteriaBuilder) ->
+             root.get("id").in(shellIdList));
+
+         Page<Shell> currentPage = shellRepository.findAll( specification.and(withAllAssociations()), ofSize( granularAccessControlFetchSize ) );
          List<Shell> shells = shellAccessHandler.filterListOfShellProperties( currentPage.stream().toList(), externalSubjectId );
          shells.stream()
                .limit( (long) pageSize + 1 - foundList.size() )
@@ -186,7 +254,7 @@ public class ShellService {
          }
          ShellCursor shellCursor = new ShellCursor( pageSize,
                cursor.getEncodedCursorShell( lastItemOf( currentPage.getContent() ).getCreatedDate(), currentPage.hasNext() ) );
-         specification = shellAccessHandler.shellFilterSpecification( SORT_FIELD_NAME_SHELL, shellCursor, externalSubjectId );
+         specification = shellAccessHandler.shellFilterSpecification( SORT_FIELD_NAME_SHELL, shellCursor, externalSubjectId, createdAfter );
       }
       String nextCursor = null;
 
@@ -202,12 +270,64 @@ public class ShellService {
             .build();
    }
 
+   /**
+    * Adds mandatory specific asset ID filters to the given JPA Specification.
+    *
+    * This method modifies the provided Specification to include filtering conditions
+    * based on specific asset IDs and their values. It ensures that only entities
+    * matching the specified criteria are included in the query results.
+    *
+    * The filtering is applied only if granular access control is enabled and the
+    * `externalSubjectId` does not match the owning tenant ID.
+    *
+    * @param externalSubjectId The external subject ID of the user making the request.
+    * @param specification The existing JPA Specification to be modified.
+    * @return Specification<Shell> The modified Specification with additional filtering conditions.
+    */
+   private Specification<Shell> setMandatorySpecificIdsAndValues(String externalSubjectId, Specification<Shell> specification) {
+    if(isGranularAccessControlEnabled && !owningTenantId.equals( externalSubjectId )) {
+       var specificAssetIdNameAndNameSet =  accessControlRuleService.findAllByBpnWithinValidityPeriod(externalSubjectId,Instant.now());
+
+            // Add filtering by specific asset IDs to the specification
+           specification = specification.and((root, query, criteriaBuilder) -> {
+               // Skip if there are no identifiers to filter by
+               if (specificAssetIdNameAndNameSet == null || specificAssetIdNameAndNameSet.isEmpty()) {
+                   return criteriaBuilder.conjunction(); // always true
+               }
+
+               // Ensure distinct results to avoid duplicates
+               Optional.ofNullable( query ).ifPresent( queryDetails -> queryDetails.distinct(true));
+
+               // Join Shell with ShellIdentifier entities
+               var identifierJoin = root.join("identifiers", JoinType.LEFT);
+
+               // Create predicates for each key-value pair
+               var predicates =  specificAssetIdNameAndNameSet.entrySet().stream().filter( stringSetEntry -> CollectionUtils.isNotEmpty( stringSetEntry.getValue() ))
+               .map( stringSetEntry -> {
+                  Predicate keyPredicate = criteriaBuilder.equal(identifierJoin.get("key"), stringSetEntry.getKey());
+                  Predicate valuePredicate = identifierJoin.get("value").in(stringSetEntry.getValue());
+                  return criteriaBuilder.and(keyPredicate, valuePredicate);
+               }).toList();
+
+               // If no valid predicates were created, return always true
+               if (CollectionUtils.isEmpty( predicates )) {
+                   return criteriaBuilder.conjunction();
+               }
+
+               // Return OR of all key-value pair predicates (shell matches if it has ANY of the pairs)
+               return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
+           });
+
+      }
+    return specification;
+   }
+
    @Transactional( readOnly = true )
    public SubmodelCollectionDto findAllSubmodel( Integer pageSize, String cursorVal, Shell assetID ) {
       pageSize = getPageSize( pageSize );
 
       ShellCursor cursor = new ShellCursor( pageSize, cursorVal );
-      var specification = new ShellSpecification<Submodel>( SORT_FIELD_NAME_SUBMODEL, cursor, null, null, null, null );
+      var specification = new ShellSpecification<Submodel>( SORT_FIELD_NAME_SUBMODEL, cursor, null, null, null, null,null );
       Page<Submodel> shellPage = submodelRepository.findAll( Specification.allOf( hasShellFkId( assetID ).and( specification ) ),
             ofSize( cursor.getRecordSize() ) );
 
@@ -230,22 +350,25 @@ public class ShellService {
       return pageSize == null ? MAXIMUM_RECORDS : pageSize;
    }
 
-   private Specification<Submodel> hasShellFkId( Shell shellId ) {
+   private Specification<Submodel> hasShellFkId( final Shell shellId ) {
       return ( root, cq, cb ) -> cb.equal( root.get( "shellId" ), shellId );
    }
 
    @Transactional( readOnly = true )
-   public InlineResponse200 findExternalShellIdsByIdentifiersByExactMatch( Set<ShellIdentifier> shellIdentifiers,
-         Integer pageSize, String cursor, String externalSubjectId ) {
+   public InlineResponse200 findExternalShellIdsByIdentifiersByExactMatch( final Set<ShellIdentifier> shellIdentifiers, Integer pageSize, final String cursor,
+         final String externalSubjectId, final OffsetDateTime createdAfter ) {
 
       pageSize = getPageSize( pageSize );
+      final boolean isCursorAvailable = StringUtils.isNotBlank( cursor );
       final String cursorValue = getCursorDecoded( cursor ).orElse( DEFAULT_EXTERNAL_ID );
       try {
          final List<String> visibleAssetIds;
          if ( shellAccessHandler.supportsGranularAccessControl() ) {
-            visibleAssetIds = fetchAPageOfAasIdsUsingGranularAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize );
+            visibleAssetIds = fetchAPageOfAasIdsUsingGranularAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize, isCursorAvailable,
+                  createdAfter );
          } else {
-            visibleAssetIds = fetchAPageOfAasIdsUsingLegacyAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize );
+            visibleAssetIds = fetchAPageOfAasIdsUsingLegacyAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize, isCursorAvailable,
+                  createdAfter );
          }
 
          final var assetIdList = visibleAssetIds.stream().limit( pageSize ).toList();
@@ -270,9 +393,9 @@ public class ShellService {
       try {
          final List<String> visibleAssetIds;
          if ( shellAccessHandler.supportsGranularAccessControl() ) {
-            visibleAssetIds = fetchAPageOfAasIdsUsingGranularAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize );
+            visibleAssetIds = fetchAPageOfAasIdsUsingGranularAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize, false, null );
          } else {
-            visibleAssetIds = fetchAPageOfAasIdsUsingLegacyAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize );
+            visibleAssetIds = fetchAPageOfAasIdsUsingLegacyAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize, false, null );
          }
 
          final var assetIdList = visibleAssetIds.stream().limit( pageSize ).toList();
@@ -288,21 +411,48 @@ public class ShellService {
       }
    }
 
-   private List<String> fetchAPageOfAasIdsUsingLegacyAccessControl(
-         Set<ShellIdentifier> shellIdentifiers, String externalSubjectId, String cursorValue, int pageSize ) {
+   private List<String> fetchAPageOfAasIdsUsingLegacyAccessControl( final Set<ShellIdentifier> shellIdentifiers, final String externalSubjectId,
+         final String cursorValue, final int pageSize, final boolean isCursorAvailable, final OffsetDateTime createdAfter ) {
       final var fetchSize = pageSize + 1;
-      final Instant cutoffDate = shellRepository.getCreatedDateByIdExternal( cursorValue )
-            .orElse( MINIMUM_SQL_DATETIME );
+      final Instant cutoffDate = getCreatedDate( cursorValue, isCursorAvailable, createdAfter );
       List<String> keyValueCombinations = toKeyValueCombinations( shellIdentifiers );
       return shellIdentifierRepository.findExternalShellIdsByIdentifiersByExactMatch( keyValueCombinations,
             keyValueCombinations.size(), externalSubjectId, externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes, owningTenantId,
             ShellIdentifier.GLOBAL_ASSET_ID_KEY, cutoffDate, cursorValue, fetchSize );
    }
 
-   private List<String> fetchAPageOfAasIdsUsingGranularAccessControl(
-         Set<ShellIdentifier> shellIdentifiers, String externalSubjectId, String cursorValue, int pageSize )
-         throws DenyAccessException {
-      Set<SpecificAssetId> userQuery = shellIdentifiers.stream()
+   /**
+    * Retrieves the created date based on the cursor value and the availability of the cursor.
+    *
+    * <p>This method determines the created date to be used in queries. If the cursor is available,
+    * it fetches the created date from the repository using the cursor value. If the cursor is not
+    * available and the cursor value matches the default external ID, it uses the provided
+    * `createdAfter` date or fetches the created date from the repository. Otherwise, it defaults
+    * to the minimum SQL datetime.</p>
+    *
+    * @param cursorValue the value of the cursor, used to identify the entity
+    * @param isCursorAvailable a flag indicating whether the cursor is available
+    * @param createdAfter the date after which entities were created, used as a fallback
+    * @return the created date as an {@link Instant}
+    */
+   private Instant getCreatedDate( final String cursorValue, final boolean isCursorAvailable, final OffsetDateTime createdAfter ) {
+      if ( isCursorAvailable ) {
+         // Fetch the created date from the repository using the cursor value
+         return shellRepository.getCreatedDateByIdExternal( cursorValue ).orElse( MINIMUM_SQL_DATETIME );
+      }
+      if ( cursorValue.equalsIgnoreCase( DEFAULT_EXTERNAL_ID ) ) {
+         // Use the provided createdAfter date or fetch from the repository as a fallback
+         return Optional.ofNullable( createdAfter )
+               .map( OffsetDateTime::toInstant )
+               .orElseGet( () -> shellRepository.getCreatedDateByIdExternal( cursorValue ).orElse( MINIMUM_SQL_DATETIME ) );
+      }
+      // Default case: fetch the created date from the repository or use the minimum SQL datetime
+      return shellRepository.getCreatedDateByIdExternal( cursorValue ).orElse( MINIMUM_SQL_DATETIME );
+   }
+
+   private List<String> fetchAPageOfAasIdsUsingGranularAccessControl( final Set<ShellIdentifier> shellIdentifiers, final String externalSubjectId,
+         final String cursorValue, final int pageSize, final boolean isCursorAvailable, final OffsetDateTime createdAfter ) throws DenyAccessException {
+      final Set<SpecificAssetId> userQuery = shellIdentifiers.stream()
             .map( id -> new SpecificAssetId( id.getKey(), id.getValue() ) )
             .collect( Collectors.toSet() );
       List<String> keyValueCombinations = toKeyValueCombinations( shellIdentifiers );
@@ -311,8 +461,7 @@ public class ShellService {
       String currentCursorValue = cursorValue;
       final List<String> visibleAssetIds = new ArrayList<>();
       while ( visibleAssetIds.size() < pageSize + 1 ) {
-         final Instant currentCutoffDate = shellRepository.getCreatedDateByIdExternal( currentCursorValue )
-               .orElse( MINIMUM_SQL_DATETIME );
+         final Instant currentCutoffDate = getCreatedDate( currentCursorValue, isCursorAvailable, createdAfter );
          List<UUID> shellIds = shellIdentifierRepository.findAPageOfShellIdsBySpecificAssetIds(
                keyValueCombinations, keyValueCombinations.size(), currentCutoffDate, currentCursorValue, PageRequest.ofSize( fetchSize ) );
          if ( shellIds.isEmpty() ) {
@@ -326,7 +475,7 @@ public class ShellService {
                .forEach( visibleAssetIds::add );
          currentCursorValue = lastItemOf( queryResults ).shellId();
       }
-      return visibleAssetIds;
+      return visibleAssetIds.stream().distinct().toList();
    }
 
    @Transactional( readOnly = true )
@@ -420,15 +569,6 @@ public class ShellService {
       Shell shellFromDb = doFindShellByExternalIdWithoutFiltering( externalShellId );
       submodel.setShellId( shellFromDb );
 
-      //uniqueness on shellId and idShort
-      boolean isIdShortPresent = Optional.of( shellFromDb ).map( Shell::getSubmodels ).stream().flatMap( Collection::stream )
-            .map( Submodel::getIdShort )
-            .anyMatch(
-                  idShort -> idShort.equalsIgnoreCase( submodel.getIdShort() ) ); // check whether the input sub-model.idShort exists in DB
-
-      if ( isIdShortPresent ) {// Throw exception if sub-model.idShort exists in DB
-         throw new DuplicateKeyException( DUPLICATE_SUBMODEL_ID_SHORT_EXCEPTION );
-      }
       return saveSubmodel( submodel );
    }
 

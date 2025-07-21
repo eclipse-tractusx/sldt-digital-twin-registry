@@ -20,6 +20,7 @@
 
 package org.eclipse.tractusx.semantics.registry.service;
 
+import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -49,9 +50,10 @@ public class DefaultShellAccessHandler implements ShellAccessHandler {
    }
 
    @Override
-   public Specification<Shell> shellFilterSpecification( String sortFieldName, ShellCursor cursor, String externalSubjectId ) {
+   public Specification<Shell> shellFilterSpecification( final String sortFieldName, final ShellCursor cursor, final String externalSubjectId,
+         final OffsetDateTime createdAfter ) {
       return new ShellSpecification<>( sortFieldName, cursor, externalSubjectId, owningTenantId, externalSubjectIdWildcardPrefix,
-            externalSubjectIdWildcardAllowedTypes );
+            externalSubjectIdWildcardAllowedTypes, createdAfter );
    }
 
    /**
