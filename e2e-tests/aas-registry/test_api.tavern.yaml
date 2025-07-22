@@ -102,6 +102,7 @@ stages:
           "value":"24975539203422"
         }]
         submodelDescriptors: []
+        createdAt: !anything
 
   - name: Update shell descriptor by id
     request:
