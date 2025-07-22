@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.f4b6a3.uuid.UuidCreator;
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.registry.repository.ShellRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +37,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
-import java.util.UUID;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @SpringBootTest
@@ -156,7 +156,7 @@ public abstract class AbstractAssetAdministrationShellApi {
     }
 
     protected static String uuid(String prefix) {
-        return prefix + "#" + UUID.randomUUID();
+        return prefix + "#" + UuidCreator.getTimeOrderedEpoch();
     }
 
 
@@ -173,7 +173,7 @@ public abstract class AbstractAssetAdministrationShellApi {
 
     protected ObjectNode createBaseNewIdPayload(String idPrefix, String idShort) throws JsonProcessingException {
         ObjectNode objectNode = mapper.createObjectNode();
-        objectNode.put("id", UUID.randomUUID().toString());
+        objectNode.put("id", UuidCreator.getTimeOrderedEpoch().toString());
         objectNode.put("idShort", idShort);
         return objectNode;
     }

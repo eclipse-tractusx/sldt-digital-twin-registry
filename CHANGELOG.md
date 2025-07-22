@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Filtering shells based on timestamp
 ### Changed
+ - Replace UUIDv4 with UUIDv7 to improve insert performance
 ### Fixed
  - Restore IDTA conformity and reinstate max length of subprotocolBody to 2048
  - High number of SELECT statements during pagination
