@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## 0.9.0-RC1
 ### Added
 - AAS 3.1 release
+### Changed
 - Updated DEPENDENCIES
 ### Fixed
 
