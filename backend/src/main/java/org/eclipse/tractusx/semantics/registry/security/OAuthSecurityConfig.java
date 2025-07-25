@@ -21,18 +21,30 @@
 package org.eclipse.tractusx.semantics.registry.security;
 
 import org.eclipse.tractusx.semantics.RegistryProperties;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Profile("!local")
 @Configuration
+@EnableWebSecurity()
 public class OAuthSecurityConfig {
+
+	@Bean(name = "jwtDecoderWithIssuerLocation")
+	@ConditionalOnProperty(prefix="security.oauth2.resourceserver.jwt", name="issuer-uri")
+	public JwtDecoder jwtDecoderWithIssuerLocation(@Value( "${security.oauth2.resourceserver.jwt.issuer-uri}") String issuerUri) {
+		return JwtDecoders.fromIssuerLocation(issuerUri);
+	}
 
     /**
      * Applies the jwt token based security configuration.
