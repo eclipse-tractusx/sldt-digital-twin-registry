@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2025 Robert Bosch Manufacturing Solutions GmbH and others
+ * Copyright (c) 2025 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -36,7 +36,7 @@ import org.eclipse.tractusx.semantics.aas.registry.model.AssetLink;
 import org.eclipse.tractusx.semantics.aas.registry.model.GetAssetAdministrationShellDescriptorsResult;
 import org.eclipse.tractusx.semantics.aas.registry.model.GetSubmodelDescriptorsResult;
 import org.eclipse.tractusx.semantics.aas.registry.model.InlineResponse200;
-import org.eclipse.tractusx.semantics.aas.registry.model.SearchAllShellsByAssetLink200Response;
+import org.eclipse.tractusx.semantics.aas.registry.model.SearchAllAssetAdministrationShellIdsByAssetLink200Response;
 import org.eclipse.tractusx.semantics.aas.registry.model.ServiceDescription;
 import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
@@ -47,6 +47,7 @@ import org.eclipse.tractusx.semantics.registry.mapper.SubmodelMapper;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
 import org.eclipse.tractusx.semantics.registry.model.Submodel;
+import org.eclipse.tractusx.semantics.registry.service.EntityNotFoundException;
 import org.eclipse.tractusx.semantics.registry.service.ShellService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -78,7 +79,7 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
 
     @Override
-    public ResponseEntity<ServiceDescription> getDescription() {
+    public ResponseEntity<ServiceDescription> getSelfDescription() {
         ServiceDescription serviceDescription = new ServiceDescription();
         serviceDescription.setProfiles( List.of( ServiceDescription.ProfilesEnum.ASSETADMINISTRATIONSHELLREGISTRYSERVICESPECIFICATION_SSP_001, ServiceDescription.ProfilesEnum.DISCOVERYSERVICESPECIFICATION_SSP_001) );
         return  new ResponseEntity<>( serviceDescription, HttpStatus.OK );
@@ -149,18 +150,36 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
 
     @Override
-    public ResponseEntity<Void> putAssetAdministrationShellDescriptorById( String aasIdentifier, AssetAdministrationShellDescriptor assetAdministrationShellDescriptor, @RequestHeader String externalSubjectId ) {
-        Shell shell = shellMapper.fromApiDto( assetAdministrationShellDescriptor );
-        Shell shellFromDb = shellService.findShellByExternalIdWithoutFiltering( getDecodedId( aasIdentifier ) );
-        shellService.update( shell.withId( shellFromDb.getId() ).withIdExternal( getDecodedId( aasIdentifier ) ), getDecodedId( aasIdentifier ) );
+    public ResponseEntity<AssetAdministrationShellDescriptor> putAssetAdministrationShellDescriptorById( String aasIdentifier, AssetAdministrationShellDescriptor assetAdministrationShellDescriptor, @RequestHeader String externalSubjectId ) {
+        try{
+           Shell shellFromDb = shellService.findShellByExternalIdWithoutFiltering( getDecodedId( aasIdentifier ) );
+           shellService.update( shellMapper.fromApiDto( assetAdministrationShellDescriptor )
+                       .withId( shellFromDb.getId() )
+                       .withIdExternal( getDecodedId( aasIdentifier ) ), getDecodedId( aasIdentifier ) );
+        }catch ( EntityNotFoundException entityNotFoundException ){
+            // If the shell doesn't exist, create a new one using the post method
+            assetAdministrationShellDescriptor.setId( getDecodedId( aasIdentifier ) );
+            return postAssetAdministrationShellDescriptor(assetAdministrationShellDescriptor);
+        }
+
         return new ResponseEntity<>( HttpStatus.NO_CONTENT );
     }
 
     @Override
-    public ResponseEntity<Void> putSubmodelDescriptorByIdThroughSuperpath( String aasIdentifier, String submodelIdentifier, SubmodelDescriptor submodelDescriptor, @RequestHeader String externalSubjectId ) {
-        shellService.deleteSubmodel(getDecodedId( aasIdentifier ),  getDecodedId( submodelIdentifier ),getExternalSubjectIdOrEmpty( externalSubjectId ));
-        submodelDescriptor.setId( getDecodedId( submodelIdentifier ));
-        postSubmodelDescriptorThroughSuperpath(aasIdentifier,submodelDescriptor,externalSubjectId );
+    public ResponseEntity<SubmodelDescriptor> putSubmodelDescriptorByIdThroughSuperpath( String aasIdentifier, String submodelIdentifier, SubmodelDescriptor submodelDescriptor, @RequestHeader String externalSubjectId ) {
+       try{
+          shellService.deleteSubmodel(getDecodedId( aasIdentifier ),  getDecodedId( submodelIdentifier ),getExternalSubjectIdOrEmpty( externalSubjectId ));
+          submodelDescriptor.setId( getDecodedId( submodelIdentifier ));
+          postSubmodelDescriptorThroughSuperpath(aasIdentifier,submodelDescriptor,externalSubjectId );
+        }catch ( EntityNotFoundException entityNotFoundException ){
+          if(entityNotFoundException.getMessage().contains("Submodel")) {
+               // If the submodel doesn't exist, create a new one using the post method
+               submodelDescriptor.setId( getDecodedId( submodelIdentifier ) );
+               return postSubmodelDescriptorThroughSuperpath(aasIdentifier,submodelDescriptor,externalSubjectId);
+            } else {
+             throw entityNotFoundException;
+            }
+        }
         return new ResponseEntity<>( HttpStatus.NO_CONTENT );
     }
 
@@ -178,11 +197,11 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
     }
 
     @Override
-    public ResponseEntity<SearchAllShellsByAssetLink200Response> searchAllShellsByAssetLink(
+    public ResponseEntity<SearchAllAssetAdministrationShellIdsByAssetLink200Response> searchAllAssetAdministrationShellIdsByAssetLink(
           Integer limit, String cursor, @RequestHeader String externalSubjectId,List<AssetLink> assetIds) {
 
         if (assetIds == null || assetIds.isEmpty()) {
-            return new ResponseEntity<>(new SearchAllShellsByAssetLink200Response(), HttpStatus.OK);
+            return new ResponseEntity<>(new SearchAllAssetAdministrationShellIdsByAssetLink200Response(), HttpStatus.OK);
         }
 
         final var result  = shellService.findExternalShellIdsByAssetLinkByExactMatch(

@@ -81,6 +81,7 @@ data:
             id: "{decoded_shell_id:s}"
             specificAssetIds: []
             submodelDescriptors: []
+            createdAt: !anything
 
       - name: Update shell descriptor by id
         request:

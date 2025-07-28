@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2024 Robert Bosch Manufacturing Solutions GmbH and others
- * Copyright (c) 2024 Contributors to the Eclipse Foundation
+ * Copyright (c) 2025 Robert Bosch Manufacturing Solutions GmbH and others
+ * Copyright (c) 2025 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -131,7 +131,7 @@ class LegacyShellServiceTest {
       assertThat( actual.getResult() ).isNotNull().hasSize( pageSize ).containsAll( expectedIds.subList( 0, pageSize ) );
       assertThat( actual.getPagingMetadata() ).isNotNull();
       assertThat( actual.getPagingMetadata().getCursor() ).isNotNull()
-            .isEqualTo( toCursor( expectedIds, pageSize - 1 ) );
+                  .isEqualTo( toCursor( expectedIds, pageSize - 1 ) );
    }
 
    @Test
