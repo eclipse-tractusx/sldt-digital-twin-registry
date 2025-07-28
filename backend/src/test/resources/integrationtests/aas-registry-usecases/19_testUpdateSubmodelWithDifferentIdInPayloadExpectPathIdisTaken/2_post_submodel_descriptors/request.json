@@ -3,7 +3,7 @@
   "tenant": "TENANT_ONE",
   "method":"POST",
   "body": {
-    "idShort":"7gPmF6Y6sG",
+    "idShort":"new_IdShort_InUpdate1",
     "id":"c00b94ac-9e91-4f04-848c-9fa5b287a6ac",
     "endpoints":[
       {

@@ -1,0 +1,14 @@
+{
+  "status": 400,
+  "content": true,
+  "assertions": [
+    {
+      "jsonPath": "$.messages[0].code",
+      "equals": "submodelDescriptors[0].endpoints[0].protocolInformation.subprotocolBody"
+    }
+  ,{
+      "jsonPath": "$.messages[0].text",
+      "equals": "size must be between 0 and 2048"
+    }],
+  "expectedPayload": null
+}

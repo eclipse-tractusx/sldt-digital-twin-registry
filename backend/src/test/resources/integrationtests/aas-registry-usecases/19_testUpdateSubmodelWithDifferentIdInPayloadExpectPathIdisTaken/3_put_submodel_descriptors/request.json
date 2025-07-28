@@ -3,7 +3,7 @@
   "tenant": "TENANT_ONE",
   "method":"PUT",
   "body": {
-    "idShort":"newIdShortInUpdateRequest",
+    "idShort":"new_IdShort_InUpdate1",
     "id":"newSubmodelId",
     "endpoints":[
       {

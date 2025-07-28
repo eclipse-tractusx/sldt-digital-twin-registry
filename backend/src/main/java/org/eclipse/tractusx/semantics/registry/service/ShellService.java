@@ -41,8 +41,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.aas.registry.model.InlineResponse200;
 import org.eclipse.tractusx.semantics.aas.registry.model.PagedResultPagingMetadata;
-import org.eclipse.tractusx.semantics.aas.registry.model.SearchAllShellsByAssetLink200Response;
 import org.eclipse.tractusx.semantics.accesscontrol.api.AccessControlRuleService;
+import org.eclipse.tractusx.semantics.aas.registry.model.SearchAllAssetAdministrationShellIdsByAssetLink200Response;
 import org.eclipse.tractusx.semantics.accesscontrol.api.exception.DenyAccessException;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.registry.dto.BatchResultDto;
@@ -385,7 +385,7 @@ public class ShellService {
    }
 
    @Transactional( readOnly = true )
-   public SearchAllShellsByAssetLink200Response findExternalShellIdsByAssetLinkByExactMatch( Set<ShellIdentifier> shellIdentifiers,
+   public SearchAllAssetAdministrationShellIdsByAssetLink200Response findExternalShellIdsByAssetLinkByExactMatch( Set<ShellIdentifier> shellIdentifiers,
          Integer pageSize, String cursor, String externalSubjectId ) {
 
       pageSize = getPageSize( pageSize );
@@ -400,12 +400,12 @@ public class ShellService {
 
          final var assetIdList = visibleAssetIds.stream().limit( pageSize ).toList();
          final String nextCursor = getCursorEncoded( visibleAssetIds, assetIdList );
-         final var response = new SearchAllShellsByAssetLink200Response();
+         final var response = new SearchAllAssetAdministrationShellIdsByAssetLink200Response();
          response.setResult( assetIdList );
          response.setPagingMetadata( new PagedResultPagingMetadata().cursor( nextCursor ) );
          return response;
       } catch ( DenyAccessException e ) {
-         final var response = new SearchAllShellsByAssetLink200Response();
+         final var response = new SearchAllAssetAdministrationShellIdsByAssetLink200Response();
          response.setResult( Collections.emptyList() );
          return response;
       }
