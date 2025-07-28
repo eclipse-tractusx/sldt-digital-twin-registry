@@ -114,7 +114,7 @@ stages:
         Edc-Bpn: "{edc_bpn:s}"
       json:
         id: "{decoded_shell_id:s}"
-        idShort: digital twin of a break (Testing Update)
+        idShort: new_IdShort_InUpdate
         specificAssetIds: [{
           "name": "PartInstanceID",
           "value": "24975539203422"
