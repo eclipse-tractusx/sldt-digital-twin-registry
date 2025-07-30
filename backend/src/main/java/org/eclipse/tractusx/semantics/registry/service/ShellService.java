@@ -61,6 +61,7 @@ import org.eclipse.tractusx.semantics.registry.utils.ShellSpecification;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -222,52 +223,36 @@ public class ShellService {
    }
 
    @Transactional( readOnly = true )
-   public ShellCollectionDto findAllShells( Integer pageSize, final String cursorVal, final String externalSubjectId, final OffsetDateTime createdAfter ) {
+   public ShellCollectionDto findAllShells(Integer pageSize, final String cursorVal, final String externalSubjectId, final OffsetDateTime createdAfter) {
 
       pageSize = getPageSize( pageSize );
-      ShellCursor cursor = new ShellCursor( pageSize, cursorVal );
-      var specification = shellAccessHandler.shellFilterSpecification( SORT_FIELD_NAME_SHELL, cursor, externalSubjectId, createdAfter );
-      final var foundList = new ArrayList<Shell>();
-      //fetch 1 more item to make sure there is a visible item for the next page
-      while ( foundList.size() < pageSize + 1 ) {
-         specification = setMandatorySpecificIdsAndValues( externalSubjectId, specification );
+      ShellCursor cursor = new ShellCursor(pageSize, cursorVal);
 
-         var shellList = shellRepository.findAll(specification, ofSize( granularAccessControlFetchSize ));
-         var shellIdList = shellList.stream().map( Shell::getId ).toList();
+     // Instant cursorCreatedDate = cursor.getShellSearchCursor();
+      Instant cursorCreatedDate = createdAfter.toInstant();
 
-         if ( CollectionUtils.isEmpty( shellIdList)) {
-              break;
-         }
-         // Add shellIds filter to the existing specification
-         // This code snippet modifies an existing JPA Specification by adding a filter condition.
-         // The filter ensures that only entities with an "id" attribute matching one of the IDs in the `shellIdList` are included in the query results.
-         specification = specification.and((root, query, criteriaBuilder) ->
-             root.get("id").in(shellIdList));
+      Page<Shell> shellPage = shellRepository.findAllByExternalSubjectId(
+              externalSubjectId,
+              owningTenantId,
+              externalSubjectIdWildcardPrefix,
+              externalSubjectIdWildcardAllowedTypes,
+              cursorCreatedDate,
+              PageRequest.of(0, pageSize, Sort.by("created_date").ascending())
+      );
 
-         Page<Shell> currentPage = shellRepository.findAll( specification.and(withAllAssociations()), ofSize( granularAccessControlFetchSize ) );
-         List<Shell> shells = shellAccessHandler.filterListOfShellProperties( currentPage.stream().toList(), externalSubjectId );
-         shells.stream()
-               .limit( (long) pageSize + 1 - foundList.size() )
-               .forEach( foundList::add );
-         if ( !currentPage.hasNext() ) {
-            break;
-         }
-         ShellCursor shellCursor = new ShellCursor( pageSize,
-               cursor.getEncodedCursorShell( lastItemOf( currentPage.getContent() ).getCreatedDate(), currentPage.hasNext() ) );
-         specification = shellAccessHandler.shellFilterSpecification( SORT_FIELD_NAME_SHELL, shellCursor, externalSubjectId, createdAfter );
-      }
+      //Page to List
+      List<Shell> shells = shellAccessHandler.filterListOfShellProperties( shellPage.stream().toList(), externalSubjectId );
+
       String nextCursor = null;
-
-      final boolean hasNextPage = foundList.size() > pageSize;
-      List<Shell> resultList = foundList.stream().limit( pageSize ).toList();
-      if ( !resultList.isEmpty() ) {
-         nextCursor = cursor.getEncodedCursorShell( resultList.get( resultList.size() - 1 ).getCreatedDate(), hasNextPage );
+      if (!shells.isEmpty()) {
+         Instant lastDate = shells.get(shells.size() - 1).getCreatedDate();
+         nextCursor = cursor.getEncodedCursorShell(lastDate, shells.size() == pageSize);
       }
 
       return ShellCollectionDto.builder()
-            .items( resultList )
-            .cursor( nextCursor )
-            .build();
+              .items( shells )
+              .cursor( nextCursor )
+              .build();
    }
 
    /**

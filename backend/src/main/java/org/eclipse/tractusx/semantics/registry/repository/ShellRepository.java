@@ -85,6 +85,59 @@ public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecific
 
    List<Shell> findShellsByIdExternalIsIn( Set<String> idExternals );
 
+   @Query(
+           value = """
+                   SELECT DISTINCT ON (s.id) s.*
+                   FROM SHELL s
+                   JOIN SHELL_IDENTIFIER si ON si.fk_shell_id = s.id
+                   LEFT JOIN SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE sies
+                       ON sies.FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID = si.id
+                   LEFT JOIN SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY sider
+                       ON sider.FK_SI_EXTERNAL_SUBJECT_REFERENCE_ID = sies.id
+                   WHERE
+                       s.created_date > :cursorCreatedDate
+                       AND (
+                           :tenantId IS NULL
+                           OR :tenantId = :owningTenantId
+                           OR sider.ref_key_value = :tenantId
+                           OR (
+                               sider.ref_key_value = :publicWildcardPrefix
+                               AND si.namespace IN (:publicWildcardAllowedTypes)
+                           )
+                       )
+                   ORDER BY s.id, s.created_date ASC
+        """,
+           countQuery = """
+        SELECT COUNT(DISTINCT s.id)
+        FROM SHELL s
+        JOIN SHELL_IDENTIFIER si ON si.fk_shell_id = s.id
+        LEFT JOIN SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE sies
+            ON sies.FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID = si.id
+        LEFT JOIN SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY sider
+            ON sider.FK_SI_EXTERNAL_SUBJECT_REFERENCE_ID = sies.id
+        WHERE
+            s.created_date > :cursorCreatedDate
+            AND (
+                :tenantId IS NULL
+                OR :tenantId = :owningTenantId
+                OR sider.ref_key_value = :tenantId
+                OR (
+                    sider.ref_key_value = :publicWildcardPrefix
+                    AND si.namespace IN (:publicWildcardAllowedTypes)
+                )
+            )
+        """,
+           nativeQuery = true
+   )
+   Page<Shell> findAllByExternalSubjectId(
+           @Param("tenantId") String tenantId,
+           @Param("owningTenantId") String owningTenantId,
+           @Param("publicWildcardPrefix") String publicWildcardPrefix,
+           @Param("publicWildcardAllowedTypes") List<String> publicWildcardAllowedTypes,
+           @Param("cursorCreatedDate") Instant cursorCreatedDate,
+           Pageable pageable
+   );
+
    /**
     * Returns external shell ids for the given keyValueCombinations.
     * External shell ids that match any keyValueCombinations are returned.
