@@ -414,6 +414,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
          super.testFindExternalShellIdsBySpecificAssetIdsWithTenantBasedVisibilityExpectSuccess();
       }
 
+      @Disabled("Deprecated API call: GET /lookup/shells")
       @Test
       public void testFindExternalShellIdsBySpecificAssetIdsWithTenantBasedVisibilityAndWildcardExpectSuccess() throws Exception {
          accessControlRuleRepository.saveAllAndFlush( List.of(
