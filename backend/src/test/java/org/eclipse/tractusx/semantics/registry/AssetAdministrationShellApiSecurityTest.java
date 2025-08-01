@@ -905,6 +905,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                .andExpect( jsonPath( "$.result", contains( shellPayload.getId() ) ) );
       }
 
+      @Disabled("Deprecated API call: GET /lookup/shells")
       @Test
       public void testFindExternalShellIdsBySpecificAssetIdsWithTenantBasedVisibilityAndWildcardExpectSuccess() throws Exception {
          // the keyPrefix ensures that this test can run against a persistent database multiple times

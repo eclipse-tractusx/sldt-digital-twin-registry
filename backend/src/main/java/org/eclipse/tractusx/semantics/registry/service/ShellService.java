@@ -36,6 +36,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import jakarta.persistence.Tuple;
+import org.antlr.v4.runtime.misc.Pair;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.eclipse.tractusx.semantics.RegistryProperties;
@@ -58,6 +60,7 @@ import org.eclipse.tractusx.semantics.registry.repository.ShellRepository;
 import org.eclipse.tractusx.semantics.registry.repository.SubmodelRepository;
 import org.eclipse.tractusx.semantics.registry.utils.ShellCursor;
 import org.eclipse.tractusx.semantics.registry.utils.ShellSpecification;
+import org.hibernate.sql.results.internal.TupleImpl;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -229,10 +232,17 @@ public class ShellService {
       ShellCursor cursor = new ShellCursor(pageSize, cursorVal);
 
      // Instant cursorCreatedDate = cursor.getShellSearchCursor();
-      Instant cursorCreatedDate = createdAfter.toInstant();
+      String cVal = cursorVal;
+      if(cVal == null){cVal = DEFAULT_EXTERNAL_ID;}
+      Instant cursorCreatedDate = getCreatedDate(cVal,cursorVal!=null,createdAfter);
+
+      String extSubId = null;
+      if(!externalSubjectId.isEmpty()){
+         extSubId = externalSubjectId;
+      }
 
       Page<Shell> shellPage = shellRepository.findAllByExternalSubjectId(
-              externalSubjectId,
+              extSubId,
               owningTenantId,
               externalSubjectIdWildcardPrefix,
               externalSubjectIdWildcardAllowedTypes,
@@ -346,18 +356,24 @@ public class ShellService {
       pageSize = getPageSize( pageSize );
       final boolean isCursorAvailable = StringUtils.isNotBlank( cursor );
       final String cursorValue = getCursorDecoded( cursor ).orElse( DEFAULT_EXTERNAL_ID );
+
+      final List<String> assetIdList;
+      final String nextCursor;
+
       try {
-         final List<String> visibleAssetIds;
+         final Pair<List<String>,Long> visibleAssetIds;
          if ( shellAccessHandler.supportsGranularAccessControl() ) {
             visibleAssetIds = fetchAPageOfAasIdsUsingGranularAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize, isCursorAvailable,
                   createdAfter );
+            assetIdList = visibleAssetIds.a;
+            nextCursor = getCursorEncoded(assetIdList, visibleAssetIds.b);
          } else {
             visibleAssetIds = fetchAPageOfAasIdsUsingLegacyAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize, isCursorAvailable,
                   createdAfter );
+            assetIdList = visibleAssetIds.a.stream().limit( pageSize ).toList();
+            nextCursor = getCursorEncoded( visibleAssetIds.a, assetIdList );
          }
 
-         final var assetIdList = visibleAssetIds.stream().limit( pageSize ).toList();
-         final String nextCursor = getCursorEncoded( visibleAssetIds, assetIdList );
          final var response = new InlineResponse200();
          response.setResult( assetIdList );
          response.setPagingMetadata( new PagedResultPagingMetadata().cursor( nextCursor ) );
@@ -375,16 +391,25 @@ public class ShellService {
 
       pageSize = getPageSize( pageSize );
       final String cursorValue = getCursorDecoded( cursor ).orElse( DEFAULT_EXTERNAL_ID );
+
+
+      final List<String> assetIdList;
+      final String nextCursor;
+
       try {
-         final List<String> visibleAssetIds;
+         final Pair<List<String>,Long> visibleAssetIds;
          if ( shellAccessHandler.supportsGranularAccessControl() ) {
-            visibleAssetIds = fetchAPageOfAasIdsUsingGranularAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize, false, null );
+            visibleAssetIds = fetchAPageOfAasIdsUsingGranularAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize, false,
+                    null );
+            assetIdList = visibleAssetIds.a;
+            nextCursor = getCursorEncoded(assetIdList, visibleAssetIds.b);
          } else {
-            visibleAssetIds = fetchAPageOfAasIdsUsingLegacyAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize, false, null );
+            visibleAssetIds = fetchAPageOfAasIdsUsingLegacyAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize, false,
+                    null );
+            assetIdList = visibleAssetIds.a.stream().limit( pageSize ).toList();
+            nextCursor = getCursorEncoded( visibleAssetIds.a, assetIdList );
          }
 
-         final var assetIdList = visibleAssetIds.stream().limit( pageSize ).toList();
-         final String nextCursor = getCursorEncoded( visibleAssetIds, assetIdList );
          final var response = new SearchAllAssetAdministrationShellIdsByAssetLink200Response();
          response.setResult( assetIdList );
          response.setPagingMetadata( new PagedResultPagingMetadata().cursor( nextCursor ) );
@@ -396,14 +421,17 @@ public class ShellService {
       }
    }
 
-   private List<String> fetchAPageOfAasIdsUsingLegacyAccessControl( final Set<ShellIdentifier> shellIdentifiers, final String externalSubjectId,
+   private Pair<List<String>,Long> fetchAPageOfAasIdsUsingLegacyAccessControl( final Set<ShellIdentifier> shellIdentifiers, final String externalSubjectId,
          final String cursorValue, final int pageSize, final boolean isCursorAvailable, final OffsetDateTime createdAfter ) {
       final var fetchSize = pageSize + 1;
       final Instant cutoffDate = getCreatedDate( cursorValue, isCursorAvailable, createdAfter );
       List<String> keyValueCombinations = toKeyValueCombinations( shellIdentifiers );
-      return shellIdentifierRepository.findExternalShellIdsByIdentifiersByExactMatch( keyValueCombinations,
-            keyValueCombinations.size(), externalSubjectId, externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes, owningTenantId,
-            ShellIdentifier.GLOBAL_ASSET_ID_KEY, cutoffDate, cursorValue, fetchSize );
+
+      List<String> foundShells = shellIdentifierRepository.findExternalShellIdsByIdentifiersByExactMatch( keyValueCombinations,
+              keyValueCombinations.size(), externalSubjectId, externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes, owningTenantId,
+              ShellIdentifier.GLOBAL_ASSET_ID_KEY, cutoffDate, cursorValue, fetchSize);
+
+      return new Pair<>(foundShells, (long) foundShells.size());
    }
 
    /**
@@ -435,32 +463,31 @@ public class ShellService {
       return shellRepository.getCreatedDateByIdExternal( cursorValue ).orElse( MINIMUM_SQL_DATETIME );
    }
 
-   private List<String> fetchAPageOfAasIdsUsingGranularAccessControl( final Set<ShellIdentifier> shellIdentifiers, final String externalSubjectId,
-         final String cursorValue, final int pageSize, final boolean isCursorAvailable, final OffsetDateTime createdAfter ) throws DenyAccessException {
+   private Pair<List<String>, Long>  fetchAPageOfAasIdsUsingGranularAccessControl(final Set<ShellIdentifier> shellIdentifiers, final String externalSubjectId,
+                                                                           final String cursorValue, final int pageSize, final boolean isCursorAvailable, final OffsetDateTime createdAfter ) throws DenyAccessException {
+
       final Set<SpecificAssetId> userQuery = shellIdentifiers.stream()
             .map( id -> new SpecificAssetId( id.getKey(), id.getValue() ) )
             .collect( Collectors.toSet() );
+
       List<String> keyValueCombinations = toKeyValueCombinations( shellIdentifiers );
-      final var fetchSize = granularAccessControlFetchSize;
 
-      String currentCursorValue = cursorValue;
-      final List<String> visibleAssetIds = new ArrayList<>();
-      while ( visibleAssetIds.size() < pageSize + 1 ) {
-         final Instant currentCutoffDate = getCreatedDate( currentCursorValue, isCursorAvailable, createdAfter );
-         List<UUID> shellIds = shellIdentifierRepository.findAPageOfShellIdsBySpecificAssetIds(
-               keyValueCombinations, keyValueCombinations.size(), currentCutoffDate, currentCursorValue, PageRequest.ofSize( fetchSize ) );
-         if ( shellIds.isEmpty() ) {
-            break;
-         }
-         List<ShellIdentifierMinimal> queryResults = shellIdentifierRepository
-               .findMinimalShellIdsByShellIds( shellIds, currentCutoffDate, currentCursorValue );
+      final Instant currentCutoffDate = getCreatedDate( cursorValue, isCursorAvailable, createdAfter );
 
-         shellAccessHandler.filterToVisibleShellIdsForLookup( userQuery, queryResults, externalSubjectId ).stream()
-               .limit( (long) fetchSize - visibleAssetIds.size() )
-               .forEach( visibleAssetIds::add );
-         currentCursorValue = lastItemOf( queryResults ).shellId();
+      String extSubId = null;
+      if(!externalSubjectId.isEmpty()){
+         extSubId = externalSubjectId;
       }
-      return visibleAssetIds.stream().distinct().toList();
+
+      Page<UUID> shellIds = shellIdentifierRepository.findAPageOfShellIdsBySpecificAssetIds(
+               keyValueCombinations, keyValueCombinations.size(), currentCutoffDate, extSubId, owningTenantId, externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes, PageRequest.ofSize( pageSize ) );
+
+      List<ShellIdentifierMinimal> queryResults = shellIdentifierRepository
+               .findMinimalShellIdsByShellIds(shellIds.stream().toList());
+
+      List<String> visibleAssetIds = shellAccessHandler.filterToVisibleShellIdsForLookup( userQuery, queryResults, extSubId );
+
+      return new Pair<List<String>, Long> (visibleAssetIds, shellIds.getTotalElements());
    }
 
    @Transactional( readOnly = true )
@@ -652,6 +679,13 @@ public class ShellService {
 
    private String getCursorEncoded( List<String> queryResult, List<String> assetIdList ) {
       if ( !queryResult.isEmpty() && !lastItemOf( assetIdList ).equals( lastItemOf( queryResult ) ) ) {
+         return Base64.getEncoder().encodeToString( lastItemOf( assetIdList ).getBytes() );
+      }
+      return null;
+   }
+
+   private String getCursorEncoded( List<String> assetIdList , Long totalElementCount ) {
+      if ( !assetIdList.isEmpty() && assetIdList.size() < totalElementCount) {
          return Base64.getEncoder().encodeToString( lastItemOf( assetIdList ).getBytes() );
       }
       return null;
