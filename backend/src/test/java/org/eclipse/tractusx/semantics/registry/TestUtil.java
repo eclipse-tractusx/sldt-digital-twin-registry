@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2025 Robert Bosch Manufacturing Solutions GmbH and others
+ * Copyright (c) 2025 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -54,7 +54,7 @@ public class TestUtil {
       assetAdministrationShellDescriptor.setAssetType( "AssetType" );
       assetAdministrationShellDescriptor.setAssetKind( AssetKind.INSTANCE );
       assetAdministrationShellDescriptor.setId( "fb7ebcc2-5731-4948-aeaa-c9e9692decf5" );
-      assetAdministrationShellDescriptor.setIdShort( RandomStringUtils.random( 10, true, true ) );
+      assetAdministrationShellDescriptor.setIdShort( generateValidIdShort( 10 ) );
 
       Reference specificAssetIdReference = new Reference();
       specificAssetIdReference.setType( ReferenceTypes.MODELREFERENCE );
@@ -135,7 +135,7 @@ public class TestUtil {
       SubmodelDescriptor submodelDescriptor = new SubmodelDescriptor();
       submodelDescriptor.setId( UuidCreator.getTimeOrderedEpoch().toString() );
       submodelDescriptor.setDisplayName( List.of( displayName ) );
-      submodelDescriptor.setIdShort( RandomStringUtils.random( 10, true, true ) );
+      submodelDescriptor.setIdShort( generateValidIdShort( 10 ) );
       submodelDescriptor.setSemanticId( submodelSemanticReference );
       submodelDescriptor.setSupplementalSemanticId( List.of( submodelSupplemSemanticIdReference ) );
       submodelDescriptor.setDescription( List.of( description1, description2 ) );
@@ -144,6 +144,25 @@ public class TestUtil {
       submodelDescriptors.add( submodelDescriptor );
       assetAdministrationShellDescriptor.setSubmodelDescriptors( submodelDescriptors );
       return assetAdministrationShellDescriptor;
+   }
+
+   public static String generateValidIdShort(int length) {
+       if (length < 2) {
+           throw new IllegalArgumentException("Length must be at least 2");
+       }
+
+       // First character must be a letter
+       String firstChar = RandomStringUtils.random(1, 0, 0, true, false);
+
+       // Last character must be a letter, number, or underscore (not a hyphen)
+       String lastChar = RandomStringUtils.random(1, 0, 0, true, true, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_".toCharArray());
+
+       // Middle characters can be letters, numbers, underscores, or hyphens
+       String middleChars = length > 2 ?
+               RandomStringUtils.random(length - 2, 0, 0, true, true, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-".toCharArray()) :
+               "";
+
+       return firstChar + middleChars + lastChar;
    }
 
    public static SubmodelDescriptor createSubmodel() {
