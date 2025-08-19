@@ -128,35 +128,76 @@ public interface ShellIdentifierRepository extends JpaRepository<ShellIdentifier
     * @return external shell ids for the given key value combinations
     */
    @Query( value = """
-         SELECT s.id_external
-         FROM shell s
-            JOIN shell_identifier si ON s.id = si.fk_shell_id
-         WHERE
-            CONCAT( si.namespace, si.identifier ) IN ( :keyValueCombinations )
-            AND (
-               s.created_date > :cutoffDate
-               OR ( s.created_date = :cutoffDate AND s.id_external > :cursorValue )
-            )
-            AND (
-               :tenantId = :owningTenantId
-               OR si.namespace = :globalAssetId
-               OR EXISTS (
-                  SELECT 1
-                  FROM SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY sider
-                     JOIN SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE sies ON sider.FK_SI_EXTERNAL_SUBJECT_REFERENCE_ID = sies.id
-                  WHERE
-                     (
-                        sider.ref_key_value = :tenantId
-                        OR ( sider.ref_key_value = :publicWildcardPrefix AND si.namespace IN (:publicWildcardAllowedTypes) )
-                     )
-                     AND sies.FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID = si.id
-               )
-            )
-         GROUP BY s.id_external, s.created_date
-         HAVING COUNT(*) = :keyValueCombinationsSize
-         ORDER BY s.created_date, s.id_external
-         LIMIT :pageSize
-         """, nativeQuery = true )
+           SELECT id_external
+           FROM (
+               SELECT
+                   s.id_external,
+                   s.created_date
+               FROM shell s
+               JOIN shell_identifier si ON s.id = si.fk_shell_id
+               WHERE
+                   CONCAT(si.namespace, si.identifier) IN (:keyValueCombinations)
+                   AND (
+                       s.created_date > :cutoffDate
+                       OR (s.created_date = :cutoffDate AND s.id_external > :cursorValue)
+                   )
+                   AND :tenantId = :owningTenantId
+               GROUP BY s.id_external, s.created_date
+               HAVING COUNT(*) = :keyValueCombinationsSize
+           
+               UNION ALL
+           
+               SELECT
+                   s.id_external,
+                   s.created_date
+               FROM shell s
+               JOIN shell_identifier si ON s.id = si.fk_shell_id
+               WHERE
+                   CONCAT(si.namespace, si.identifier) IN (:keyValueCombinations)
+                   AND (
+                       s.created_date > :cutoffDate
+                       OR (s.created_date = :cutoffDate AND s.id_external > :cursorValue)
+                   )
+                   AND si.namespace = :globalAssetId
+                   AND NOT (:tenantId = :owningTenantId)
+               GROUP BY s.id_external, s.created_date
+               HAVING COUNT(*) = :keyValueCombinationsSize
+           
+               UNION ALL
+           
+               SELECT
+                   s.id_external,
+                   s.created_date
+               FROM shell s
+               JOIN shell_identifier si ON s.id = si.fk_shell_id
+               WHERE
+                   CONCAT(si.namespace, si.identifier) IN (:keyValueCombinations)
+                   AND (
+                       s.created_date > :cutoffDate
+                       OR (s.created_date = :cutoffDate AND s.id_external > :cursorValue)
+                   )
+                   AND EXISTS (
+                       SELECT 1
+                       FROM SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY sider
+                       JOIN SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE sies
+                           ON sider.FK_SI_EXTERNAL_SUBJECT_REFERENCE_ID = sies.id
+                       WHERE
+                           sies.FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID = si.id
+                           AND (
+                               sider.ref_key_value = :tenantId
+                               OR (
+                                   sider.ref_key_value = :publicWildcardPrefix
+                                   AND si.namespace IN (:publicWildcardAllowedTypes)
+                               )
+                           )
+                   )
+                   AND NOT (:tenantId = :owningTenantId OR si.namespace = :globalAssetId)
+               GROUP BY s.id_external, s.created_date
+               HAVING COUNT(*) = :keyValueCombinationsSize
+           ) AS combined_shells
+           ORDER BY created_date, id_external
+           LIMIT :pageSize;
+           """, nativeQuery = true )
    List<String> findExternalShellIdsByIdentifiersByExactMatch( @Param( "keyValueCombinations" ) List<String> keyValueCombinations,
          @Param( "keyValueCombinationsSize" ) int keyValueCombinationsSize,
          @Param( "tenantId" ) String tenantId,
