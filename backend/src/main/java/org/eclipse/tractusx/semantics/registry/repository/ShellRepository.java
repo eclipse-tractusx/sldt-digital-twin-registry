@@ -129,7 +129,7 @@ public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecific
                            )
                      )
                  )
-           )
+           ) AS shell_count
         """,
            nativeQuery = true
    )
