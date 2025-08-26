@@ -1579,7 +1579,7 @@ components:
           maxLength: 128
           type: string
           minLength: 1
-          pattern: "^[a-zA-Z][a-zA-Z0-9_-]*[a-zA-Z0-9_]+$"
+#          pattern: "^[a-zA-Z][a-zA-Z0-9_-]*[a-zA-Z0-9_]+$"
         id:
           maxLength: 2048
           minLength: 1
