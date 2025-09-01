@@ -104,9 +104,7 @@ public class AssetAdministrationShellIntegrationTest {
             .sorted( Comparator.comparing( Path::getFileName ) )
             .forEach( testStepPath -> {
                try {
-                  if(!testStepPath.toString().contains( "3_testCreateShellWithExistingIdExpectBadRequest" )) {
                      executeTestStep( testStepPath );
-                  }
                } catch ( Exception e ) {
                   throw new RuntimeException( "Failed to load test steps", e );
                }
