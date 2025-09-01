@@ -1097,7 +1097,7 @@ components:
               maxLength: 128
               type: string
               minLength: 1
-#              pattern: "^[a-zA-Z][a-zA-Z0-9_-]*[a-zA-Z0-9_]+$"
+              pattern: "^[a-zA-Z][a-zA-Z0-9_-]*[a-zA-Z0-9_]+$"
             id:
               maxLength: 2048
               minLength: 1
@@ -1174,7 +1174,7 @@ components:
             valueType:
               $ref: '#/components/schemas/DataTypeDefXsd'
             value:
-#              pattern: "^([\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
+              pattern: "^([\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
               type: string
             refersTo:
               minItems: 1
@@ -1579,7 +1579,7 @@ components:
           maxLength: 128
           type: string
           minLength: 1
-#          pattern: "^[a-zA-Z][a-zA-Z0-9_-]*[a-zA-Z0-9_]+$"
+          pattern: "^[a-zA-Z][a-zA-Z0-9_-]*[a-zA-Z0-9_]+$"
         id:
           maxLength: 2048
           minLength: 1
