@@ -104,7 +104,7 @@ public class AssetAdministrationShellIntegrationTest {
             .sorted( Comparator.comparing( Path::getFileName ) )
             .forEach( testStepPath -> {
                try {
-                     executeTestStep( testStepPath );
+                  executeTestStep( testStepPath );
                } catch ( Exception e ) {
                   throw new RuntimeException( "Failed to load test steps", e );
                }
