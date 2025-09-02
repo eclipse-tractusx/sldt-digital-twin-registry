@@ -147,7 +147,7 @@ keycloak:
     # -- workaround to use bitnamilegacy chart for version 16.1.x till committers align on new postgresql charts
     repository: bitnamilegacy/keycloak
     # -- workaround to use bitnamilegacy chart for version 16.1.x till committers align on new postgresql charts
-    tag: 16.1.1-debian-10-r99
+    tag: 22.0.3-debian-11-r14
   postgresql:
     enabled: false
   externalDatabase:
