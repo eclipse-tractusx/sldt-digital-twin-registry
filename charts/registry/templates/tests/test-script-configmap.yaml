@@ -57,7 +57,7 @@ data:
             Edc-Bpn: "default-tenant"
           json: 
             id: "{decoded_shell_id:s}"
-            idShort: twin of a break (Testing)
+            idShort: new_IdShort_InSample
         response:
           status_code: 201
           headers:
@@ -77,7 +77,7 @@ data:
           json: 
             description: []
             displayName: []
-            idShort: twin of a break (Testing)
+            idShort: new_IdShort_InSample
             id: "{decoded_shell_id:s}"
             specificAssetIds: []
             submodelDescriptors: []
@@ -92,7 +92,7 @@ data:
             Edc-Bpn: "default-tenant"
           json: 
             id: "{decoded_shell_id:s}"
-            idShort: twin of a break (Testing Update)
+            idShort: new_IdShort_InUpdate
         response:
           status_code: 204
 
