@@ -46,7 +46,7 @@ digital-twin-registry:
     idpIssuerUri: <path:semantics/data/dtr#idpIssuerUri>
     idpClientId: <path:semantics/data/dtr#idpClientId>
     tenantId: <path:semantics/data/dtr#tenantId>
-    useGranularAccessControl: "false"
+    useGranularAccessControl: "true"
     ingress:
       enabled: true
       tls: 
