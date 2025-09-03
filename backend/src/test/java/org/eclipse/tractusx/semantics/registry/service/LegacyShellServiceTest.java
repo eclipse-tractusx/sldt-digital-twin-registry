@@ -20,14 +20,7 @@
 
 package org.eclipse.tractusx.semantics.registry.service;
 
-import java.time.OffsetDateTime;
-import java.util.Base64;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.IntStream;
-import static org.assertj.core.api.Assertions.assertThat;
-
+import com.github.f4b6a3.uuid.UuidCreator;
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
 import org.eclipse.tractusx.semantics.aas.registry.model.InlineResponse200;
@@ -42,6 +35,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.time.OffsetDateTime;
+import java.util.Base64;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.IntStream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -58,7 +59,7 @@ class LegacyShellServiceTest {
 
    @BeforeEach
    void setUp() {
-      keyPrefix = UUID.randomUUID().toString();
+      keyPrefix = UuidCreator.getTimeOrderedEpoch().toString();
    }
 
    @Test
@@ -81,7 +82,7 @@ class LegacyShellServiceTest {
       String specificAssetIdName = keyPrefix + "key";
       String specificAssetIdValue = "value";
       Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
-      String id = UUID.randomUUID().toString();
+      String id = UuidCreator.getTimeOrderedEpoch().toString();
       createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue );
 
       final var actual = shellService.findExternalShellIdsByIdentifiersByExactMatch(
@@ -99,7 +100,7 @@ class LegacyShellServiceTest {
       String specificAssetIdValue = "value";
       Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
       List<String> expectedIds = IntStream.rangeClosed( 0, 4 )
-            .mapToObj( i -> UUID.randomUUID().toString() )
+            .mapToObj( i -> UuidCreator.getTimeOrderedEpoch().toString() )
             .toList();
       expectedIds.forEach( id -> createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue ) );
 
@@ -120,7 +121,7 @@ class LegacyShellServiceTest {
       int pageSize = 5;
       int totalItems = pageSize + 1;
       List<String> expectedIds = IntStream.range( 0, totalItems )
-            .mapToObj( i -> UUID.randomUUID().toString() )
+            .mapToObj( i -> UuidCreator.getTimeOrderedEpoch().toString() )
             .toList();
       expectedIds.forEach( id -> createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue ) );
 
@@ -142,7 +143,7 @@ class LegacyShellServiceTest {
       int pageSize = 5;
       int totalItems = pageSize + pageSize;
       List<String> expectedIds = IntStream.range( 0, totalItems )
-            .mapToObj( i -> UUID.randomUUID().toString() )
+            .mapToObj( i -> UuidCreator.getTimeOrderedEpoch().toString() )
             .toList();
       expectedIds.forEach( id -> createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue ) );
 
@@ -164,7 +165,7 @@ class LegacyShellServiceTest {
       int pageSize = 5;
       int totalItems = pageSize * 3;
       List<String> expectedIds = IntStream.range( 0, totalItems )
-            .mapToObj( i -> UUID.randomUUID().toString() )
+            .mapToObj( i -> UuidCreator.getTimeOrderedEpoch().toString() )
             .toList();
       expectedIds.forEach( id -> createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue ) );
 
@@ -186,7 +187,7 @@ class LegacyShellServiceTest {
       int pageSize = 5;
       int totalItems = pageSize * 3;
       List<String> expectedIds = IntStream.range( 0, totalItems )
-            .mapToObj( i -> UUID.randomUUID().toString() )
+            .mapToObj( i -> UuidCreator.getTimeOrderedEpoch().toString() )
             .toList();
       expectedIds.forEach( id -> createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue ) );
 
@@ -220,7 +221,7 @@ class LegacyShellServiceTest {
          final String specificAssetIdName = keyPrefix + "key";
          final String specificAssetIdValue = "value";
          final Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
-         final String id = UUID.randomUUID().toString();
+         final String id = UuidCreator.getTimeOrderedEpoch().toString();
          createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue );
    
          final var actual = shellService.findExternalShellIdsByIdentifiersByExactMatch(
@@ -240,7 +241,7 @@ class LegacyShellServiceTest {
          final int pageSize = 5;
          final int totalItems = pageSize * 3;
          final List<String> expectedIds = IntStream.range( 0, totalItems )
-               .mapToObj( i -> UUID.randomUUID().toString() )
+               .mapToObj( i -> UuidCreator.getTimeOrderedEpoch().toString() )
                .toList();
          expectedIds.forEach( id -> createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue ) );
    
@@ -274,7 +275,7 @@ class LegacyShellServiceTest {
       final String specificAssetIdName = keyPrefix + "key";
       final String specificAssetIdValue = "value";
       final Set<ShellIdentifier> criteria = Set.of( new ShellIdentifier().withKey( specificAssetIdName ).withValue( specificAssetIdValue ) );
-      final String id = UUID.randomUUID().toString();
+      final String id = UuidCreator.getTimeOrderedEpoch().toString();
       createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue );
 
       final var actual = shellService.findExternalShellIdsByIdentifiersByExactMatch(

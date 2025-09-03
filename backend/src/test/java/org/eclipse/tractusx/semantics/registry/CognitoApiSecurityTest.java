@@ -20,15 +20,14 @@
 
 package org.eclipse.tractusx.semantics.registry;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.UUID;
-
+import com.github.f4b6a3.uuid.UuidCreator;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles(profiles = { "cognito-test" })
 public class CognitoApiSecurityTest extends AbstractAssetAdministrationShellApi {
@@ -36,7 +35,7 @@ public class CognitoApiSecurityTest extends AbstractAssetAdministrationShellApi 
     public void testWithInvalidAuthenticationTokenConfigurationExpectUnauthorized() throws Exception {
        mvc.perform(
                    MockMvcRequestBuilders
-                         .get( SINGLE_SHELL_BASE_PATH, UUID.randomUUID() )
+                         .get( SINGLE_SHELL_BASE_PATH, UuidCreator.getTimeOrderedEpoch() )
                          .accept( MediaType.APPLICATION_JSON )
                          .with( jwtTokenFactory.withoutResourceAccess() )
              )
@@ -45,7 +44,7 @@ public class CognitoApiSecurityTest extends AbstractAssetAdministrationShellApi 
 
        mvc.perform(
                    MockMvcRequestBuilders
-                         .get( SINGLE_SHELL_BASE_PATH, UUID.randomUUID() )
+                         .get( SINGLE_SHELL_BASE_PATH, UuidCreator.getTimeOrderedEpoch() )
                          .accept( MediaType.APPLICATION_JSON )
                          .with( jwtTokenFactory.withoutRoles() )
              )
@@ -58,7 +57,7 @@ public class CognitoApiSecurityTest extends AbstractAssetAdministrationShellApi 
     	// test is only if Cognito auth is working. Shell descriptor does not exist so we expect a 404 not found.
         mvc.perform(
                    MockMvcRequestBuilders
-                         .get( SINGLE_SHELL_BASE_PATH, UUID.randomUUID() )
+                         .get( SINGLE_SHELL_BASE_PATH, UuidCreator.getTimeOrderedEpoch() )
                          .accept( MediaType.APPLICATION_JSON )
                          .with( jwtTokenFactory.allRoles() )
              )

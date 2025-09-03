@@ -20,39 +20,21 @@
 
 package org.eclipse.tractusx.semantics.registry;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.github.f4b6a3.uuid.UuidCreator;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
-import org.eclipse.tractusx.semantics.aas.registry.model.AssetKind;
-import org.eclipse.tractusx.semantics.aas.registry.model.AssetLink;
-import org.eclipse.tractusx.semantics.aas.registry.model.Endpoint;
-import org.eclipse.tractusx.semantics.aas.registry.model.Key;
-import org.eclipse.tractusx.semantics.aas.registry.model.KeyTypes;
-import org.eclipse.tractusx.semantics.aas.registry.model.LangStringNameType;
-import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
-import org.eclipse.tractusx.semantics.aas.registry.model.ProtocolInformation;
-import org.eclipse.tractusx.semantics.aas.registry.model.ProtocolInformationSecurityAttributes;
-import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
-import org.eclipse.tractusx.semantics.aas.registry.model.ReferenceTypes;
-import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
-import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
+import org.eclipse.tractusx.semantics.aas.registry.model.*;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRule;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRulePolicy;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.policy.AccessRulePolicyValue;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.policy.PolicyOperator;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class TestUtil {
 
@@ -151,7 +133,7 @@ public class TestUtil {
       submodelSupplemSemanticIdReference.setKeys( List.of( submodelSupplemSemanticIdkey ) );
 
       SubmodelDescriptor submodelDescriptor = new SubmodelDescriptor();
-      submodelDescriptor.setId( UUID.randomUUID().toString() );
+      submodelDescriptor.setId( UuidCreator.getTimeOrderedEpoch().toString() );
       submodelDescriptor.setDisplayName( List.of( displayName ) );
       submodelDescriptor.setIdShort( generateValidIdShort( 10 ) );
       submodelDescriptor.setSemanticId( submodelSemanticReference );
@@ -189,7 +171,7 @@ public class TestUtil {
 
    public static SubmodelDescriptor createSubmodel( String semanticId, String endpointUrl ) {
       SubmodelDescriptor submodelDescriptor = new SubmodelDescriptor();
-      submodelDescriptor.setId( UUID.randomUUID().toString() );
+      submodelDescriptor.setId( UuidCreator.getTimeOrderedEpoch().toString() );
       submodelDescriptor.setIdShort( "idShortExample" );
 
       Reference submodelSemanticReference = new Reference();
