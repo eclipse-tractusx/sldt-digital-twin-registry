@@ -22,12 +22,28 @@ package org.eclipse.tractusx.semantics.registry.model;
 
 import java.util.Set;
 import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import jakarta.persistence.*;
-import lombok.*;
+import com.github.f4b6a3.uuid.UuidCreator;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.With;
 import lombok.experimental.FieldNameConstants;
 
 @Entity
@@ -43,9 +59,7 @@ public class ShellIdentifier {
     public static final String GLOBAL_ASSET_ID_KEY = "globalAssetId";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
-    private UUID id;
+	private UUID id = UuidCreator.getTimeOrderedEpoch();
     @Column(name = "namespace")
     private String key;
     @Column(name = "identifier")
