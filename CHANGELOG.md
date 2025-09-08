@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.9.1
+### Added
+### Changed
+- Replace UUIDv4 with UUIDv7 to improve insert performance
+### Fixed
+
 ## 0.9.0
 ### Added
 Migration Guide is added under docs/admin/Migration Guide.md
@@ -22,7 +28,6 @@ Migration Guide is added under docs/admin/Migration Guide.md
 ### Added
 - Filtering shells based on timestamp
 ### Changed
- - Replace UUIDv4 with UUIDv7 to improve insert performance
 ### Fixed
  - Restore IDTA conformity and reinstate max length of subprotocolBody to 2048
  - High number of SELECT statements during pagination
