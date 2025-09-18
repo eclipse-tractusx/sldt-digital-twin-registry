@@ -61,6 +61,7 @@ public class OAuthSecurityConfig {
                     // lookup
                     // query endpoint is allowed for reader
                     .requestMatchers( HttpMethod.POST, "/**/lookup/**/query/**" ).access( "@authorizationEvaluator.hasRoleViewDigitalTwin()" )
+                    .requestMatchers( HttpMethod.POST, "/**/lookup/shellsByAssetLink" ).access( "@authorizationEvaluator.hasRoleViewDigitalTwin()" )
                     // others are HTTP method based
                     .requestMatchers( HttpMethod.GET, "/**/lookup/**" ).access( "@authorizationEvaluator.hasRoleViewDigitalTwin()" )
                     .requestMatchers( HttpMethod.POST, "/**/lookup/**" ).access( "@authorizationEvaluator.hasRoleAddDigitalTwin()" )
