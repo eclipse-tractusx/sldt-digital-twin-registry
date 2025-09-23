@@ -525,6 +525,32 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                .andExpect( status().isOk() );
       }
 
+      @Test
+      public void testRbacForLookupShellsByAssetLink() throws Exception {
+         ArrayNode specificAssetIds = emptyArrayNode()
+               .add( specificAssetId( "key1", "value1" ) )
+               .add( specificAssetId( "key2", "value2" ) );
+
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .post( LOOKUP_SHELL_BASE_PATH_POST )
+                           .contentType( MediaType.APPLICATION_JSON )
+                           .content( toJson( specificAssetIds ) )
+                           .with( jwtTokenFactory.addTwin() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isForbidden() );
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .post( LOOKUP_SHELL_BASE_PATH_POST )
+                           .contentType( MediaType.APPLICATION_JSON )
+                           .accept( MediaType.APPLICATION_JSON )
+                           .content( toJson( specificAssetIds ) )
+                           .with( jwtTokenFactory.readTwin() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isOk() );
+      }
    }
 
    @Nested
