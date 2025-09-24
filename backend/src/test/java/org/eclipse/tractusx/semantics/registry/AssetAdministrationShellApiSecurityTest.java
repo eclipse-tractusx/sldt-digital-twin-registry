@@ -536,10 +536,20 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                            .post( LOOKUP_SHELL_BASE_PATH_POST )
                            .contentType( MediaType.APPLICATION_JSON )
                            .content( toJson( specificAssetIds ) )
-                           .with( jwtTokenFactory.addTwin() )
+                           .with( jwtTokenFactory.deleteTwin() )
                )
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isForbidden() );
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .post( LOOKUP_SHELL_BASE_PATH_POST )
+                           .contentType( MediaType.APPLICATION_JSON )
+                           .accept( MediaType.APPLICATION_JSON )
+                           .content( toJson( specificAssetIds ) )
+                           .with( jwtTokenFactory.addTwin() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isOk() );
          mvc.perform(
                      MockMvcRequestBuilders
                            .post( LOOKUP_SHELL_BASE_PATH_POST )
