@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 ### Changed
 - Replace UUIDv4 with UUIDv7 to improve insert performance
+- Make `/lookup/shellsByAssetLink` endpoint accessible to `view_digital_twin` role
 ### Fixed
 
 ## 0.9.0
