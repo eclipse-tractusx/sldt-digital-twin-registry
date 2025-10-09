@@ -9,7 +9,7 @@
     "displayName":[
 
     ],
-    "idShort":"7WXEUFyZRD",
+    "idShort":"new_IdShort_InUpdate1",
     "id":"5d4b6464-50b0-4234-8de6-1f74a836329a",
     "specificAssetIds":[
       {
@@ -23,7 +23,7 @@
     ],
     "submodelDescriptors":[
       {
-        "idShort":"newIdShortInUpdateRequest",
+        "idShort":"new_IdShort_InUpdate1",
         "id":"c00b94ac-9e91-4f04-848c-9fa5b287a6ac",
         "endpoints":[
           {

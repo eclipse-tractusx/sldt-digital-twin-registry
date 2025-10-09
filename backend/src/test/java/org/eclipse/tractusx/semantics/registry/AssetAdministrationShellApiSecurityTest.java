@@ -20,33 +20,23 @@
 
 package org.eclipse.tractusx.semantics.registry;
 
-import static org.eclipse.tractusx.semantics.registry.TestUtil.*;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.UUID;
-
-import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
-import org.eclipse.tractusx.semantics.aas.registry.model.Key;
-import org.eclipse.tractusx.semantics.aas.registry.model.KeyTypes;
-import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
-import org.eclipse.tractusx.semantics.aas.registry.model.ReferenceTypes;
-import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
-import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.f4b6a3.uuid.UuidCreator;
+import org.eclipse.tractusx.semantics.aas.registry.model.*;
+import org.junit.jupiter.api.*;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+
+import static org.eclipse.tractusx.semantics.registry.TestUtil.getEncodedValue;
+import static org.eclipse.tractusx.semantics.registry.TestUtil.serialize;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  *  This class contains test to verify Authentication and RBAC based Authorization for all API endpoints.
@@ -61,7 +51,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
       public void testWithoutAuthenticationTokenProvidedExpectUnauthorized() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( SINGLE_SHELL_BASE_PATH, UUID.randomUUID() )
+                           .get( SINGLE_SHELL_BASE_PATH, UuidCreator.getTimeOrderedEpoch())
                            .accept( MediaType.APPLICATION_JSON )
                )
                .andDo( MockMvcResultHandlers.print() )
@@ -72,7 +62,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
       public void testWithAuthenticationTokenProvidedExpectUnauthorized() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( SINGLE_SHELL_BASE_PATH, UUID.randomUUID() )
+                           .get( SINGLE_SHELL_BASE_PATH, UuidCreator.getTimeOrderedEpoch() )
                            .accept( MediaType.APPLICATION_JSON )
                )
                .andDo( MockMvcResultHandlers.print() )
@@ -83,7 +73,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
       public void testWithInvalidAuthenticationTokenConfigurationExpectUnauthorized() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( SINGLE_SHELL_BASE_PATH, UUID.randomUUID() )
+                           .get( SINGLE_SHELL_BASE_PATH, UuidCreator.getTimeOrderedEpoch() )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.withoutResourceAccess() )
                )
@@ -92,7 +82,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
 
          mvc.perform(
                      MockMvcRequestBuilders
-                           .get( SINGLE_SHELL_BASE_PATH, UUID.randomUUID() )
+                           .get( SINGLE_SHELL_BASE_PATH, UuidCreator.getTimeOrderedEpoch() )
                            .accept( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.withoutRoles() )
                )
@@ -110,7 +100,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
       @BeforeEach
       public void before() throws Exception {
          AssetAdministrationShellDescriptor shellPayload1 = TestUtil.createCompleteAasDescriptor();
-         shellPayload1.setId( UUID.randomUUID().toString() );
+         shellPayload1.setId( UuidCreator.getTimeOrderedEpoch().toString() );
          performShellCreateRequest( mapper.writeValueAsString( shellPayload1 ) );
          shellId = shellPayload1.getId();
 
@@ -168,7 +158,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
       @Test
       public void testRbacForCreate() throws Exception {
          AssetAdministrationShellDescriptor shellPayload1 = TestUtil.createCompleteAasDescriptor();
-         shellPayload1.setId( UUID.randomUUID().toString() );
+         shellPayload1.setId( UuidCreator.getTimeOrderedEpoch().toString() );
          mvc.perform(
                      MockMvcRequestBuilders
                            .post( SHELL_BASE_PATH )
@@ -180,7 +170,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isForbidden() );
 
-         shellPayload1.setId( UUID.randomUUID().toString() );
+         shellPayload1.setId( UuidCreator.getTimeOrderedEpoch().toString() );
          mvc.perform(
                      MockMvcRequestBuilders
                            .post( SHELL_BASE_PATH, mapper.writeValueAsString( shellPayload1 ) )
@@ -260,7 +250,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
       @Test
       public void testRbacForGetAll() throws Exception {
          AssetAdministrationShellDescriptor testAas = TestUtil.createCompleteAasDescriptor();
-         testAas.setId( UUID.randomUUID().toString() );
+         testAas.setId( UuidCreator.getTimeOrderedEpoch().toString() );
          performShellCreateRequest( mapper.writeValueAsString( testAas ) );
          shellId = testAas.getId();
 
@@ -290,7 +280,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
       public void testRbacForGetById() throws Exception {
 
          AssetAdministrationShellDescriptor testAas = TestUtil.createCompleteAasDescriptor();
-         testAas.setId( UUID.randomUUID().toString() );
+         testAas.setId( UuidCreator.getTimeOrderedEpoch().toString() );
          performShellCreateRequest( mapper.writeValueAsString( testAas ) );
          shellId = testAas.getId();
          submodelIdAas = testAas.getSubmodelDescriptors().get( 0 ).getId();
@@ -321,11 +311,11 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
       public void testRbacForCreate() throws Exception {
 
          SubmodelDescriptor testSubmodelDescriptor = TestUtil.createSubmodel();
-         testSubmodelDescriptor.setId( UUID.randomUUID().toString() );
+         testSubmodelDescriptor.setId( UuidCreator.getTimeOrderedEpoch().toString() );
          String submodelPayloadForCreate = mapper.writeValueAsString( testSubmodelDescriptor );
 
          AssetAdministrationShellDescriptor testAas = TestUtil.createCompleteAasDescriptor();
-         testAas.setId( UUID.randomUUID().toString() );
+         testAas.setId( UuidCreator.getTimeOrderedEpoch().toString() );
          performShellCreateRequest( mapper.writeValueAsString( testAas ) );
          shellId = testAas.getId();
 
@@ -340,7 +330,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isForbidden() );
 
-         testSubmodelDescriptor.setId( UUID.randomUUID().toString() );
+         testSubmodelDescriptor.setId( UuidCreator.getTimeOrderedEpoch().toString() );
 
          mvc.perform(
                      MockMvcRequestBuilders
@@ -358,7 +348,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
       public void testRbacForUpdate() throws Exception {
 
          AssetAdministrationShellDescriptor testAas = TestUtil.createCompleteAasDescriptor();
-         testAas.setId( UUID.randomUUID().toString() );
+         testAas.setId( UuidCreator.getTimeOrderedEpoch().toString() );
          performShellCreateRequest( mapper.writeValueAsString( testAas ) );
          shellId = testAas.getId();
          submodelIdAas = testAas.getSubmodelDescriptors().get( 0 ).getId();
@@ -393,7 +383,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
       @Test
       public void testRbacForDelete() throws Exception {
          AssetAdministrationShellDescriptor testAas = TestUtil.createCompleteAasDescriptor();
-         testAas.setId( UUID.randomUUID().toString() );
+         testAas.setId( UuidCreator.getTimeOrderedEpoch().toString() );
          performShellCreateRequest( mapper.writeValueAsString( testAas ) );
          shellId = testAas.getId();
          submodelIdAas = testAas.getSubmodelDescriptors().get( 0 ).getId();
@@ -427,7 +417,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
       @BeforeEach
       public void before() throws Exception {
          AssetAdministrationShellDescriptor testAas = TestUtil.createCompleteAasDescriptor();
-         testAas.setId( UUID.randomUUID().toString() );
+         testAas.setId( UuidCreator.getTimeOrderedEpoch().toString() );
          performShellCreateRequest( mapper.writeValueAsString( testAas ) );
 
          shellId = testAas.getId();
@@ -535,6 +525,42 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                .andExpect( status().isOk() );
       }
 
+      @Test
+      public void testRbacForLookupShellsByAssetLink() throws Exception {
+         ArrayNode specificAssetIds = emptyArrayNode()
+               .add( specificAssetId( "key1", "value1" ) )
+               .add( specificAssetId( "key2", "value2" ) );
+
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .post( LOOKUP_SHELL_BASE_PATH_POST )
+                           .contentType( MediaType.APPLICATION_JSON )
+                           .content( toJson( specificAssetIds ) )
+                           .with( jwtTokenFactory.deleteTwin() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isForbidden() );
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .post( LOOKUP_SHELL_BASE_PATH_POST )
+                           .contentType( MediaType.APPLICATION_JSON )
+                           .accept( MediaType.APPLICATION_JSON )
+                           .content( toJson( specificAssetIds ) )
+                           .with( jwtTokenFactory.addTwin() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isOk() );
+         mvc.perform(
+                     MockMvcRequestBuilders
+                           .post( LOOKUP_SHELL_BASE_PATH_POST )
+                           .contentType( MediaType.APPLICATION_JSON )
+                           .accept( MediaType.APPLICATION_JSON )
+                           .content( toJson( specificAssetIds ) )
+                           .with( jwtTokenFactory.readTwin() )
+               )
+               .andDo( MockMvcResultHandlers.print() )
+               .andExpect( status().isOk() );
+      }
    }
 
    @Nested
@@ -621,7 +647,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
 
       @BeforeEach
       void setUp() {
-         keyPrefix = UUID.randomUUID().toString();
+         keyPrefix = UuidCreator.getTimeOrderedEpoch().toString();
       }
 
       @Test
@@ -774,7 +800,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
       @Test
       public void testGetSpecificAssetIdsFilteredByTenantId() throws Exception {
          AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
-         shellPayload.setId( UUID.randomUUID().toString() );
+         shellPayload.setId( UuidCreator.getTimeOrderedEpoch().toString() );
          performShellCreateRequest( mapper.writeValueAsString( shellPayload ) );
 
          // Update specificIds only with one specificAssetId for tenantOne
@@ -834,11 +860,11 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
       @Test
       public void testFindExternalShellIdsBySpecificAssetIdsWithTenantBasedVisibilityExpectSuccess() throws Exception {
          // the keyPrefix ensures that this test can run against a persistent database multiple times
-         String keyPrefix = UUID.randomUUID().toString();
+         String keyPrefix = UuidCreator.getTimeOrderedEpoch().toString();
          // first shell
          AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
          shellPayload.setSpecificAssetIds( null );
-         shellPayload.setId( UUID.randomUUID().toString() );
+         shellPayload.setId( UuidCreator.getTimeOrderedEpoch().toString() );
          SpecificAssetId asset1 = TestUtil.createSpecificAssetId( keyPrefix + "findExternal_2", "value_2", null );
          SpecificAssetId asset2 = TestUtil.createSpecificAssetId( keyPrefix + "findExternal_2_1", "value_2_1",
                List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
@@ -1014,10 +1040,10 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
       @Test
       public void testFindExternalShellIdsBySpecificAssetIdsWithDefaultClosedTenantBasedVisibilityExpectSuccess() throws Exception {
          // the keyPrefix ensures that this test can run against a persistent database multiple times
-         String keyPrefix = UUID.randomUUID().toString();
+         String keyPrefix = UuidCreator.getTimeOrderedEpoch().toString();
          AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
          shellPayload.setSpecificAssetIds( null );
-         shellPayload.setId( UUID.randomUUID().toString() );
+         shellPayload.setId( UuidCreator.getTimeOrderedEpoch().toString() );
 
          // asset1 is only visible for the owner because the externalSubjectId = null (owner is TENANT_ONE)
          SpecificAssetId asset1 = TestUtil.createSpecificAssetId( keyPrefix + "defaultClosed", "value_1", null );
@@ -1075,7 +1101,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
       @BeforeEach
       public void before() {
          shellRepository.deleteAll();
-         keyPrefix = UUID.randomUUID().toString();
+         keyPrefix = UuidCreator.getTimeOrderedEpoch().toString();
       }
 
       @Test

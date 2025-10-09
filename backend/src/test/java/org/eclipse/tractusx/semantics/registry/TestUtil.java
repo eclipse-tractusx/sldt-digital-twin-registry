@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
- * Copyright (c) 2021 Contributors to the Eclipse Foundation
+ * Copyright (c) 2025 Robert Bosch Manufacturing Solutions GmbH and others
+ * Copyright (c) 2025 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -20,39 +20,21 @@
 
 package org.eclipse.tractusx.semantics.registry;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.github.f4b6a3.uuid.UuidCreator;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
-import org.eclipse.tractusx.semantics.aas.registry.model.AssetKind;
-import org.eclipse.tractusx.semantics.aas.registry.model.AssetLink;
-import org.eclipse.tractusx.semantics.aas.registry.model.Endpoint;
-import org.eclipse.tractusx.semantics.aas.registry.model.Key;
-import org.eclipse.tractusx.semantics.aas.registry.model.KeyTypes;
-import org.eclipse.tractusx.semantics.aas.registry.model.LangStringNameType;
-import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
-import org.eclipse.tractusx.semantics.aas.registry.model.ProtocolInformation;
-import org.eclipse.tractusx.semantics.aas.registry.model.ProtocolInformationSecurityAttributes;
-import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
-import org.eclipse.tractusx.semantics.aas.registry.model.ReferenceTypes;
-import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
-import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
+import org.eclipse.tractusx.semantics.aas.registry.model.*;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRule;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRulePolicy;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.policy.AccessRulePolicyValue;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.policy.PolicyOperator;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class TestUtil {
 
@@ -72,7 +54,7 @@ public class TestUtil {
       assetAdministrationShellDescriptor.setAssetType( "AssetType" );
       assetAdministrationShellDescriptor.setAssetKind( AssetKind.INSTANCE );
       assetAdministrationShellDescriptor.setId( "fb7ebcc2-5731-4948-aeaa-c9e9692decf5" );
-      assetAdministrationShellDescriptor.setIdShort( RandomStringUtils.random( 10, true, true ) );
+      assetAdministrationShellDescriptor.setIdShort( generateValidIdShort( 10 ) );
 
       Reference specificAssetIdReference = new Reference();
       specificAssetIdReference.setType( ReferenceTypes.MODELREFERENCE );
@@ -151,9 +133,9 @@ public class TestUtil {
       submodelSupplemSemanticIdReference.setKeys( List.of( submodelSupplemSemanticIdkey ) );
 
       SubmodelDescriptor submodelDescriptor = new SubmodelDescriptor();
-      submodelDescriptor.setId( UUID.randomUUID().toString() );
+      submodelDescriptor.setId( UuidCreator.getTimeOrderedEpoch().toString() );
       submodelDescriptor.setDisplayName( List.of( displayName ) );
-      submodelDescriptor.setIdShort( RandomStringUtils.random( 10, true, true ) );
+      submodelDescriptor.setIdShort( generateValidIdShort( 10 ) );
       submodelDescriptor.setSemanticId( submodelSemanticReference );
       submodelDescriptor.setSupplementalSemanticId( List.of( submodelSupplemSemanticIdReference ) );
       submodelDescriptor.setDescription( List.of( description1, description2 ) );
@@ -164,13 +146,32 @@ public class TestUtil {
       return assetAdministrationShellDescriptor;
    }
 
+   public static String generateValidIdShort(int length) {
+       if (length < 2) {
+           throw new IllegalArgumentException("Length must be at least 2");
+       }
+
+       // First character must be a letter
+       String firstChar = RandomStringUtils.random(1, 0, 0, true, false);
+
+       // Last character must be a letter, number, or underscore (not a hyphen)
+       String lastChar = RandomStringUtils.random(1, 0, 0, true, true, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_".toCharArray());
+
+       // Middle characters can be letters, numbers, underscores, or hyphens
+       String middleChars = length > 2 ?
+               RandomStringUtils.random(length - 2, 0, 0, true, true, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-".toCharArray()) :
+               "";
+
+       return firstChar + middleChars + lastChar;
+   }
+
    public static SubmodelDescriptor createSubmodel() {
       return createSubmodel( "semanticIdExample", "http://endpoint-address" );
    }
 
    public static SubmodelDescriptor createSubmodel( String semanticId, String endpointUrl ) {
       SubmodelDescriptor submodelDescriptor = new SubmodelDescriptor();
-      submodelDescriptor.setId( UUID.randomUUID().toString() );
+      submodelDescriptor.setId( UuidCreator.getTimeOrderedEpoch().toString() );
       submodelDescriptor.setIdShort( "idShortExample" );
 
       Reference submodelSemanticReference = new Reference();

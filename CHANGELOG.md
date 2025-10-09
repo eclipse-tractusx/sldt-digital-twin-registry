@@ -8,6 +8,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
  - Optimize native SQL and JPQL queries by flattening subqueries and improving join performance
 
+## 0.9.1
+### Added
+### Changed
+- Replace UUIDv4 with UUIDv7 to improve insert performance
+### Fixed
+- Make `/lookup/shellsByAssetLink` endpoint accessible to `view_digital_twin` role
+
+## 0.9.0
+### Added
+Migration Guide is added under docs/admin/Migration Guide.md
+### Changed
+- Changed bitnami repository to bitnamilegacy in values.yaml for deployment
+### Fixed
+
+## 0.9.0-RC1
+### Added
+- AAS 3.1 release
+### Changed
+- Updated DEPENDENCIES
+### Fixed
+
 ## 0.8.1 
 ### Added
 - Filtering shells based on timestamp
@@ -15,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
  - Restore IDTA conformity and reinstate max length of subprotocolBody to 2048
  - High number of SELECT statements during pagination
+ - Remove duplicate `idShort` checks from `ShellService`
 
 ## 0.8.0
 ### Added
