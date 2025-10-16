@@ -32,8 +32,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.query.Param;
 
+@NoRepositoryBean
 public interface ShellIdentifierRepository extends JpaRepository<ShellIdentifier, UUID> {
 
    @Modifying
@@ -79,53 +81,27 @@ public interface ShellIdentifierRepository extends JpaRepository<ShellIdentifier
     * External shell ids matching the conditions below are returned:
     *   - specificAssetIds match exactly the keyValueCombinations
     *   - if externalSubjectId (tenantId) is not null it must match the tenantId
+    * <p>
+    * Please note that the namespace and identifier lists must be of the same size and represent key-value pairs.
+    * Positional matching between these two arguments is expected, and is used to determine the pairs to search for.
     *
-    *
-    * To be able to properly index the key and value conditions, the query does not use any functions.
-    * Computed indexes cannot be created for mutable functions like CONCAT in Postgres.
-    *
-    * @param keyValueCombinations the keys values to search for as tuples
-    * @param keyValueCombinationsSize the size of the key value combinations
-    * @return external shell ids for the given key value combinations
+    * @param namespaces the lookup keys to search for
+    * @param identifiers the lookup values to search for
+    * @param pairCount the number of key-value pairs
+    * @return external shell ids for the given key value pairs
     */
-   @Query( value = """
-         SELECT s.id_external
-         FROM shell s
-            JOIN shell_identifier si ON s.id = si.fk_shell_id
-         WHERE
-            CONCAT( si.namespace, si.identifier ) IN ( :keyValueCombinations )
-            AND (
-               s.created_date > :cutoffDate
-               OR ( s.created_date = :cutoffDate AND s.id_external > :cursorValue )
-            )
-            AND (
-               :tenantId = :owningTenantId
-               OR si.namespace = :globalAssetId
-               OR EXISTS (
-                  SELECT 1
-                  FROM SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY sider
-                     JOIN SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE sies ON sider.FK_SI_EXTERNAL_SUBJECT_REFERENCE_ID = sies.id
-                  WHERE
-                     (
-                        sider.ref_key_value = :tenantId
-                        OR ( sider.ref_key_value = :publicWildcardPrefix AND si.namespace IN (:publicWildcardAllowedTypes) )
-                     )
-                     AND sies.FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID = si.id
-               )
-            )
-         GROUP BY s.id_external, s.created_date
-         HAVING COUNT(*) = :keyValueCombinationsSize
-         ORDER BY s.created_date, s.id_external
-         LIMIT :pageSize
-         """, nativeQuery = true )
-   List<String> findExternalShellIdsByIdentifiersByExactMatch( @Param( "keyValueCombinations" ) List<String> keyValueCombinations,
-         @Param( "keyValueCombinationsSize" ) int keyValueCombinationsSize,
-         @Param( "tenantId" ) String tenantId,
-         @Param( "publicWildcardPrefix" ) String publicWildcardPrefix,
-         @Param( "publicWildcardAllowedTypes" ) List<String> publicWildcardAllowedTypes,
-         @Param( "owningTenantId" ) String owningTenantId,
-         @Param( "globalAssetId" ) String globalAssetId,
-         @Param( "cutoffDate" ) Instant cutoffDate,
-         @Param( "cursorValue" ) String cursorValue,
-         @Param( "pageSize" ) int pageSize);
+   default List<String> findExternalShellIdsByIdentifiersByExactMatch(
+           @Param("namespaces") List<String> namespaces,
+           @Param("identifiers") List<String> identifiers,
+           @Param("pairCount") int pairCount,
+           @Param("tenantId") String tenantId,
+           @Param("publicWildcardPrefix") String publicWildcardPrefix,
+           @Param("publicWildcardAllowedTypes") List<String> publicWildcardAllowedTypes,
+           @Param("owningTenantId") String owningTenantId,
+           @Param("globalAssetId") String globalAssetId,
+           @Param("cutoffDate") Instant cutoffDate,
+           @Param("cursorValue") String cursorValue,
+           @Param("pageSize") int pageSize) {
+       throw new UnsupportedOperationException("Override provided only in profile-specific repository (e.g. H2, PostgreSQL).");
+   }
 }
