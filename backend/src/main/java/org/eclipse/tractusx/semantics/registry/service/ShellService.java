@@ -411,15 +411,24 @@ public class ShellService {
       }
    }
 
-   private List<String> fetchAPageOfAasIdsUsingLegacyAccessControl( final Set<ShellIdentifier> shellIdentifiers, final String externalSubjectId,
-         final String cursorValue, final int pageSize, final boolean isCursorAvailable, final OffsetDateTime createdAfter ) {
-      final var fetchSize = pageSize + 1;
-      final Instant cutoffDate = getCreatedDate( cursorValue, isCursorAvailable, createdAfter );
-      List<String> keyValueCombinations = toKeyValueCombinations( shellIdentifiers );
-      return shellIdentifierRepository.findExternalShellIdsByIdentifiersByExactMatch( keyValueCombinations,
-            keyValueCombinations.size(), externalSubjectId, externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes, owningTenantId,
-            ShellIdentifier.GLOBAL_ASSET_ID_KEY, cutoffDate, cursorValue, fetchSize );
-   }
+    private List<String> fetchAPageOfAasIdsUsingLegacyAccessControl( final Set<ShellIdentifier> shellIdentifiers, final String externalSubjectId,
+                                                                     final String cursorValue, final int pageSize, final boolean isCursorAvailable, final OffsetDateTime createdAfter ) {
+        final var fetchSize = pageSize + 1;
+        final Instant cutoffDate = getCreatedDate( cursorValue, isCursorAvailable, createdAfter );
+
+        List<String> namespaces = new ArrayList<>();
+        List<String> identifiers = new ArrayList<>();
+
+        shellIdentifiers.forEach( shellIdentifier -> {
+            namespaces.add(shellIdentifier.getKey());
+            identifiers.add(shellIdentifier.getValue());
+        });
+
+        return shellIdentifierRepository.findExternalShellIdsByIdentifiersByExactMatch(
+                namespaces, identifiers, shellIdentifiers.size(),
+                externalSubjectId, externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes, owningTenantId,
+                ShellIdentifier.GLOBAL_ASSET_ID_KEY, cutoffDate, cursorValue, fetchSize);
+    }
 
    /**
     * Retrieves the created date based on the cursor value and the availability of the cursor.
