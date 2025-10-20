@@ -63,7 +63,7 @@ public interface ShellIdentifierRepository extends JpaRepository<ShellIdentifier
          )
      )
    GROUP BY s.id, s.created_date, s.id_external
-   HAVING COUNT(*) = :keyValueCombinationsSize
+   HAVING COUNT(DISTINCT CONCAT(si.namespace, si.identifier)) = :keyValueCombinationsSize
    ORDER BY s.created_date, s.id_external ASC
    """,
            nativeQuery = true,
@@ -88,7 +88,7 @@ public interface ShellIdentifierRepository extends JpaRepository<ShellIdentifier
              )
           )
         GROUP BY s.id, s.created_date, s.id_external
-        HAVING COUNT(*) = :keyValueCombinationsSize
+        HAVING COUNT(DISTINCT CONCAT(si.namespace, si.identifier)) = :keyValueCombinationsSize
      ) AS counted
      """
    )
