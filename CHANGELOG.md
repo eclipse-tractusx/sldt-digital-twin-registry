@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 ### Changed
 - Replace UUIDv4 with UUIDv7 to improve insert performance
+- Split `findExternalShellIdsByIdentifiersByExactMatch` of `ShellIdentifierRepository` into H2 and PostgreSQL-specific implementations
 ### Fixed
 - Make `/lookup/shellsByAssetLink` endpoint accessible to `view_digital_twin` role
 
