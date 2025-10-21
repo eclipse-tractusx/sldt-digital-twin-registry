@@ -126,7 +126,7 @@ postgresql:
     # -- workaround to use bitnamilegacy chart for version 12.12.x till committers align on new postgresql charts
     repository: bitnamilegacy/postgresql
     # -- workaround to use bitnamilegacy chart for version 12.12.x till committers align on new postgresql charts
-    tag: 15.4.0-debian-11-r45
+    tag: 17.6.0-debian-12-r4
   primary:
     persistence:
       enabled: true
