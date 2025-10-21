@@ -81,8 +81,8 @@ public interface PostgreSqlShellIdentifierRepository extends ShellIdentifierRepo
                 LIMIT :pageSize;
             """, nativeQuery = true)
     List<String> findExternalShellIdsByIdentifiersByExactMatch(
-            @Param("namespaces") List<String> namespaces,
-            @Param("identifiers") List<String> identifiers,
+            @Param("namespaces") String[] namespaces,
+            @Param("identifiers") String[] identifiers,
             @Param("pairCount") int pairCount,
             @Param("tenantId") String tenantId,
             @Param("publicWildcardPrefix") String publicWildcardPrefix,

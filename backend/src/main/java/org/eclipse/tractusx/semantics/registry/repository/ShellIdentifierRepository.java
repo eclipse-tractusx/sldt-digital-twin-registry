@@ -91,8 +91,8 @@ public interface ShellIdentifierRepository extends JpaRepository<ShellIdentifier
     * @return external shell ids for the given key value pairs
     */
    default List<String> findExternalShellIdsByIdentifiersByExactMatch(
-           @Param("namespaces") List<String> namespaces,
-           @Param("identifiers") List<String> identifiers,
+           @Param("namespaces") String[] namespaces,
+           @Param("identifiers") String[] identifiers,
            @Param("pairCount") int pairCount,
            @Param("tenantId") String tenantId,
            @Param("publicWildcardPrefix") String publicWildcardPrefix,

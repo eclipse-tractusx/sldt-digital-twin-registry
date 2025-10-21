@@ -416,13 +416,15 @@ public class ShellService {
         final var fetchSize = pageSize + 1;
         final Instant cutoffDate = getCreatedDate( cursorValue, isCursorAvailable, createdAfter );
 
-        List<String> namespaces = new ArrayList<>();
-        List<String> identifiers = new ArrayList<>();
+        String[] namespaces = new String[shellIdentifiers.size()];
+        String[] identifiers = new String[shellIdentifiers.size()];
 
-        shellIdentifiers.forEach( shellIdentifier -> {
-            namespaces.add(shellIdentifier.getKey());
-            identifiers.add(shellIdentifier.getValue());
-        });
+        List<ShellIdentifier> shellIdentifierList = new ArrayList<>(shellIdentifiers);
+        for (int i = 0; i < shellIdentifiers.size(); i++) {
+            ShellIdentifier shellIdentifier = shellIdentifierList.get(i);
+            namespaces[i] = shellIdentifier.getKey();
+            identifiers[i] = shellIdentifier.getValue();
+        }
 
         return shellIdentifierRepository.findExternalShellIdsByIdentifiersByExactMatch(
                 namespaces, identifiers, shellIdentifiers.size(),

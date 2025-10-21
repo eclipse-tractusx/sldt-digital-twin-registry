@@ -35,8 +35,8 @@ public interface ShellIdentifierRepositoryImpl extends ShellIdentifierRepository
 
     @Override
     default List<String> findExternalShellIdsByIdentifiersByExactMatch(
-            @Param("namespaces") List<String> namespaces,
-            @Param("identifiers") List<String> identifiers,
+            @Param("namespaces") String[] namespaces,
+            @Param("identifiers") String[] identifiers,
             @Param("pairCount") int pairCount,
             @Param("tenantId") String tenantId,
             @Param("publicWildcardPrefix") String publicWildcardPrefix,
@@ -47,10 +47,10 @@ public interface ShellIdentifierRepositoryImpl extends ShellIdentifierRepository
             @Param("cursorValue") String cursorValue,
             @Param("pageSize") int pageSize) {
 
-        // Concatenate namespaces and identifiers for H2 IN clause
+        // Concatenate namespaces and identifiers for IN clause
         List<String> keyValuePairs = new ArrayList<>();
-        for (int i = 0; i < namespaces.size(); i++) {
-            keyValuePairs.add(namespaces.get(i) + identifiers.get(i));
+        for (int i = 0; i < namespaces.length; i++) {
+            keyValuePairs.add(namespaces[i] + identifiers[i]);
         }
 
         // Execute actual query with the converted parameters
