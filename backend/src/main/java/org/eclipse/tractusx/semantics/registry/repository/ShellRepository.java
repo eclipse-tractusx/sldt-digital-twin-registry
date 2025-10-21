@@ -45,35 +45,26 @@ public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecific
    boolean existsByIdShort( @Param( "idShort" ) String idShort );
 
    @Query( value = """
-         SELECT *
-         FROM SHELL s
-         WHERE
-            s.id_external = :idExternal
-            AND (
-               :tenantId = :owningTenantId
-               OR EXISTS (
-                  SELECT si.fk_shell_id
-                  FROM SHELL_IDENTIFIER si
-                  WHERE
-                     si.fk_shell_id = s.id
-                     AND EXISTS (
-                        SELECT sider.ref_key_value
-                        FROM SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY sider
-                        WHERE
-                           (
-                              sider.ref_key_value = :tenantId
-                              OR ( sider.ref_key_value = :publicWildcardPrefix AND si.namespace IN (:publicWildcardAllowedTypes) )
-                           )
-                           AND sider.FK_SI_EXTERNAL_SUBJECT_REFERENCE_ID=(
-                              SELECT sies.id
-                              FROM SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE sies
-                              WHERE
-                                 sies.FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID=si.id
-                           )
-                     )
-               )
+      SELECT s.*
+      FROM SHELL s
+      WHERE
+         s.id_external = :idExternal
+         AND (
+            :tenantId = :owningTenantId
+            OR EXISTS (
+               SELECT 1
+               FROM SHELL_IDENTIFIER si
+               JOIN SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE sies ON si.id = sies.FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID
+               JOIN SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY sider ON sies.id = sider.FK_SI_EXTERNAL_SUBJECT_REFERENCE_ID
+               WHERE
+                  si.fk_shell_id = s.id
+                  AND (
+                     sider.ref_key_value = :tenantId
+                     OR ( sider.ref_key_value = :publicWildcardPrefix AND si.namespace IN (:publicWildcardAllowedTypes) )
+                  )
             )
-         """, nativeQuery = true )
+         )
+      """, nativeQuery = true )
    Optional<Shell> findByIdExternalAndExternalSubjectId( @Param( "idExternal" ) String idExternal,
          @Param( "tenantId" ) String tenantId,
          @Param( "owningTenantId" ) String owningTenantId,
@@ -98,36 +89,24 @@ public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecific
    @Query( value = """
          SELECT s.id_external
          FROM SHELL s
+         JOIN SHELL_IDENTIFIER si ON s.id = si.fk_shell_id
+         LEFT JOIN SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE sies ON si.id = sies.FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID
+         LEFT JOIN SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY sider ON sies.id = sider.FK_SI_EXTERNAL_SUBJECT_REFERENCE_ID
          WHERE
-            s.id IN (
-               SELECT si.fk_shell_id
-               FROM SHELL_IDENTIFIER si
-               WHERE
-                  CONCAT(si.namespace,si.identifier) IN (:keyValueCombinations)
-                  AND (
-                     :tenantId = :owningTenantId
-                     OR si.namespace= :globalAssetId
-                     OR EXISTS (
-                        SELECT sider.ref_key_value
-                        FROM SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY sider
-                        WHERE
-                           (
-                              sider.ref_key_value = :tenantId
-                              OR (
-                                 sider.ref_key_value = :publicWildcardPrefix
-                                 AND si.namespace IN (:publicWildcardAllowedTypes)
-                              )
-                           )
-                           AND sider.FK_SI_EXTERNAL_SUBJECT_REFERENCE_ID=(
-                              SELECT sies.id
-                              FROM SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE sies
-                              WHERE
-                                 sies.FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID=si.id
-                           )
+            CONCAT(si.namespace, si.identifier) IN (:keyValueCombinations)
+            AND (
+               :tenantId = :owningTenantId
+               OR si.namespace = :globalAssetId
+               OR (
+                     sider.ref_key_value = :tenantId
+                     OR (
+                        sider.ref_key_value = :publicWildcardPrefix
+                        AND si.namespace IN (:publicWildcardAllowedTypes)
                      )
-                  )
-               GROUP BY si.fk_shell_id
+               )
             )
+         GROUP BY s.id_external, s.id
+         HAVING COUNT(DISTINCT CONCAT(si.namespace, si.identifier)) = :keyValueCombinationsSize
          """, nativeQuery = true )
    List<String> findExternalShellIdsByIdentifiersByAnyMatch( @Param( "keyValueCombinations" ) List<String> keyValueCombinations,
          @Param( "tenantId" ) String tenantId,
