@@ -59,7 +59,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles( profiles = { "granular", "test" } )
+@ActiveProfiles( profiles = { "granular", "test", "default" } )
 @EnableConfigurationProperties( RegistryProperties.class )
 public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdministrationShellApiSecurityTest {
 

@@ -102,6 +102,8 @@ public interface ShellIdentifierRepository extends JpaRepository<ShellIdentifier
            @Param("cutoffDate") Instant cutoffDate,
            @Param("cursorValue") String cursorValue,
            @Param("pageSize") int pageSize) {
-       throw new UnsupportedOperationException("Override provided only in profile-specific repository (e.g. H2, PostgreSQL).");
+       throw new UnsupportedOperationException(
+               "Override provided only in profile-specific repositories (e.g. default, H2, PostgreSQL)."
+       );
    }
 }

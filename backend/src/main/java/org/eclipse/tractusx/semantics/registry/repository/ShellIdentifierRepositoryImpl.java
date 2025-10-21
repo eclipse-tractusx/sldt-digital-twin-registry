@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-@Profile("test")
-public interface H2ShellIdentifierRepository extends ShellIdentifierRepository {
+@Profile("default")
+public interface ShellIdentifierRepositoryImpl extends ShellIdentifierRepository {
 
     @Override
     default List<String> findExternalShellIdsByIdentifiersByExactMatch(

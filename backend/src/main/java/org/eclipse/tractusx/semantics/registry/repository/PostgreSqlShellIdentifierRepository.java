@@ -28,7 +28,7 @@ import java.time.Instant;
 import java.util.List;
 
 @Repository
-@Profile("!test")
+@Profile("postgresql")
 public interface PostgreSqlShellIdentifierRepository extends ShellIdentifierRepository {
 
     /**
