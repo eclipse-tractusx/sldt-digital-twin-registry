@@ -59,7 +59,7 @@ jobs:
         run: |
           echo "use-agent" >> ~/.gnupg/gpg.conf
           echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
-          echo -e "${{ secrets.ORG_GPG_PRIVATE_KEY }}" | gpg --import --batch
+          echo -e "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --import --batch
           for fpr in $(gpg --list-keys --with-colons | awk -F: '/fpr:/ {print $10}' | sort -u);
           do
             echo -e "5\\ny\\n" |  gpg --batch --command-fd 0 --expert --edit-key $fpr trust;
@@ -67,8 +67,8 @@ jobs:
       - name: Publish to the Maven Central Repository
         shell: bash
         run: |
-          mvn clean verify nexus-staging:deploy -P release-to-central
+          mvn clean verify deploy
         env:
-          MAVEN_USERNAME: "${{ secrets.ORG_OSSRH_USERNAME }}"
-          MAVEN_PASSWORD: "${{ secrets.ORG_OSSRH_PASSWORD }}"
-          MAVEN_GPG_PASSPHRASE: "${{ secrets.ORG_GPG_PASSPHRASE }}"
+          MAVEN_USERNAME: "${{ secrets.CENTRAL_SONATYPE_TOKEN_USERNAME }}"
+          MAVEN_PASSWORD: "${{ secrets.CENTRAL_SONATYPE_TOKEN_PASSWORD }}"
+          MAVEN_GPG_PASSPHRASE: "${{ secrets.GPG_PASSPHRASE }}"
