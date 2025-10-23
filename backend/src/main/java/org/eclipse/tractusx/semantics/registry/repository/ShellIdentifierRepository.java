@@ -103,7 +103,7 @@ public interface ShellIdentifierRepository extends JpaRepository<ShellIdentifier
            @Param("cursorValue") String cursorValue,
            @Param("pageSize") int pageSize) {
        throw new UnsupportedOperationException(
-               "Override provided only in profile-specific repositories (e.g. default, H2, PostgreSQL)."
+               "Override provided only in the specific repositories (e.g. default, H2, PostgreSQL, ...)."
        );
    }
 }

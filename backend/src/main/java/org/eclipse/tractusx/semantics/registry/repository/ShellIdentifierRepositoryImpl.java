@@ -20,7 +20,7 @@
 
 package org.eclipse.tractusx.semantics.registry.repository;
 
-import org.springframework.context.annotation.Profile;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -29,8 +29,14 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.eclipse.tractusx.semantics.registry.repository.RepositoryConfigurationKeys.SHELL_IDENTIFIER_REPOSITORY_TYPE;
+
 @Repository
-@Profile("default")
+@ConditionalOnProperty(
+        name = SHELL_IDENTIFIER_REPOSITORY_TYPE,
+        havingValue = "default",
+        matchIfMissing = true
+)
 public interface ShellIdentifierRepositoryImpl extends ShellIdentifierRepository {
 
     @Override
@@ -114,7 +120,7 @@ public interface ShellIdentifierRepositoryImpl extends ShellIdentifierRepository
             ) AS combined_shells
             ORDER BY created_date, id_external
             LIMIT :pageSize
-            """, nativeQuery = true )
+            """, nativeQuery = true)
     List<String> findExternalShellIdsByIdentifiersByExactMatchInternal(
             @Param("keyValuePairs") List<String> keyValuePairs,
             @Param("pairCount") int pairCount,

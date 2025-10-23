@@ -29,7 +29,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ActiveProfiles(profiles = { "cognito-test", "default" })
+@ActiveProfiles(profiles = { "cognito-test" })
 public class CognitoApiSecurityTest extends AbstractAssetAdministrationShellApi {
     @Test
     public void testWithInvalidAuthenticationTokenConfigurationExpectUnauthorized() throws Exception {

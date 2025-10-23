@@ -37,7 +37,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles( profiles = { "granular", "test", "default" } )
+@ActiveProfiles( profiles = { "granular", "test" } )
 @EnableConfigurationProperties( RegistryProperties.class )
 class GranularShellServiceTest extends LegacyShellServiceTest {
 

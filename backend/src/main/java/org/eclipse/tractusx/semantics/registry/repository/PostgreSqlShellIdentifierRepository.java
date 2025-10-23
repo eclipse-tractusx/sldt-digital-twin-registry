@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.semantics.registry.repository;
 
-import org.springframework.context.annotation.Profile;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -27,8 +27,14 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.List;
 
+
+import static org.eclipse.tractusx.semantics.registry.repository.RepositoryConfigurationKeys.SHELL_IDENTIFIER_REPOSITORY_TYPE;
+
 @Repository
-@Profile("postgresql")
+@ConditionalOnProperty(
+        name = SHELL_IDENTIFIER_REPOSITORY_TYPE,
+        havingValue = "postgresql"
+)
 public interface PostgreSqlShellIdentifierRepository extends ShellIdentifierRepository {
 
     /**
