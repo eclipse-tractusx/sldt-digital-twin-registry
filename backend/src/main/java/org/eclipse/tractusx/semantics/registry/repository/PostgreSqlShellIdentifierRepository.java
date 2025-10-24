@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.semantics.registry.repository;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -27,13 +28,13 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.List;
 
-
-import static org.eclipse.tractusx.semantics.registry.repository.RepositoryConfigurationKeys.SHELL_IDENTIFIER_REPOSITORY_TYPE;
+import static org.eclipse.tractusx.semantics.registry.repository.RepositoryConfigurationKeys.SPRING_DATASOURCE_DRIVERCLASS_NAME;
 
 @Repository
+@Primary
 @ConditionalOnProperty(
-        name = SHELL_IDENTIFIER_REPOSITORY_TYPE,
-        havingValue = "postgresql"
+        name = SPRING_DATASOURCE_DRIVERCLASS_NAME,
+        havingValue = "org.postgresql.Driver"
 )
 public interface PostgreSqlShellIdentifierRepository extends ShellIdentifierRepository {
 
