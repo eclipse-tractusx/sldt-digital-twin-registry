@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Fixed
  - Optimize pagination for legacy access control by filtering directly in the database query
+ - Optimize native SQL and JPQL queries by flattening subqueries and improving join performance
+
+## 0.9.1
+### Added
+### Changed
+- Replace UUIDv4 with UUIDv7 to improve insert performance
+### Fixed
+- Make `/lookup/shellsByAssetLink` endpoint accessible to `view_digital_twin` role
+
+## 0.9.0
+### Added
+Migration Guide is added under docs/admin/Migration Guide.md
+### Changed
+- Changed bitnami repository to bitnamilegacy in values.yaml for deployment
+### Fixed
 
 ## 0.9.0-RC1
 ### Added
