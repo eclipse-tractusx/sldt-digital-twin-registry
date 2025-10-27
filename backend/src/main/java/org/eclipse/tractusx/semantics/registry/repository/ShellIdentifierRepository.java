@@ -92,7 +92,7 @@ public interface ShellIdentifierRepository extends JpaRepository<ShellIdentifier
      ) AS counted
      """
    )
-   Page<UUID> findAPageOfShellIdsBySpecificAssetIds(
+   Page<UUID> findAPageOfShellIdsBySpecificAssetIdsLegacyAccessControl(
            @Param("keyValueCombinations") List<String> keyValueCombinations,
            @Param("keyValueCombinationsSize") int keyValueCombinationsSize,
            @Param("cutoffDate") Instant cutoffDate,
@@ -103,6 +103,23 @@ public interface ShellIdentifierRepository extends JpaRepository<ShellIdentifier
            Pageable pageable
    );
 
+    @Query(value = """
+              SELECT s.id
+              FROM ShellIdentifier sid
+                 JOIN sid.shellId s
+              WHERE
+                 CONCAT( sid.key, sid.value ) IN ( :keyValueCombinations )
+                 AND (
+                    s.createdDate > :cutoffDate
+                    OR ( s.createdDate = :cutoffDate AND s.idExternal > :cursorValue )
+                 )
+              GROUP BY s.id, s.createdDate, s.idExternal
+              HAVING COUNT(*) = :keyValueCombinationsSize
+              ORDER BY s.createdDate ASC, s.idExternal ASC
+            """)
+    List<UUID> findAPageOfShellIdsBySpecificAssetIdsGranularAccessControl(List<String> keyValueCombinations,
+            int keyValueCombinationsSize, Instant cutoffDate, String cursorValue, Pageable pageable);
+
    @Query( value = """
             SELECT NEW org.eclipse.tractusx.semantics.registry.model.projection.ShellIdentifierMinimal(s.idExternal, sid.key, sid.value)
             FROM ShellIdentifier sid
@@ -111,7 +128,22 @@ public interface ShellIdentifierRepository extends JpaRepository<ShellIdentifier
                s.id IN ( :shellIds )
             ORDER BY s.createdDate, s.idExternal ASC
          """ )
-   List<ShellIdentifierMinimal> findMinimalShellIdsByShellIds(List<UUID> shellIds);
+   List<ShellIdentifierMinimal> findMinimalShellIdsByShellIdsLegacyAccessControl(List<UUID> shellIds);
+
+    @Query(value = """
+               SELECT NEW org.eclipse.tractusx.semantics.registry.model.projection.ShellIdentifierMinimal(s.idExternal, sid.key, sid.value)
+               FROM ShellIdentifier sid
+                  JOIN sid.shellId s
+               WHERE
+                  s.id IN ( :shellIds )
+                  AND (
+                     s.createdDate > :cutoffDate
+                     OR ( s.createdDate = :cutoffDate AND s.idExternal > :cursorValue )
+                  )
+               ORDER BY s.createdDate ASC, s.idExternal ASC
+            """)
+    List<ShellIdentifierMinimal> findMinimalShellIdsByShellIdsGranularAccessControl(List<UUID> shellIds,
+            Instant cutoffDate, String cursorValue);
 
    /**
     * Returns external shell ids for the given keyValueCombinations.
