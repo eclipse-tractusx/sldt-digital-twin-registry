@@ -525,6 +525,11 @@
 								<goals>
 										<goal>prepare-agent</goal>
 								</goals>
+                     <configuration>
+                        <propertyName>jacocoArgLine</propertyName>
+                        <destFile>${project.build.directory}/jacoco.exec</destFile>
+                        <append>true</append>
+                     </configuration>
 						</execution>
 						<execution>
 								<id>report</id>
