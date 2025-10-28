@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 ### Changed
 - Replace UUIDv4 with UUIDv7 to improve insert performance
+- Create a `ShellIdentifierRepository` specific for `postgresql`, with improved query performance
 ### Fixed
 - Make `/lookup/shellsByAssetLink` endpoint accessible to `view_digital_twin` role
 
