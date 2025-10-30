@@ -501,18 +501,29 @@ public class ShellService {
         return response;
     }
 
-   private Pair<List<String>,Long> fetchAPageOfAasIdsUsingLegacyAccessControl( final Set<ShellIdentifier> shellIdentifiers, final String externalSubjectId,
-         final String cursorValue, final int pageSize, final boolean isCursorAvailable, final OffsetDateTime createdAfter ) {
-      final var fetchSize = pageSize + 1;
-      final Instant cutoffDate = getCreatedDate( cursorValue, isCursorAvailable, createdAfter );
-      List<String> keyValueCombinations = toKeyValueCombinations( shellIdentifiers );
+	private Pair<List<String>, Long> fetchAPageOfAasIdsUsingLegacyAccessControl(
+			final Set<ShellIdentifier> shellIdentifiers, final String externalSubjectId,
+                                                                     final String cursorValue, final int pageSize, final boolean isCursorAvailable, final OffsetDateTime createdAfter ) {
+        final var fetchSize = pageSize + 1;
+        final Instant cutoffDate = getCreatedDate( cursorValue, isCursorAvailable, createdAfter );
 
-      List<String> foundShells = shellIdentifierRepository.findExternalShellIdsByIdentifiersByExactMatch( keyValueCombinations,
-              keyValueCombinations.size(), externalSubjectId, externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes, owningTenantId,
-              ShellIdentifier.GLOBAL_ASSET_ID_KEY, cutoffDate, cursorValue, fetchSize);
+        String[] namespaces = new String[shellIdentifiers.size()];
+        String[] identifiers = new String[shellIdentifiers.size()];
 
-      return new Pair<>(foundShells, (long) foundShells.size());
-   }
+        List<ShellIdentifier> shellIdentifierList = new ArrayList<>(shellIdentifiers);
+        for (int i = 0; i < shellIdentifiers.size(); i++) {
+            ShellIdentifier shellIdentifier = shellIdentifierList.get(i);
+            namespaces[i] = shellIdentifier.getKey();
+            identifiers[i] = shellIdentifier.getValue();
+        }
+
+		List<String> foundShells = shellIdentifierRepository.findExternalShellIdsByIdentifiersByExactMatch(
+                namespaces, identifiers, shellIdentifiers.size(),
+                externalSubjectId, externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes, owningTenantId,
+                ShellIdentifier.GLOBAL_ASSET_ID_KEY, cutoffDate, cursorValue, fetchSize);
+
+		return new Pair<>(foundShells, (long) foundShells.size());
+    }
 
    /**
     * Retrieves the created date based on the cursor value and the availability of the cursor.

@@ -21,9 +21,22 @@
 package org.eclipse.tractusx.semantics.registry.model;
 
 import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.*;
-import lombok.*;
+import com.github.f4b6a3.uuid.UuidCreator;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.With;
 
 @Entity
 @Getter
@@ -34,9 +47,7 @@ import lombok.*;
 @With
 public class ShellIdentifierSemanticReferenceKey {
    @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
-   @Column(name="id")
-   UUID id;
+   private UUID id = UuidCreator.getTimeOrderedEpoch();
    ReferenceKeyType type;
    @Column(name = "ref_key_value")
    String value;

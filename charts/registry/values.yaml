@@ -54,7 +54,7 @@ registry:
   identityProvider: keycloak
   externalSubjectIdWildcardPrefix: PUBLIC_READABLE
   externalSubjectIdWildcardAllowedTypes: manufacturerPartId,digitalTwinType
-  useGranularAccessControl: "false"
+  useGranularAccessControl: "true"
   granularAccessControlFetchSize: "500"
   service:
     port: 8080
@@ -122,6 +122,11 @@ registry:
     readOnlyRootFilesystem: true
 
 postgresql:
+  image:
+    # -- workaround to use bitnamilegacy chart for version 12.12.x till committers align on new postgresql charts
+    repository: bitnamilegacy/postgresql
+    # -- workaround to use bitnamilegacy chart for version 12.12.x till committers align on new postgresql charts
+    tag: 15.4.0-debian-11-r45
   primary:
     persistence:
       enabled: true
@@ -138,6 +143,11 @@ postgresql:
     existingSecret: secret-dtr-postgres-init
 
 keycloak:
+  image:
+    # -- workaround to use bitnamilegacy chart for version 16.1.x till committers align on new postgresql charts
+    repository: bitnamilegacy/keycloak
+    # -- workaround to use bitnamilegacy chart for version 16.1.x till committers align on new postgresql charts
+    tag: 22.0.3-debian-11-r14
   postgresql:
     enabled: false
   externalDatabase:

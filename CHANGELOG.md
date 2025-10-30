@@ -4,9 +4,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+
+## 0.9.1
+### Added
+### Changed
+- Replace UUIDv4 with UUIDv7 to improve insert performance
+- Create a `ShellIdentifierRepository` specific for `postgresql`, with improved query performance
+ - Optimize native SQL and JPQL queries by flattening subqueries and improving join performance
 ### Fixed
- - Optimize pagination for legacy access control by filtering directly in the database query
+- Make `/lookup/shellsByAssetLink` endpoint accessible to `view_digital_twin` role
+
+## 0.9.0
+### Added
+Migration Guide is added under docs/admin/Migration Guide.md
+### Changed
+- Changed bitnami repository to bitnamilegacy in values.yaml for deployment
+### Fixed
 
 ## 0.9.0-RC1
 ### Added
