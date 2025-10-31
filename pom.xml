@@ -117,6 +117,7 @@
 		<sonar.moduleKey>${project.groupId}:${project.artifactId}</sonar.moduleKey>
 		<sonar.projectName>sldt-digital-twin-registry</sonar.projectName>
 		<sonar.java.source>17</sonar.java.source>
+      <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/backend/target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 
 	<dependencyManagement>
@@ -533,7 +534,7 @@
 						</execution>
 						<execution>
 								<id>report</id>
-								<phase>test</phase>
+								<phase>verify</phase>
 								<goals>
 										<goal>report</goal>
 								</goals>
