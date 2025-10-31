@@ -36,13 +36,14 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
+import org.antlr.v4.runtime.misc.Pair;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.aas.registry.model.InlineResponse200;
 import org.eclipse.tractusx.semantics.aas.registry.model.PagedResultPagingMetadata;
-import org.eclipse.tractusx.semantics.accesscontrol.api.AccessControlRuleService;
 import org.eclipse.tractusx.semantics.aas.registry.model.SearchAllAssetAdministrationShellIdsByAssetLink200Response;
+import org.eclipse.tractusx.semantics.accesscontrol.api.AccessControlRuleService;
 import org.eclipse.tractusx.semantics.accesscontrol.api.exception.DenyAccessException;
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.registry.dto.BatchResultDto;
@@ -61,6 +62,7 @@ import org.eclipse.tractusx.semantics.registry.utils.ShellSpecification;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -222,53 +224,96 @@ public class ShellService {
    }
 
    @Transactional( readOnly = true )
-   public ShellCollectionDto findAllShells( Integer pageSize, final String cursorVal, final String externalSubjectId, final OffsetDateTime createdAfter ) {
-
-      pageSize = getPageSize( pageSize );
-      ShellCursor cursor = new ShellCursor( pageSize, cursorVal );
-      var specification = shellAccessHandler.shellFilterSpecification( SORT_FIELD_NAME_SHELL, cursor, externalSubjectId, createdAfter );
-      final var foundList = new ArrayList<Shell>();
-      //fetch 1 more item to make sure there is a visible item for the next page
-      while ( foundList.size() < pageSize + 1 ) {
-         specification = setMandatorySpecificIdsAndValues( externalSubjectId, specification );
-
-         var shellList = shellRepository.findAll(specification, ofSize( granularAccessControlFetchSize ));
-         var shellIdList = shellList.stream().map( Shell::getId ).toList();
-
-         if ( CollectionUtils.isEmpty( shellIdList)) {
-              break;
-         }
-         // Add shellIds filter to the existing specification
-         // This code snippet modifies an existing JPA Specification by adding a filter condition.
-         // The filter ensures that only entities with an "id" attribute matching one of the IDs in the `shellIdList` are included in the query results.
-         specification = specification.and((root, query, criteriaBuilder) ->
-             root.get("id").in(shellIdList));
-
-         Page<Shell> currentPage = shellRepository.findAll( specification.and(withAllAssociations()), ofSize( granularAccessControlFetchSize ) );
-         List<Shell> shells = shellAccessHandler.filterListOfShellProperties( currentPage.stream().toList(), externalSubjectId );
-         shells.stream()
-               .limit( (long) pageSize + 1 - foundList.size() )
-               .forEach( foundList::add );
-         if ( !currentPage.hasNext() ) {
-            break;
-         }
-         ShellCursor shellCursor = new ShellCursor( pageSize,
-               cursor.getEncodedCursorShell( lastItemOf( currentPage.getContent() ).getCreatedDate(), currentPage.hasNext() ) );
-         specification = shellAccessHandler.shellFilterSpecification( SORT_FIELD_NAME_SHELL, shellCursor, externalSubjectId, createdAfter );
-      }
-      String nextCursor = null;
-
-      final boolean hasNextPage = foundList.size() > pageSize;
-      List<Shell> resultList = foundList.stream().limit( pageSize ).toList();
-      if ( !resultList.isEmpty() ) {
-         nextCursor = cursor.getEncodedCursorShell( resultList.get( resultList.size() - 1 ).getCreatedDate(), hasNextPage );
-      }
-
-      return ShellCollectionDto.builder()
-            .items( resultList )
-            .cursor( nextCursor )
-            .build();
+   public ShellCollectionDto findAllShells(Integer pageSize, final String cursorVal, final String externalSubjectId, final OffsetDateTime createdAfter) {
+        if (isGranularAccessControlEnabled) {
+            return findAllShellsGranularAccessControl(pageSize, cursorVal, externalSubjectId, createdAfter);
+        } else {
+            return findAllShellsLegacyAccessControl(pageSize, cursorVal, externalSubjectId, createdAfter);
+        }
    }
+ 
+    private ShellCollectionDto findAllShellsGranularAccessControl(Integer pageSize, final String cursorVal,
+            final String externalSubjectId, final OffsetDateTime createdAfter) {
+        pageSize = getPageSize(pageSize);
+        ShellCursor cursor = new ShellCursor(pageSize, cursorVal);
+        var specification = shellAccessHandler.shellFilterSpecification(SORT_FIELD_NAME_SHELL, cursor,
+                externalSubjectId, createdAfter);
+        final var foundList = new ArrayList<Shell>();
+        // fetch 1 more item to make sure there is a visible item for the next page
+        while (foundList.size() < pageSize + 1) {
+            specification = setMandatorySpecificIdsAndValues(externalSubjectId, specification);
+
+            var shellList = shellRepository.findAll(specification, ofSize(granularAccessControlFetchSize));
+            var shellIdList = shellList.stream().map(Shell::getId).toList();
+
+            if (CollectionUtils.isEmpty(shellIdList)) {
+                break;
+            }
+            // Add shellIds filter to the existing specification
+            // This code snippet modifies an existing JPA Specification by adding a filter
+            // condition.
+            // The filter ensures that only entities with an "id" attribute matching one of
+            // the IDs in the `shellIdList` are included in the query results.
+            specification = specification.and((root, query, criteriaBuilder) -> root.get("id").in(shellIdList));
+
+            Page<Shell> currentPage = shellRepository.findAll(specification.and(withAllAssociations()),
+                    ofSize(granularAccessControlFetchSize));
+            List<Shell> shells = shellAccessHandler.filterListOfShellProperties(currentPage.stream().toList(),
+                    externalSubjectId);
+            shells.stream().limit((long) pageSize + 1 - foundList.size()).forEach(foundList::add);
+            if (!currentPage.hasNext()) {
+                break;
+            }
+            ShellCursor shellCursor = new ShellCursor(pageSize, cursor.getEncodedCursorShell(
+                    lastItemOf(currentPage.getContent()).getCreatedDate(), currentPage.hasNext()));
+            specification = shellAccessHandler.shellFilterSpecification(SORT_FIELD_NAME_SHELL, shellCursor,
+                    externalSubjectId, createdAfter);
+        }
+        String nextCursor = null;
+
+        final boolean hasNextPage = foundList.size() > pageSize;
+        List<Shell> resultList = foundList.stream().limit(pageSize).toList();
+        if (!resultList.isEmpty()) {
+            nextCursor = cursor.getEncodedCursorShell(resultList.get(resultList.size() - 1).getCreatedDate(),
+                    hasNextPage);
+        }
+
+        return ShellCollectionDto.builder().items(resultList).cursor(nextCursor).build();
+    }
+
+    private ShellCollectionDto findAllShellsLegacyAccessControl(Integer pageSize, final String cursorVal,
+            final String externalSubjectId, final OffsetDateTime createdAfter) {
+        pageSize = getPageSize(pageSize);
+        ShellCursor cursor = new ShellCursor(pageSize, cursorVal);
+
+        // Instant cursorCreatedDate = cursor.getShellSearchCursor();
+        String cVal = cursorVal;
+        if (cVal == null) {
+            cVal = DEFAULT_EXTERNAL_ID;
+        }
+        Instant cursorCreatedDate = getCreatedDate(cVal, cursorVal != null, createdAfter);
+
+        String extSubId = null;
+        if (!externalSubjectId.isEmpty()) {
+            extSubId = externalSubjectId;
+        }
+
+        Page<Shell> shellPage = shellRepository.findAllByExternalSubjectId(extSubId, owningTenantId,
+                externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes, cursorCreatedDate,
+                PageRequest.of(0, pageSize, Sort.by("created_date").ascending()));
+
+        // Page to List
+        List<Shell> shells = shellAccessHandler.filterListOfShellProperties(shellPage.stream().toList(),
+                externalSubjectId);
+
+        String nextCursor = null;
+        if (!shells.isEmpty()) {
+            Instant lastDate = shells.get(shells.size() - 1).getCreatedDate();
+            nextCursor = cursor.getEncodedCursorShell(lastDate, shells.size() == pageSize);
+        }
+
+        return ShellCollectionDto.builder().items(shells).cursor(nextCursor).build();
+    }
 
    /**
     * Adds mandatory specific asset ID filters to the given JPA Specification.
@@ -357,69 +402,128 @@ public class ShellService {
    @Transactional( readOnly = true )
    public InlineResponse200 findExternalShellIdsByIdentifiersByExactMatch( final Set<ShellIdentifier> shellIdentifiers, Integer pageSize, final String cursor,
          final String externalSubjectId, final OffsetDateTime createdAfter ) {
-
-      pageSize = getPageSize( pageSize );
-      final boolean isCursorAvailable = StringUtils.isNotBlank( cursor );
-      final String cursorValue = getCursorDecoded( cursor ).orElse( DEFAULT_EXTERNAL_ID );
-      try {
-         final List<String> visibleAssetIds;
-         if ( shellAccessHandler.supportsGranularAccessControl() ) {
-            visibleAssetIds = fetchAPageOfAasIdsUsingGranularAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize, isCursorAvailable,
-                  createdAfter );
-         } else {
-            visibleAssetIds = fetchAPageOfAasIdsUsingLegacyAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize, isCursorAvailable,
-                  createdAfter );
-         }
-
-         final var assetIdList = visibleAssetIds.stream().limit( pageSize ).toList();
-         final String nextCursor = getCursorEncoded( visibleAssetIds, assetIdList );
-         final var response = new InlineResponse200();
-         response.setResult( assetIdList );
-         response.setPagingMetadata( new PagedResultPagingMetadata().cursor( nextCursor ) );
-         return response;
-      } catch ( DenyAccessException e ) {
-         final var response = new InlineResponse200();
-         response.setResult( Collections.emptyList() );
-         return response;
-      }
+        if (isGranularAccessControlEnabled) {
+            return findExternalShellIdsByIdentifiersByExactMatchGranularAccessControl(shellIdentifiers, pageSize,
+                    cursor, externalSubjectId, createdAfter);
+        } else {
+            return findExternalShellIdsByIdentifiersByExactMatchLegacyAccessControl(shellIdentifiers, pageSize, cursor,
+            externalSubjectId, createdAfter);
+        }
    }
+
+    private InlineResponse200 findExternalShellIdsByIdentifiersByExactMatchGranularAccessControl(
+            final Set<ShellIdentifier> shellIdentifiers, Integer pageSize, final String cursor,
+            final String externalSubjectId, final OffsetDateTime createdAfter) {
+        pageSize = getPageSize(pageSize);
+        final boolean isCursorAvailable = StringUtils.isNotBlank(cursor);
+        final String cursorValue = getCursorDecoded(cursor).orElse(DEFAULT_EXTERNAL_ID);
+        try {
+            final List<String> visibleAssetIds = fetchAPageOfAasIdsUsingGranularAccessControl(shellIdentifiers,
+                    externalSubjectId, cursorValue, pageSize, isCursorAvailable, createdAfter);
+
+            final var assetIdList = visibleAssetIds.stream().limit(pageSize).toList();
+            final String nextCursor = getCursorEncoded(visibleAssetIds, assetIdList);
+            final var response = new InlineResponse200();
+            response.setResult(assetIdList);
+            response.setPagingMetadata(new PagedResultPagingMetadata().cursor(nextCursor));
+            return response;
+        } catch (DenyAccessException e) {
+            final var response = new InlineResponse200();
+            response.setResult(Collections.emptyList());
+            return response;
+        }
+    }
+
+    private InlineResponse200 findExternalShellIdsByIdentifiersByExactMatchLegacyAccessControl(
+            final Set<ShellIdentifier> shellIdentifiers, Integer pageSize, final String cursor,
+            final String externalSubjectId, final OffsetDateTime createdAfter) {
+        pageSize = getPageSize(pageSize);
+        final boolean isCursorAvailable = StringUtils.isNotBlank(cursor);
+        final String cursorValue = getCursorDecoded(cursor).orElse(DEFAULT_EXTERNAL_ID);
+
+        final Pair<List<String>, Long> visibleAssetIds = fetchAPageOfAasIdsUsingLegacyAccessControl(shellIdentifiers,
+                externalSubjectId, cursorValue, pageSize, isCursorAvailable, createdAfter);
+        final List<String> assetIdList = visibleAssetIds.a.stream().limit(pageSize).toList();
+        final String nextCursor = getCursorEncoded(visibleAssetIds.a, assetIdList);
+
+        final var response = new InlineResponse200();
+        response.setResult(assetIdList);
+        response.setPagingMetadata(new PagedResultPagingMetadata().cursor(nextCursor));
+        return response;
+    }
 
    @Transactional( readOnly = true )
    public SearchAllAssetAdministrationShellIdsByAssetLink200Response findExternalShellIdsByAssetLinkByExactMatch( Set<ShellIdentifier> shellIdentifiers,
          Integer pageSize, String cursor, String externalSubjectId ) {
-
-      pageSize = getPageSize( pageSize );
-      final String cursorValue = getCursorDecoded( cursor ).orElse( DEFAULT_EXTERNAL_ID );
-      try {
-         final List<String> visibleAssetIds;
-         if ( shellAccessHandler.supportsGranularAccessControl() ) {
-            visibleAssetIds = fetchAPageOfAasIdsUsingGranularAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize, false, null );
-         } else {
-            visibleAssetIds = fetchAPageOfAasIdsUsingLegacyAccessControl( shellIdentifiers, externalSubjectId, cursorValue, pageSize, false, null );
-         }
-
-         final var assetIdList = visibleAssetIds.stream().limit( pageSize ).toList();
-         final String nextCursor = getCursorEncoded( visibleAssetIds, assetIdList );
-         final var response = new SearchAllAssetAdministrationShellIdsByAssetLink200Response();
-         response.setResult( assetIdList );
-         response.setPagingMetadata( new PagedResultPagingMetadata().cursor( nextCursor ) );
-         return response;
-      } catch ( DenyAccessException e ) {
-         final var response = new SearchAllAssetAdministrationShellIdsByAssetLink200Response();
-         response.setResult( Collections.emptyList() );
-         return response;
-      }
+        if (isGranularAccessControlEnabled) {
+            return findExternalShellIdsByAssetLinkByExactMatchGranularAccessControl(shellIdentifiers, pageSize, cursor,
+                    externalSubjectId);
+        } else {
+            return findExternalShellIdsByAssetLinkByExactMatchLegacyAccessControl(shellIdentifiers, pageSize, cursor,
+            externalSubjectId);
+        }
    }
 
-   private List<String> fetchAPageOfAasIdsUsingLegacyAccessControl( final Set<ShellIdentifier> shellIdentifiers, final String externalSubjectId,
-         final String cursorValue, final int pageSize, final boolean isCursorAvailable, final OffsetDateTime createdAfter ) {
-      final var fetchSize = pageSize + 1;
-      final Instant cutoffDate = getCreatedDate( cursorValue, isCursorAvailable, createdAfter );
-      List<String> keyValueCombinations = toKeyValueCombinations( shellIdentifiers );
-      return shellIdentifierRepository.findExternalShellIdsByIdentifiersByExactMatch( keyValueCombinations,
-            keyValueCombinations.size(), externalSubjectId, externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes, owningTenantId,
-            ShellIdentifier.GLOBAL_ASSET_ID_KEY, cutoffDate, cursorValue, fetchSize );
-   }
+    private SearchAllAssetAdministrationShellIdsByAssetLink200Response findExternalShellIdsByAssetLinkByExactMatchGranularAccessControl(
+            Set<ShellIdentifier> shellIdentifiers, Integer pageSize, String cursor, String externalSubjectId) {
+        pageSize = getPageSize(pageSize);
+        final String cursorValue = getCursorDecoded(cursor).orElse(DEFAULT_EXTERNAL_ID);
+        try {
+            final List<String> visibleAssetIds = fetchAPageOfAasIdsUsingGranularAccessControl(shellIdentifiers,
+                    externalSubjectId, cursorValue, pageSize, false, null);
+
+            final var assetIdList = visibleAssetIds.stream().limit(pageSize).toList();
+            final String nextCursor = getCursorEncoded(visibleAssetIds, assetIdList);
+            final var response = new SearchAllAssetAdministrationShellIdsByAssetLink200Response();
+            response.setResult(assetIdList);
+            response.setPagingMetadata(new PagedResultPagingMetadata().cursor(nextCursor));
+            return response;
+        } catch (DenyAccessException e) {
+            final var response = new SearchAllAssetAdministrationShellIdsByAssetLink200Response();
+            response.setResult(Collections.emptyList());
+            return response;
+        }
+    }
+
+    private SearchAllAssetAdministrationShellIdsByAssetLink200Response findExternalShellIdsByAssetLinkByExactMatchLegacyAccessControl(
+            Set<ShellIdentifier> shellIdentifiers, Integer pageSize, String cursor, String externalSubjectId) {
+        pageSize = getPageSize(pageSize);
+        final String cursorValue = getCursorDecoded(cursor).orElse(DEFAULT_EXTERNAL_ID);
+
+        final Pair<List<String>, Long> visibleAssetIds = fetchAPageOfAasIdsUsingLegacyAccessControl(shellIdentifiers,
+                externalSubjectId, cursorValue, pageSize, false, null);
+        List<String> assetIdList = visibleAssetIds.a.stream().limit(pageSize).toList();
+        String nextCursor = getCursorEncoded(visibleAssetIds.a, assetIdList);
+
+        final var response = new SearchAllAssetAdministrationShellIdsByAssetLink200Response();
+        response.setResult(assetIdList);
+        response.setPagingMetadata(new PagedResultPagingMetadata().cursor(nextCursor));
+        return response;
+    }
+
+	private Pair<List<String>, Long> fetchAPageOfAasIdsUsingLegacyAccessControl(
+			final Set<ShellIdentifier> shellIdentifiers, final String externalSubjectId,
+                                                                     final String cursorValue, final int pageSize, final boolean isCursorAvailable, final OffsetDateTime createdAfter ) {
+        final var fetchSize = pageSize + 1;
+        final Instant cutoffDate = getCreatedDate( cursorValue, isCursorAvailable, createdAfter );
+
+        String[] namespaces = new String[shellIdentifiers.size()];
+        String[] identifiers = new String[shellIdentifiers.size()];
+
+        List<ShellIdentifier> shellIdentifierList = new ArrayList<>(shellIdentifiers);
+        for (int i = 0; i < shellIdentifiers.size(); i++) {
+            ShellIdentifier shellIdentifier = shellIdentifierList.get(i);
+            namespaces[i] = shellIdentifier.getKey();
+            identifiers[i] = shellIdentifier.getValue();
+        }
+
+		List<String> foundShells = shellIdentifierRepository.findExternalShellIdsByIdentifiersByExactMatch(
+                namespaces, identifiers, shellIdentifiers.size(),
+                externalSubjectId, externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes, owningTenantId,
+                ShellIdentifier.GLOBAL_ASSET_ID_KEY, cutoffDate, cursorValue, fetchSize);
+
+		return new Pair<>(foundShells, (long) foundShells.size());
+    }
 
    /**
     * Retrieves the created date based on the cursor value and the availability of the cursor.
@@ -450,33 +554,32 @@ public class ShellService {
       return shellRepository.getCreatedDateByIdExternal( cursorValue ).orElse( MINIMUM_SQL_DATETIME );
    }
 
-   private List<String> fetchAPageOfAasIdsUsingGranularAccessControl( final Set<ShellIdentifier> shellIdentifiers, final String externalSubjectId,
-         final String cursorValue, final int pageSize, final boolean isCursorAvailable, final OffsetDateTime createdAfter ) throws DenyAccessException {
-      final Set<SpecificAssetId> userQuery = shellIdentifiers.stream()
-            .map( id -> new SpecificAssetId( id.getKey(), id.getValue() ) )
-            .collect( Collectors.toSet() );
-      List<String> keyValueCombinations = toKeyValueCombinations( shellIdentifiers );
-      final var fetchSize = granularAccessControlFetchSize;
+    private List<String> fetchAPageOfAasIdsUsingGranularAccessControl(final Set<ShellIdentifier> shellIdentifiers,
+            final String externalSubjectId, final String cursorValue, final int pageSize,
+            final boolean isCursorAvailable, final OffsetDateTime createdAfter) throws DenyAccessException {
+        final Set<SpecificAssetId> userQuery = shellIdentifiers.stream()
+                .map(id -> new SpecificAssetId(id.getKey(), id.getValue())).collect(Collectors.toSet());
+        List<String> keyValueCombinations = toKeyValueCombinations(shellIdentifiers);
+        final var fetchSize = granularAccessControlFetchSize;
 
-      String currentCursorValue = cursorValue;
-      final List<String> visibleAssetIds = new ArrayList<>();
-      while ( visibleAssetIds.size() < pageSize + 1 ) {
-         final Instant currentCutoffDate = getCreatedDate( currentCursorValue, isCursorAvailable, createdAfter );
-         List<UUID> shellIds = shellIdentifierRepository.findAPageOfShellIdsBySpecificAssetIds(
-               keyValueCombinations, keyValueCombinations.size(), currentCutoffDate, currentCursorValue, PageRequest.ofSize( fetchSize ) );
-         if ( shellIds.isEmpty() ) {
-            break;
-         }
-         List<ShellIdentifierMinimal> queryResults = shellIdentifierRepository
-               .findMinimalShellIdsByShellIds( shellIds, currentCutoffDate, currentCursorValue );
+        String currentCursorValue = cursorValue;
+        final List<String> visibleAssetIds = new ArrayList<>();
+        while (visibleAssetIds.size() < pageSize + 1) {
+            final Instant currentCutoffDate = getCreatedDate(currentCursorValue, isCursorAvailable, createdAfter);
+            List<UUID> shellIds = shellIdentifierRepository.findAPageOfShellIdsBySpecificAssetIdsGranularAccessControl(keyValueCombinations,
+                    keyValueCombinations.size(), currentCutoffDate, currentCursorValue, PageRequest.ofSize(fetchSize));
+            if (shellIds.isEmpty()) {
+                break;
+            }
+            List<ShellIdentifierMinimal> queryResults = shellIdentifierRepository
+                    .findMinimalShellIdsByShellIdsGranularAccessControl(shellIds, currentCutoffDate, currentCursorValue);
 
-         shellAccessHandler.filterToVisibleShellIdsForLookup( userQuery, queryResults, externalSubjectId ).stream()
-               .limit( (long) fetchSize - visibleAssetIds.size() )
-               .forEach( visibleAssetIds::add );
-         currentCursorValue = lastItemOf( queryResults ).shellId();
-      }
-      return visibleAssetIds.stream().distinct().toList();
-   }
+            shellAccessHandler.filterToVisibleShellIdsForLookup(userQuery, queryResults, externalSubjectId).stream()
+                    .limit((long) fetchSize - visibleAssetIds.size()).forEach(visibleAssetIds::add);
+            currentCursorValue = lastItemOf(queryResults).shellId();
+        }
+        return visibleAssetIds.stream().distinct().toList();
+    }
 
    @Transactional( readOnly = true )
    public List<String> findExternalShellIdsByIdentifiersByAnyMatch( Set<ShellIdentifier> shellIdentifiers, String externalSubjectId ) {
@@ -667,6 +770,13 @@ public class ShellService {
 
    private String getCursorEncoded( List<String> queryResult, List<String> assetIdList ) {
       if ( !queryResult.isEmpty() && !lastItemOf( assetIdList ).equals( lastItemOf( queryResult ) ) ) {
+         return Base64.getEncoder().encodeToString( lastItemOf( assetIdList ).getBytes() );
+      }
+      return null;
+   }
+
+   private String getCursorEncoded( List<String> assetIdList , Long totalElementCount ) {
+      if ( !assetIdList.isEmpty() && assetIdList.size() < totalElementCount) {
          return Base64.getEncoder().encodeToString( lastItemOf( assetIdList ).getBytes() );
       }
       return null;

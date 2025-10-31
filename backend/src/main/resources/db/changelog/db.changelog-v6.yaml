@@ -1,0 +1,190 @@
+################################################################################
+# Copyright (c) 2025 Robert Bosch Manufacturing Solutions GmbH and others
+# Copyright (c) 2025 Contributors to the Eclipse Foundation
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache License, Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0.
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+################################################################################
+
+databaseChangeLog:
+  - changeSet:
+      id: 19082025-1
+      author: FraunhoferIESE
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          indexExists:
+            indexName: idx_shell_identifier_fk_shell_id
+            tableName: shell_identifier
+      changes:
+        - createIndex:
+            indexName: idx_shell_identifier_fk_shell_id
+            tableName: shell_identifier
+            columns:
+              - column:
+                  name: fk_shell_id
+
+  - changeSet:
+      id: 19082025-2
+      author: FraunhoferIESE
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          indexExists:
+            indexName: idx_shell_identifier_external_subject_reference_fk
+            tableName: shell_identifier_external_subject_reference
+      changes:
+        - createIndex:
+            indexName: idx_shell_identifier_external_subject_reference_fk
+            tableName: shell_identifier_external_subject_reference
+            columns:
+              - column:
+                  name: fk_shell_identifier_external_subject_id
+
+  - changeSet:
+      id: 19082025-3
+      author: FraunhoferIESE
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          indexExists:
+            indexName: idx_shell_identifier_external_subject_reference_key_fk
+            tableName: shell_identifier_external_subject_reference_key
+      changes:
+        - createIndex:
+            indexName: idx_shell_identifier_external_subject_reference_key_fk
+            tableName: shell_identifier_external_subject_reference_key
+            columns:
+              - column:
+                  name: fk_si_external_subject_reference_id
+
+  - changeSet:
+      id: 19082025-4
+      author: FraunhoferIESE
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          indexExists:
+            indexName: idx_shell_identifier_supplem_semantic_reference_fk
+            tableName: shell_identifier_supplem_semantic_reference
+      changes:
+        - createIndex:
+            indexName: idx_shell_identifier_supplem_semantic_reference_fk
+            tableName: shell_identifier_supplem_semantic_reference
+            columns:
+              - column:
+                  name: fk_shell_identifier_supplem_semantic_id
+
+  - changeSet:
+      id: 19082025-5
+      author: FraunhoferIESE
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          indexExists:
+            indexName: idx_submodel_description_fk
+            tableName: submodel_description
+      changes:
+        - createIndex:
+            indexName: idx_submodel_description_fk
+            tableName: submodel_description
+            columns:
+              - column:
+                  name: fk_submodel_id
+
+  - changeSet:
+      id: 19082025-6
+      author: FraunhoferIESE
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          indexExists:
+            indexName: idx_submodel_display_name_fk
+            tableName: submodel_display_name
+      changes:
+        - createIndex:
+            indexName: idx_submodel_display_name_fk
+            tableName: submodel_display_name
+            columns:
+              - column:
+                  name: fk_submodel_id
+
+  - changeSet:
+      id: 19082025-7
+      author: FraunhoferIESE
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          indexExists:
+            indexName: idx_submodel_semantic_id_reference_key_fk
+            tableName: submodel_semantic_id_reference_key
+      changes:
+        - createIndex:
+            indexName: idx_submodel_semantic_id_reference_key_fk
+            tableName: submodel_semantic_id_reference_key
+            columns:
+              - column:
+                  name: fk_submodel_semantic_id_reference_id
+
+  - changeSet:
+      id: 19082025-8
+      author: FraunhoferIESE
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          indexExists:
+            indexName: idx_submodel_supplem_semantic_id_reference_fk
+            tableName: submodel_supplem_semantic_id_reference
+      changes:
+        - createIndex:
+            indexName: idx_submodel_supplem_semantic_id_reference_fk
+            tableName: submodel_supplem_semantic_id_reference
+            columns:
+              - column:
+                  name: fk_submodel_id
+
+  - changeSet:
+      id: 19082025-9
+      author: FraunhoferIESE
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          indexExists:
+            indexName: idx_submodel_endpoint_fk
+            tableName: submodel_endpoint
+      changes:
+        - createIndex:
+            indexName: idx_submodel_endpoint_fk
+            tableName: submodel_endpoint
+            columns:
+              - column:
+                  name: fk_submodel_id
+
+  - changeSet:
+      id: 19082025-10
+      author: FraunhoferIESE
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          indexExists:
+            indexName: idx_submodel_security_attribute_fk
+            tableName: submodel_security_attribute
+      changes:
+        - createIndex:
+            indexName: idx_submodel_security_attribute_fk
+            tableName: submodel_security_attribute
+            columns:
+              - column:
+                  name: fk_submodel_endpoint_id

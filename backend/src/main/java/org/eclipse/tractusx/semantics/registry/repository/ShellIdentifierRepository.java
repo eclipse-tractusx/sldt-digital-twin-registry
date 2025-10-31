@@ -28,12 +28,15 @@ import java.util.UUID;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
 import org.eclipse.tractusx.semantics.registry.model.projection.ShellIdentifierMinimal;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.query.Param;
 
+@NoRepositoryBean
 public interface ShellIdentifierRepository extends JpaRepository<ShellIdentifier, UUID> {
 
    @Modifying
@@ -42,22 +45,82 @@ public interface ShellIdentifierRepository extends JpaRepository<ShellIdentifier
 
    Set<ShellIdentifier> findByShellId( Shell shellId );
 
-   @Query( value = """
-           SELECT s.id
-           FROM ShellIdentifier sid
-              JOIN sid.shellId s
-           WHERE
-              CONCAT( sid.key, sid.value ) IN ( :keyValueCombinations )
-              AND (
-                 s.createdDate > :cutoffDate
-                 OR ( s.createdDate = :cutoffDate AND s.idExternal > :cursorValue )
-              )
-           GROUP BY s.id, s.createdDate, s.idExternal
-           HAVING COUNT(*) = :keyValueCombinationsSize
-           ORDER BY s.createdDate ASC, s.idExternal ASC
-         """ )
-   List<UUID> findAPageOfShellIdsBySpecificAssetIds(
-         List<String> keyValueCombinations, int keyValueCombinationsSize, Instant cutoffDate, String cursorValue, Pageable pageable );
+   @Query(value = """
+   SELECT s.id
+   FROM shell_identifier si
+   JOIN shell s ON si.fk_shell_id = s.id
+   LEFT JOIN shell_identifier_external_subject_reference sies
+      ON sies.FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID = si.id
+   LEFT JOIN shell_identifier_external_subject_reference_key sier
+      ON sier.FK_SI_EXTERNAL_SUBJECT_REFERENCE_ID = sies.id
+   WHERE CONCAT(si.namespace, si.identifier) IN (:keyValueCombinations)
+     AND s.created_date > :cutoffDate
+     AND (
+         :tenantId IS NULL
+         OR :tenantId = :owningTenantId
+         OR sier.ref_key_value = :tenantId
+         OR (
+            sier.ref_key_value = :publicWildcardPrefix
+            AND si.namespace IN (:publicWildcardAllowedTypes)
+         )
+     )
+   GROUP BY s.id, s.created_date, s.id_external
+   HAVING COUNT(DISTINCT CONCAT(si.namespace, si.identifier)) = :keyValueCombinationsSize
+   ORDER BY s.created_date, s.id_external ASC
+   """,
+           nativeQuery = true,
+           countQuery = """
+     SELECT COUNT(*) FROM (
+        SELECT s.id
+        FROM shell_identifier si
+        JOIN shell s ON si.fk_shell_id = s.id
+        LEFT JOIN shell_identifier_external_subject_reference sies
+           ON sies.FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID = si.id
+        LEFT JOIN shell_identifier_external_subject_reference_key sier
+           ON sier.FK_SI_EXTERNAL_SUBJECT_REFERENCE_ID = sies.id
+        WHERE CONCAT(si.namespace, si.identifier) IN (:keyValueCombinations)
+          AND s.created_date > :cutoffDate
+          AND (
+             :tenantId IS NULL
+             OR :tenantId = :owningTenantId
+             OR sier.ref_key_value = :tenantId
+             OR (
+                sier.ref_key_value = :publicWildcardPrefix
+                AND si.namespace IN (:publicWildcardAllowedTypes)
+             )
+          )
+        GROUP BY s.id, s.created_date, s.id_external
+        HAVING COUNT(DISTINCT CONCAT(si.namespace, si.identifier)) = :keyValueCombinationsSize
+     ) AS counted
+     """
+   )
+   Page<UUID> findAPageOfShellIdsBySpecificAssetIdsLegacyAccessControl(
+           @Param("keyValueCombinations") List<String> keyValueCombinations,
+           @Param("keyValueCombinationsSize") int keyValueCombinationsSize,
+           @Param("cutoffDate") Instant cutoffDate,
+           @Param("tenantId") String tenantId,
+           @Param("owningTenantId") String owningTenantId,
+           @Param("publicWildcardPrefix") String publicWildcardPrefix,
+           @Param("publicWildcardAllowedTypes") List<String> publicWildcardAllowedTypes,
+           Pageable pageable
+   );
+
+    @Query(value = """
+              SELECT s.id
+              FROM ShellIdentifier sid
+                 JOIN sid.shellId s
+              WHERE
+                 CONCAT( sid.key, sid.value ) IN ( :keyValueCombinations )
+                 AND (
+                    s.createdDate > :cutoffDate
+                    OR ( s.createdDate = :cutoffDate AND s.idExternal > :cursorValue )
+                 )
+              GROUP BY s.id, s.createdDate, s.idExternal
+              HAVING COUNT(*) = :keyValueCombinationsSize
+              ORDER BY s.createdDate ASC, s.idExternal ASC
+            """)
+    List<UUID> findAPageOfShellIdsBySpecificAssetIdsGranularAccessControl(List<String> keyValueCombinations,
+            int keyValueCombinationsSize, Instant cutoffDate, String cursorValue, Pageable pageable);
 
    @Query( value = """
             SELECT NEW org.eclipse.tractusx.semantics.registry.model.projection.ShellIdentifierMinimal(s.idExternal, sid.key, sid.value)
@@ -65,108 +128,53 @@ public interface ShellIdentifierRepository extends JpaRepository<ShellIdentifier
                JOIN sid.shellId s
             WHERE
                s.id IN ( :shellIds )
-               AND (
-                  s.createdDate > :cutoffDate
-                  OR ( s.createdDate = :cutoffDate AND s.idExternal > :cursorValue )
-               )
-            ORDER BY s.createdDate ASC, s.idExternal ASC
+            ORDER BY s.createdDate, s.idExternal ASC
          """ )
-   List<ShellIdentifierMinimal> findMinimalShellIdsByShellIds(
-         List<UUID> shellIds, Instant cutoffDate, String cursorValue );
+   List<ShellIdentifierMinimal> findMinimalShellIdsByShellIdsLegacyAccessControl(List<UUID> shellIds);
+
+    @Query(value = """
+               SELECT NEW org.eclipse.tractusx.semantics.registry.model.projection.ShellIdentifierMinimal(s.idExternal, sid.key, sid.value)
+               FROM ShellIdentifier sid
+                  JOIN sid.shellId s
+               WHERE
+                  s.id IN ( :shellIds )
+                  AND (
+                     s.createdDate > :cutoffDate
+                     OR ( s.createdDate = :cutoffDate AND s.idExternal > :cursorValue )
+                  )
+               ORDER BY s.createdDate ASC, s.idExternal ASC
+            """)
+    List<ShellIdentifierMinimal> findMinimalShellIdsByShellIdsGranularAccessControl(List<UUID> shellIds,
+            Instant cutoffDate, String cursorValue);
 
    /**
     * Returns external shell ids for the given keyValueCombinations.
     * External shell ids matching the conditions below are returned:
     *   - specificAssetIds match exactly the keyValueCombinations
     *   - if externalSubjectId (tenantId) is not null it must match the tenantId
+    * <p>
+    * Please note that the namespace and identifier lists must be of the same size and represent key-value pairs.
+    * Positional matching between these two arguments is expected, and is used to determine the pairs to search for.
     *
-    *
-    * To be able to properly index the key and value conditions, the query does not use any functions.
-    * Computed indexes cannot be created for mutable functions like CONCAT in Postgres.
-    *
-    * @param keyValueCombinations the keys values to search for as tuples
-    * @param keyValueCombinationsSize the size of the key value combinations
-    * @return external shell ids for the given key value combinations
+    * @param namespaces the lookup keys to search for
+    * @param identifiers the lookup values to search for
+    * @param pairCount the number of key-value pairs
+    * @return external shell ids for the given key value pairs
     */
-   @Query( value = """
-           SELECT id_external
-           FROM (
-               SELECT
-                   s.id_external,
-                   s.created_date
-               FROM shell s
-               JOIN shell_identifier si ON s.id = si.fk_shell_id
-               WHERE
-                   CONCAT(si.namespace, si.identifier) IN (:keyValueCombinations)
-                   AND (
-                       s.created_date > :cutoffDate
-                       OR (s.created_date = :cutoffDate AND s.id_external > :cursorValue)
-                   )
-                   AND :tenantId = :owningTenantId
-               GROUP BY s.id_external, s.created_date
-               HAVING COUNT(*) = :keyValueCombinationsSize
-           
-               UNION ALL
-           
-               SELECT
-                   s.id_external,
-                   s.created_date
-               FROM shell s
-               JOIN shell_identifier si ON s.id = si.fk_shell_id
-               WHERE
-                   CONCAT(si.namespace, si.identifier) IN (:keyValueCombinations)
-                   AND (
-                       s.created_date > :cutoffDate
-                       OR (s.created_date = :cutoffDate AND s.id_external > :cursorValue)
-                   )
-                   AND si.namespace = :globalAssetId
-                   AND NOT (:tenantId = :owningTenantId)
-               GROUP BY s.id_external, s.created_date
-               HAVING COUNT(*) = :keyValueCombinationsSize
-           
-               UNION ALL
-           
-               SELECT
-                   s.id_external,
-                   s.created_date
-               FROM shell s
-               JOIN shell_identifier si ON s.id = si.fk_shell_id
-               WHERE
-                   CONCAT(si.namespace, si.identifier) IN (:keyValueCombinations)
-                   AND (
-                       s.created_date > :cutoffDate
-                       OR (s.created_date = :cutoffDate AND s.id_external > :cursorValue)
-                   )
-                   AND EXISTS (
-                       SELECT 1
-                       FROM SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE_KEY sider
-                       JOIN SHELL_IDENTIFIER_EXTERNAL_SUBJECT_REFERENCE sies
-                           ON sider.FK_SI_EXTERNAL_SUBJECT_REFERENCE_ID = sies.id
-                       WHERE
-                           sies.FK_SHELL_IDENTIFIER_EXTERNAL_SUBJECT_ID = si.id
-                           AND (
-                               sider.ref_key_value = :tenantId
-                               OR (
-                                   sider.ref_key_value = :publicWildcardPrefix
-                                   AND si.namespace IN (:publicWildcardAllowedTypes)
-                               )
-                           )
-                   )
-                   AND NOT (:tenantId = :owningTenantId OR si.namespace = :globalAssetId)
-               GROUP BY s.id_external, s.created_date
-               HAVING COUNT(*) = :keyValueCombinationsSize
-           ) AS combined_shells
-           ORDER BY created_date, id_external
-           LIMIT :pageSize;
-           """, nativeQuery = true )
-   List<String> findExternalShellIdsByIdentifiersByExactMatch( @Param( "keyValueCombinations" ) List<String> keyValueCombinations,
-         @Param( "keyValueCombinationsSize" ) int keyValueCombinationsSize,
-         @Param( "tenantId" ) String tenantId,
-         @Param( "publicWildcardPrefix" ) String publicWildcardPrefix,
-         @Param( "publicWildcardAllowedTypes" ) List<String> publicWildcardAllowedTypes,
-         @Param( "owningTenantId" ) String owningTenantId,
-         @Param( "globalAssetId" ) String globalAssetId,
-         @Param( "cutoffDate" ) Instant cutoffDate,
-         @Param( "cursorValue" ) String cursorValue,
-         @Param( "pageSize" ) int pageSize);
+   default List<String> findExternalShellIdsByIdentifiersByExactMatch(
+           @Param("namespaces") String[] namespaces,
+           @Param("identifiers") String[] identifiers,
+           @Param("pairCount") int pairCount,
+           @Param("tenantId") String tenantId,
+           @Param("publicWildcardPrefix") String publicWildcardPrefix,
+           @Param("publicWildcardAllowedTypes") List<String> publicWildcardAllowedTypes,
+           @Param("owningTenantId") String owningTenantId,
+           @Param("globalAssetId") String globalAssetId,
+           @Param("cutoffDate") Instant cutoffDate,
+           @Param("cursorValue") String cursorValue,
+           @Param("pageSize") int pageSize) {
+       throw new UnsupportedOperationException(
+               "Override provided only in the specific repositories (e.g. default, H2, PostgreSQL, ...)."
+       );
+   }
 }
