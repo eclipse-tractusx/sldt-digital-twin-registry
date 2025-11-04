@@ -20,19 +20,8 @@
 
 package org.eclipse.tractusx.semantics.registry;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.f4b6a3.uuid.UuidCreator;
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
 import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
@@ -41,13 +30,7 @@ import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRulePolicy;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.policy.AccessRulePolicyValue;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.policy.PolicyOperator;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.repository.AccessControlRuleRepository;
-import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.AasPolicy;
-import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.AccessRuleValue;
-import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.AccessRuleValues;
-import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.CreateAccessRule;
-import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.OperatorType;
-import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.PolicyType;
-import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.ReadUpdateAccessRule;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.rest.model.*;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -61,7 +44,18 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -585,7 +579,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
 
       @Test
       void testPostSubmodelDescriptorAuthorizedWithoutMatchingSemanticIdExpectForbidden() throws Exception {
-         String randomId = UUID.randomUUID().toString();
+         String randomId = UuidCreator.getTimeOrderedEpoch().toString();
          AssetAdministrationShellDescriptor shellPayload = TestUtil
                .createCompleteAasDescriptor( randomId + "semanticIdExample", EXISTING_URL + randomId );
          shellPayload.setSpecificAssetIds( null );
@@ -619,7 +613,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
 
       @Test
       void testPostSubmodelDescriptorAuthorizedWithMatchingShellAndSemanticIdExpectSuccess() throws Exception {
-         String randomId = UUID.randomUUID().toString();
+         String randomId = UuidCreator.getTimeOrderedEpoch().toString();
          AssetAdministrationShellDescriptor shellPayload = TestUtil
                .createCompleteAasDescriptor( randomId + "semanticIdExample", EXISTING_URL + randomId );
          shellPayload.setSpecificAssetIds( null );
@@ -653,7 +647,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
 
       @Test
       void testPostSubmodelDescriptorAuthorizedWithoutMatchingShellExpectForbidden() throws Exception {
-         String randomId = UUID.randomUUID().toString();
+         String randomId = UuidCreator.getTimeOrderedEpoch().toString();
          AssetAdministrationShellDescriptor shellPayload = TestUtil
                .createCompleteAasDescriptor( randomId + "semanticIdExample", EXISTING_URL + randomId );
          shellPayload.setSpecificAssetIds( null );
@@ -730,7 +724,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
                            .content( objectMapper.writeValueAsString( new CreateAccessRule()
                                  .policyType( PolicyType.AAS )
                                  .policy( defaultPolicy )
-                                 .description( UUID.randomUUID().toString() ) ) )
+                                 .description( UuidCreator.getTimeOrderedEpoch().toString() ) ) )
                )
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isUnauthorized() );
@@ -757,7 +751,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
                                  .tid( jwtTokenFactory.tenantOne().getTenantId() )
                                  .policyType( PolicyType.AAS )
                                  .policy( defaultPolicy )
-                                 .description( UUID.randomUUID().toString() ) ) )
+                                 .description( UuidCreator.getTimeOrderedEpoch().toString() ) ) )
                )
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isUnauthorized() );
@@ -793,7 +787,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
                            .content( objectMapper.writeValueAsString( new CreateAccessRule()
                                  .policyType( PolicyType.AAS )
                                  .policy( defaultPolicy )
-                                 .description( UUID.randomUUID().toString() ) ) )
+                                 .description( UuidCreator.getTimeOrderedEpoch().toString() ) ) )
                            .with( jwtTokenFactory.tenantOne().readAccessRules() )
                )
                .andDo( MockMvcResultHandlers.print() )
@@ -822,7 +816,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
                                  .tid( jwtTokenFactory.tenantOne().getTenantId() )
                                  .policyType( PolicyType.AAS )
                                  .policy( defaultPolicy )
-                                 .description( UUID.randomUUID().toString() ) ) )
+                                 .description( UuidCreator.getTimeOrderedEpoch().toString() ) ) )
                            .with( jwtTokenFactory.tenantOne().readAccessRules() )
                )
                .andDo( MockMvcResultHandlers.print() )
@@ -854,7 +848,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
 
       @Test
       void testPostAccessRuleWithTokenExpectSuccess() throws Exception {
-         String description = UUID.randomUUID().toString();
+         String description = UuidCreator.getTimeOrderedEpoch().toString();
          String responseBody = mvc.perform(
                      MockMvcRequestBuilders
                            .post( "/api/v3/access-controls/rules" )
@@ -884,7 +878,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
 
       @Test
       void testGetAnAccessRuleWithTokenExpectSuccess() throws Exception {
-         String description = UUID.randomUUID().toString();
+         String description = UuidCreator.getTimeOrderedEpoch().toString();
          AccessRule saved = saveDefaultRule( description );
          String responseBody = mvc.perform(
                      MockMvcRequestBuilders
@@ -917,7 +911,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
          accessRule.setTargetTenant( "target" );
          AccessRule saved = accessControlRuleRepository.saveAndFlush( accessRule );
 
-         String description = UUID.randomUUID().toString();
+         String description = UuidCreator.getTimeOrderedEpoch().toString();
          String responseBody = mvc.perform(
                      MockMvcRequestBuilders
                            .put( "/api/v3/access-controls/rules/" + saved.getId() )
@@ -949,7 +943,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
 
       @Test
       void testDeleteAnAccessRuleWithTokenExpectSuccess() throws Exception {
-         AccessRule saved = saveDefaultRule( UUID.randomUUID().toString() );
+         AccessRule saved = saveDefaultRule( UuidCreator.getTimeOrderedEpoch().toString() );
          //verify that it exists
          mvc.perform(
                      MockMvcRequestBuilders
