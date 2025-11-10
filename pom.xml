@@ -449,6 +449,7 @@
 							<propertyName>licence_url</propertyName>
 							<propertyName>licence_distribution</propertyName>
 							<buildDirectory>${project.build.directory}</buildDirectory>
+                     <argLine>@{jacocoArgLine} -Xmx2g -Xms1g -XX:MaxMetaspaceSize=512m -Xss2m</argLine>
 						</systemPropertyVariables>
 					</configuration>
 				</plugin>
