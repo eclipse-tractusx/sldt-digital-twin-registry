@@ -4,11 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.9.1
+## 0.10.0-RC1
 ### Added
 ### Changed
+- Create a `ShellIdentifierRepository` specific for `postgresql`, with improved query performance
 - Replace UUIDv4 with UUIDv7 to improve insert performance
 ### Fixed
+- Optimize native SQL and JPQL queries by flattening subqueries and improving join performance
+- Optimize pagination for legacy access control by filtering directly in the database query
 - Make `/lookup/shellsByAssetLink` endpoint accessible to `view_digital_twin` role
 
 ## 0.9.0
