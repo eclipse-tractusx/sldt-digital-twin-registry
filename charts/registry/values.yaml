@@ -54,7 +54,7 @@ registry:
   identityProvider: keycloak
   externalSubjectIdWildcardPrefix: PUBLIC_READABLE
   externalSubjectIdWildcardAllowedTypes: manufacturerPartId,digitalTwinType
-  useGranularAccessControl: "true"
+  useGranularAccessControl: "false"
   granularAccessControlFetchSize: "500"
   service:
     port: 8080
