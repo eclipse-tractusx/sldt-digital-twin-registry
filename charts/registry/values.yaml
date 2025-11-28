@@ -123,10 +123,11 @@ registry:
 
 postgresql:
   image:
-    # -- workaround to use bitnamilegacy chart for version 12.12.x till committers align on new postgresql charts
-    repository: bitnamilegacy/postgresql
-    # -- workaround to use bitnamilegacy chart for version 12.12.x till committers align on new postgresql charts
-    tag: 17.6.0-debian-12-r4
+    # -- PostgreSQL image registry
+    registry: docker.io
+    # -- PostgreSQL image repository
+    repository: postgres
+    tag: "18.0@sha256:1ffc019dae94eca6b09a49ca67d37398951346de3c3d0cfe23d8d4ca33da83fb"
   primary:
     persistence:
       enabled: true

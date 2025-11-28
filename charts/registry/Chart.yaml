@@ -30,10 +30,11 @@ version: 0.10.0-RC1
 appVersion: 0.10.0-RC1
 
 dependencies:
-  - repository: https://charts.bitnami.com/bitnami
-    name: postgresql
-    version: 12.12.10
+  - repository: oci://registry-1.docker.io/cloudpirates
+    name: postgres
+    version: 0.11.0
     condition: enablePostgres
+    alias: postgresql
   - repository: https://charts.bitnami.com/bitnami
     name: keycloak
     version: 16.1.7
