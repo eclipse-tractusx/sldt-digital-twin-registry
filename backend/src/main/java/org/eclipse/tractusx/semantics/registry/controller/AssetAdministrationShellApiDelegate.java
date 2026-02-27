@@ -80,9 +80,11 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
 
     @Override
     public ResponseEntity<ServiceDescription> getSelfDescription() {
-        ServiceDescription serviceDescription = new ServiceDescription();
-        serviceDescription.setProfiles( List.of( ServiceDescription.ProfilesEnum.ASSETADMINISTRATIONSHELLREGISTRYSERVICESPECIFICATION_SSP_001, ServiceDescription.ProfilesEnum.DISCOVERYSERVICESPECIFICATION_SSP_001) );
-        return  new ResponseEntity<>( serviceDescription, HttpStatus.OK );
+       ServiceDescription serviceDescription = new ServiceDescription();
+       serviceDescription.setProfiles( List.of( ServiceDescription.ProfilesEnum._0_ASSETADMINISTRATIONSHELLREGISTRYSERVICESPECIFICATION_SSP_001,
+             ServiceDescription.ProfilesEnum._1_ASSETADMINISTRATIONSHELLREGISTRYSERVICESPECIFICATION_SSP_001,
+             ServiceDescription.ProfilesEnum._1_DISCOVERYSERVICESPECIFICATION_SSP_001 ) );
+       return new ResponseEntity<>( serviceDescription, HttpStatus.OK );
     }
 
     @Override
