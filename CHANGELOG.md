@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.11.0-RC2
+### Added
+### Changed
+### Fixed
+- fixed security issue com.fasterxml.jackson.core. upgraded to 2.21.1
+- Added missing ServiceDescription Profiles enum values
+
 ## 0.11.0-RC1
 ### Added
 ### Changed
