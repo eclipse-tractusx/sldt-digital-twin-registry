@@ -26,7 +26,7 @@
 	<parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.11</version> <!-- need to be repeated in properties section for technical purposes -->
+        <version>3.5.7</version> <!-- need to be repeated in properties section for technical purposes -->
         <relativePath/> <!-- lookup parent from repository and not the filesystem -->
     </parent>
 
@@ -66,7 +66,7 @@
 
 		<!-- version properties -->
 		<!-- framework and base stuff -->
-		<spring.boot.version>3.4.11</spring.boot.version>
+		<spring.boot.version>3.5.7</spring.boot.version>
 		<springdoc.version>1.6.14</springdoc.version>
 		<lombok.version>1.18.34</lombok.version>
 		<swagger-annotations.version>1.5.20</swagger-annotations.version>
@@ -87,7 +87,7 @@
 		<!-- json, xml, formats, ... -->
 		<jackson.version>2.13.1</jackson.version>
 		<jackson.databind.version>2.14.1</jackson.databind.version>
-
+		<jackson.core.version>2.21.1</jackson.core.version>
 		<!-- persistence -->
 		<mapstruct.version>1.5.3.Final</mapstruct.version>
 		<mapstruct.lombok.version>0.2.0</mapstruct.lombok.version>
@@ -267,12 +267,21 @@
 						<groupId>com.fasterxml.jackson.core</groupId>
 						<artifactId>jackson-databind</artifactId>
 					</exclusion>
+					<exclusion>
+						<groupId>com.fasterxml.jackson.core</groupId>
+						<artifactId>jackson-core</artifactId>
+					</exclusion>
 				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-databind</artifactId>
 				<version>${jackson.databind.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-core</artifactId>
+				<version>${jackson.core.version}</version>
 			</dependency>
 
 
