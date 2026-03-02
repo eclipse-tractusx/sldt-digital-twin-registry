@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 ### Fixed
 - fixed security issue spring-boot-starter-parent. upgraded to 3.4.11
+- Added missing ServiceDescription Profiles enum values
 
 ## 0.10.0
 ### Added
