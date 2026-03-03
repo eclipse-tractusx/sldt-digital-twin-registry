@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## 0.11.0-RC2
 ### Added
 ### Changed
+- Updated DEPENDENCIES file
 ### Fixed
 - fixed security issue com.fasterxml.jackson.core. upgraded to 2.21.1
 - Added missing ServiceDescription Profiles enum values
