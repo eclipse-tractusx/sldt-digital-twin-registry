@@ -4,11 +4,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.10.1
+## 0.11.1
 ### Added
 ### Changed
 - Updated Postgres Database version to 18.0 and switched helm from binami charts to cloudpirates charts.
 ### Fixed
+
+## 0.11.0
+### Added
+### Changed
+- Updated DEPENDENCIES file
+### Fixed
+- fixed security issue com.fasterxml.jackson.core. upgraded to 2.21.1
+- Added missing ServiceDescription Profiles enum values
+
+## 0.11.0-RC1
+### Added
+### Changed
+### Fixed
+- fixed security issue spring-boot-starter-parent. upgraded to 3.4.11
 
 ## 0.10.0
 ### Added
