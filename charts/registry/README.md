@@ -14,8 +14,8 @@ Tractus-X Digital Twin Registry Helm Chart
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://charts.bitnami.com/bitnami | keycloak | 16.1.7 |
-| https://charts.bitnami.com/bitnami | postgresql | 12.12.10 |
+| oci://registry-1.docker.io/cloudpirates | postgres (alias: postgresql) | 0.11.0 |
+| oci://registry-1.docker.io/cloudpirates | keycloak | 0.13.6 |
 
 ## Prerequisites
 
@@ -62,20 +62,26 @@ helm install registry -n semantics . --create-namespace
 | enableKeycloak | bool | `false` |  |
 | enablePostgres | bool | `true` |  |
 | fullnameOverride | string | `nil` |  |
-| keycloak.args[0] | string | `"kc.sh import --file /opt/keycloak/data/import/default-realm-import.json; kc.sh start-dev --hostname=registry-keycloak --hostname-strict=false --proxy=edge"` |  |
-| keycloak.auth.adminPassword | string | `nil` |  |
-| keycloak.auth.adminUser | string | `nil` |  |
-| keycloak.command[0] | string | `"/bin/sh"` |  |
-| keycloak.command[1] | string | `"-c"` |  |
-| keycloak.externalDatabase.existingSecret | string | `"keycloak-database-credentials"` |  |
-| keycloak.extraVolumeMounts[0].mountPath | string | `"/opt/keycloak/data/import/default-realm-import.json"` |  |
-| keycloak.extraVolumeMounts[0].name | string | `"registry-keycloak-configmap"` |  |
-| keycloak.extraVolumeMounts[0].subPath | string | `"default-realm-import.json"` |  |
-| keycloak.extraVolumes[0].configMap.name | string | `"registry-keycloak-configmap"` |  |
-| keycloak.extraVolumes[0].name | string | `"registry-keycloak-configmap"` |  |
-| keycloak.fullnameOverride | string | `"registry-keycloak"` |  |
-| keycloak.postgresql.enabled | bool | `false` |  |
-| keycloak.service.type | string | `"ClusterIP"` |  |
+| keycloak.image.tag | string | `"26.0.7"` | Official Keycloak image tag (CloudPirates) |
+| keycloak.keycloak.adminUser | string | `"admin"` | Keycloak admin username |
+| keycloak.keycloak.adminPassword | string | `"admin"` | Keycloak admin password |
+| keycloak.keycloak.proxyHeaders | string | `"xforwarded"` | Proxy header mode (was `proxy: edge` in Bitnami) |
+| keycloak.keycloak.production | bool | `false` | Production mode |
+| keycloak.keycloak.httpRelativePath | string | `"/auth"` | Context path (no trailing slash!) |
+| keycloak.database.type | string | `"postgres"` | Database type |
+| keycloak.database.host | string | `"registry-postgresql"` | Database host (same PostgreSQL instance as DTR) |
+| keycloak.database.port | string | `"5432"` | Database port |
+| keycloak.database.name | string | `"default-database"` | Database name |
+| keycloak.database.existingSecret | string | `"secret-dtr-postgres-init"` | Secret with `db-username` and `db-password` keys |
+| keycloak.postgres.enabled | bool | `false` | Disable internal postgres subchart |
+| keycloak.realm.import | bool | `true` | Enable realm import (appends `--import-realm` to start command) |
+| keycloak.service.type | string | `"ClusterIP"` | Service type |
+| keycloak.fullnameOverride | string | `"registry-keycloak"` | Override for stable service names |
+| keycloak.extraVolumeMounts[0].mountPath | string | `"/opt/keycloak/data/import/default-realm-import.json"` | Realm import file mount path |
+| keycloak.extraVolumeMounts[0].name | string | `"registry-keycloak-configmap"` | Volume name |
+| keycloak.extraVolumeMounts[0].subPath | string | `"default-realm-import.json"` | File name within ConfigMap |
+| keycloak.extraVolumes[0].configMap.name | string | `"registry-keycloak-configmap"` | ConfigMap name for realm import |
+| keycloak.extraVolumes[0].name | string | `"registry-keycloak-configmap"` | Volume name |
 | nameOverride | string | `nil` |  |
 | postgresql.auth.database | string | `"default-database"` |  |
 | postgresql.auth.existingSecret | string | `"secret-dtr-postgres-init"` | Secret contains passwords for username postgres. |
