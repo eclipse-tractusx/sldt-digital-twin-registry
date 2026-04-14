@@ -66,6 +66,13 @@ spec:
             initialDelaySeconds: {{ .Values.registry.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.registry.readinessProbe.periodSeconds }}
             failureThreshold: {{ .Values.registry.readinessProbe.failureThreshold }}
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: {{ .Values.registry.containerPort }}
+            initialDelaySeconds: {{ .Values.registry.startupProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.registry.startupProbe.periodSeconds }}
+            failureThreshold: {{ .Values.registry.startupProbe.failureThreshold }}
           envFrom:
             - secretRef:
                 name: {{ include "dtr.fullname" . }}
