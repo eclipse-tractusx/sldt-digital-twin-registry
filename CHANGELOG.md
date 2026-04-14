@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## 0.11.1
 ### Added
 ### Changed
-- Updated Postgres Database version to 18.0 and switched helm from binami charts to cloudpirates charts.
+- Updated Postgres Database version to 18.x and switched helm from binami charts to cloudpirates charts.
+- Updated keycloak version to 26.x and switched helm from from binami charts to cloudpirates charts.
 ### Fixed
 
 ## 0.11.0
