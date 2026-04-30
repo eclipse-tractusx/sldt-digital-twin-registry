@@ -34,7 +34,7 @@ spec:
   tls:
     - hosts:
         - {{ .Values.registry.host }}
-      secretName: {{ .Values.registry.ingress.tls.secretName | default "registry-certificate-secret" }}
+      secretName: {{ .Values.registry.ingress.tls.secretName | default (printf "%s-certificate-secret" (include "dtr.fullname" .)) }}
   {{- else }}
     []  # Ensures tls is an empty list when not enabled
   {{- end }}
