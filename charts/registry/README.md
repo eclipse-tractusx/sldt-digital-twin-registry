@@ -108,7 +108,7 @@ helm install registry -n semantics . --create-namespace
 | registry.ingress.enabled | bool | `true` |  |
 | registry.ingress.rules | list | `[]` |  |
 | registry.ingress.tls.enabled | bool | `true` |  |
-| registry.ingress.tls.secretName | string | `"registry-certificate-secret"` |  |
+| registry.ingress.tls.secretName | string | `""` | TLS secret name used by the ingress. Leave empty to fall back to a release-unique default `"<release-fullname>-certificate-secret"`. Set explicitly when running multiple registry instances in the same namespace to guarantee unique secret names. |
 | registry.ingress.urlPrefix | string | `"/semantics/registry"` |  |
 | registry.livenessProbe.failureThreshold | int | `3` |  |
 | registry.livenessProbe.initialDelaySeconds | int | `100` |  |
