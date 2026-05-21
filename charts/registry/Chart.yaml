@@ -26,14 +26,15 @@ sources:
   - https://github.com/eclipse-tractusx/sldt-digital-twin-registry
 
 type: application
-version: 0.11.0
+version: 0.11.1
 appVersion: 0.11.0
 
 dependencies:
-  - repository: https://charts.bitnami.com/bitnami
-    name: postgresql
-    version: 12.12.10
+  - name: postgres
+    alias: postgresql
     condition: enablePostgres
+    repository: oci://registry-1.docker.io/cloudpirates
+    version: 0.11.0
   - repository: https://charts.bitnami.com/bitnami
     name: keycloak
     version: 16.1.7
