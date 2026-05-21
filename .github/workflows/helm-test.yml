@@ -100,5 +100,12 @@ jobs:
           helm repo add tractusx-dev https://eclipse-tractusx.github.io/charts/dev
           helm install registry tractusx-dev/registry --version ${{ github.event.inputs.upgrade_from || '0.3.19' }}
           helm dependency update charts/registry
+          
+          # Delete the PostgreSQL StatefulSet to allow recreation with new chart
+          kubectl delete statefulset registry-postgresql --ignore-not-found=true
+    
+          # Wait for deletion to complete
+          kubectl wait --for=delete statefulset/registry-postgresql --timeout=60s || true
+          
           helm upgrade registry charts/registry --set global.postgresql.auth.postgresPassword=$PASSWORD --set global.postgresql.auth.password=$PASSWORD
         if: github.event_name != 'pull_request' || steps.list-changed.outputs.changed == 'true'

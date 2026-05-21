@@ -59,13 +59,17 @@ registry:
   service:
     port: 8080
     type: ClusterIP
+  startupProbe:
+    failureThreshold: 30
+    periodSeconds: 10
+    initialDelaySeconds: 30
   livenessProbe:
     failureThreshold: 3
-    periodSeconds: 3
+    periodSeconds: 10
     initialDelaySeconds: 100
   readinessProbe:
     failureThreshold: 3
-    periodSeconds: 3
+    periodSeconds: 10
     initialDelaySeconds: 100
   dataSource:
     driverClassName: org.postgresql.Driver
@@ -123,10 +127,11 @@ registry:
 
 postgresql:
   image:
-    # -- workaround to use bitnamilegacy chart for version 12.12.x till committers align on new postgresql charts
-    repository: bitnamilegacy/postgresql
-    # -- workaround to use bitnamilegacy chart for version 12.12.x till committers align on new postgresql charts
-    tag: 15.4.0-debian-11-r45
+    # -- PostgreSQL image registry
+    registry: docker.io
+    # -- PostgreSQL image repository
+    repository: postgres
+    tag: "18.0@sha256:1ffc019dae94eca6b09a49ca67d37398951346de3c3d0cfe23d8d4ca33da83fb"
   primary:
     persistence:
       enabled: true
@@ -141,30 +146,58 @@ postgresql:
     database: default-database
     # -- Secret contains passwords for username postgres.
     existingSecret: secret-dtr-postgres-init
+  # -- Probe tuning: defaults are too aggressive for resource-constrained environments (e.g. Minikube).
+  #    Increase timeoutSeconds and failureThreshold to prevent spurious restarts that cascade
+  #    into Keycloak Liquibase migration failures.
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 60
+    periodSeconds: 30
+    timeoutSeconds: 30
+    failureThreshold: 10
+    successThreshold: 1
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 15
+    timeoutSeconds: 30
+    failureThreshold: 10
+    successThreshold: 1
+  startupProbe:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 30
+    failureThreshold: 60
+    successThreshold: 1
 
 keycloak:
   image:
-    # -- workaround to use bitnamilegacy chart for version 16.1.x till committers align on new postgresql charts
-    repository: bitnamilegacy/keycloak
-    # -- workaround to use bitnamilegacy chart for version 16.1.x till committers align on new postgresql charts
-    tag: 22.0.3-debian-11-r14
-  postgresql:
+    tag: "26.0.7"
+  # CloudPirates Keycloak configuration
+  keycloak:
+    adminUser: admin
+    adminPassword: admin
+    proxyHeaders: "xforwarded"
+    production: false
+    httpRelativePath: /auth
+  # Database configuration (CloudPirates format)
+  database:
+    type: postgres
+    host: registry-postgresql
+    port: "5432"
+    name: default-database
+    existingSecret: secret-dtr-postgres-init
+  # Disable internal postgres subchart (uses external PostgreSQL from parent chart)
+  postgres:
     enabled: false
-  externalDatabase:
-    # host: registry-postgresql
-    # port: 5432
-    # user: default-user
-    # password: password
-    # database: default-database
-    existingSecret: keycloak-database-credentials
-  auth:
-    adminUser:
-    adminPassword:
+  # Realm import via CloudPirates native flag
+  realm:
+    import: true
   service:
     type: ClusterIP
-  # Mounting a keycloak realm configuration file
   fullnameOverride: registry-keycloak
-  # default configMap is keycloak.fullnameOverride-configmap
+  # Mounting a keycloak realm configuration file
   extraVolumes:
     - name: registry-keycloak-configmap
       configMap:
@@ -173,10 +206,3 @@ keycloak:
     - mountPath: /opt/keycloak/data/import/default-realm-import.json
       subPath: default-realm-import.json
       name: registry-keycloak-configmap
-  # Using a pre-configured Keycloak with a default realm,
-  # containing a test client and user with the necessary roles to
-  # authorize requests to the digital twin registry.
-  # Make sure to remove the '--hostname' property when deploying
-  # in a non-test scanrio
-  command: ["/bin/sh", "-c"]
-  args: ["kc.sh import --file /opt/keycloak/data/import/default-realm-import.json; kc.sh start-dev --hostname=registry-keycloak --hostname-strict=false --proxy=edge"]

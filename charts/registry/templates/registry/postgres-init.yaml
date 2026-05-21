@@ -39,6 +39,10 @@ data:
   SPRING_DATASOURCE_PASSWORD: {{ $password }}
   SPRING_DATASOURCE_URL: {{ printf "jdbc:postgresql://%s:%v/%s" (include "dtr.postgres.primary.fullname" .) .Values.postgresql.service.ports.postgresql .Values.postgresql.auth.database | b64enc }}
   SPRING_DATASOURCE_USERNAME: {{ .Values.postgresql.auth.username | b64enc }}
+  {{- if $.Values.enableKeycloak }}
+  db-username: {{ .Values.postgresql.auth.username | b64enc }}
+  db-password: {{ $password }}
+  {{- end }}
 # 2. Check if default postgresql secret (Release.Name-postgresql) exists
 {{ else if $defaultSecret -}}
 data:
@@ -49,6 +53,10 @@ data:
   SPRING_DATASOURCE_PASSWORD: {{ $password }}
   SPRING_DATASOURCE_URL: {{ printf "jdbc:postgresql://%s:%v/%s" (include "dtr.postgres.primary.fullname" .) .Values.postgresql.service.ports.postgresql .Values.postgresql.auth.database | b64enc }}
   SPRING_DATASOURCE_USERNAME: {{ .Values.postgresql.auth.username | b64enc }}
+  {{- if $.Values.enableKeycloak }}
+  db-username: {{ .Values.postgresql.auth.username | b64enc }}
+  db-password: {{ $password }}
+  {{- end }}
 {{ else -}}
 # 3. If no secret exists, use provided value from values file or generate a random one if secret not exists.
 stringData:
@@ -58,5 +66,9 @@ stringData:
   SPRING_DATASOURCE_PASSWORD: {{ $password }}
   SPRING_DATASOURCE_URL: {{ printf "jdbc:postgresql://%s:%v/%s" (include "dtr.postgres.primary.fullname" .) .Values.postgresql.service.ports.postgresql .Values.postgresql.auth.database }}
   SPRING_DATASOURCE_USERNAME: {{ .Values.postgresql.auth.username }}
+  {{- if $.Values.enableKeycloak }}
+  db-username: {{ .Values.postgresql.auth.username }}
+  db-password: {{ $password }}
+  {{- end }}
 {{ end }}
 {{- end -}}
