@@ -43,10 +43,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
 
       - name: Run Trivy vulnerability scanner in repo mode
-        uses: aquasecurity/trivy-action@6c175e9c4083a92bbca2f9724c8a5e33bc2d97a5
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 #v0.36.0
         with:
           scan-type: "config"
           format: "sarif"
@@ -59,7 +59,7 @@ jobs:
           limit-severities-for-sarif: true
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@68bde559dea0fdcac2102bfdf6230c5f70eb485e #v4.35.4
         if: always()
         with:
           sarif_file: "trivy-results1.sarif"
@@ -84,7 +84,7 @@ jobs:
         run: mvn clean package
         
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@6c175e9c4083a92bbca2f9724c8a5e33bc2d97a5
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 #v0.36.0
         with:
           image-ref: "tractusx/sldt-digital-twin-registry:latest"
           format: "sarif"
@@ -96,7 +96,7 @@ jobs:
           vuln-type: "os,library"
           limit-severities-for-sarif: true
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@68bde559dea0fdcac2102bfdf6230c5f70eb485e #v4.35.4
         if: always()
         with:
           sarif_file: "trivy-results-registry.sarif"
