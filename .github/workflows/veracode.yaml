@@ -34,11 +34,11 @@ jobs:
       security-events: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           ref: release
       - name: setup-java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
         with:
           distribution: temurin
           java-version: 17
@@ -48,7 +48,7 @@ jobs:
           export REGISTRY_VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
           echo "REGISTRY_VERSION=$REGISTRY_VERSION" >> $GITHUB_ENV
       - name: Run Veracode Upload And Scan
-        uses: veracode/veracode-uploadandscan-action@0.2.1
+        uses: veracode/veracode-uploadandscan-action@c5e63c8383debb26a0d48250eab75d94327635ba # 0.2.1
         with:
           # Specify Veracode application name
           appname: "Digital Twin Registry"
