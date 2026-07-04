@@ -107,8 +107,8 @@ public class AssetAdministrationShellApiDelegate implements DescriptionApiDelega
 
     @Override
     public ResponseEntity<GetAssetAdministrationShellDescriptorsResult> getAllAssetAdministrationShellDescriptors( Integer limit, String cursor,
-          AssetKind assetKind, String assetType, @RequestHeader String externalSubjectId, final OffsetDateTime createdAfter ) {
-        ShellCollectionDto dto =  shellService.findAllShells(limit, cursor,getExternalSubjectIdOrEmpty(externalSubjectId), createdAfter);
+          AssetKind assetKind, String assetType, @RequestHeader String externalSubjectId, final OffsetDateTime createdAfter, final String sortDirection ) {
+        ShellCollectionDto dto =  shellService.findAllShells(limit, cursor,getExternalSubjectIdOrEmpty(externalSubjectId), createdAfter, sortDirection);
         GetAssetAdministrationShellDescriptorsResult result = shellMapper.toApiDto(dto);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
