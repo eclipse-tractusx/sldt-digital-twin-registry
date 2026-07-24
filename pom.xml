@@ -99,7 +99,7 @@
 		<edc.version>0.7.0</edc.version>
 
 		<!-- test libs -->
-		<assertj.version>3.24.2</assertj.version>
+		<assertj.version>3.27.7</assertj.version>
 		<junit.version>5.9.3</junit.version>
 		<jacoco.version>0.8.11</jacoco.version>
 
