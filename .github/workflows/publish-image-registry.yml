@@ -53,7 +53,7 @@ jobs:
           distribution: temurin
           java-version: 17
       - name: Setup Maven Action
-        uses: s4u/setup-maven-action@94605e0cdfe442da48d603db22bbf4c7d203c076 # v1.7.0
+        uses: s4u/setup-maven-action@ba34de01b7f4ba2ab8e2860df8993a29f4477056 # v1.20.0
         with:
           java-version: 17
       - name: execute-maven-deps
