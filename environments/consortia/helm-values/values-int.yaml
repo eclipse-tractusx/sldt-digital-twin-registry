@@ -1,0 +1,346 @@
+digital-twin-registry:
+  enableKeycloak: true
+  keycloak:
+    type: NodePort
+    args: [ "kc.sh import --file /opt/keycloak/data/import/default-realm-import.json; kc.sh start-dev --hostname-strict=false --proxy=edge" ]
+    auth:
+      adminUser: <path:semantics/data/dec-reg#keycloak-admin-user>
+      adminPassword: <path:semantics/data/dec-reg#keycloak-admin-password>
+    ingress:
+      enabled: true
+      hostname: semantics-dec-registry.int.demo.catena-x.net
+      path: /
+      tls: true
+      annotations:
+        external-dns.alpha.kubernetes.io/hostname: semantics-dec-registry.int.demo.catena-x.net
+        nginx.org/location-snippets: |
+          add_header X-Forwarded-Proto https;
+          add_header X-Forwarded-For semantics-dec-registry.int.demo.catena-x.net;
+  enablePostgres: false
+  postgresql:
+    auth:
+      username: <path:semantics/data/dec-reg#keycloak-admin-user>
+      # if password is empty, the postgres password will be generated random via postgres-init
+      password: <path:semantics/data/dec-reg#keycloak-admin-password>
+      database: default-database
+      # -- Secret contains passwords for username postgres.
+      existingSecret: secret-dtr-postgres-init
+  registry:
+    replicaCount: 1
+    imagePullPolicy: Always
+    imagePullSecrets:
+      - name: machineuser-pull-secret-ro
+    containerPort: 4243
+    host: semantics-dec-registry.int.demo.catena-x.net
+    ## If 'authentication' is set to false, no OAuth authentication is enforced
+    authentication: true
+    idpIssuerUri: https://semantics-dec-registry.int.demo.catena-x.net/realms/default-realm
+    idpClientId: default-client
+    tenantId: BPNL0000000711QM
+    useGranularAccessControl: "true"
+    service:
+      port: 8080
+      type: NodePort
+    dataSource:
+      driverClassName: org.postgresql.Driver
+      ## The url, user, and password parameter will be ignored if 'enablePostgres' is set to true.
+      ## In that case the postgresql auth parameters are used.
+      url: jdbc:postgresql://postgresql:5432/registry
+      user: registryuser
+      password: <path:semantics/data/dec-reg#registry-password>
+    ingress:
+      enabled: true
+      tls: true
+      urlPrefix: /reg
+      className: nginx
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        nginx.ingress.kubernetes.io/rewrite-target: /$2
+        nginx.ingress.kubernetes.io/use-regex: "true"
+        nginx.ingress.kubernetes.io/enable-cors: "true"
+        nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+        nginx.ingress.kubernetes.io/x-forwarded-prefix: /reg
+    resources:
+      limits:
+        memory: "1024Mi"
+      requests:
+        memory: "512Mi"
+
+postgresql:
+  fullnameOverride: postgresql
+  service:
+    ports:
+      postgresql: 5432
+  auth:
+    postgresPassword: <path:semantics/data/dec-reg#postgres-root-pw>
+  primary:
+    initdb:
+      scripts:
+        init.sql: |
+          CREATE USER edcprovider WITH ENCRYPTED PASSWORD '<path:semantics/data/dec-reg#edcprovider-password>';
+          ALTER USER edcprovider CREATEDB;
+          CREATE DATABASE provider;
+          ALTER DATABASE provider OWNER TO edcprovider;
+
+          CREATE USER edcconsumer WITH ENCRYPTED PASSWORD '<path:semantics/data/dec-reg#edcconsumer-password>';
+          ALTER USER edcconsumer CREATEDB;
+          CREATE DATABASE consumer;
+          ALTER DATABASE consumer OWNER TO edcconsumer;
+          
+          CREATE USER registryuser WITH ENCRYPTED PASSWORD '<path:semantics/data/dec-reg#registry-password>';
+          ALTER USER registryuser CREATEDB;
+          CREATE DATABASE registry;
+          ALTER DATABASE registry OWNER TO registryuser;
+
+vault:
+  enabled: true
+  fullnameOverride: edc-vault
+  injector:
+    enabled: false
+  server:
+    authDelegator:
+      enabled: false
+    dev:
+      enabled: true
+      devRootToken: <path:semantics/data/dec-reg#vault-root-token>
+    postStart:
+      - "sh"
+      - "-c"
+      - |
+        { 
+        
+        sleep 25
+
+        /bin/vault kv put secret/registry-client-secret-key content=<path:semantics/data/dec-reg#keycloak-default-tester-secret>
+        /bin/vault kv put secret/data-encryption-aes-keys content=H7j47H6vVQQOv/hbdAYz+w==
+        /bin/vault kv put secret/<path:semantics/data/dec-reg#ssi-oauth-provider-client-secretAlias> content=<path:semantics/data/dec-reg#ssi-provider-client-secret>
+        /bin/vault kv put secret/<path:semantics/data/dec-reg#ssi-oauth-consumer-client-secretAlias> content=<path:semantics/data/dec-reg#ssi-consumer-client-secret>
+        /bin/vault kv put secret/<path:semantics/data/dec-reg#iatp-sts-oauth-client-secretAlias> content=<path:semantics/data/dec-reg#iatp-sts-oauth-client-secret>
+        }
+
+provider:
+  enabled: true
+  fullnameOverride: "provider-edc"
+  backendService:
+    httpProxyTokenReceiverUrl: http://localhost
+  imagePullSecrets:
+    - name: machineuser-pull-secret-ro
+  # dataplane:
+  #   url:
+  #     public: http://provider-edc-dataplane:8081/api/public
+  install:
+    postgresql: false
+    vault: false
+  participant:
+    id: <path:semantics/data/dec-reg#provider-participant-id>
+  dataplane:
+    env:
+      EDC_IAM_TRUSTED-ISSUER_ISSUER1_ID: did:web:dim-static-prod.dis-cloud-prod.cfapps.eu10-004.hana.ondemand.com:dim-hosted:2f45795c-d6cc-4038-96c9-63cedc0cd266:holder-iatp
+      EDC_IAM_ISSUER_ID: did:web:portal-backend.int.demo.catena-x.net:api:administration:staticdata:did:BPNL0000000711QM
+      EDC_IAM_STS_DIM_URL: https://dis-integration-service-prod.eu10.dim.cloud.sap/api/v2.0.0/iatp/catena-x-portal
+      EDC_IAM_STS_OAUTH_TOKEN_URL: https://bpnl0000000711qm-bosch.authentication.eu10.hana.ondemand.com/oauth/token
+      EDC_IAM_STS_OAUTH_CLIENT_ID: sb-eaa3865f-c0c9-49bc-8988-a73747443e0d!b458201|ica-production-dim-prod-eu10-004-prod-dis-cloud-approuter!b174292
+      EDC_IAM_STS_OAUTH_CLIENT_SECRET_ALIAS: <path:semantics/data/dec-reg#iatp-sts-oauth-client-secretAlias>
+      TX_IAM_IATP_BDRS_SERVER_URL: https://bpn-did-resolution-service.int.demo.catena-x.net/api/directory
+    ingresses:
+      - enabled: true
+        hostname: semantics-edc-provider-dataplane.int.demo.catena-x.net
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-prod
+          nginx.ingress.kubernetes.io/use-regex: "true"
+          nginx.ingress.kubernetes.io/enable-cors: "true"
+          nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+        certManager:
+          clusterIssuer: letsencrypt-prod
+        endpoints:
+          - public
+          - proxy
+        className: nginx
+        tls:
+          enabled: true
+  iatp:
+    id: "did:web:portal-backend.int.demo.catena-x.net:api:administration:staticdata:did:BPNL0000000711QM"
+    trustedIssuers:
+      - "did:web:dim-static-prod.dis-cloud-prod.cfapps.eu10-004.hana.ondemand.com:dim-hosted:2f45795c-d6cc-4038-96c9-63cedc0cd266:holder-iatp"
+    sts:
+      dim:
+        url: "https://dis-integration-service-prod.eu10.dim.cloud.sap/api/v2.0.0/iatp/catena-x-portal"
+      oauth:
+        token_url: "https://bpnl0000000711qm-bosch.authentication.eu10.hana.ondemand.com/oauth/token"
+        client:
+          id: "sb-eaa3865f-c0c9-49bc-8988-a73747443e0d!b458201|ica-production-dim-prod-eu10-004-prod-dis-cloud-approuter!b174292"
+          secret_alias: <path:semantics/data/dec-reg#iatp-sts-oauth-client-secretAlias>
+  controlplane:
+    bdrs:
+      cache_validity_seconds: 600
+      server:
+        url: "https://bpn-did-resolution-service.int.demo.catena-x.net/api/directory"
+    # SSI configuration
+    ssi:
+      miw:
+        url: <path:semantics/data/dec-reg#ssi-miw-url>
+        authorityId: <path:semantics/data/dec-reg#ssi-miw-authorityId>
+      oauth:
+        tokenurl: <path:semantics/data/dec-reg#ssi-oauth-token-url>
+        client:
+          id: <path:semantics/data/dec-reg#ssi-oauth-provider-client-id>
+          secretAlias: <path:semantics/data/dec-reg#ssi-oauth-provider-client-secretAlias>
+    env:
+      EDC_IAM_TRUSTED-ISSUER_ISSUER1_ID: did:web:dim-static-prod.dis-cloud-prod.cfapps.eu10-004.hana.ondemand.com:dim-hosted:2f45795c-d6cc-4038-96c9-63cedc0cd266:holder-iatp
+      EDC_IAM_ISSUER_ID: did:web:portal-backend.int.demo.catena-x.net:api:administration:staticdata:did:BPNL0000000711QM
+      EDC_IAM_STS_DIM_URL: https://dis-integration-service-prod.eu10.dim.cloud.sap/api/v2.0.0/iatp/catena-x-portal
+      EDC_IAM_STS_OAUTH_TOKEN_URL: https://bpnl0000000711qm-bosch.authentication.eu10.hana.ondemand.com/oauth/token
+      EDC_IAM_STS_OAUTH_CLIENT_ID: sb-eaa3865f-c0c9-49bc-8988-a73747443e0d!b458201|ica-production-dim-prod-eu10-004-prod-dis-cloud-approuter!b174292
+      EDC_IAM_STS_OAUTH_CLIENT_SECRET_ALIAS: <path:semantics/data/dec-reg#iatp-sts-oauth-client-secretAlias>
+      TX_IAM_IATP_BDRS_SERVER_URL: https://bpn-did-resolution-service.int.demo.catena-x.net/api/directory
+      EDC_TRANSFER_PROXY_TOKEN_VALIDITY_SECONDS: 86400
+      EDC_DATAPLANE_TOKEN_VALIDATION_ENDPOINT: http://provider-edc-controlplane:8082/validation/token
+      EDC_DATAPLANE_SELECTOR_DEFAULTPLANE_PROPERTIES: >-
+        { 
+          "publicApiUrl": "http://provider-edc-dataplane:8081/api/public"
+        }
+    endpoints:
+      default:
+        port: "8080"
+        path: /api
+      management:
+        port: "8081"
+        path: /management
+        authKey: <path:semantics/data/dec-reg#edcprovider-authkey>
+      metrics:
+        port: "9090"
+        path: /metrics
+    ingresses:
+      - enabled: true
+        hostname: semantics-edc-provider.int.demo.catena-x.net
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-prod
+          nginx.ingress.kubernetes.io/use-regex: "true"
+          nginx.ingress.kubernetes.io/enable-cors: "true"
+          nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+        certManager:
+          clusterIssuer: letsencrypt-prod
+        endpoints:
+          - ids
+          - management
+          - protocol
+          - default
+        className: nginx
+        tls:
+          enabled: true
+  postgresql:
+    fullnameOverride: "provider-postgresql"
+    enabled: true
+    jdbcUrl: jdbc:postgresql://postgresql:5432/provider
+    username: edcprovider
+    password: <path:semantics/data/dec-reg#edcprovider-password>
+    auth:
+      database: "provider"
+      username: edcprovider
+      password: <path:semantics/data/dec-reg#edcprovider-password>
+  vault:
+    hashicorp:
+      enabled: true
+      token: <path:semantics/data/dec-reg#vault-root-token>
+      url: http://edc-vault:8200
+      secret: /v1/secret
+    secretNames:
+      transferProxyTokenEncryptionAesKey: data-encryption-aes-keys
+
+consumer:
+  enabled: true
+  fullnameOverride: "consumer-edc"
+  install:
+    postgresql: false
+    vault: false
+  participant:
+    id: <path:semantics/data/dec-reg#consumer-participant-id>
+  backendService:
+    httpProxyTokenReceiverUrl: http://localhost
+  imagePullSecrets:
+    - name: machineuser-pull-secret-ro
+  dataplane:
+    ingresses:
+      - enabled: true
+        hostname: semantics-edc-consumer-dataplane.int.demo.catena-x.net
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-prod
+          nginx.ingress.kubernetes.io/use-regex: "true"
+          nginx.ingress.kubernetes.io/enable-cors: "true"
+          nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+        certManager:
+          clusterIssuer: letsencrypt-prod
+        endpoints:
+          - public
+          - proxy
+        className: nginx
+        tls:
+          enabled: true
+  #   url:
+  #     public: http://consumer-edc-dataplane:8081/api/public
+  controlplane:
+    # SSI configuration
+    ssi:
+      miw:
+        url: <path:semantics/data/dec-reg#ssi-miw-url>
+        authorityId: <path:semantics/data/dec-reg#ssi-miw-authorityId>
+      oauth:
+        tokenurl: <path:semantics/data/dec-reg#ssi-oauth-token-url>
+        client:
+          id: <path:semantics/data/dec-reg#ssi-oauth-consumer-client-id>
+          secretAlias: <path:semantics/data/dec-reg#ssi-oauth-consumer-client-secretAlias>
+    env:
+      # edc.transfer.proxy.token.validity.seconds
+      EDC_TRANSFER_PROXY_TOKEN_VALIDITY_SECONDS: 86400
+      EDC_DATAPLANE_TOKEN_VALIDATION_ENDPOINT: http://consumer-edc-controlplane:8082/validation/token
+      EDC_DATAPLANE_SELECTOR_DEFAULTPLANE_PROPERTIES: >-
+        { 
+          "publicApiUrl": "http://consumer-edc-dataplane:8081/api/public"
+        }
+    endpoints:
+      default:
+        port: "8080"
+        path: /api
+      management:
+        port: "8081"
+        path: /management
+        authKey: <path:semantics/data/dec-reg#edcconsumer-authkey>
+      metrics:
+        port: "9090"
+        path: /metrics
+    ingresses:
+      - enabled: true
+        hostname: semantics-edc-consumer.int.demo.catena-x.net
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-prod
+          nginx.ingress.kubernetes.io/use-regex: "true"
+          nginx.ingress.kubernetes.io/enable-cors: "true"
+          nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+        certManager:
+          clusterIssuer: letsencrypt-prod
+        endpoints:
+          - ids
+          - management
+          - protocol
+          - default
+        className: nginx
+        tls:
+          enabled: true
+  postgresql:
+    fullnameOverride: "consumer-postgresql"
+    enabled: true
+    jdbcUrl: jdbc:postgresql://postgresql:5432/consumer
+    username: edcconsumer
+    password: <path:semantics/data/dec-reg#edcconsumer-password>
+    auth:
+      database: consumer
+      username: edcconsumer
+      password: <path:semantics/data/dec-reg#edcconsumer-password>
+  vault:
+    hashicorp:
+      enabled: true
+      token: <path:semantics/data/dec-reg#vault-root-token>
+      url: http://edc-vault:8200
+      secret: /v1/secret
+    secretNames:
+      transferProxyTokenEncryptionAesKey: data-encryption-aes-keys
