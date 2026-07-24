@@ -48,7 +48,7 @@ jobs:
           export REGISTRY_VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
           echo "REGISTRY_VERSION=$REGISTRY_VERSION" >> $GITHUB_ENV
       - name: Run Veracode Upload And Scan
-        uses: veracode/veracode-uploadandscan-action@c5e63c8383debb26a0d48250eab75d94327635ba # 0.2.1
+        uses: veracode/veracode-uploadandscan-action@ddca86b1d1d45639d1c414003f3495f71851cfe2 # 0.2.11
         with:
           # Specify Veracode application name
           appname: "Digital Twin Registry"
