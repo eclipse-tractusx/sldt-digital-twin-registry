@@ -76,7 +76,7 @@
 		<apache-commonse.version>1.10.0</apache-commonse.version>
 		<google.findbugs.version>3.0.2</google.findbugs.version>
 		<snakeyaml.version>2.0</snakeyaml.version>
-		<jakarta.validation.version>3.0.2</jakarta.validation.version>
+		<jakarta.validation.version>3.1.1</jakarta.validation.version>
 		<jakarta.servlet.api.version>6.0.0</jakarta.servlet.api.version>
 		<json.version>2.0.1</json.version>
 
