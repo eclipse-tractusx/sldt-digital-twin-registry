@@ -1,4 +1,4 @@
-{{- if .Values.registry.ingress.enabled }}
+{{- if .Values.registry.ingress.enabled -}}
 ################################################################################
 # Copyright (c) 2021 Robert Bosch Manufacturing Solutions GmbH and others
 # Copyright (c) 2025 Fraunhofer-Gesellschaft zur Foerderung der angewandten Forschung e.V. (represented by Fraunhofer ISST)
@@ -19,52 +19,69 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
+{{- end }}
+{{ if .Values.registry.ingress.enabled -}}
+{{- $fullName := include "dtr.fullname" . -}}
+{{- $svcPort := .Values.registry.service.port -}}
+{{- /* handle old k8s versions for ingress.class annotation */ -}}
+{{- if and .Values.registry.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+  {{- if not (hasKey .Values.registry.ingress.annotations "kubernetes.io/ingress.class") }}
+  {{- $_ := set .Values.registry.ingress.annotations "kubernetes.io/ingress.class" .Values.registry.ingress.className }}
+  {{- end }}
+{{- end }}
 
+{{- /* choose API version */ -}}
+{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
 apiVersion: networking.k8s.io/v1
+{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1beta1
+{{- else -}}
+apiVersion: extensions/v1beta1
+{{- end }}
 kind: Ingress
 metadata:
-  name: {{ include "dtr.fullname" . }}
-  annotations:
-{{ .Values.registry.ingress.annotations | toYaml | indent 4 }}
+  name: {{ $fullName }}-{{ .Values.registry.ingress.name }}
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "dtr.labels" . | nindent 4 }}
-spec:
-  ingressClassName: {{ .Values.registry.ingress.className }}
-  {{- if .Values.registry.ingress.tls.enabled }}
-  tls:
-    - hosts:
-        - {{ .Values.registry.host }}
-      secretName: {{ .Values.registry.ingress.tls.secretName | default "registry-certificate-secret" }}
-  {{- else }}
-    []  # Ensures tls is an empty list when not enabled
+  {{- with .Values.registry.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
   {{- end }}
-  {{- if .Values.registry.ingress.urlPrefix }}
+spec:
+  {{- if and .Values.registry.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+  ingressClassName: {{ .Values.registry.ingress.className }}
+  {{- end }}
+  {{- if .Values.registry.ingress.tls }}
+  tls:
+    {{- range .Values.registry.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
   rules:
-    - host: {{ .Values.registry.host }}
+    {{- range .Values.registry.ingress.hosts }}
+    - host: {{ .host | quote }}
       http:
         paths:
-          - path: {{printf "%s(/|$)(.*)" .Values.registry.ingress.urlPrefix }}
-            pathType: Prefix
-            backend:
-              service:
-                name: {{ include "dtr.fullname" . }}
-                port:
-                  number: {{ .Values.registry.service.port }}
-  {{- else }}
-  rules:
-    {{- range .Values.registry.ingress.rules }}
-    - host: {{ .host | default $.Values.registry.host }}
-      http:
-        paths:
-          {{- range .http.paths }}
+          {{- range .paths }}
           - path: {{ .path }}
-            pathType: {{ .pathType | default "ImplementationSpecific" }}
+            {{- if and .pathType (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion) }}
+            pathType: {{ .pathType }}
+            {{- end }}
             backend:
+              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
               service:
-                name: {{ include "dtr.fullname" $ }}
+                name: {{ $fullName }}
                 port:
-                  number: {{ $.Values.registry.service.port }}
+                  number: {{ $svcPort }}
+              {{- else }}
+              serviceName: {{ $fullName }}
+              servicePort: {{ $svcPort }}
+              {{- end }}
           {{- end }}
-    {{- end}}
-  {{- end}}
-{{- end}}
+    {{- end }}
+{{- end }}

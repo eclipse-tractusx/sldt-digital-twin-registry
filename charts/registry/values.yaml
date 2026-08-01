@@ -37,7 +37,6 @@ registry:
   replicaCount: 1
   imagePullPolicy: IfNotPresent
   containerPort: 4243
-  host: minikube
   ## If 'authentication' is set to false, no OAuth authentication is enforced
   authentication: true
   # Issuer url for the dtr (resource server),
@@ -77,28 +76,7 @@ registry:
     password:
   ingress:
     enabled: true
-    tls:
-      ## enable tls, default false
-      enabled: true
-      ## reuse secret in namespace with given name, default "registry-certificate-secret"
-      secretName: registry-certificate-secret
-    ## use a urlPrefix to define a path of pathType "Prefix" with regex. Result is a path "/semantics/registry(/|$)(.*)"
-    urlPrefix: /semantics/registry
-    ## specify rules on your own, if the pathType Prefix + Regex runs into issues with your ClusterIssuer has a "strict-validate-path-type" check. -host.http.paths[0].path must at least be set. Then pathType "ImplementationSpecific" is used with common service name and port. Multiple paths may be specified
-    rules: []
-    # Minimum sample
-#      - host:
-#        http:
-#          paths:
-#            - path: /
-#              pathType:
-#              backend:
-#                service:
-#                  name:
-#                  port:
-#                    number:
-
-    className: nginx
+    name: "registry"
     annotations: {}
       # Add annotations for the ingress, e.g.:
       # cert-manager.io/cluster-issuer: selfsigned-cluster-issuer
@@ -107,6 +85,22 @@ registry:
       # nginx.ingress.kubernetes.io/enable-cors: "true"
       # nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
       # nginx.ingress.kubernetes.io/x-forwarded-prefix: /semantics/registry
+    className: nginx
+    tls:
+      - hosts:
+        - "registry.example.com"
+        ## reuse secret in namespace with given name, default "registry-certificate-secret"
+        secretName: "registry-certificate-secret"
+    ## specify rules on your own, if the pathType Prefix + Regex runs into issues with your ClusterIssuer has a "strict-validate-path-type" check. -host.http.paths[0].path must at least be set. Then pathType "ImplementationSpecific" is used with common service name and port. Multiple paths may be specified
+    hosts: 
+      - host: "registry.example.com"
+        paths:
+          - path: /semantics/registry(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service: dtr-fullname-placeholder
+              port: 8080
+
   resources:
     limits:
       cpu: 750m

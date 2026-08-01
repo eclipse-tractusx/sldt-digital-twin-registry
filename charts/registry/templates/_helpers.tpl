@@ -2,11 +2,12 @@
 Expand the name of the chart.
 */}}
 {{- define "dtr.name" -}}
-{{- default .Chart.Name .Values.nameOverride | replace "+" "_"  | trunc 63 | trimSuffix "-" -}}
+{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
 {{- define "dtr.fullname" -}}
@@ -41,10 +42,24 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
-
+{{/*
+Selector labels
+*/}}
 {{- define "dtr.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "dtr.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+
+{{/*
+Create the name of the service account to use
+*/}}
+{{- define "dtr.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "dtr.fullname" .) .Values.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.name }}
+{{- end }}
 {{- end }}
 
 {{/*
@@ -62,3 +77,6 @@ Determine database hostname
 {{- end -}}
 {{- end -}}
 {{- end -}}
+
+
+
