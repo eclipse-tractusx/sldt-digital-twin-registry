@@ -105,6 +105,12 @@ class GranularShellServiceTest extends LegacyShellServiceTest {
       super.testsLookupWithThreePagesOfMatchingRecordsRequestingPageOfOnlyLastItemExpectSingleItemAndNoCursor();
    }
 
+   @Test
+   void testsFindAllShellsCursorPagination() {
+      createRule();
+      super.testsFindAllShellsCursorPagination();
+   }
+
    private void createRule() {
       String specificAssetIdName = keyPrefix + "key";
       String specificAssetIdValue = "value";

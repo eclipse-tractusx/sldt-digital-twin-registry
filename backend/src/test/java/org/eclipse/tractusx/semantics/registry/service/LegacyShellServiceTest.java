@@ -40,7 +40,9 @@ import java.time.OffsetDateTime;
 import java.util.Base64;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -270,6 +272,26 @@ class LegacyShellServiceTest {
    
       }
 	  
+   @Test
+   void testsFindAllShellsCursorPagination() {
+      String specificAssetIdName = keyPrefix + "key";
+      String specificAssetIdValue = "value";
+      List<String> createdIds = IntStream.range( 0, 3 )
+            .mapToObj( i -> UuidCreator.getTimeOrderedEpoch().toString() )
+            .toList();
+      createdIds.forEach( id -> createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue ) );
+
+      ShellCollectionDto page1 = shellService.findAllShells( 2, null, TENANT_TWO, null );
+      assertThat( page1.getItems() ).isNotEmpty();
+      assertThat( page1.getCursor() ).as( "cursor must be present when more shells exist" ).isNotNull();
+
+      ShellCollectionDto page2 = shellService.findAllShells( 2, page1.getCursor(), TENANT_TWO, null );
+
+      Set<String> page1Ids = page1.getItems().stream().map( Shell::getIdExternal ).collect( Collectors.toSet() );
+      Set<String> page2Ids = page2.getItems().stream().map( Shell::getIdExternal ).collect( Collectors.toSet() );
+      assertThat( page1Ids ).doesNotContainAnyElementsOf( page2Ids );
+   }
+
    @Test
    void testsLookupWithLessThanAPageOfMatchingRecordsExpectPartialListAndNoCursorAndInValidCreatedDate() {
       final String specificAssetIdName = keyPrefix + "key";

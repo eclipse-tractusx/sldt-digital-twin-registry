@@ -286,12 +286,9 @@ public class ShellService {
         pageSize = getPageSize(pageSize);
         ShellCursor cursor = new ShellCursor(pageSize, cursorVal);
 
-        // Instant cursorCreatedDate = cursor.getShellSearchCursor();
-        String cVal = cursorVal;
-        if (cVal == null) {
-            cVal = DEFAULT_EXTERNAL_ID;
-        }
-        Instant cursorCreatedDate = getCreatedDate(cVal, cursorVal != null, createdAfter);
+        Instant cursorCreatedDate = cursor.hasCursorReceived()
+                ? cursor.getShellSearchCursor()
+                : Optional.ofNullable(createdAfter).map(OffsetDateTime::toInstant).orElse(MINIMUM_SQL_DATETIME);
 
         String extSubId = null;
         if (!externalSubjectId.isEmpty()) {
