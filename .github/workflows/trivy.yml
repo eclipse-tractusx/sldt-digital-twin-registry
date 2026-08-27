@@ -82,7 +82,17 @@ jobs:
           
       - name: Build JAR
         run: mvn clean package
-        
+
+      - name: Trivy scan - table
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 #v0.36.0
+        with:
+          image-ref: "tractusx/sldt-digital-twin-registry:latest"
+          format: table
+          severity: "CRITICAL,HIGH"
+          exit-code: 0
+          vuln-type: os,library
+          ignore-unfixed: false
+
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 #v0.36.0
         with:
