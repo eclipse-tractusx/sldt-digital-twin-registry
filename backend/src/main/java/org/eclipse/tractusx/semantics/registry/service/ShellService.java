@@ -85,6 +85,9 @@ public class ShellService {
    private static final String DEFAULT_EXTERNAL_ID = "00000000-0000-0000-0000-000000000000";
    private static final Instant MINIMUM_SQL_DATETIME = OffsetDateTime
          .of( 1800, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC ).toInstant();
+   // Starting point for descending (newest-first) keyset pagination: walk DOWN from "the end of time".
+   private static final Instant MAXIMUM_SQL_DATETIME = OffsetDateTime
+         .of( 9999, 12, 31, 23, 59, 59, 0, ZoneOffset.UTC ).toInstant();
    private static final int MAXIMUM_RECORDS = 1000;
    private static final int DEFAULT_FETCH_SIZE = 500;
 
@@ -224,11 +227,15 @@ public class ShellService {
    }
 
    @Transactional( readOnly = true )
-   public ShellCollectionDto findAllShells(Integer pageSize, final String cursorVal, final String externalSubjectId, final OffsetDateTime createdAfter) {
+   public ShellCollectionDto findAllShells(Integer pageSize, final String cursorVal, final String externalSubjectId,
+         final OffsetDateTime createdAfter, final String sortDirection) {
+        // sortDirection is a non-standard extension (default ASC). DESC (newest-first) is
+        // currently honoured by the legacy path; the granular path stays ascending for now.
+        final boolean descending = "DESC".equalsIgnoreCase(sortDirection);
         if (isGranularAccessControlEnabled) {
             return findAllShellsGranularAccessControl(pageSize, cursorVal, externalSubjectId, createdAfter);
         } else {
-            return findAllShellsLegacyAccessControl(pageSize, cursorVal, externalSubjectId, createdAfter);
+            return findAllShellsLegacyAccessControl(pageSize, cursorVal, externalSubjectId, createdAfter, descending);
         }
    }
  
@@ -282,22 +289,29 @@ public class ShellService {
     }
 
     private ShellCollectionDto findAllShellsLegacyAccessControl(Integer pageSize, final String cursorVal,
-            final String externalSubjectId, final OffsetDateTime createdAfter) {
+            final String externalSubjectId, final OffsetDateTime createdAfter, final boolean descending) {
         pageSize = getPageSize(pageSize);
         ShellCursor cursor = new ShellCursor(pageSize, cursorVal);
 
+        // No cursor: ascending starts at the earliest (or createdAfter); descending starts at the latest.
         Instant cursorCreatedDate = cursor.hasCursorReceived()
                 ? cursor.getShellSearchCursor()
-                : Optional.ofNullable(createdAfter).map(OffsetDateTime::toInstant).orElse(MINIMUM_SQL_DATETIME);
+                : (descending
+                        ? MAXIMUM_SQL_DATETIME
+                        : Optional.ofNullable(createdAfter).map(OffsetDateTime::toInstant).orElse(MINIMUM_SQL_DATETIME));
 
         String extSubId = null;
         if (!externalSubjectId.isEmpty()) {
             extSubId = externalSubjectId;
         }
 
-        Page<Shell> shellPage = shellRepository.findAllByExternalSubjectId(extSubId, owningTenantId,
-                externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes, cursorCreatedDate,
-                PageRequest.of(0, pageSize, Sort.by("created_date").ascending()));
+        Page<Shell> shellPage = descending
+                ? shellRepository.findAllByExternalSubjectIdDescending(extSubId, owningTenantId,
+                        externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes, cursorCreatedDate,
+                        PageRequest.of(0, pageSize, Sort.by("created_date").descending()))
+                : shellRepository.findAllByExternalSubjectId(extSubId, owningTenantId,
+                        externalSubjectIdWildcardPrefix, externalSubjectIdWildcardAllowedTypes, cursorCreatedDate,
+                        PageRequest.of(0, pageSize, Sort.by("created_date").ascending()));
 
         // Page to List
         List<Shell> shells = shellAccessHandler.filterListOfShellProperties(shellPage.stream().toList(),

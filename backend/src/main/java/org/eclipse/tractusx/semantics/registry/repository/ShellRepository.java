@@ -142,6 +142,75 @@ public interface ShellRepository extends JpaRepository<Shell, UUID>, JpaSpecific
            Pageable pageable
    );
 
+   // Descending (newest-first) variant of findAllByExternalSubjectId: keyset walks
+   // DOWN from the cursor (created_date < cursor) ordered DESC. Non-standard sort
+   // extension exposed via the sortDirection query parameter (default is ASC, above).
+   @Query(
+           value = """
+           SELECT s.*
+            FROM shell s
+            WHERE s.created_date < :cursorCreatedDate
+              AND (
+                  :tenantId IS NULL
+                  OR :tenantId = :owningTenantId
+                  OR EXISTS (
+                      SELECT 1
+                      FROM shell_identifier si
+                      JOIN shell_identifier_external_subject_reference sies
+                           ON sies.fk_shell_identifier_external_subject_id = si.id
+                      JOIN shell_identifier_external_subject_reference_key sider
+                           ON sider.fk_si_external_subject_reference_id = sies.id
+                      WHERE si.fk_shell_id = s.id
+                        AND (
+                            sider.ref_key_value = :tenantId
+                            OR (
+                                sider.ref_key_value = :publicWildcardPrefix
+                                AND si.namespace IN (:publicWildcardAllowedTypes)
+                            )
+                        )
+                  )
+              )
+            ORDER BY s.id DESC, s.created_date DESC
+        """,
+           countQuery = """
+         SELECT COUNT(*)
+           FROM (
+               SELECT s.id
+               FROM shell s
+               WHERE s.created_date < :cursorCreatedDate
+                 AND (
+                     :tenantId IS NULL
+                     OR :tenantId = :owningTenantId
+                     OR EXISTS (
+                         SELECT 1
+                         FROM shell_identifier si
+                         JOIN shell_identifier_external_subject_reference sies
+                              ON sies.fk_shell_identifier_external_subject_id = si.id
+                         JOIN shell_identifier_external_subject_reference_key sider
+                              ON sider.fk_si_external_subject_reference_id = sies.id
+                         WHERE si.fk_shell_id = s.id
+                           AND (
+                               sider.ref_key_value = :tenantId
+                               OR (
+                                   sider.ref_key_value = :publicWildcardPrefix
+                                   AND si.namespace IN (:publicWildcardAllowedTypes)
+                               )
+                           )
+                     )
+                 )
+           ) AS shell_count
+        """,
+           nativeQuery = true
+   )
+   Page<Shell> findAllByExternalSubjectIdDescending(
+           @Param("tenantId") String tenantId,
+           @Param("owningTenantId") String owningTenantId,
+           @Param("publicWildcardPrefix") String publicWildcardPrefix,
+           @Param("publicWildcardAllowedTypes") List<String> publicWildcardAllowedTypes,
+           @Param("cursorCreatedDate") Instant cursorCreatedDate,
+           Pageable pageable
+   );
+
    /**
     * Returns external shell ids for the given keyValueCombinations.
     * External shell ids that match any keyValueCombinations are returned.

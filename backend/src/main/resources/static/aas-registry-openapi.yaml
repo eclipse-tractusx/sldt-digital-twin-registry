@@ -100,6 +100,13 @@ paths:
           schema:
             type: string
             format: date-time
+        - name: sortDirection
+          in: query
+          description: "Non-standard extension. Sort order by the shell's creation timestamp: ASC (oldest first, the default) or DESC (newest first)."
+          required: false
+          schema:
+            type: string
+            default: ASC
       responses:
         "200":
           description: Requested Asset Administration Shell Descriptors

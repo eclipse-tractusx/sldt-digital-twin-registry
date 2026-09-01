@@ -281,15 +281,38 @@ class LegacyShellServiceTest {
             .toList();
       createdIds.forEach( id -> createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue ) );
 
-      ShellCollectionDto page1 = shellService.findAllShells( 2, null, TENANT_TWO, null );
+      ShellCollectionDto page1 = shellService.findAllShells( 2, null, TENANT_TWO, null, "ASC" );
       assertThat( page1.getItems() ).isNotEmpty();
       assertThat( page1.getCursor() ).as( "cursor must be present when more shells exist" ).isNotNull();
 
-      ShellCollectionDto page2 = shellService.findAllShells( 2, page1.getCursor(), TENANT_TWO, null );
+      ShellCollectionDto page2 = shellService.findAllShells( 2, page1.getCursor(), TENANT_TWO, null, "ASC" );
 
       Set<String> page1Ids = page1.getItems().stream().map( Shell::getIdExternal ).collect( Collectors.toSet() );
       Set<String> page2Ids = page2.getItems().stream().map( Shell::getIdExternal ).collect( Collectors.toSet() );
       assertThat( page1Ids ).doesNotContainAnyElementsOf( page2Ids );
+   }
+
+   @Test
+   void testsFindAllShellsSortDirectionDescendingReturnsNewestFirst() {
+      String specificAssetIdName = keyPrefix + "key";
+      String specificAssetIdValue = "value";
+      List<String> createdIds = IntStream.range( 0, 3 )
+            .mapToObj( i -> UuidCreator.getTimeOrderedEpoch().toString() )
+            .toList();
+      createdIds.forEach( id -> createShellWithIdAndSpecificAssetIds( id, specificAssetIdName, specificAssetIdValue ) );
+
+      // DESC (newest-first): among our three shells the most recently created (index 2)
+      // must precede the older ones; robust to other shells in the store.
+      List<String> desc = shellService.findAllShells( 1000, null, TENANT_TWO, null, "DESC" )
+            .getItems().stream().map( Shell::getIdExternal ).toList();
+      assertThat( desc.indexOf( createdIds.get( 2 ) ) ).isGreaterThanOrEqualTo( 0 );
+      assertThat( desc.indexOf( createdIds.get( 2 ) ) ).isLessThan( desc.indexOf( createdIds.get( 1 ) ) );
+      assertThat( desc.indexOf( createdIds.get( 1 ) ) ).isLessThan( desc.indexOf( createdIds.get( 0 ) ) );
+
+      // ASC (default) is the reverse order.
+      List<String> asc = shellService.findAllShells( 1000, null, TENANT_TWO, null, "ASC" )
+            .getItems().stream().map( Shell::getIdExternal ).toList();
+      assertThat( asc.indexOf( createdIds.get( 0 ) ) ).isLessThan( asc.indexOf( createdIds.get( 2 ) ) );
    }
 
    @Test
