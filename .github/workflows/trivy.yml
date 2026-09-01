@@ -82,7 +82,7 @@ jobs:
           
       - name: Build JAR
         run: mvn clean package
-        
+
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 #v0.36.0
         with:
@@ -94,6 +94,7 @@ jobs:
           hide-progress: false
           exit-code: "1" # Trivy exits with code 1 if vulnerabilities are found, causing the workflow step to fail.
           vuln-type: "os,library"
+          trivyignores: ".trivyignore"
           limit-severities-for-sarif: true
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 #v4.37.3
