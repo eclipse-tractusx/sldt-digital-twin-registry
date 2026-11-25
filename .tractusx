@@ -25,3 +25,9 @@ repositories:
   - name: "sldt-digital-twin-registry"
     usage: "This is the repository which contains the source code for the SLDT digital twin registry"
     url: "https://github.com/eclipse-tractusx/sldt-digital-twin-registry.git"
+
+# The E2E test of this product (proposed field, see the draft TRG).
+e2eTests:
+  - name: "Digital Twin Registry E2E test"
+    path: "tck/e2e"
+    workflow: ".github/workflows/e2e-test.yml"

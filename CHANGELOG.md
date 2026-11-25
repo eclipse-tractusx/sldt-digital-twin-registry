@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+### Added
+- E2E test of the registry in a running dataspace: a TCK project in `tck/e2e`, run on every pull request by `.github/workflows/e2e-test.yml` and linked in `.tractusx`
+### Changed
+### Fixed
+
 ## 0.13.0
 ### Added
 ### Changed
